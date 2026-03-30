@@ -1588,7 +1588,7 @@ async function startExport(){
   for(const t of S.tracks)for(const c of t.clips){if(c.type==='video'||c.type==='audio')videoClips.push({...c,track:t});}
   if(!videoClips.length&&S.expFmt==='mp4'){toast('請先加入影片素材','err');return;}
   S.processing=true;
-  document.getElementById('progWrap').style.display='';
+  document.getElementById('progWrap').style.display='block';
   document.getElementById('expBtn').disabled=true;
   document.getElementById('progFill').style.width='0%';
   document.getElementById('progLbl').textContent='準備中…';
@@ -1615,6 +1615,8 @@ async function startExport(){
           const data=ffmpeg.FS('readFile','output.mp4');
           download(data.buffer,'video/mp4',(document.getElementById('expName').value||'output')+'.mp4');
         }
+        document.getElementById('progFill').style.width='100%';
+        document.getElementById('progLbl').textContent='✓ 匯出完成！';
         toast('匯出完成！','ok');
       }
     } else if(S.expFmt==='mp3'){
@@ -1627,12 +1629,19 @@ async function startExport(){
           await ffmpeg.run('-i','audio_in','-ar','44100','-ac','2','-b:a','192k','-y','output.mp3');
           const data=ffmpeg.FS('readFile','output.mp3');
           download(data.buffer,'audio/mpeg',(document.getElementById('expName').value||'output')+'.mp3');
+          document.getElementById('progFill').style.width='100%';
+          document.getElementById('progLbl').textContent='✓ MP3 匯出完成！';
           toast('MP3 匯出完成！','ok');
         }
       }
     }
   }catch(e){toast('匯出失敗：'+e.message,'err');document.getElementById('progLbl').textContent='匯出失敗';}
-  finally{S.processing=false;document.getElementById('expBtn').disabled=false;}
+  finally{
+    S.processing=false;
+    document.getElementById('expBtn').disabled=false;
+    // Keep bar visible after done so user can see 100%; hide after 2s
+    setTimeout(()=>{document.getElementById('progWrap').style.display='none';},2000);
+  }
 }
 function download(buffer,mime,filename){const blob=new Blob([buffer],{type:mime});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();}
 
