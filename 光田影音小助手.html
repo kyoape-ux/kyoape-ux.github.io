@@ -470,6 +470,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     <div class="tt-sep"></div>
     <span class="tl-time" id="tlTime">0:00.000</span>
     <div style="margin-left:auto;display:flex;gap:2px;align-items:center">
+      <button class="tt on" id="tt-snap" title="吸附對齊 (N)" onclick="toggleSnap()" style="font-size:9px;font-weight:700;width:32px">磁吸</button>
+      <div class="tt-sep"></div>
       <span style="font-size:10px;color:var(--text3)">縮放</span>
       <button class="tt" onclick="changeZoom(-15)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
       <button class="tt" onclick="changeZoom(15)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
@@ -608,7 +610,7 @@ function setTool(t){
   const cur=t==='cut'?'crosshair':t==='del'?'cell':'default';
   document.getElementById('tlScroll').style.cursor=cur;
 }
-document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;if(e.key==='v'||e.key==='V')setTool('select');if(e.key==='c'||e.key==='C')setTool('cut');if(e.key==='d'||e.key==='D')setTool('del');if(e.key==='s'||e.key==='S')splitAllAtPlayhead();if(e.key===' '){e.preventDefault();togglePlay();}if((e.key==='Delete'||e.key==='Backspace')&&S.selClip)deleteSelectedClip();if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undo();}if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='Z'){e.preventDefault();redo();}});
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;if(e.key==='v'||e.key==='V')setTool('select');if(e.key==='c'||e.key==='C')setTool('cut');if(e.key==='d'||e.key==='D')setTool('del');if(e.key==='n'||e.key==='N')toggleSnap();if(e.key==='s'||e.key==='S')splitAllAtPlayhead();if(e.key===' '){e.preventDefault();togglePlay();}if((e.key==='Delete'||e.key==='Backspace')&&S.selClip)deleteSelectedClip();if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undo();}if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='Z'){e.preventDefault();redo();}});
 function splitAllAtPlayhead(){saveU();let cut=false;for(const t of S.tracks){const clipsSnap=[...t.clips];for(const cl of clipsSnap){if(S.currentTime>cl.start+0.1&&S.currentTime<cl.start+cl.duration-0.1){const d1=S.currentTime-cl.start,d2=cl.start+cl.duration-S.currentTime;const clip2={...cl,id:uid(),start:S.currentTime,duration:d2,sourceOffset:(cl.sourceOffset||0)+d1};cl.duration=d1;const idx=t.clips.indexOf(cl);t.clips.splice(idx+1,0,clip2);cut=true;}}}if(cut){renderAll();toast('已分割所有軌道','info');}}
 
 /* ===== CANVAS SIZE ===== */
@@ -1046,6 +1048,37 @@ function e_drop(e,tid){
   dragAssetId=null;
 }
 
+/* ===== SNAP-TO-GRID ===== */
+const SNAP_THRESH=0.15; // seconds
+let snapEnabled=true;
+
+/* Collect all snap points: clip start/end edges + playhead + t=0 */
+function getSnapPoints(excludeId){
+  const pts=[0,S.currentTime];
+  for(const t of S.tracks)for(const cl of t.clips){
+    if(cl.id===excludeId)continue;
+    pts.push(cl.start,cl.start+cl.duration);
+  }
+  return pts;
+}
+
+/* Snap a time value to nearest snap point within threshold */
+function snapTime(t,excludeId){
+  if(!snapEnabled)return t;
+  const pts=getSnapPoints(excludeId);
+  let best=t,bestDist=SNAP_THRESH;
+  for(const p of pts){const d=Math.abs(t-p);if(d<bestDist){bestDist=d;best=p;}}
+  return best;
+}
+
+/* Visual snap indicator line on the timeline */
+function showSnapLine(t){
+  let line=document.getElementById('snapLine');
+  if(!line){line=document.createElement('div');line.id='snapLine';line.style.cssText='position:absolute;top:0;bottom:0;width:1px;background:rgba(19,160,125,.8);z-index:9;pointer-events:none;';document.getElementById('tlInner').appendChild(line);}
+  line.style.left=(t*S.zoom)+'px';line.style.display='block';
+}
+function hideSnapLine(){const l=document.getElementById('snapLine');if(l)l.style.display='none';}
+
 /* ===== CLIP INTERACTION ===== */
 let dragState=null;
 function onClipMouseDown(e,cid){
@@ -1060,26 +1093,42 @@ function onClipMouseDown(e,cid){
     if(!dragState)return;
     const dx=ev.clientX-dragState.startX;
     const c=findClip(dragState.cid);if(!c)return;
-    c.start=Math.max(0,dragState.startStart+dx/S.zoom);
+    const raw=Math.max(0,dragState.startStart+dx/S.zoom);
+    const snapped=snapTime(raw,dragState.cid);
+    // Also snap end edge
+    const endSnapped=snapTime(raw+c.duration,dragState.cid);
+    const useSnap=Math.abs(snapped-raw)<Math.abs(endSnapped-c.duration-raw)?snapped:endSnapped-c.duration;
+    c.start=Math.max(0,useSnap);
+    if(c.start!==raw)showSnapLine(c.start);else hideSnapLine();
     renderTimeline();
   };
   const onUp=()=>{
     if(dragState)saveU();
-    dragState=null;
+    dragState=null;hideSnapLine();
     document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);
   };
   document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
 }
 function onClipResize(e,cid,isRight){
   e.preventDefault();const cl=findClip(cid);if(!cl)return;
-  const startX=e.clientX,startVal=isRight?cl.duration:cl.start,startDur=cl.duration,startStart=cl.start;
+  const startX=e.clientX,startDur=cl.duration,startStart=cl.start;
   const onMove=ev=>{
     const dx=(ev.clientX-startX)/S.zoom;
-    if(isRight){cl.duration=Math.max(0.1,startDur+dx);}
-    else{const ns=Math.max(0,Math.min(startStart+dx,startStart+startDur-0.1));const dd=startStart+startDur-ns;cl.start=ns;cl.duration=dd;}
+    if(isRight){
+      const rawEnd=startStart+startDur+dx;
+      const snapped=snapTime(rawEnd,cid);
+      cl.duration=Math.max(0.1,snapped-startStart);
+      if(snapped!==rawEnd)showSnapLine(snapped);else hideSnapLine();
+    }else{
+      const rawStart=Math.max(0,startStart+dx);
+      const snapped=snapTime(rawStart,cid);
+      const ns=Math.max(0,Math.min(snapped,startStart+startDur-0.1));
+      cl.duration=startStart+startDur-ns;cl.start=ns;
+      if(snapped!==rawStart)showSnapLine(snapped);else hideSnapLine();
+    }
     renderTimeline();
   };
-  const onUp=()=>{saveU();document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);};
+  const onUp=()=>{saveU();hideSnapLine();document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);};
   document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
 }
 
@@ -1516,6 +1565,7 @@ function seekToStart(){S.currentTime=0;S.playing=false;syncAudioClips(false);doc
 function seekToEnd(){S.currentTime=getProjectDuration();S.playing=false;syncAudioClips(false);document.getElementById('playIco').innerHTML='<polygon points="5,3 19,12 5,21"/>';updatePlayhead();renderPreview();}
 function toggleFullscreen(){const el=document.getElementById('previewArea');if(!document.fullscreenElement)el.requestFullscreen();else document.exitFullscreen();}
 function changeZoom(d){S.zoom=Math.max(20,Math.min(300,S.zoom+d));renderTimeline();}
+function toggleSnap(){snapEnabled=!snapEnabled;document.getElementById('tt-snap').classList.toggle('on',snapEnabled);toast(snapEnabled?'磁吸對齊已開啟':'磁吸對齊已關閉','info');}
 
 /* ===== RECORDING ===== */
 let mediaRec=null,recChunks=[],recInterval=null,recStart=0,recStream=null;
