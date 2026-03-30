@@ -528,54 +528,55 @@ textarea.input{resize:vertical;min-height:60px}
 <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
 <script>
 // ==================== COOP/COEP Service Worker for GitHub Pages ====================
-// SharedArrayBuffer requires Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers.
-// GitHub Pages doesn't allow custom headers, so we use a Service Worker to inject them.
+// Uses a separate coi-serviceworker.js file (proven to work on GitHub Pages).
+// The SW intercepts all fetches and injects COOP/COEP headers so SharedArrayBuffer
+// becomes available for FFmpeg.wasm.
 (function() {
-  const SW_CODE = `
-    self.addEventListener('install', () => self.skipWaiting());
-    self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-    self.addEventListener('fetch', (e) => {
-      if (e.request.cache === 'only-if-cached' && e.request.mode !== 'same-origin') return;
-      e.respondWith(
-        fetch(e.request).then((r) => {
-          if (r.status === 0) return r;
-          const h = new Headers(r.headers);
-          h.set('Cross-Origin-Opener-Policy', 'same-origin');
-          h.set('Cross-Origin-Embedder-Policy', 'credentialless');
-          return new Response(r.body, { status: r.status, statusText: r.statusText, headers: h });
-        }).catch((err) => new Response('Service Worker fetch error', { status: 500 }))
-      );
-    });
-  `;
+  if (!('serviceWorker' in navigator)) return;
 
-  if ('serviceWorker' in navigator) {
-    // Check if SharedArrayBuffer is already available (server provides headers)
-    if (typeof SharedArrayBuffer !== 'undefined') {
-      console.log('[COOP/COEP] SharedArrayBuffer already available.');
-    } else {
-      // Register a service worker to inject headers
-      const blob = new Blob([SW_CODE], { type: 'application/javascript' });
-      const swURL = URL.createObjectURL(blob);
-      navigator.serviceWorker.register(swURL, { scope: window.location.pathname }).then((reg) => {
-        console.log('[COOP/COEP] Service Worker registered, reloading to enable SharedArrayBuffer...');
-        if (reg.active && !navigator.serviceWorker.controller) {
-          // SW is active but page isn't controlled yet — reload
-          window.location.reload();
-        } else if (!reg.active) {
-          reg.addEventListener('updatefound', () => {
-            const newWorker = reg.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'activated') {
-                window.location.reload();
-              }
-            });
-          });
-        }
-      }).catch((err) => {
-        console.warn('[COOP/COEP] Service Worker registration failed:', err);
-      });
-    }
+  if (typeof SharedArrayBuffer !== 'undefined') {
+    // Headers already present (e.g. local dev server with COOP/COEP)
+    console.log('[COI] SharedArrayBuffer already available.');
+    return;
   }
+
+  // Resolve the SW path relative to this page
+  const swPath = (function() {
+    const s = document.currentScript;
+    if (s) {
+      const base = s.src ? new URL('.', s.src).pathname : location.pathname;
+      return base.replace(/\/$/, '') + '/coi-serviceworker.js';
+    }
+    return '/coi-serviceworker.js';
+  })();
+
+  navigator.serviceWorker.register(swPath)
+    .then(reg => {
+      console.log('[COI] SW registered:', reg.scope);
+
+      // Helper: reload once SW is controlling
+      function reloadWhenReady(worker) {
+        worker.addEventListener('statechange', () => {
+          if (worker.state === 'activated') {
+            console.log('[COI] SW activated — reloading for cross-origin isolation.');
+            window.location.reload();
+          }
+        });
+      }
+
+      if (reg.installing) {
+        reloadWhenReady(reg.installing);
+      } else if (reg.waiting) {
+        reloadWhenReady(reg.waiting);
+      } else if (reg.active) {
+        // SW is active but this page isn't controlled yet
+        if (!navigator.serviceWorker.controller) {
+          console.log('[COI] SW active but not controlling — reloading.');
+          window.location.reload();
+        }
+      }
+    })
+    .catch(err => console.warn('[COI] SW registration failed:', err));
 })();
 
 // ==================== State ====================
