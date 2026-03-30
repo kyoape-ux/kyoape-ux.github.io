@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光田影音小助手</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#0F6E56;--primary-light:#13a07d;--primary-dark:#0a4e3d;
+  --bg:#111318;--bg2:#1a1d24;--bg3:#22262f;--bg4:#2a2f3a;
+  --text:#e8eaed;--text2:#9aa0a6;--text3:#5f6368;
+  --border:#333840;--danger:#e74c3c;--warn:#f39c12;--success:#27ae60;
+  --radius:10px;--shadow:0 4px 24px rgba(0,0,0,.4);
+}
+html{font-size:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+a{color:var(--primary-light);text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit;color:var(--text)}
+
+/* Layout */
+.app-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.app-logo{width:36px;height:36px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff}
+.app-title{font-size:18px;font-weight:700;color:var(--text)}
+.app-title span{color:var(--primary-light)}
+.app-subtitle{font-size:12px;color:var(--text2)}
+
+.main-container{display:flex;height:calc(100vh - 61px)}
+.sidebar{width:260px;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0}
+.sidebar-nav{padding:12px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius);color:var(--text2);font-size:13px;cursor:pointer;transition:.2s;margin-bottom:2px}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--primary-dark);color:#fff}
+.nav-item .icon{width:20px;text-align:center;font-size:16px}
+.nav-item .badge{margin-left:auto;background:var(--primary);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px}
+
+.content{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px}
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.panel-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
+.panel-header .icon{color:var(--primary-light)}
+.panel-body{padding:18px}
+
+/* Upload Area */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:48px 24px;text-align:center;cursor:pointer;transition:.3s;position:relative}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--primary-light);background:rgba(15,110,86,.08)}
+.upload-zone .icon{font-size:48px;color:var(--primary-light);margin-bottom:12px}
+.upload-zone h3{font-size:16px;margin-bottom:6px}
+.upload-zone p{color:var(--text2);font-size:12px}
+.upload-zone input{display:none}
+
+/* Video Preview */
+.video-container{position:relative;background:#000;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;max-height:420px}
+.video-container video{width:100%;height:100%;object-fit:contain}
+.video-controls{display:flex;align-items:center;gap:12px;padding:12px 0}
+.btn-icon{width:36px;height:36px;border:none;border-radius:8px;background:var(--bg3);color:var(--text);display:flex;align-items:center;justify-content:center;font-size:16px;transition:.2s}
+.btn-icon:hover{background:var(--primary)}
+.time-display{font-size:12px;color:var(--text2);font-variant-numeric:tabular-nums;min-width:100px}
+
+/* Range Sliders */
+.trim-slider-container{padding:8px 0}
+.range-track{position:relative;height:40px;background:var(--bg3);border-radius:6px;margin:8px 0;overflow:hidden;cursor:pointer}
+.range-fill{position:absolute;top:0;height:100%;background:rgba(15,110,86,.3)}
+.range-thumb{position:absolute;top:0;width:12px;height:100%;cursor:ew-resize;z-index:2}
+.range-thumb::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:4px;height:24px;background:var(--primary-light);border-radius:2px}
+.range-thumb.left{border-right:2px solid var(--primary-light)}
+.range-thumb.right{border-left:2px solid var(--primary-light)}
+.trim-times{display:flex;justify-content:space-between;font-size:12px;color:var(--text2)}
+.waveform-canvas{width:100%;height:40px;border-radius:6px}
+
+/* Form Controls */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:500}
+.form-row{display:flex;gap:12px;align-items:flex-end}
+.form-row .form-group{flex:1}
+.input{width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none;transition:.2s}
+.input:focus{border-color:var(--primary-light)}
+select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239aa0a6'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+textarea.input{resize:vertical;min-height:60px}
+.input-range{-webkit-appearance:none;width:100%;height:6px;background:var(--bg4);border-radius:3px;outline:none}
+.input-range::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--primary-light);border-radius:50%;cursor:pointer}
+
+.btn{padding:8px 18px;border:none;border-radius:6px;font-size:13px;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-light)}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--bg4)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#c0392b}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-lg{padding:12px 28px;font-size:15px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* Watermark */
+.watermark-preview{position:relative;background:#000;border-radius:var(--radius);aspect-ratio:16/9;overflow:hidden;margin-bottom:14px}
+.watermark-preview img.bg{width:100%;height:100%;object-fit:contain}
+.watermark-preview .wm{position:absolute;cursor:move;user-select:none}
+.watermark-preview .wm img{width:100%;height:100%;object-fit:contain}
+.position-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:200px}
+.pos-btn{padding:8px;border:1px solid var(--border);border-radius:4px;background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;text-align:center;transition:.2s}
+.pos-btn:hover,.pos-btn.active{border-color:var(--primary-light);color:var(--primary-light);background:rgba(15,110,86,.15)}
+
+/* Subtitle List */
+.subtitle-list{max-height:300px;overflow-y:auto}
+.subtitle-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border-radius:6px;margin-bottom:8px}
+.subtitle-item .time{font-size:11px;color:var(--primary-light);font-variant-numeric:tabular-nums;min-width:100px}
+.subtitle-item .text{flex:1;font-size:13px}
+.subtitle-item .actions{display:flex;gap:4px}
+
+/* Intro/Outro Templates */
+.template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.template-card{border:2px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:.2s}
+.template-card:hover{border-color:var(--primary-light)}
+.template-card.selected{border-color:var(--primary-light);box-shadow:0 0 0 1px var(--primary-light)}
+.template-thumb{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:12px;padding:12px;text-align:center}
+.template-card .name{padding:8px;font-size:12px;text-align:center;border-top:1px solid var(--border);background:var(--bg2)}
+
+/* Export */
+.export-options{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.quality-card{padding:16px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:.2s;text-align:center}
+.quality-card:hover{border-color:var(--primary-light)}
+.quality-card.selected{border-color:var(--primary-light);background:rgba(15,110,86,.1)}
+.quality-card h4{font-size:14px;margin-bottom:4px}
+.quality-card p{font-size:11px;color:var(--text2)}
+
+/* Progress */
+.progress-bar{width:100%;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-light));border-radius:4px;transition:width .3s;width:0%}
+.progress-text{font-size:12px;color:var(--text2);margin-top:6px;text-align:center}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);width:90%;max-width:500px;box-shadow:var(--shadow)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-body{padding:20px}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+
+/* Status */
+.status-bar{background:var(--bg2);border-top:1px solid var(--border);padding:8px 24px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:12px;position:sticky;bottom:0}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--success)}
+.status-dot.idle{background:var(--text3)}
+.status-dot.processing{background:var(--warn);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* Toast */
+.toast-container{position:fixed;top:80px;right:24px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{padding:12px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);font-size:13px;display:flex;align-items:center;gap:10px;animation:slideIn .3s ease}
+.toast.success{border-left:3px solid var(--success)}
+.toast.error{border-left:3px solid var(--danger)}
+.toast.info{border-left:3px solid var(--primary-light)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+
+/* Responsive */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main-container{height:auto}
+  .content{padding:16px}
+}
+
+/* Hidden sections */
+.section{display:none}
+.section.active{display:flex;flex-direction:column;gap:20px}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-logo">光</div>
+  <div>
+    <div class="app-title"><span>光田</span>影音小助手</div>
+    <div class="app-subtitle">Kuang Tien Video Tool — Browser-based, No Upload Needed</div>
+  </div>
+  <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+    <span id="ffmpegStatus" style="font-size:11px;color:var(--text3)">FFmpeg 載入中...</span>
+  </div>
+</header>
+
+<div class="main-container">
+  <nav class="sidebar">
+    <div class="sidebar-nav">
+      <div class="nav-item active" data-section="upload" onclick="switchSection('upload')">
+        <span class="icon">📁</span> 上傳影片
+      </div>
+      <div class="nav-item" data-section="trim" onclick="switchSection('trim')">
+        <span class="icon">✂️</span> 剪輯裁切
+      </div>
+      <div class="nav-item" data-section="watermark" onclick="switchSection('watermark')">
+        <span class="icon">🏷️</span> 浮水印
+      </div>
+      <div class="nav-item" data-section="subtitle" onclick="switchSection('subtitle')">
+        <span class="icon">💬</span> 字幕/標題
+        <span class="badge" id="subtitleCount" style="display:none">0</span>
+      </div>
+      <div class="nav-item" data-section="intros" onclick="switchSection('intros')">
+        <span class="icon">🎬</span> 片頭片尾
+      </div>
+      <div class="nav-item" data-section="export" onclick="switchSection('export')">
+        <span class="icon">📤</span> 匯出
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+
+    <!-- UPLOAD SECTION -->
+    <div class="section active" id="sec-upload">
+      <div class="panel">
+        <div class="panel-header"><span class="icon">📁</span> 上傳影片檔案</div>
+        <div class="panel-body">
+          <div class="upload-zone" id="uploadZone">
+            <div class="icon">🎥</div>
+            <h3>拖放影片檔案到此處</h3>
+            <p>或點擊選擇檔案（支援 MP4、MOV，建議 500MB 以下）</p>
+            <input type="file" id="videoInput" accept="video/mp4,video/quicktime,.mp4,.mov">
+          </div>
+          <div id="videoInfo" style="display:none;margin-top:14px">
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <div class="panel" style="flex:1;min-width:150px"><div class="panel-body" style="padding:10px 14px"><div style="font-size:11px;color:var(--text2)">檔案名稱</div><div id="infoName" style="font-size:13px;margin-top:2px">-</div></div></div>
+              <div class="panel" style="flex:1;min-width:150px"><div class="panel-body" style="padding:10px 14px"><div style="font-size:11px;color:var(--text2)">檔案大小</div><div id="infoSize" style="font-size:13px;margin-top:2px">-</div></div></div>
+              <div class="panel" style="flex:1;min-width:150px"><div class="panel-body" style="padding:10px 14px"><div style="font-size:11px;color:var(--text2)">影片長度</div><div id="infoDuration" style="font-size:13px;margin-top:2px">-</div></div></div>
+              <div class="panel" style="flex:1;min-width:150px"><div class="panel-body" style="padding:10px 14px"><div style="font-size:11px;color:var(--text2)">解析度</div><div id="infoRes" style="font-size:13px;margin-top:2px">-</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel" id="previewPanel" style="display:none">
+        <div class="panel-header"><span class="icon">▶️</span> 預覽</div>
+        <div class="panel-body">
+          <div class="video-container">
+            <video id="videoPlayer" playsinline></video>
+          </div>
+          <div class="video-controls">
+            <button class="btn-icon" onclick="togglePlay()" id="playBtn">▶</button>
+            <span class="time-display"><span id="currentTime">00:00.0</span> / <span id="totalTime">00:00.0</span></span>
+            <input type="range" class="input-range" id="seekBar" min="0" max="1000" value="0" style="flex:1" oninput="seekVideo(this.value)">
+            <button class="btn-icon" onclick="videoPlayer.muted=!videoPlayer.muted;this.textContent=videoPlayer.muted?'🔇':'🔊'">🔊</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRIM SECTION -->
+    <div class="section" id="sec-trim">
+      <div class="panel">
+        <div class="panel-header"><span class="icon">✂️</span> 剪頭剪尾</div>
+        <div class="panel-body">
+          <div id="trimNoVideo" style="color:var(--text2);text-align:center;padding:24px">請先上傳影片</div>
+          <div id="trimControls" style="display:none">
+            <div class="video-container" style="max-height:280px;margin-bottom:14px">
+              <video id="trimPreview" playsinline muted></video>
+            </div>
+            <div class="trim-slider-container">
+              <label style="font-size:12px;color:var(--text2);margin-bottom:6px;display:block">拖動綠色把手設定起止點</label>
+              <div class="range-track" id="trimTrack">
+                <div class="range-fill" id="trimFill"></div>
+                <div class="range-thumb left" id="trimLeft"></div>
+                <div class="range-thumb right" id="trimRight"></div>
+              </div>
+              <div class="trim-times">
+                <span>起點: <strong id="trimInTime">00:00.0</strong></span>
+                <span>終點: <strong id="trimOutTime">00:00.0</strong></span>
+                <span>片段長度: <strong id="trimDuration">00:00.0</strong></span>
+              </div>
+            </div>
+            <div class="form-row" style="margin-top:12px">
+              <div class="form-group">
+                <label>起點 (秒)</label>
+                <input type="number" class="input" id="trimInSec" min="0" step="0.1" value="0" onchange="setTrimFromInput()">
+              </div>
+              <div class="form-group">
+                <label>終點 (秒)</label>
+                <input type="number" class="input" id="trimOutSec" min="0" step="0.1" value="0" onchange="setTrimFromInput()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WATERMARK SECTION -->
+    <div class="section" id="sec-watermark">
+      <div class="panel">
+        <div class="panel-header"><span class="icon">🏷️</span> 浮水印設定</div>
+        <div class="panel-body">
+          <div id="wmNoVideo" style="color:var(--text2);text-align:center;padding:24px">請先上傳影片</div>
+          <div id="wmControls" style="display:none">
+            <div class="watermark-preview" id="wmPreview">
+              <canvas id="wmCanvas" style="width:100%;height:100%"></canvas>
+            </div>
+            <div class="form-group">
+              <label>上傳 Logo (PNG)</label>
+              <input type="file" id="logoInput" accept="image/png,.png" class="input" style="padding:6px">
+            </div>
+            <div id="wmSettings" style="display:none">
+              <div class="form-group">
+                <label>位置</label>
+                <div class="position-grid">
+                  <div class="pos-btn" data-pos="top-left" onclick="setWmPos(this)">左上</div>
+                  <div class="pos-btn" data-pos="top-center" onclick="setWmPos(this)">上中</div>
+                  <div class="pos-btn" data-pos="top-right" onclick="setWmPos(this)">右上</div>
+                  <div class="pos-btn" data-pos="mid-left" onclick="setWmPos(this)">左中</div>
+                  <div class="pos-btn" data-pos="mid-center" onclick="setWmPos(this)">中央</div>
+                  <div class="pos-btn" data-pos="mid-right" onclick="setWmPos(this)">右中</div>
+                  <div class="pos-btn active" data-pos="bot-left" onclick="setWmPos(this)">左下</div>
+                  <div class="pos-btn" data-pos="bot-center" onclick="setWmPos(this)">下中</div>
+                  <div class="pos-btn" data-pos="bot-right" onclick="setWmPos(this)">右下</div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>透明度: <span id="wmOpacityVal">70</span>%</label>
+                  <input type="range" class="input-range" id="wmOpacity" min="10" max="100" value="70" oninput="updateWmPreview()">
+                </div>
+                <div class="form-group">
+                  <label>大小: <span id="wmSizeVal">15</span>%</label>
+                  <input type="range" class="input-range" id="wmSize" min="5" max="50" value="15" oninput="updateWmPreview()">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>邊距 (px)</label>
+                <input type="number" class="input" id="wmMargin" value="20" min="0" max="200" style="width:100px" onchange="updateWmPreview()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBTITLE SECTION -->
+    <div class="section" id="sec-subtitle">
+      <div class="panel">
+        <div class="panel-header"><span class="icon">💬</span> 字幕 / 標題卡</div>
+        <div class="panel-body">
+          <div id="subNoVideo" style="color:var(--text2);text-align:center;padding:24px">請先上傳影片</div>
+          <div id="subControls" style="display:none">
+            <div class="form-row" style="align-items:flex-end">
+              <div class="form-group">
+                <label>開始 (秒)</label>
+                <input type="number" class="input" id="subStart" min="0" step="0.1" value="0">
+              </div>
+              <div class="form-group">
+                <label>結束 (秒)</label>
+                <input type="number" class="input" id="subEnd" min="0" step="0.1" value="3">
+              </div>
+              <div class="form-group" style="flex:3">
+                <label>文字內容</label>
+                <input type="text" class="input" id="subText" placeholder="輸入字幕文字...">
+              </div>
+              <button class="btn btn-primary" onclick="addSubtitle()">新增</button>
+            </div>
+            <div class="form-row" style="margin-top:8px">
+              <div class="form-group">
+                <label>字體大小</label>
+                <select class="input" id="subFontSize">
+                  <option value="24">小 (24px)</option>
+                  <option value="36" selected>中 (36px)</option>
+                  <option value="48">大 (48px)</option>
+                  <option value="64">特大 (64px)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>字體顏色</label>
+                <input type="color" class="input" id="subColor" value="#ffffff" style="height:34px;padding:2px">
+              </div>
+              <div class="form-group">
+                <label>位置</label>
+                <select class="input" id="subPosition">
+                  <option value="bottom">底部</option>
+                  <option value="top">頂部</option>
+                  <option value="center">中央</option>
+                </select>
+              </div>
+            </div>
+            <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
+            <div class="subtitle-list" id="subtitleList">
+              <div style="color:var(--text3);text-align:center;padding:16px;font-size:13px">尚未新增字幕</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTRO/OUTRO SECTION -->
+    <div class="section" id="sec-intros">
+      <div class="panel">
+        <div class="panel-header"><span class="icon">🎬</span> 片頭設定</div>
+        <div class="panel-body">
+          <div class="template-grid" id="introTemplates">
+            <div class="template-card" onclick="selectTemplate('intro','none',this)">
+              <div class="template-thumb" style="background:var(--bg3);color:var(--text3)">無片頭</div>
+              <div class="name">不使用</div>
+            </div>
+            <div class="template-card" onclick="selectTemplate('intro','black-text',this)">
+              <div class="template-thumb" style="background:#000;color:#fff">光田綜合醫院<br><span style="font-size:10px;color:#aaa">黑底白字</span></div>
+              <div class="name">黑底文字</div>
+            </div>
+            <div class="template-card" onclick="selectTemplate('intro','green-fade',this)">
+              <div class="template-thumb" style="background:linear-gradient(135deg,#0a4e3d,#13a07d);color:#fff">光田綜合醫院<br><span style="font-size:10px;color:rgba(255,255,255,.7)">漸層綠底</span></div>
+              <div class="name">光田綠底</div>
+            </div>
+            <div class="template-card" onclick="selectTemplate('intro','minimal',this)">
+              <div class="template-thumb" style="background:#1a1a1a;color:var(--primary-light);font-size:11px">光 田<br>Kuang Tien</div>
+              <div class="name">極簡風</div>
+            </div>
+          </div>
+          <div id="introSettings" style="display:none;margin-top:14px">
+            <div class="form-row">
+              <div class="form-group" style="flex:2">
+                <label>標題文字</label>
+                <input type="text" class="input" id="introTitle" value="光田綜合醫院" placeholder="標題文字">
+              </div>
+              <div class="form-group">
+                <label>副標題</label>
+                <input type="text" class="input" id="introSubtitle" value="" placeholder="副標題（選填）">
+              </div>
+              <div class="form-group">
+                <label>秒數</label>
+                <input type="number" class="input" id="introDuration" value="3" min="1" max="10">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="icon">🎬</span> 片尾設定</div>
+        <div class="panel-body">
+          <div class="template-grid" id="outroTemplates">
+            <div class="template-card" onclick="selectTemplate('outro','none',this)">
+              <div class="template-thumb" style="background:var(--bg3);color:var(--text3)">無片尾</div>
+              <div class="name">不使用</div>
+            </div>
+            <div class="template-card" onclick="selectTemplate('outro','black-text',this)">
+              <div class="template-thumb" style="background:#000;color:#fff">感謝觀看<br><span style="font-size:10px;color:#aaa">黑底白字</span></div>
+              <div class="name">黑底文字</div>
+            </div>
+            <div class="template-card" onclick="selectTemplate('outro','green-fade',this)">
+              <div class="template-thumb" style="background:linear-gradient(135deg,#0a4e3d,#13a07d);color:#fff">感謝觀看<br><span style="font-size:10px;color:rgba(255,255,255,.7)">漸層綠底</span></div>
+              <div class="name">光田綠底</div>
+            </div>
+            <div class="template-card" onclick="selectTemplate('outro','minimal',this)">
+              <div class="template-thumb" style="background:#1a1a1a;color:var(--primary-light);font-size:11px">感謝觀看</div>
+              <div class="name">極簡風</div>
+            </div>
+          </div>
+          <div id="outroSettings" style="display:none;margin-top:14px">
+            <div class="form-row">
+              <div class="form-group" style="flex:2">
+                <label>標題文字</label>
+                <input type="text" class="input" id="outroTitle" value="感謝觀看" placeholder="標題文字">
+              </div>
+              <div class="form-group">
+                <label>副標題</label>
+                <input type="text" class="input" id="outroSubtitle" value="" placeholder="副標題（選填）">
+              </div>
+              <div class="form-group">
+                <label>秒數</label>
+                <input type="number" class="input" id="outroDuration" value="3" min="1" max="10">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPORT SECTION -->
+    <div class="section" id="sec-export">
+      <div class="panel">
+        <div class="panel-header"><span class="icon">📤</span> 匯出設定</div>
+        <div class="panel-body">
+          <div id="exportNoVideo" style="color:var(--text2);text-align:center;padding:24px">請先上傳影片</div>
+          <div id="exportControls" style="display:none">
+            <div class="form-group">
+              <label>畫質選擇</label>
+              <div class="export-options">
+                <div class="quality-card selected" onclick="selectQuality('high',this)">
+                  <h4>高品質</h4>
+                  <p>CRF 18・檔案較大</p>
+                </div>
+                <div class="quality-card" onclick="selectQuality('medium',this)">
+                  <h4>中品質</h4>
+                  <p>CRF 23・平衡</p>
+                </div>
+                <div class="quality-card" onclick="selectQuality('low',this)">
+                  <h4>低品質</h4>
+                  <p>CRF 28・檔案最小</p>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top:14px">
+              <label>輸出檔名</label>
+              <input type="text" class="input" id="outputName" value="output" placeholder="輸出檔名（不含副檔名）">
+            </div>
+            <div style="margin-top:8px;padding:12px;background:var(--bg3);border-radius:6px;font-size:12px;color:var(--text2)">
+              <strong style="color:var(--text)">匯出摘要：</strong>
+              <div id="exportSummary" style="margin-top:6px">請先上傳影片...</div>
+            </div>
+            <div style="margin-top:16px;text-align:center">
+              <button class="btn btn-primary btn-lg" id="exportBtn" onclick="startExport()" disabled>
+                🎬 開始匯出
+              </button>
+            </div>
+            <div id="exportProgress" style="display:none;margin-top:16px">
+              <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+              <div class="progress-text" id="progressText">準備中...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="status-bar">
+  <span class="status-dot idle" id="statusDot"></span>
+  <span id="statusText">就緒</span>
+  <span style="margin-left:auto;font-size:10px;color:var(--text3)">Powered by FFmpeg.wasm | 所有處理皆在瀏覽器端完成</span>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+<script>
+// ==================== COOP/COEP Service Worker for GitHub Pages ====================
+// SharedArrayBuffer requires Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers.
+// GitHub Pages doesn't allow custom headers, so we use a Service Worker to inject them.
+(function() {
+  const SW_CODE = `
+    self.addEventListener('install', () => self.skipWaiting());
+    self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+    self.addEventListener('fetch', (e) => {
+      if (e.request.cache === 'only-if-cached' && e.request.mode !== 'same-origin') return;
+      e.respondWith(
+        fetch(e.request).then((r) => {
+          if (r.status === 0) return r;
+          const h = new Headers(r.headers);
+          h.set('Cross-Origin-Opener-Policy', 'same-origin');
+          h.set('Cross-Origin-Embedder-Policy', 'credentialless');
+          return new Response(r.body, { status: r.status, statusText: r.statusText, headers: h });
+        }).catch((err) => new Response('Service Worker fetch error', { status: 500 }))
+      );
+    });
+  `;
+
+  if ('serviceWorker' in navigator) {
+    // Check if SharedArrayBuffer is already available (server provides headers)
+    if (typeof SharedArrayBuffer !== 'undefined') {
+      console.log('[COOP/COEP] SharedArrayBuffer already available.');
+    } else {
+      // Register a service worker to inject headers
+      const blob = new Blob([SW_CODE], { type: 'application/javascript' });
+      const swURL = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swURL, { scope: window.location.pathname }).then((reg) => {
+        console.log('[COOP/COEP] Service Worker registered, reloading to enable SharedArrayBuffer...');
+        if (reg.active && !navigator.serviceWorker.controller) {
+          // SW is active but page isn't controlled yet — reload
+          window.location.reload();
+        } else if (!reg.active) {
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'activated') {
+                window.location.reload();
+              }
+            });
+          });
+        }
+      }).catch((err) => {
+        console.warn('[COOP/COEP] Service Worker registration failed:', err);
+      });
+    }
+  }
+})();
+
+// ==================== State ====================
+const state = {
+  videoFile: null,
+  videoURL: null,
+  duration: 0,
+  width: 0,
+  height: 0,
+  trimIn: 0,
+  trimOut: 0,
+  logoFile: null,
+  logoURL: null,
+  wmPosition: 'bot-left',
+  wmOpacity: 70,
+  wmSize: 15,
+  wmMargin: 20,
+  subtitles: [],
+  introTemplate: 'none',
+  outroTemplate: 'none',
+  quality: 'high',
+  ffmpegLoaded: false,
+  processing: false
+};
+
+let ffmpeg = null;
+
+// ==================== FFmpeg (0.11.x single-thread) ====================
+async function loadFFmpeg() {
+  const statusEl = document.getElementById('ffmpegStatus');
+  try {
+    const { createFFmpeg } = FFmpeg;
+    ffmpeg = createFFmpeg({
+      log: true,
+      progress: ({ ratio }) => {
+        if (state.processing && ratio >= 0) {
+          const pct = Math.round(Math.max(0, Math.min(100, ratio * 100)));
+          document.getElementById('progressFill').style.width = pct + '%';
+          document.getElementById('progressText').textContent = `處理中... ${pct}%`;
+        }
+      },
+      corePath: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+    });
+    statusEl.textContent = 'FFmpeg 下載中...';
+    await ffmpeg.load();
+    state.ffmpegLoaded = true;
+    statusEl.textContent = 'FFmpeg 已就緒';
+    statusEl.style.color = 'var(--success)';
+    showToast('FFmpeg 載入完成', 'success');
+  } catch (e) {
+    console.error('FFmpeg load error:', e);
+    statusEl.textContent = 'FFmpeg 載入失敗';
+    statusEl.style.color = 'var(--danger)';
+    showToast('FFmpeg 載入失敗：' + e.message, 'error');
+  }
+}
+
+// ==================== Navigation ====================
+function switchSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  document.querySelector(`.nav-item[data-section="${name}"]`).classList.add('active');
+}
+
+// ==================== Toast ====================
+function showToast(msg, type = 'info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = '.3s'; setTimeout(() => t.remove(), 300); }, 3500);
+}
+
+// ==================== Upload ====================
+const uploadZone = document.getElementById('uploadZone');
+const videoInput = document.getElementById('videoInput');
+const videoPlayer = document.getElementById('videoPlayer');
+
+uploadZone.addEventListener('click', () => videoInput.click());
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault(); uploadZone.classList.remove('dragover');
+  if (e.dataTransfer.files.length) handleVideoFile(e.dataTransfer.files[0]);
+});
+videoInput.addEventListener('change', e => { if (e.target.files.length) handleVideoFile(e.target.files[0]); });
+
+function handleVideoFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['mp4','mov'].includes(ext)) { showToast('僅支援 MP4 / MOV 格式', 'error'); return; }
+  state.videoFile = file;
+  if (state.videoURL) URL.revokeObjectURL(state.videoURL);
+  state.videoURL = URL.createObjectURL(file);
+  videoPlayer.src = state.videoURL;
+  document.getElementById('trimPreview').src = state.videoURL;
+
+  document.getElementById('infoName').textContent = file.name;
+  document.getElementById('infoSize').textContent = formatBytes(file.size);
+  document.getElementById('videoInfo').style.display = '';
+  document.getElementById('previewPanel').style.display = '';
+
+  videoPlayer.onloadedmetadata = () => {
+    state.duration = videoPlayer.duration;
+    state.width = videoPlayer.videoWidth;
+    state.height = videoPlayer.videoHeight;
+    state.trimIn = 0;
+    state.trimOut = state.duration;
+    document.getElementById('infoDuration').textContent = formatTime(state.duration);
+    document.getElementById('infoRes').textContent = state.width + ' × ' + state.height;
+    document.getElementById('totalTime').textContent = formatTime(state.duration);
+    document.getElementById('trimOutSec').value = state.duration.toFixed(1);
+    document.getElementById('trimOutTime').textContent = formatTime(state.duration);
+    document.getElementById('trimDuration').textContent = formatTime(state.duration);
+    updateTrimSlider();
+    enableSections();
+    showToast('影片載入完成：' + file.name, 'success');
+    updateExportSummary();
+  };
+}
+
+function enableSections() {
+  ['trimNoVideo','wmNoVideo','subNoVideo','exportNoVideo'].forEach(id => document.getElementById(id).style.display = 'none');
+  ['trimControls','wmControls','subControls','exportControls'].forEach(id => document.getElementById(id).style.display = '');
+  document.getElementById('exportBtn').disabled = false;
+}
+
+// ==================== Video Playback ====================
+function togglePlay() {
+  if (videoPlayer.paused) { videoPlayer.play(); document.getElementById('playBtn').textContent = '⏸'; }
+  else { videoPlayer.pause(); document.getElementById('playBtn').textContent = '▶'; }
+}
+videoPlayer.addEventListener('timeupdate', () => {
+  document.getElementById('currentTime').textContent = formatTime(videoPlayer.currentTime);
+  if (state.duration > 0) document.getElementById('seekBar').value = (videoPlayer.currentTime / state.duration * 1000).toFixed(0);
+});
+videoPlayer.addEventListener('ended', () => document.getElementById('playBtn').textContent = '▶');
+function seekVideo(val) {
+  videoPlayer.currentTime = (val / 1000) * state.duration;
+}
+
+// ==================== Trim Slider ====================
+let trimDragging = null;
+const trimTrack = document.getElementById('trimTrack');
+
+function updateTrimSlider() {
+  if (!state.duration) return;
+  const leftPct = (state.trimIn / state.duration) * 100;
+  const rightPct = (state.trimOut / state.duration) * 100;
+  document.getElementById('trimLeft').style.left = leftPct + '%';
+  document.getElementById('trimRight').style.left = rightPct + '%';
+  document.getElementById('trimFill').style.left = leftPct + '%';
+  document.getElementById('trimFill').style.width = (rightPct - leftPct) + '%';
+  document.getElementById('trimInTime').textContent = formatTime(state.trimIn);
+  document.getElementById('trimOutTime').textContent = formatTime(state.trimOut);
+  document.getElementById('trimDuration').textContent = formatTime(state.trimOut - state.trimIn);
+  document.getElementById('trimInSec').value = state.trimIn.toFixed(1);
+  document.getElementById('trimOutSec').value = state.trimOut.toFixed(1);
+  updateExportSummary();
+}
+
+document.getElementById('trimLeft').addEventListener('mousedown', e => { trimDragging = 'left'; e.preventDefault(); });
+document.getElementById('trimRight').addEventListener('mousedown', e => { trimDragging = 'right'; e.preventDefault(); });
+document.addEventListener('mousemove', e => {
+  if (!trimDragging || !state.duration) return;
+  const rect = trimTrack.getBoundingClientRect();
+  let pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  let t = pct * state.duration;
+  if (trimDragging === 'left') { state.trimIn = Math.min(t, state.trimOut - 0.1); }
+  else { state.trimOut = Math.max(t, state.trimIn + 0.1); }
+  updateTrimSlider();
+  document.getElementById('trimPreview').currentTime = trimDragging === 'left' ? state.trimIn : state.trimOut;
+});
+document.addEventListener('mouseup', () => trimDragging = null);
+
+// Touch support
+document.getElementById('trimLeft').addEventListener('touchstart', e => { trimDragging = 'left'; e.preventDefault(); }, {passive:false});
+document.getElementById('trimRight').addEventListener('touchstart', e => { trimDragging = 'right'; e.preventDefault(); }, {passive:false});
+document.addEventListener('touchmove', e => {
+  if (!trimDragging || !state.duration) return;
+  const touch = e.touches[0];
+  const rect = trimTrack.getBoundingClientRect();
+  let pct = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+  let t = pct * state.duration;
+  if (trimDragging === 'left') state.trimIn = Math.min(t, state.trimOut - 0.1);
+  else state.trimOut = Math.max(t, state.trimIn + 0.1);
+  updateTrimSlider();
+}, {passive:false});
+document.addEventListener('touchend', () => trimDragging = null);
+
+function setTrimFromInput() {
+  state.trimIn = Math.max(0, parseFloat(document.getElementById('trimInSec').value) || 0);
+  state.trimOut = Math.min(state.duration, parseFloat(document.getElementById('trimOutSec').value) || state.duration);
+  if (state.trimIn >= state.trimOut) state.trimIn = Math.max(0, state.trimOut - 0.1);
+  updateTrimSlider();
+}
+
+// ==================== Watermark ====================
+const logoInput = document.getElementById('logoInput');
+let logoImg = new Image();
+
+logoInput.addEventListener('change', e => {
+  if (!e.target.files.length) return;
+  state.logoFile = e.target.files[0];
+  if (state.logoURL) URL.revokeObjectURL(state.logoURL);
+  state.logoURL = URL.createObjectURL(state.logoFile);
+  logoImg.src = state.logoURL;
+  logoImg.onload = () => {
+    document.getElementById('wmSettings').style.display = '';
+    updateWmPreview();
+    showToast('Logo 載入完成', 'success');
+  };
+});
+
+function setWmPos(el) {
+  document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  state.wmPosition = el.dataset.pos;
+  updateWmPreview();
+}
+
+function updateWmPreview() {
+  state.wmOpacity = parseInt(document.getElementById('wmOpacity').value);
+  state.wmSize = parseInt(document.getElementById('wmSize').value);
+  state.wmMargin = parseInt(document.getElementById('wmMargin').value) || 20;
+  document.getElementById('wmOpacityVal').textContent = state.wmOpacity;
+  document.getElementById('wmSizeVal').textContent = state.wmSize;
+
+  const canvas = document.getElementById('wmCanvas');
+  const ctx = canvas.getContext('2d');
+  // Draw video frame
+  const vw = state.width || 1920;
+  const vh = state.height || 1080;
+  canvas.width = 640;
+  canvas.height = Math.round(640 * vh / vw);
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (videoPlayer.readyState >= 2) {
+    ctx.drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
+  }
+  // Draw logo
+  if (logoImg.complete && logoImg.naturalWidth) {
+    const scale = (state.wmSize / 100) * canvas.width / logoImg.naturalWidth;
+    const lw = logoImg.naturalWidth * scale;
+    const lh = logoImg.naturalHeight * scale;
+    const m = state.wmMargin * (canvas.width / vw);
+    let x = m, y = m;
+    const pos = state.wmPosition;
+    if (pos.includes('center') && !pos.includes('mid')) x = (canvas.width - lw) / 2;
+    if (pos.includes('right')) x = canvas.width - lw - m;
+    if (pos.includes('mid')) y = (canvas.height - lh) / 2;
+    if (pos.includes('bot')) y = canvas.height - lh - m;
+    ctx.globalAlpha = state.wmOpacity / 100;
+    ctx.drawImage(logoImg, x, y, lw, lh);
+    ctx.globalAlpha = 1;
+  }
+  updateExportSummary();
+}
+
+// ==================== Subtitles ====================
+function addSubtitle() {
+  const start = parseFloat(document.getElementById('subStart').value) || 0;
+  const end = parseFloat(document.getElementById('subEnd').value) || 3;
+  const text = document.getElementById('subText').value.trim();
+  if (!text) { showToast('請輸入字幕文字', 'error'); return; }
+  if (start >= end) { showToast('結束時間必須大於開始時間', 'error'); return; }
+  state.subtitles.push({
+    start, end, text,
+    fontSize: document.getElementById('subFontSize').value,
+    color: document.getElementById('subColor').value,
+    position: document.getElementById('subPosition').value
+  });
+  document.getElementById('subText').value = '';
+  renderSubtitles();
+  showToast('字幕已新增', 'success');
+  updateExportSummary();
+}
+
+function removeSubtitle(i) {
+  state.subtitles.splice(i, 1);
+  renderSubtitles();
+  updateExportSummary();
+}
+
+function renderSubtitles() {
+  const list = document.getElementById('subtitleList');
+  const badge = document.getElementById('subtitleCount');
+  if (!state.subtitles.length) {
+    list.innerHTML = '<div style="color:var(--text3);text-align:center;padding:16px;font-size:13px">尚未新增字幕</div>';
+    badge.style.display = 'none';
+    return;
+  }
+  badge.style.display = '';
+  badge.textContent = state.subtitles.length;
+  list.innerHTML = state.subtitles.map((s, i) => `
+    <div class="subtitle-item">
+      <span class="time">${formatTime(s.start)} → ${formatTime(s.end)}</span>
+      <span class="text" style="color:${s.color}">${escHtml(s.text)}</span>
+      <div class="actions">
+        <button class="btn btn-sm btn-danger" onclick="removeSubtitle(${i})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ==================== Intro/Outro ====================
+function selectTemplate(type, template, el) {
+  const container = document.getElementById(type + 'Templates');
+  container.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  if (type === 'intro') state.introTemplate = template;
+  else state.outroTemplate = template;
+  document.getElementById(type + 'Settings').style.display = template === 'none' ? 'none' : '';
+  updateExportSummary();
+}
+
+// ==================== Quality ====================
+function selectQuality(q, el) {
+  document.querySelectorAll('.quality-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.quality = q;
+}
+
+// ==================== Export Summary ====================
+function updateExportSummary() {
+  if (!state.videoFile) return;
+  const parts = [];
+  const trimmed = state.trimIn > 0 || state.trimOut < state.duration;
+  if (trimmed) parts.push(`裁切 ${formatTime(state.trimIn)} ~ ${formatTime(state.trimOut)}`);
+  else parts.push(`完整影片 (${formatTime(state.duration)})`);
+  if (state.logoFile) parts.push('浮水印: ' + state.logoFile.name);
+  if (state.subtitles.length) parts.push(`字幕 ×${state.subtitles.length}`);
+  if (state.introTemplate !== 'none') parts.push('片頭: ' + state.introTemplate);
+  if (state.outroTemplate !== 'none') parts.push('片尾: ' + state.outroTemplate);
+  document.getElementById('exportSummary').innerHTML = parts.map(p => '• ' + p).join('<br>');
+}
+
+// ==================== Export ====================
+async function startExport() {
+  if (!state.videoFile) { showToast('請先上傳影片', 'error'); return; }
+  if (!state.ffmpegLoaded) { showToast('FFmpeg 尚未載入完成', 'error'); return; }
+  if (state.processing) return;
+
+  state.processing = true;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot processing';
+  document.getElementById('statusText').textContent = '處理中...';
+  document.getElementById('exportBtn').disabled = true;
+  document.getElementById('exportProgress').style.display = '';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('progressText').textContent = '讀取影片檔案...';
+
+  try {
+    const { fetchFile } = FFmpeg;
+
+    // Write input video
+    ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(state.videoFile));
+    document.getElementById('progressText').textContent = '影片已載入，準備處理...';
+
+    // Build ffmpeg command
+    const inputs = [];
+    let inputIdx = 0;
+
+    // Handle intro
+    let hasIntro = state.introTemplate !== 'none';
+    if (hasIntro) {
+      const introDur = parseInt(document.getElementById('introDuration').value) || 3;
+      const introTitle = document.getElementById('introTitle').value || '光田綜合醫院';
+      const introSub = document.getElementById('introSubtitle').value || '';
+      const introCanvas = createTitleCard(state.introTemplate, introTitle, introSub, state.width || 1920, state.height || 1080);
+      const introBlob = await new Promise(r => introCanvas.toBlob(r, 'image/png'));
+      const introData = new Uint8Array(await introBlob.arrayBuffer());
+      ffmpeg.FS('writeFile', 'intro.png', introData);
+      inputs.push('-loop', '1', '-t', String(introDur), '-i', 'intro.png');
+      inputIdx++;
+    }
+
+    // Main video input
+    inputs.push('-i', 'input.mp4');
+    const mainVidIdx = inputIdx;
+    inputIdx++;
+
+    // Handle outro
+    let hasOutro = state.outroTemplate !== 'none';
+    let outroInputIdx = -1;
+    if (hasOutro) {
+      const outroDur = parseInt(document.getElementById('outroDuration').value) || 3;
+      const outroTitle = document.getElementById('outroTitle').value || '感謝觀看';
+      const outroSub = document.getElementById('outroSubtitle').value || '';
+      const outroCanvas = createTitleCard(state.outroTemplate, outroTitle, outroSub, state.width || 1920, state.height || 1080);
+      const outroBlob = await new Promise(r => outroCanvas.toBlob(r, 'image/png'));
+      const outroData = new Uint8Array(await outroBlob.arrayBuffer());
+      ffmpeg.FS('writeFile', 'outro.png', outroData);
+      outroInputIdx = inputIdx;
+      inputs.push('-loop', '1', '-t', String(outroDur), '-i', 'outro.png');
+      inputIdx++;
+    }
+
+    // Write watermark
+    let hasWatermark = state.logoFile && state.logoURL;
+    let wmInputIdx = -1;
+    if (hasWatermark) {
+      ffmpeg.FS('writeFile', 'logo.png', await fetchFile(state.logoFile));
+      wmInputIdx = inputIdx;
+      inputs.push('-i', 'logo.png');
+      inputIdx++;
+    }
+
+    // Build filter complex
+    const crf = state.quality === 'high' ? '18' : state.quality === 'medium' ? '23' : '28';
+
+    let filterParts = [];
+    let currentVideo = `[${mainVidIdx}:v]`;
+    let currentAudio = `[${mainVidIdx}:a]`;
+
+    // Trim
+    const trimmed = state.trimIn > 0.05 || state.trimOut < state.duration - 0.05;
+    if (trimmed) {
+      filterParts.push(`${currentVideo}trim=start=${state.trimIn.toFixed(3)}:end=${state.trimOut.toFixed(3)},setpts=PTS-STARTPTS[trimv]`);
+      filterParts.push(`${currentAudio}atrim=start=${state.trimIn.toFixed(3)}:end=${state.trimOut.toFixed(3)},asetpts=PTS-STARTPTS[trima]`);
+      currentVideo = '[trimv]';
+      currentAudio = '[trima]';
+    }
+
+    // Watermark overlay
+    if (hasWatermark) {
+      const pos = state.wmPosition;
+      const margin = state.wmMargin;
+      const sizeRatio = state.wmSize / 100;
+      const opacity = state.wmOpacity / 100;
+      const scaledW = `iw*${sizeRatio}`;
+      filterParts.push(`[${wmInputIdx}:v]scale=${scaledW}:-1,format=rgba,colorchannelmixer=aa=${opacity.toFixed(2)}[wm]`);
+      let overlayX = String(margin), overlayY = String(margin);
+      if (pos.includes('center') && !pos.includes('mid')) overlayX = '(W-w)/2';
+      if (pos.includes('right')) overlayX = `W-w-${margin}`;
+      if (pos.includes('mid')) overlayY = '(H-h)/2';
+      if (pos.includes('bot')) overlayY = `H-h-${margin}`;
+      filterParts.push(`${currentVideo}[wm]overlay=${overlayX}:${overlayY}[wmout]`);
+      currentVideo = '[wmout]';
+    }
+
+    // Subtitles (drawtext)
+    if (state.subtitles.length) {
+      state.subtitles.forEach((sub, i) => {
+        const fontSize = parseInt(sub.fontSize) || 36;
+        const color = sub.color || '#ffffff';
+        let yPos = 'h-th-60';
+        if (sub.position === 'top') yPos = '60';
+        if (sub.position === 'center') yPos = '(h-th)/2';
+        const safeText = sub.text.replace(/'/g, "'\\''").replace(/:/g, '\\:').replace(/\\/g, '\\\\');
+        const hexColor = color.replace('#', '');
+        const label = `dtv${i}`;
+        filterParts.push(`${currentVideo}drawtext=text='${safeText}':fontsize=${fontSize}:fontcolor=0x${hexColor}:x=(w-tw)/2:y=${yPos}:enable='between(t\\,${sub.start}\\,${sub.end})':borderw=2:bordercolor=black[${label}]`);
+        currentVideo = `[${label}]`;
+      });
+    }
+
+    // Build concat if intro/outro
+    if (hasIntro || hasOutro) {
+      const introDur = parseInt(document.getElementById('introDuration').value) || 3;
+      const outroDur = parseInt(document.getElementById('outroDuration').value) || 3;
+      const w = state.width || 1920, h = state.height || 1080;
+
+      if (hasIntro) {
+        filterParts.push(`[0:v]scale=${w}:${h},setsar=1,fps=30[introv]`);
+        filterParts.push(`anullsrc=r=44100:cl=stereo[introa_raw]`);
+        filterParts.push(`[introa_raw]atrim=0:${introDur}[introa]`);
+      }
+
+      filterParts.push(`${currentVideo}scale=${w}:${h},setsar=1,fps=30[mainv]`);
+      filterParts.push(`${currentAudio}aresample=44100[maina]`);
+      currentVideo = '[mainv]';
+      currentAudio = '[maina]';
+
+      if (hasOutro) {
+        filterParts.push(`[${outroInputIdx}:v]scale=${w}:${h},setsar=1,fps=30[outrov]`);
+        filterParts.push(`anullsrc=r=44100:cl=stereo[outroa_raw]`);
+        filterParts.push(`[outroa_raw]atrim=0:${outroDur}[outroa]`);
+      }
+
+      let concatParts = [];
+      let n = 0;
+      if (hasIntro) { concatParts.push('[introv][introa]'); n++; }
+      concatParts.push(`${currentVideo}${currentAudio}`);
+      n++;
+      if (hasOutro) { concatParts.push('[outrov][outroa]'); n++; }
+      filterParts.push(`${concatParts.join('')}concat=n=${n}:v=1:a=1[outv][outa]`);
+      currentVideo = '[outv]';
+      currentAudio = '[outa]';
+    }
+
+    // Build final command
+    let cmd = [...inputs];
+    if (filterParts.length) {
+      cmd.push('-filter_complex', filterParts.join(';'));
+      cmd.push('-map', currentVideo, '-map', currentAudio);
+    }
+
+    cmd.push('-c:v', 'libx264', '-preset', 'fast', '-crf', crf);
+    cmd.push('-c:a', 'aac', '-b:a', '128k');
+    cmd.push('-movflags', '+faststart');
+    cmd.push('-y', 'output.mp4');
+
+    console.log('FFmpeg command:', cmd.join(' '));
+    document.getElementById('progressText').textContent = '開始處理影片...';
+
+    await ffmpeg.run(...cmd);
+
+    // Read output
+    const data = ffmpeg.FS('readFile', 'output.mp4');
+    const blob = new Blob([data.buffer], { type: 'video/mp4' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (document.getElementById('outputName').value || 'output') + '.mp4';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    showToast('匯出完成！檔案已下載', 'success');
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressText').textContent = '完成！';
+
+  } catch (e) {
+    console.error('Export error:', e);
+    showToast('匯出失敗：' + e.message, 'error');
+    document.getElementById('progressText').textContent = '匯出失敗：' + e.message;
+  } finally {
+    state.processing = false;
+    document.getElementById('statusDot').className = 'status-dot idle';
+    document.getElementById('statusText').textContent = '就緒';
+    document.getElementById('exportBtn').disabled = false;
+  }
+}
+
+// ==================== Title Card Generator ====================
+function createTitleCard(template, title, subtitle, w, h) {
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+
+  switch (template) {
+    case 'black-text':
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.font = `bold ${Math.round(h/10)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText(title, w/2, h/2 - (subtitle ? h/20 : 0));
+      if (subtitle) {
+        ctx.font = `${Math.round(h/18)}px "Noto Sans TC", sans-serif`;
+        ctx.fillStyle = '#aaa';
+        ctx.fillText(subtitle, w/2, h/2 + h/12);
+      }
+      break;
+    case 'green-fade':
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#0a4e3d');
+      grad.addColorStop(1, '#13a07d');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.font = `bold ${Math.round(h/10)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText(title, w/2, h/2 - (subtitle ? h/20 : 0));
+      if (subtitle) {
+        ctx.font = `${Math.round(h/18)}px "Noto Sans TC", sans-serif`;
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.fillText(subtitle, w/2, h/2 + h/12);
+      }
+      break;
+    case 'minimal':
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#13a07d';
+      ctx.textAlign = 'center';
+      ctx.font = `300 ${Math.round(h/12)}px "Noto Sans TC", sans-serif`;
+      ctx.letterSpacing = '0.3em';
+      ctx.fillText(title, w/2, h/2 - (subtitle ? h/20 : 0));
+      if (subtitle) {
+        ctx.font = `${Math.round(h/22)}px "Noto Sans TC", sans-serif`;
+        ctx.fillStyle = '#666';
+        ctx.fillText(subtitle, w/2, h/2 + h/12);
+      }
+      break;
+  }
+  return canvas;
+}
+
+// ==================== Utilities ====================
+function formatTime(s) {
+  if (!s || isNaN(s)) return '00:00.0';
+  const m = Math.floor(s / 60);
+  const sec = (s % 60).toFixed(1);
+  return String(m).padStart(2, '0') + ':' + sec.padStart(4, '0');
+}
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+  return (b / 1048576).toFixed(1) + ' MB';
+}
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ==================== Init ====================
+loadFFmpeg();
+</script>
+</body>
+</html>
