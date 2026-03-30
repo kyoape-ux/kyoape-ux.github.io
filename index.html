@@ -246,6 +246,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 .toast.err{border-left:3px solid var(--red)}
 .toast.info{border-left:3px solid var(--accent-l)}
 @keyframes tIn{from{transform:translateX(110%);opacity:0}to{transform:none;opacity:1}}
+/* ── Effects Panel ── */
+.fx-btn{padding:7px 5px;background:var(--bg-clip);border:1.5px solid var(--border);border-radius:6px;color:var(--text2);font-size:10px;cursor:pointer;transition:.15s;text-align:center}
+.fx-btn:hover{border-color:var(--accent-l);color:var(--accent-l)}
 /* ── Orientation Toggle ── */
 .orient-btns{display:flex;gap:4px;padding:4px 10px 8px}
 .ob{flex:1;padding:6px 4px;background:var(--bg-clip);border:1.5px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:.15s}
@@ -306,6 +309,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
   <button class="ni" data-p="canvas" onclick="setPanel('canvas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18"/></svg><span class="lbl">畫布</span></button>
   <button class="ni" data-p="text" onclick="setPanel('text')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7V5h16v2M9 20h6M12 5v15"/></svg><span class="lbl">文字</span></button>
   <button class="ni" data-p="audio" onclick="setPanel('audio')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span class="lbl">音樂</span></button>
+  <button class="ni" data-p="fx" onclick="setPanel('fx')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><span class="lbl">特效</span></button>
   <div class="ni-sep"></div>
   <button class="ni" data-p="record" onclick="setPanel('record')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0M12 19v3M8 22h8"/></svg><span class="lbl">錄音</span></button>
 </nav>
@@ -365,6 +369,37 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     <div class="pt">音訊素材</div>
     <div class="alist" id="audioList"><div style="color:var(--text3);font-size:11px;padding:8px">上傳音訊後顯示在此</div></div>
   </div>
+  <!-- EFFECTS / TRANSITIONS -->
+  <div class="ps" id="ps-fx">
+    <div class="pt">套用至選取素材</div>
+    <div style="padding:4px 10px 6px;font-size:10px;color:var(--text2)">淡入淡出</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:0 10px 10px">
+      <button class="fx-btn" onclick="applyFx('fadeIn',1)">⬆ 淡入 1s</button>
+      <button class="fx-btn" onclick="applyFx('fadeIn',0.5)">⬆ 淡入 0.5s</button>
+      <button class="fx-btn" onclick="applyFx('fadeOut',1)">⬇ 淡出 1s</button>
+      <button class="fx-btn" onclick="applyFx('fadeOut',0.5)">⬇ 淡出 0.5s</button>
+      <button class="fx-btn" onclick="applyFx('fadeIn',0);applyFx('fadeOut',0)">✕ 移除淡入淡出</button>
+    </div>
+    <div style="padding:4px 10px 6px;font-size:10px;color:var(--text2)">轉場（套用至選取素材的開頭）</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:0 10px 10px">
+      <button class="fx-btn" onclick="applyFx('transition','dissolve')">◈ 溶解</button>
+      <button class="fx-btn" onclick="applyFx('transition','wipe-r')">▶ 推入（右）</button>
+      <button class="fx-btn" onclick="applyFx('transition','wipe-l')">◀ 推入（左）</button>
+      <button class="fx-btn" onclick="applyFx('transition','zoom-in')">⊕ 放大進入</button>
+      <button class="fx-btn" onclick="applyFx('transitionDur',0.5)">0.5s 時長</button>
+      <button class="fx-btn" onclick="applyFx('transitionDur',1)">1s 時長</button>
+      <button class="fx-btn" onclick="applyFx('transition','none')">✕ 移除轉場</button>
+    </div>
+    <div style="padding:4px 10px 6px;font-size:10px;color:var(--text2)">視覺效果</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:0 10px 10px">
+      <button class="fx-btn" onclick="applyFx('vfx','grayscale')">◑ 黑白</button>
+      <button class="fx-btn" onclick="applyFx('vfx','sepia')">🎞 復古</button>
+      <button class="fx-btn" onclick="applyFx('vfx','invert')">⊛ 負片</button>
+      <button class="fx-btn" onclick="applyFx('vfx','blur')">⬡ 模糊</button>
+      <button class="fx-btn" onclick="applyFx('vfx','vivid')">✦ 鮮豔</button>
+      <button class="fx-btn" onclick="applyFx('vfx','none')">✕ 移除效果</button>
+    </div>
+  </div>
   <!-- RECORD -->
   <div class="ps" id="ps-record">
     <div class="pt">錄音</div>
@@ -403,6 +438,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     </div>
     <div class="pg" id="rp-txt-sec" style="display:none"><h4>文字內容</h4>
       <textarea class="pi2" id="rp-txt" rows="3" style="width:100%;resize:vertical" oninput="updateClipProp('text',this.value)"></textarea>
+    </div>
+    <div class="pg" id="rp-transform-sec"><h4>變換</h4>
+      <div class="pr"><label>縮放</label><input type="range" id="rp-scale" min="10" max="300" value="100" style="flex:1" oninput="updateClipProp('scale',this.value)"><span id="rp-scale-v" style="font-size:10px;min-width:34px;text-align:right">100%</span></div>
+      <div class="pr"><label>位置 X</label><input type="range" id="rp-px" min="-100" max="100" value="0" style="flex:1" oninput="updateClipProp('px',this.value)"><span id="rp-px-v" style="font-size:10px;min-width:34px;text-align:right">0</span></div>
+      <div class="pr"><label>位置 Y</label><input type="range" id="rp-py" min="-100" max="100" value="0" style="flex:1" oninput="updateClipProp('py',this.value)"><span id="rp-py-v" style="font-size:10px;min-width:34px;text-align:right">0</span></div>
+      <div class="pr"><label>透明度</label><input type="range" id="rp-opacity" min="0" max="100" value="100" style="flex:1" oninput="updateClipProp('opacity',this.value)"><span id="rp-opacity-v" style="font-size:10px;min-width:34px;text-align:right">100%</span></div>
+    </div>
+    <div class="pg"><h4>淡入 / 淡出</h4>
+      <div class="pr"><label>淡入</label><input type="range" id="rp-fadein" min="0" max="5" step="0.1" value="0" style="flex:1" oninput="updateClipProp('fadeIn',this.value)"><span id="rp-fadein-v" style="font-size:10px;min-width:34px;text-align:right">0s</span></div>
+      <div class="pr"><label>淡出</label><input type="range" id="rp-fadeout" min="0" max="5" step="0.1" value="0" style="flex:1" oninput="updateClipProp('fadeOut',this.value)"><span id="rp-fadeout-v" style="font-size:10px;min-width:34px;text-align:right">0s</span></div>
     </div>
     <div class="pg" id="rp-vol-sec"><h4>音量</h4>
       <div class="pr"><label>音量</label><input type="range" id="rp-vol" min="0" max="200" value="100" style="flex:1" oninput="updateClipProp('volume',this.value)"><span id="rp-vol-v" style="font-size:10px;min-width:30px;text-align:right">100%</span></div>
@@ -466,6 +511,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     <div class="m-actions">
       <button class="m-btn m-cancel" onclick="hideExportModal()">取消</button>
       <button class="m-btn m-confirm" id="expBtn" onclick="startExport()">開始匯出</button>
+    </div>
+  </div>
+</div>
+<!-- Confirmation Modal -->
+<div class="modal-bg" id="confirmModal">
+  <div class="modal" style="width:340px">
+    <p id="confirmMsg" style="font-size:13px;margin-bottom:18px;line-height:1.6"></p>
+    <div class="m-actions">
+      <button class="m-btn m-cancel" onclick="confirmCancel()">取消</button>
+      <button class="m-btn m-confirm" onclick="confirmOk()">確認切換</button>
     </div>
   </div>
 </div>
@@ -541,7 +596,30 @@ document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.
 function splitAllAtPlayhead(){saveU();let cut=false;for(const t of S.tracks){const clipsSnap=[...t.clips];for(const cl of clipsSnap){if(S.currentTime>cl.start+0.1&&S.currentTime<cl.start+cl.duration-0.1){const d1=S.currentTime-cl.start,d2=cl.start+cl.duration-S.currentTime;const clip2={...cl,id:uid(),start:S.currentTime,duration:d2,sourceOffset:(cl.sourceOffset||0)+d1};cl.duration=d1;const idx=t.clips.indexOf(cl);t.clips.splice(idx+1,0,clip2);cut=true;}}}if(cut){renderAll();toast('已分割所有軌道','info');}}
 
 /* ===== CANVAS SIZE ===== */
-function setCanvas(w,h,btn){S.canvas={w,h};document.querySelectorAll('.pb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');const pc=document.getElementById('previewCanvas');pc.width=w;pc.height=h;renderPreview();}
+function setCanvas(w,h,btn){
+  const curAR=(S.canvas.w/S.canvas.h).toFixed(3);
+  const newAR=(w/h).toFixed(3);
+  const doSet=()=>{
+    S.canvas={w,h};
+    document.querySelectorAll('.pb').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    document.getElementById('ob-land').classList.toggle('on',w>=h);
+    document.getElementById('ob-port').classList.toggle('on',w<h);
+    const pc=document.getElementById('previewCanvas');pc.width=w;pc.height=h;
+    renderPreview();toast(`畫布：${w}×${h}`,'info');
+  };
+  if(curAR!==newAR&&(S.tracks.some(t=>t.clips.length>0))){
+    showConfirm(`切換畫布比例為 ${w}×${h}？<br><span style="font-size:11px;color:var(--text2)">素材可能需要重新調整位置</span>`,doSet);
+  }else{doSet();}
+}
+let _confirmCb=null;
+function showConfirm(msg,cb){
+  _confirmCb=cb;
+  document.getElementById('confirmMsg').innerHTML=msg;
+  document.getElementById('confirmModal').classList.add('on');
+}
+function confirmOk(){if(_confirmCb)_confirmCb();document.getElementById('confirmModal').classList.remove('on');_confirmCb=null;}
+function confirmCancel(){document.getElementById('confirmModal').classList.remove('on');_confirmCb=null;}
 
 /* ===== COLOR ===== */
 function updateColor(k,el){const v=parseInt(el.value);S.color[k]=v;document.getElementById('v-'+k).textContent=v;renderPreview();}
@@ -687,9 +765,8 @@ async function handleFile(file){
     await new Promise(res=>{const img=new Image();img.src=url;img.onload=()=>{asset.duration=5;asset.w=img.naturalWidth;asset.h=img.naturalHeight;asset.thumbnail=url;res();};});
   }else{
     await new Promise(res=>{const a=document.createElement('audio');a.src=url;a.onloadedmetadata=()=>{asset.duration=a.duration;res();};a.onerror=res;a.load();});
-    renderAudioPanel();
   }
-  S.assets.push(asset);renderAssetGrid();toast('素材已載入：'+file.name,'ok');
+  S.assets.push(asset);renderAssetGrid();renderAudioPanel();toast('素材已載入：'+file.name,'ok');
 }
 
 function renderAssetGrid(){
@@ -750,7 +827,23 @@ function addTextClip(){
 }
 
 /* ===== TRACK MANAGEMENT ===== */
-function addTrack(type){saveU();const n=S.tracks.filter(t=>t.type===type).length+1;S.tracks.push({id:uid(),type,name:(type==='video'?'影片':'音樂')+' '+n,muted:false,clips:[]});renderAll();}
+function addTrack(type){
+  saveU();
+  const n=S.tracks.filter(t=>t.type===type).length+1;
+  const newTrack={id:uid(),type,name:(type==='video'?'影片':'音樂')+' '+n,muted:false,clips:[]};
+  if(type==='video'){
+    // Video tracks stack above: insert before the first video track
+    const firstVidIdx=S.tracks.findIndex(t=>t.type==='video');
+    if(firstVidIdx>=0)S.tracks.splice(firstVidIdx,0,newTrack);
+    else S.tracks.unshift(newTrack);
+  }else{
+    // Audio tracks stack below: append after the last audio track
+    const lastAudIdx=S.tracks.map((t,i)=>t.type==='audio'?i:-1).filter(i=>i>=0).pop();
+    if(lastAudIdx!=null)S.tracks.splice(lastAudIdx+1,0,newTrack);
+    else S.tracks.push(newTrack);
+  }
+  renderAll();
+}
 function toggleMute(tid){const t=S.tracks.find(x=>x.id===tid);if(t){t.muted=!t.muted;renderTimeline();}}
 
 /* ===== TIMELINE RENDERING ===== */
@@ -963,6 +1056,21 @@ function selectClip(cid){
     if(cl.type==='text')document.getElementById('rp-txt').value=cl.text||'';
     document.getElementById('rp-vol').value=cl.volume||100;
     document.getElementById('rp-vol-v').textContent=(cl.volume||100)+'%';
+    // Transform
+    const scale=cl.scale||100;
+    document.getElementById('rp-scale').value=scale;
+    document.getElementById('rp-scale-v').textContent=scale+'%';
+    const px=cl.px||0,py=cl.py||0;
+    document.getElementById('rp-px').value=px;document.getElementById('rp-px-v').textContent=px;
+    document.getElementById('rp-py').value=py;document.getElementById('rp-py-v').textContent=py;
+    const op=cl.opacity!=null?cl.opacity:100;
+    document.getElementById('rp-opacity').value=op;document.getElementById('rp-opacity-v').textContent=op+'%';
+    // Fade
+    const fi=cl.fadeIn||0,fo=cl.fadeOut||0;
+    document.getElementById('rp-fadein').value=fi;document.getElementById('rp-fadein-v').textContent=fi+'s';
+    document.getElementById('rp-fadeout').value=fo;document.getElementById('rp-fadeout-v').textContent=fo+'s';
+    // Hide transform for audio (position/scale irrelevant)
+    document.getElementById('rp-transform-sec').style.display=cl.type==='audio'?'none':'';
   }
   renderTimeline();
 }
@@ -982,9 +1090,27 @@ function updateClipProp(k,v){
   const cl=findClip(S.selClip);if(!cl)return;
   if(k==='start')cl.start=Math.max(0,parseFloat(v)||0);
   else if(k==='duration')cl.duration=Math.max(0.1,parseFloat(v)||1);
-  else if(k==='text')cl.text=v;
-  else if(k==='volume'){cl.volume=parseInt(v)||100;document.getElementById('rp-vol-v').textContent=(cl.volume)+'%';}
+  else if(k==='text'){cl.text=v;cl.label=v;}
+  else if(k==='volume'){cl.volume=parseInt(v)||100;document.getElementById('rp-vol-v').textContent=cl.volume+'%';}
+  else if(k==='scale'){cl.scale=parseInt(v)||100;document.getElementById('rp-scale-v').textContent=cl.scale+'%';}
+  else if(k==='px'){cl.px=parseInt(v)||0;document.getElementById('rp-px-v').textContent=cl.px;}
+  else if(k==='py'){cl.py=parseInt(v)||0;document.getElementById('rp-py-v').textContent=cl.py;}
+  else if(k==='opacity'){cl.opacity=parseInt(v);document.getElementById('rp-opacity-v').textContent=cl.opacity+'%';}
+  else if(k==='fadeIn'){cl.fadeIn=parseFloat(v)||0;document.getElementById('rp-fadein-v').textContent=cl.fadeIn+'s';}
+  else if(k==='fadeOut'){cl.fadeOut=parseFloat(v)||0;document.getElementById('rp-fadeout-v').textContent=cl.fadeOut+'s';}
   renderAll();
+}
+// Apply effect preset to selected clip
+function applyFx(k,v){
+  const cl=findClip(S.selClip);
+  if(!cl){toast('請先選取時間軸上的素材','err');return;}
+  if(k==='fadeIn'){cl.fadeIn=v;document.getElementById('rp-fadein').value=v;document.getElementById('rp-fadein-v').textContent=v+'s';}
+  else if(k==='fadeOut'){cl.fadeOut=v;document.getElementById('rp-fadeout').value=v;document.getElementById('rp-fadeout-v').textContent=v+'s';}
+  else if(k==='transition'){cl.transition=v;}
+  else if(k==='transitionDur'){cl.transitionDur=v;}
+  else if(k==='vfx'){cl.vfx=v;}
+  renderAll();
+  toast('特效已套用','ok');
 }
 
 function updatePlayhead(){
@@ -1003,16 +1129,88 @@ function updateTimeDisplay(){
 /* ===== PREVIEW CANVAS ===== */
 const previewCanvas=document.getElementById('previewCanvas');
 const pCtx=previewCanvas.getContext('2d');
+
+/* Compute effective opacity for a clip at currentTime (fade in/out + base opacity) */
+function clipAlpha(cl){
+  const t=S.currentTime-cl.start;
+  const dur=cl.duration;
+  const base=(cl.opacity!=null?cl.opacity:100)/100;
+  let alpha=base;
+  const fi=cl.fadeIn||0,fo=cl.fadeOut||0;
+  if(fi>0&&t<fi)alpha*=t/fi;
+  if(fo>0&&t>(dur-fo))alpha*=Math.max(0,(dur-t)/fo);
+  return Math.max(0,Math.min(1,alpha));
+}
+
+/* Compute transition alpha (0=hidden, 1=fully visible) at start of clip */
+function transitionAlpha(cl){
+  if(!cl.transition||cl.transition==='none')return 1;
+  const tDur=cl.transitionDur||0.5;
+  const t=S.currentTime-cl.start;
+  if(t>=tDur)return 1;
+  const p=t/tDur;
+  if(cl.transition==='dissolve'||cl.transition==='fade')return p;
+  if(cl.transition==='zoom-in')return p; // handled via scale too
+  return 1;
+}
+
+/* Build VFX filter string for a clip */
+function clipFilter(cl,baseFilter){
+  const parts=baseFilter?[baseFilter]:[];
+  if(cl.vfx==='grayscale')parts.push('grayscale(1)');
+  else if(cl.vfx==='sepia')parts.push('sepia(0.8)');
+  else if(cl.vfx==='invert')parts.push('invert(1)');
+  else if(cl.vfx==='blur')parts.push('blur(8px)');
+  else if(cl.vfx==='vivid')parts.push('saturate(2) contrast(1.1)');
+  return parts.length?parts.join(' '):null;
+}
+
+/* Draw a clip's media (video/image) with scale/position/opacity/transition/vfx */
+function drawClipMedia(ctx,el,cw,ch,cl,baseFilter){
+  const alpha=clipAlpha(cl)*transitionAlpha(cl);
+  if(alpha<=0)return;
+  ctx.save();
+  ctx.globalAlpha=alpha;
+  const scale=(cl.scale||100)/100;
+  const tAlpha=transitionAlpha(cl);
+  const zoomScale=(cl.transition==='zoom-in'&&tAlpha<1)?0.8+0.2*tAlpha:1;
+  const totalScale=scale*zoomScale;
+  const wipe=cl.transition&&cl.transition.startsWith('wipe');
+  const ew=el.videoWidth||el.naturalWidth||cw;
+  const eh=el.videoHeight||el.naturalHeight||ch;
+  const fitScale=Math.min(cw/ew,ch/eh);
+  const dw=ew*fitScale*totalScale,dh=eh*fitScale*totalScale;
+  const offsetX=(cl.px||0)/100*cw;
+  const offsetY=(cl.py||0)/100*ch;
+  const dx=(cw-dw)/2+offsetX,dy=(ch-dh)/2+offsetY;
+  const fStr=clipFilter(cl,baseFilter);
+  if(fStr)ctx.filter=fStr;
+  if(wipe){
+    const tDur=cl.transitionDur||0.5;
+    const t=Math.min(1,(S.currentTime-cl.start)/tDur);
+    ctx.save();
+    if(cl.transition==='wipe-r'){ctx.beginPath();ctx.rect(0,0,cw*t,ch);ctx.clip();}
+    else if(cl.transition==='wipe-l'){ctx.beginPath();ctx.rect(cw*(1-t),0,cw,ch);ctx.clip();}
+    ctx.drawImage(el,dx,dy,dw,dh);
+    ctx.restore();
+  }else{
+    try{ctx.drawImage(el,dx,dy,dw,dh);}catch(e){}
+  }
+  ctx.filter='none';
+  ctx.restore();
+}
+
 function renderPreview(){
   const{w,h}=S.canvas;
   pCtx.clearRect(0,0,w,h);
   pCtx.fillStyle='#000';pCtx.fillRect(0,0,w,h);
-  // Build CSS filter string
+  // Global color correction filter
   const{br,co,sa,hu,bl}=S.color;
-  const filterStr=`brightness(${1+br/100}) contrast(${1+co/100}) saturate(${1+sa/100}) hue-rotate(${hu}deg) blur(${bl}px)`;
   const hasFilter=br!==0||co!==0||sa!==0||hu!==0||bl!==0;
-  // Draw active video/image clips
-  for(const t of S.tracks){
+  const baseFilter=hasFilter?`brightness(${1+br/100}) contrast(${1+co/100}) saturate(${1+sa/100}) hue-rotate(${hu}deg) blur(${bl}px)`:null;
+  // Draw active video/image clips (tracks render bottom-up so higher tracks = on top)
+  const reversedTracks=[...S.tracks].reverse();
+  for(const t of reversedTracks){
     if(t.muted)continue;
     for(const cl of t.clips){
       if(cl.start>S.currentTime||cl.start+cl.duration<=S.currentTime)continue;
@@ -1021,22 +1219,25 @@ function renderPreview(){
         if(ve){
           const targetT=(S.currentTime-cl.start)+(cl.sourceOffset||0);
           if(Math.abs(ve.currentTime-targetT)>0.15)ve.currentTime=targetT;
-          try{drawMediaFit(pCtx,ve,w,h,hasFilter?filterStr:null);}catch(e){}
+          drawClipMedia(pCtx,ve,w,h,cl,baseFilter);
         }
       }else if(cl.type==='image'){
         const asset=S.assets.find(a=>a.id===cl.assetId);
         if(asset){
           const img=new Image();img.src=asset.url||asset.thumbnail;
-          try{drawMediaFit(pCtx,img,w,h,hasFilter?filterStr:null);}catch(e){}
+          drawClipMedia(pCtx,img,w,h,cl,baseFilter);
         }
       }
     }
   }
-  // Draw text clips
+  // Draw text clips (always on top)
   for(const t of S.tracks){
     for(const cl of t.clips){
       if(cl.type!=='text')continue;
       if(cl.start>S.currentTime||cl.start+cl.duration<=S.currentTime)continue;
+      const alpha=clipAlpha(cl)*transitionAlpha(cl);
+      if(alpha<=0)continue;
+      pCtx.save();pCtx.globalAlpha=alpha;
       pCtx.textBaseline='alphabetic';
       const cx=(cl.x||0.5)*w;
       const cy=(cl.y||0.85)*h;
@@ -1044,6 +1245,7 @@ function renderPreview(){
         size:cl.fontSize||48,font:cl.fontFamily||'sans-serif',
         color:cl.color||'#fff',oc:cl.outlineColor||'#000',ow:cl.outlineWidth||0,
         or:cl.outlineRadius||0,bg:cl.bgColor||'#000',ba:cl.bgOpacity||0,bold:cl.bold});
+      pCtx.restore();
       // Draw selection outline on canvas if selected
       if(S.selClip===cl.id){
         const r=getTextClipRect(cl,w,h);
