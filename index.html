@@ -246,6 +246,28 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 .toast.err{border-left:3px solid var(--red)}
 .toast.info{border-left:3px solid var(--accent-l)}
 @keyframes tIn{from{transform:translateX(110%);opacity:0}to{transform:none;opacity:1}}
+/* ── Orientation Toggle ── */
+.orient-btns{display:flex;gap:4px;padding:4px 10px 8px}
+.ob{flex:1;padding:6px 4px;background:var(--bg-clip);border:1.5px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:.15s}
+.ob:hover{border-color:var(--text3);color:var(--text)}
+.ob.on{border-color:var(--accent-l);background:rgba(15,110,86,.1);color:var(--accent-l)}
+/* ── Rubber Band Selection ── */
+.rubber-band{position:absolute;border:1.5px solid var(--accent-l);background:rgba(15,110,86,.08);pointer-events:none;z-index:8;display:none}
+/* ── Inline Text Editing Overlay ── */
+#txtEditTA{position:absolute;display:none;z-index:15;background:rgba(0,0,0,.7);border:none;color:#fff;resize:none;outline:2px dashed var(--accent-l);border-radius:4px;padding:6px 10px;font-family:inherit;text-align:center}
+/* ── Project Settings Modal ── */
+#projModal .modal{width:440px}
+.mi-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.mi-row label{font-size:11px;color:var(--text2);min-width:72px;flex-shrink:0}
+.mi-row input{flex:1;padding:5px 8px;background:var(--bg-clip);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:12px;outline:none}
+.mi-row input:focus{border-color:var(--accent-l)}
+.mi-row .unit{font-size:10px;color:var(--text3);white-space:nowrap}
+/* ── Canvas Handles ── */
+.cv-wrap{position:relative}
+#cvHandleLayer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4}
+.ch{position:absolute;width:10px;height:10px;background:#fff;border:1.5px solid var(--accent-l);border-radius:2px;transform:translate(-50%,-50%);cursor:nwse-resize;pointer-events:auto}
+.ch.edge-e,.ch.edge-w{cursor:ew-resize}
+.ch.edge-n,.ch.edge-s{cursor:ns-resize}
 </style>
 </head>
 <body>
@@ -266,6 +288,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
   <div class="t-right">
     <button class="icon-btn" title="復原" onclick="undo()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg></button>
     <button class="icon-btn" title="重做" onclick="redo()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 004.5 14.5V15"/></svg></button>
+    <div class="t-sep"></div>
+    <button class="icon-btn" title="儲存專案 JSON" onclick="saveProject()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></button>
+    <label class="icon-btn" title="開啟專案 JSON" style="cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><input type="file" style="display:none" accept=".json" onchange="loadProject(this)"></label>
+    <button class="icon-btn" title="專案設定" onclick="showProjSettings()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
     <span class="badge" id="ffBadge">FFmpeg…</span>
     <button class="btn-export" onclick="showExportModal()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -294,6 +320,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
   </div>
   <!-- CANVAS -->
   <div class="ps" id="ps-canvas">
+    <div class="pt">方向</div>
+    <div class="orient-btns">
+      <button class="ob on" id="ob-land" onclick="setOrientation('landscape')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/></svg>橫式
+      </button>
+      <button class="ob" id="ob-port" onclick="setOrientation('portrait')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>直式
+      </button>
+    </div>
     <div class="pt">畫布尺寸</div>
     <div class="preset-list">
       <button class="pb on" onclick="setCanvas(1920,1080,this)"><div class="pi h"></div><div class="pl"><div class="n">16:9 FHD</div><div class="r">1920 × 1080</div></div></button>
@@ -345,6 +380,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 <div class="preview" id="previewArea">
   <div class="cv-wrap" id="cvWrap">
     <canvas id="previewCanvas" width="1920" height="1080"></canvas>
+    <div id="cvHandleLayer"></div>
+    <textarea id="txtEditTA" rows="2"></textarea>
   </div>
   <div class="pb-bar">
     <button class="pb-btn" onclick="seekToStart()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19 20 9 12 19 4"/><line x1="5" y1="4" x2="5" y2="20"/></svg></button>
@@ -402,6 +439,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
       <div class="tl-inner" id="tlInner">
         <canvas id="rulerCanvas" height="26"></canvas>
         <div class="tracks-body" id="tracksBody"></div>
+        <div class="rubber-band" id="rubberBand"></div>
         <div class="playhead" id="playhead"></div>
       </div>
     </div>
@@ -428,6 +466,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     <div class="m-actions">
       <button class="m-btn m-cancel" onclick="hideExportModal()">取消</button>
       <button class="m-btn m-confirm" id="expBtn" onclick="startExport()">開始匯出</button>
+    </div>
+  </div>
+</div>
+<!-- Project Settings Modal -->
+<div class="modal-bg" id="projModal">
+  <div class="modal">
+    <h3>專案設定</h3>
+    <div class="mi-row"><label>專案名稱</label><input id="pm-name" type="text" placeholder="未命名專案"></div>
+    <div class="mi-row"><label>畫布寬度</label><input id="pm-cw" type="number" min="320" max="7680"><span class="unit">px</span></div>
+    <div class="mi-row"><label>畫布高度</label><input id="pm-ch" type="number" min="180" max="4320"><span class="unit">px</span></div>
+    <div class="mi-row"><label>時間長度</label><input id="pm-dur" type="number" min="1" max="7200"><span class="unit">秒</span></div>
+    <div class="m-actions">
+      <button class="m-btn m-cancel" onclick="hideProjSettings()">取消</button>
+      <button class="m-btn m-confirm" onclick="applyProjSettings()">套用</button>
     </div>
   </div>
 </div>
@@ -463,6 +515,7 @@ let S={
   playing:false,
   tool:'select',
   selClip:null,
+  selClips:[],
   color:{br:0,co:0,sa:0,hu:0,bl:0},
   text:{font:'Noto Sans TC',size:48,color:'#ffffff',oc:'#000000',ow:4,or:8,bg:'#000000',ba:0,bold:false},
   expFmt:'mp4',expQual:'high',
@@ -484,7 +537,8 @@ function getProjectDuration(){let max=0;for(const t of S.tracks)for(const c of t
 /* ===== PANEL / TOOL ===== */
 function setPanel(p){document.querySelectorAll('.ps').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.ni').forEach(e=>e.classList.remove('on'));document.getElementById('ps-'+p).classList.add('on');document.querySelector(`.ni[data-p="${p}"]`).classList.add('on');}
 function setTool(t){S.tool=t;['sel','cut'].forEach(k=>{document.getElementById('tb-'+k).classList.toggle('on',k===t);document.getElementById('tt-'+k).classList.toggle('on',k===t);});document.getElementById('tlScroll').style.cursor=t==='cut'?'crosshair':'default';}
-document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;if(e.key==='v'||e.key==='V')setTool('select');if(e.key==='c'||e.key==='C')setTool('cut');if(e.key===' '){e.preventDefault();togglePlay();}if((e.key==='Delete'||e.key==='Backspace')&&S.selClip)deleteSelectedClip();if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undo();}if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='Z'){e.preventDefault();redo();}});
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;if(e.key==='v'||e.key==='V')setTool('select');if(e.key==='c'||e.key==='C')setTool('cut');if(e.key==='s'||e.key==='S')splitAllAtPlayhead();if(e.key===' '){e.preventDefault();togglePlay();}if((e.key==='Delete'||e.key==='Backspace')&&S.selClip)deleteSelectedClip();if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undo();}if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='Z'){e.preventDefault();redo();}});
+function splitAllAtPlayhead(){saveU();let cut=false;for(const t of S.tracks){const clipsSnap=[...t.clips];for(const cl of clipsSnap){if(S.currentTime>cl.start+0.1&&S.currentTime<cl.start+cl.duration-0.1){const d1=S.currentTime-cl.start,d2=cl.start+cl.duration-S.currentTime;const clip2={...cl,id:uid(),start:S.currentTime,duration:d2,sourceOffset:(cl.sourceOffset||0)+d1};cl.duration=d1;const idx=t.clips.indexOf(cl);t.clips.splice(idx+1,0,clip2);cut=true;}}}if(cut){renderAll();toast('已分割所有軌道','info');}}
 
 /* ===== CANVAS SIZE ===== */
 function setCanvas(w,h,btn){S.canvas={w,h};document.querySelectorAll('.pb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');const pc=document.getElementById('previewCanvas');pc.width=w;pc.height=h;renderPreview();}
@@ -565,12 +619,40 @@ function drawVarietyText(ctx,text,cx,cy,opts){
   if(ba>0){ctx.globalAlpha=ba/100;ctx.fillStyle=bg;roundRect(ctx,bx,by,bw,bh,or);ctx.fill();ctx.globalAlpha=1;}
   // Outline box
   if(ow>0){ctx.strokeStyle=oc;ctx.lineWidth=ow;roundRect(ctx,bx,by,bw,bh,or);ctx.stroke();}
-  // Text stroke
-  if(ow>1){ctx.strokeStyle=oc;ctx.lineWidth=ow*0.6;ctx.strokeText(text,cx-tw/2,cy);}
+  // Text stroke (rounded endpoints)
+  if(ow>1){ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=oc;ctx.lineWidth=ow*0.6;ctx.strokeText(text,cx-tw/2,cy);ctx.lineCap='butt';ctx.lineJoin='miter';}
   // Text fill
   ctx.fillStyle=color;ctx.fillText(text,cx-tw/2,cy);
 }
 function roundRect(ctx,x,y,w,h,r){r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
+
+/* Draw a video/image element into ctx maintaining aspect ratio (pillarbox/letterbox) */
+function drawMediaFit(ctx,el,cw,ch,filterStr){
+  const ew=el.videoWidth||el.naturalWidth||cw;
+  const eh=el.videoHeight||el.naturalHeight||ch;
+  if(!ew||!eh){if(filterStr)ctx.filter=filterStr;ctx.drawImage(el,0,0,cw,ch);if(filterStr)ctx.filter='none';return;}
+  const scale=Math.min(cw/ew,ch/eh);
+  const dw=ew*scale,dh=eh*scale;
+  const dx=(cw-dw)/2,dy=(ch-dh)/2;
+  if(filterStr)ctx.filter=filterStr;
+  ctx.drawImage(el,dx,dy,dw,dh);
+  if(filterStr)ctx.filter='none';
+}
+
+/* Return bounding box {x,y,w,h} of a text clip on the canvas */
+function getTextClipRect(cl,cw,ch){
+  const size=cl.fontSize||48;
+  const font=cl.fontFamily||'sans-serif';
+  const bold=cl.bold||false;
+  const ow=cl.outlineWidth||0;
+  pCtx.font=`${bold?'bold ':' '}${size}px "${font}", sans-serif`;
+  const tw=pCtx.measureText(cl.text||'').width;
+  const th=size;
+  const pad=Math.max(ow,4)+10;
+  const cx=(cl.x||0.5)*cw;
+  const cy=(cl.y||0.85)*ch;
+  return{x:cx-tw/2-pad,y:cy-th-pad/2,w:tw+pad*2,h:th+pad*1.5,cx,cy};
+}
 
 function renderTextPreview(){
   const cv=document.getElementById('txtPrev');const ctx=cv.getContext('2d');
@@ -662,7 +744,7 @@ function addTextClip(){
   saveU();
   const st=S.currentTime;
   const t=S.text;loadFont(t.font);
-  const clip={id:uid(),type:'text',assetId:null,start:st,duration:5,text:'輸入文字',fontFamily:t.font,fontSize:t.size,color:t.color,outlineColor:t.oc,outlineWidth:t.ow,outlineRadius:t.or,bgColor:t.bg,bgOpacity:t.ba,bold:t.bold,volume:100,label:'文字'};
+  const clip={id:uid(),type:'text',assetId:null,start:st,duration:5,text:'輸入文字',fontFamily:t.font,fontSize:t.size,color:t.color,outlineColor:t.oc,outlineWidth:0,outlineRadius:t.or,bgColor:t.bg,bgOpacity:t.ba,bold:t.bold,x:0.5,y:0.85,volume:100,label:'文字'};
   track.clips.push(clip);
   renderAll();selectClip(clip.id);
 }
@@ -722,11 +804,56 @@ function renderTrackBodies(totalW){
     // Resize handles
     el.querySelectorAll('.clip-hdl').forEach(h=>{h.addEventListener('mousedown',e=>{e.stopPropagation();onClipResize(e,cid,h.classList.contains('r'));});});
   });
-  // Track click for scissors / seek
+  // Track mousedown for rubber-band selection or seek
   body.querySelectorAll('.track-row').forEach(row=>{
-    row.addEventListener('click',e=>{
+    row.addEventListener('mousedown',e=>{
       if(e.target.classList.contains('clip')||e.target.closest('.clip'))return;
-      const x=e.offsetX;S.currentTime=Math.max(0,x/S.zoom);updatePlayhead();updateTimeDisplay();renderPreview();
+      if(e.button!==0)return;
+      const scroll=document.getElementById('tlScroll');
+      const bodyRect=body.getBoundingClientRect();
+      const startClientX=e.clientX,startClientY=e.clientY;
+      const startX=e.clientX-bodyRect.left+scroll.scrollLeft;
+      const startY=e.clientY-bodyRect.top+scroll.scrollTop;
+      let isRubber=false;
+      const rb=document.getElementById('rubberBand');
+      const onMove=ev=>{
+        const dx=Math.abs(ev.clientX-startClientX),dy=Math.abs(ev.clientY-startClientY);
+        if(!isRubber&&(dx>5||dy>5)){isRubber=true;rb.style.display='block';}
+        if(isRubber){
+          const cx=ev.clientX-bodyRect.left+scroll.scrollLeft;
+          const cy=ev.clientY-bodyRect.top+scroll.scrollTop;
+          const rx=Math.min(startX,cx),ry=Math.min(startY,cy),rw=Math.abs(cx-startX),rh=Math.abs(cy-startY);
+          rb.style.left=rx+'px';rb.style.top=ry+'px';rb.style.width=rw+'px';rb.style.height=rh+'px';
+        }
+      };
+      const onUp=ev=>{
+        document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);
+        rb.style.display='none';
+        if(isRubber){
+          // Select clips within rubber band
+          const cx=ev.clientX-bodyRect.left+scroll.scrollLeft;
+          const cy=ev.clientY-bodyRect.top+scroll.scrollTop;
+          const r1x=Math.min(startX,cx),r1y=Math.min(startY,cy),r1w=Math.abs(cx-startX),r1h=Math.abs(cy-startY);
+          S.selClips=[];
+          S.tracks.forEach((t,ti)=>{
+            const trackTop=ti*(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--track-h'))||52);
+            t.clips.forEach(cl=>{
+              const cl_left=cl.start*S.zoom,cl_width=Math.max(8,cl.duration*S.zoom);
+              const cl_top=trackTop,cl_h=52;
+              if(cl_left+cl_width>r1x&&cl_left<r1x+r1w&&cl_top+cl_h>r1y&&cl_top<r1y+r1h){
+                S.selClips.push(cl.id);
+              }
+            });
+          });
+          if(S.selClips.length===1)selectClip(S.selClips[0]);
+          else if(S.selClips.length>1){S.selClip=S.selClips[0];renderTimeline();toast(`已選取 ${S.selClips.length} 個素材`,'info');}
+        }else{
+          // Simple click — seek
+          const x=e.clientX-bodyRect.left+scroll.scrollLeft;
+          S.currentTime=Math.max(0,x/S.zoom);updatePlayhead();updateTimeDisplay();renderPreview();
+        }
+      };
+      document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
     });
   });
   // Ruler click
@@ -740,7 +867,7 @@ function renderTrackBodies(totalW){
 function renderClip(cl,track){
   const left=cl.start*S.zoom;const width=Math.max(8,cl.duration*S.zoom);
   const cls=cl.type==='audio'?'ac':cl.type==='text'?'tc':cl.type==='image'?'ic':'vc';
-  const sel=S.selClip===cl.id?'sel':'';
+  const sel=(S.selClip===cl.id||(S.selClips&&S.selClips.includes(cl.id)))?'sel':'';
   const asset=S.assets.find(a=>a.id===cl.assetId);
   let inner='';
   if(cl.type==='video'&&asset?.thumbnail){
@@ -778,10 +905,8 @@ function onClipMouseDown(e,cid){
   if(e.button!==0)return;
   const cl=findClip(cid);if(!cl)return;
   if(S.tool==='cut'){
-    const rect=e.currentTarget.getBoundingClientRect();
-    const x=e.clientX-rect.left;
-    const cutTime=cl.start+x/S.zoom;
-    cutClip(cid,cutTime);return;
+    // Always cut at playhead position (red reference line), not mouse click
+    cutClip(cid,S.currentTime);return;
   }
   selectClip(cid);
   const startX=e.clientX,startStart=cl.start;
@@ -848,7 +973,10 @@ function deselectClip(){
   renderTimeline();
 }
 function findClip(cid){for(const t of S.tracks)for(const c of t.clips)if(c.id===cid)return c;return null;}
-function deleteSelectedClip(){if(S.selClip)deleteClipById(S.selClip);}
+function deleteSelectedClip(){
+  if(S.selClips&&S.selClips.length>1){saveU();S.selClips.forEach(id=>S.tracks.forEach(t=>{t.clips=t.clips.filter(c=>c.id!==id);}));S.selClips=[];deselectClip();renderAll();}
+  else if(S.selClip)deleteClipById(S.selClip);
+}
 function deleteClipById(cid){saveU();S.tracks.forEach(t=>{t.clips=t.clips.filter(c=>c.id!==cid);});if(S.selClip===cid)deselectClip();else renderTimeline();renderPreview();}
 function updateClipProp(k,v){
   const cl=findClip(S.selClip);if(!cl)return;
@@ -882,6 +1010,7 @@ function renderPreview(){
   // Build CSS filter string
   const{br,co,sa,hu,bl}=S.color;
   const filterStr=`brightness(${1+br/100}) contrast(${1+co/100}) saturate(${1+sa/100}) hue-rotate(${hu}deg) blur(${bl}px)`;
+  const hasFilter=br!==0||co!==0||sa!==0||hu!==0||bl!==0;
   // Draw active video/image clips
   for(const t of S.tracks){
     if(t.muted)continue;
@@ -892,13 +1021,13 @@ function renderPreview(){
         if(ve){
           const targetT=(S.currentTime-cl.start)+(cl.sourceOffset||0);
           if(Math.abs(ve.currentTime-targetT)>0.15)ve.currentTime=targetT;
-          try{pCtx.filter=filterStr;pCtx.drawImage(ve,0,0,w,h);pCtx.filter='none';}catch(e){}
+          try{drawMediaFit(pCtx,ve,w,h,hasFilter?filterStr:null);}catch(e){}
         }
       }else if(cl.type==='image'){
         const asset=S.assets.find(a=>a.id===cl.assetId);
-        if(asset?.thumbnail){
+        if(asset){
           const img=new Image();img.src=asset.url||asset.thumbnail;
-          try{pCtx.filter=filterStr;pCtx.drawImage(img,0,0,w,h);pCtx.filter='none';}catch(e){}
+          try{drawMediaFit(pCtx,img,w,h,hasFilter?filterStr:null);}catch(e){}
         }
       }
     }
@@ -909,14 +1038,172 @@ function renderPreview(){
       if(cl.type!=='text')continue;
       if(cl.start>S.currentTime||cl.start+cl.duration<=S.currentTime)continue;
       pCtx.textBaseline='alphabetic';
-      drawVarietyText(pCtx,cl.text||'',w/2,h*0.85,{
+      const cx=(cl.x||0.5)*w;
+      const cy=(cl.y||0.85)*h;
+      drawVarietyText(pCtx,cl.text||'',cx,cy,{
         size:cl.fontSize||48,font:cl.fontFamily||'sans-serif',
         color:cl.color||'#fff',oc:cl.outlineColor||'#000',ow:cl.outlineWidth||0,
         or:cl.outlineRadius||0,bg:cl.bgColor||'#000',ba:cl.bgOpacity||0,bold:cl.bold});
+      // Draw selection outline on canvas if selected
+      if(S.selClip===cl.id){
+        const r=getTextClipRect(cl,w,h);
+        pCtx.save();pCtx.strokeStyle='rgba(19,160,125,.85)';pCtx.lineWidth=2;pCtx.setLineDash([5,4]);
+        pCtx.strokeRect(r.x,r.y,r.w,r.h);pCtx.setLineDash([]);pCtx.restore();
+      }
     }
   }
   updateTimeDisplay();
+  updateTextHandles();
 }
+
+/* ===== CANVAS TEXT INTERACTION ===== */
+let txtDragState=null,txtEditClipId=null;
+
+function getCanvasCoords(e){
+  const rect=previewCanvas.getBoundingClientRect();
+  return{
+    x:(e.clientX-rect.left)*(S.canvas.w/rect.width),
+    y:(e.clientY-rect.top)*(S.canvas.h/rect.height)
+  };
+}
+
+function getActiveTextClips(){
+  const res=[];
+  for(const t of S.tracks)for(const cl of t.clips)
+    if(cl.type==='text'&&cl.start<=S.currentTime&&cl.start+cl.duration>S.currentTime)res.push(cl);
+  return res;
+}
+
+function hitTestTextClips(cx,cy){
+  const actives=getActiveTextClips();
+  for(let i=actives.length-1;i>=0;i--){
+    const cl=actives[i];
+    const r=getTextClipRect(cl,S.canvas.w,S.canvas.h);
+    if(cx>=r.x&&cx<=r.x+r.w&&cy>=r.y&&cy<=r.y+r.h)return cl;
+  }
+  return null;
+}
+
+function updateTextHandles(){
+  const layer=document.getElementById('cvHandleLayer');
+  if(!layer)return;
+  layer.innerHTML='';
+  if(!S.selClip)return;
+  const cl=findClip(S.selClip);
+  if(!cl||cl.type!=='text')return;
+  if(cl.start>S.currentTime||cl.start+cl.duration<=S.currentTime)return;
+  const r=getTextClipRect(cl,S.canvas.w,S.canvas.h);
+  const cw=previewCanvas.getBoundingClientRect().width;
+  const ch=previewCanvas.getBoundingClientRect().height;
+  const scaleX=cw/S.canvas.w;
+  const scaleY=ch/S.canvas.h;
+  const corners=[
+    {nx:r.x,ny:r.y,cursor:'nwse-resize',pos:'nw'},
+    {nx:r.x+r.w,ny:r.y,cursor:'nesw-resize',pos:'ne'},
+    {nx:r.x,ny:r.y+r.h,cursor:'nesw-resize',pos:'sw'},
+    {nx:r.x+r.w,ny:r.y+r.h,cursor:'nwse-resize',pos:'se'},
+  ];
+  corners.forEach(({nx,ny,cursor,pos})=>{
+    const h=document.createElement('div');
+    h.className='ch';
+    h.style.cssText=`left:${nx*scaleX}px;top:${ny*scaleY}px;cursor:${cursor}`;
+    h.dataset.pos=pos;
+    h.addEventListener('mousedown',e=>{e.stopPropagation();onTextHandleDown(e,pos,cl,r,scaleX,scaleY);});
+    layer.appendChild(h);
+  });
+}
+
+function onTextHandleDown(e,pos,cl,r,scaleX,scaleY){
+  e.preventDefault();
+  const startX=e.clientX,startY=e.clientY;
+  const startSize=cl.fontSize||48;
+  const startX0=cl.x,startY0=cl.y;
+  const cw=S.canvas.w,ch=S.canvas.h;
+  const onMove=ev=>{
+    const dx=(ev.clientX-startX)/scaleX,dy=(ev.clientY-startY)/scaleY;
+    // Scale font size proportionally based on corner drag distance
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    const sign=(pos==='se'||pos==='ne')?1:-1;
+    cl.fontSize=Math.max(10,startSize+sign*dist*0.4);
+    renderPreview();
+  };
+  const onUp=()=>{saveU();document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);};
+  document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+}
+
+// Bind canvas events once
+previewCanvas.addEventListener('mousedown',e=>{
+  if(e.button!==0)return;
+  const{x,y}=getCanvasCoords(e);
+  const hit=hitTestTextClips(x,y);
+  if(hit){
+    selectClip(hit.id);
+    const startX=e.clientX,startY=e.clientY;
+    const startCX=hit.x,startCY=hit.y;
+    const rect=previewCanvas.getBoundingClientRect();
+    const scaleX=S.canvas.w/rect.width,scaleY=S.canvas.h/rect.height;
+    txtDragState={cl:hit,startX,startY,startCX,startCY,scaleX,scaleY,moved:false};
+    e.stopPropagation();
+    const onMove=ev=>{
+      if(!txtDragState)return;
+      const dx=(ev.clientX-txtDragState.startX)*txtDragState.scaleX/S.canvas.w;
+      const dy=(ev.clientY-txtDragState.startY)*txtDragState.scaleY/S.canvas.h;
+      txtDragState.cl.x=Math.max(0,Math.min(1,txtDragState.startCX+dx));
+      txtDragState.cl.y=Math.max(0,Math.min(1,txtDragState.startCY+dy));
+      txtDragState.moved=true;
+      renderPreview();
+    };
+    const onUp=()=>{
+      if(txtDragState?.moved)saveU();
+      txtDragState=null;
+      document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);
+    };
+    document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+  }else{
+    // Click on blank canvas = deselect
+    deselectClip();
+    commitTextEdit();
+  }
+});
+
+previewCanvas.addEventListener('dblclick',e=>{
+  const{x,y}=getCanvasCoords(e);
+  const hit=hitTestTextClips(x,y);
+  if(hit){startTextEdit(hit);}
+});
+
+function startTextEdit(cl){
+  if(!cl)return;
+  txtEditClipId=cl.id;
+  const ta=document.getElementById('txtEditTA');
+  const r=getTextClipRect(cl,S.canvas.w,S.canvas.h);
+  const rect=previewCanvas.getBoundingClientRect();
+  const scaleX=rect.width/S.canvas.w,scaleY=rect.height/S.canvas.h;
+  const cvRect=document.getElementById('cvWrap').getBoundingClientRect();
+  const canvasLeft=rect.left-cvRect.left,canvasTop=rect.top-cvRect.top;
+  ta.value=cl.text||'';
+  ta.style.display='block';
+  ta.style.left=(canvasLeft+r.x*scaleX)+'px';
+  ta.style.top=(canvasTop+r.y*scaleY)+'px';
+  ta.style.width=(r.w*scaleX)+'px';
+  ta.style.minHeight=(r.h*scaleY)+'px';
+  ta.style.fontSize=Math.round((cl.fontSize||48)*scaleY)+'px';
+  ta.focus();ta.select();
+}
+function commitTextEdit(){
+  const ta=document.getElementById('txtEditTA');
+  if(!ta||ta.style.display==='none')return;
+  if(txtEditClipId){
+    const cl=findClip(txtEditClipId);
+    if(cl){cl.text=ta.value;cl.label=ta.value;renderAll();}
+    txtEditClipId=null;
+  }
+  ta.style.display='none';
+}
+document.getElementById('txtEditTA').addEventListener('keydown',e=>{
+  if(e.key==='Escape'){commitTextEdit();e.preventDefault();}
+  if(e.key==='Enter'&&!e.shiftKey){commitTextEdit();e.preventDefault();}
+});
 
 /* ===== PLAYBACK ===== */
 let lastRaf=null,lastTimestamp=null;
@@ -1062,6 +1349,92 @@ async function startExport(){
   finally{S.processing=false;document.getElementById('expBtn').disabled=false;}
 }
 function download(buffer,mime,filename){const blob=new Blob([buffer],{type:mime});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();}
+
+/* ===== CANVAS ORIENTATION ===== */
+function setOrientation(mode){
+  const{w,h}=S.canvas;
+  const isLand=w>=h;
+  if(mode==='landscape'&&!isLand){S.canvas={w:h,h:w};}
+  else if(mode==='portrait'&&isLand){S.canvas={w:h,h:w};}
+  document.getElementById('ob-land').classList.toggle('on',S.canvas.w>=S.canvas.h);
+  document.getElementById('ob-port').classList.toggle('on',S.canvas.w<S.canvas.h);
+  const pc=document.getElementById('previewCanvas');
+  pc.width=S.canvas.w;pc.height=S.canvas.h;
+  renderPreview();toast(`畫布已切換為 ${S.canvas.w}×${S.canvas.h}`,'info');
+}
+
+/* ===== PROJECT MANAGEMENT ===== */
+function saveProject(){
+  const proj={
+    version:1,
+    projectName:S.projectName,
+    canvas:S.canvas,
+    duration:S.duration,
+    zoom:S.zoom,
+    color:S.color,
+    text:S.text,
+    tracks:S.tracks.map(t=>({...t,clips:t.clips.map(cl=>{const c={...cl};delete c.file;return c;})})),
+    assets:S.assets.map(a=>({id:a.id,name:a.name,type:a.type,duration:a.duration,w:a.w,h:a.h,thumbnail:a.thumbnail}))
+  };
+  const blob=new Blob([JSON.stringify(proj,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(S.projectName||'專案')+'.json';a.click();
+  toast('專案已儲存','ok');
+}
+
+function saveProjectAs(){
+  const name=prompt('另存為（不含副檔名）：',S.projectName||'未命名專案');
+  if(!name)return;
+  S.projectName=name;
+  document.getElementById('projName').value=name;
+  saveProject();
+}
+
+function loadProject(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const proj=JSON.parse(e.target.result);
+      S.projectName=proj.projectName||'未命名專案';
+      S.canvas=proj.canvas||{w:1920,h:1080};
+      S.duration=proj.duration||60;
+      S.zoom=proj.zoom||80;
+      S.color=proj.color||{br:0,co:0,sa:0,hu:0,bl:0};
+      S.text=proj.text||S.text;
+      S.tracks=proj.tracks||S.tracks;
+      S.selClip=null;S.selClips=[];
+      // Restore assets meta (no file blobs)
+      if(proj.assets)S.assets=proj.assets.map(a=>({...a,url:a.thumbnail||'',file:null}));
+      document.getElementById('projName').value=S.projectName;
+      const pc=document.getElementById('previewCanvas');pc.width=S.canvas.w;pc.height=S.canvas.h;
+      renderAll();toast('專案已開啟：'+S.projectName,'ok');
+    }catch(err){toast('開啟失敗：'+err.message,'err');}
+  };
+  reader.readAsText(file);input.value='';
+}
+
+function showProjSettings(){
+  document.getElementById('pm-name').value=S.projectName||'未命名專案';
+  document.getElementById('pm-cw').value=S.canvas.w;
+  document.getElementById('pm-ch').value=S.canvas.h;
+  document.getElementById('pm-dur').value=S.duration;
+  document.getElementById('projModal').classList.add('on');
+}
+function hideProjSettings(){document.getElementById('projModal').classList.remove('on');}
+function applyProjSettings(){
+  const name=document.getElementById('pm-name').value.trim();
+  const cw=parseInt(document.getElementById('pm-cw').value)||1920;
+  const ch=parseInt(document.getElementById('pm-ch').value)||1080;
+  const dur=parseInt(document.getElementById('pm-dur').value)||60;
+  if(name){S.projectName=name;document.getElementById('projName').value=name;}
+  S.canvas={w:cw,h:ch};
+  S.duration=dur;
+  const pc=document.getElementById('previewCanvas');pc.width=cw;pc.height=ch;
+  document.getElementById('ob-land').classList.toggle('on',cw>=ch);
+  document.getElementById('ob-port').classList.toggle('on',cw<ch);
+  hideProjSettings();renderAll();toast(`畫布：${cw}×${ch}，時長：${dur}s`,'info');
+}
 
 /* ===== INIT ===== */
 function init(){
