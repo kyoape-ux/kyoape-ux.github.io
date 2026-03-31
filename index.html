@@ -339,7 +339,7 @@ if ('serviceWorker' in navigator) {
     </div>
     <div class="header-tags">
       <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-tool"/></svg>影音轉檔工具</span>
-      <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-palette"/></svg>影音資源庫</span>
+      <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-film"/></svg>影音資源庫</span>
       <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-monitor"/></svg>剪輯軟體推薦</span>
     </div>
   </div>
@@ -351,7 +351,7 @@ if ('serviceWorker' in navigator) {
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-tool"/></svg>轉檔工具
     </button>
     <button class="nav-btn" onclick="showPanel('res',this)">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-palette"/></svg>影音資源庫
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-film"/></svg>影音資源庫
     </button>
     <button class="nav-btn" onclick="showPanel('sw',this)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-monitor"/></svg>剪輯軟體
@@ -631,7 +631,7 @@ if ('serviceWorker' in navigator) {
 <!-- RESOURCES -->
 <div class="panel" id="panel-res">
   <div class="tips" style="margin-top:24px">
-    <div class="tips-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-palette"/></svg></div>
+    <div class="tips-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-film"/></svg></div>
     <div><div class="tips-title">精選素材網站 · AI 工具 · 模板庫</div><div class="tips-text">包含免費（CC0）、免費帳號（Freemium）及付費訂閱網站，各卡片標示收費方式，使用前請確認各站授權條款。</div></div>
   </div>
 
@@ -695,7 +695,6 @@ if ('serviceWorker' in navigator) {
     <div class="tips-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-monitor"/></svg></div>
     <div><div class="tips-title">精選免費剪輯軟體推薦</div><div class="tips-text">以下軟體均免費使用，根據需求與技術程度選擇適合的工具。</div></div>
   </div>
-  <div class="section-title">新手友善</div>
   <div class="sw-grid">
     <a href="https://www.capcut.com/" target="_blank" class="sw-card"><div class="sw-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-cut"/></svg></div><div class="sw-info"><div class="sw-name">CapCut</div><span class="sw-level easy">新手友善</span><div class="sw-desc">操作簡單、AI 功能豐富，適合社群媒體短影片。</div><div class="sw-badges"><span class="sw-badge">網頁</span><span class="sw-badge">iOS</span><span class="sw-badge">Android</span><span class="sw-badge">AI 輔助</span></div></div></a>
     <a href="https://jianying.com/" target="_blank" class="sw-card"><div class="sw-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-cpu"/></svg></div><div class="sw-info"><div class="sw-name">剪映</div><span class="sw-level easy">新手友善</span><div class="sw-desc">與 CapCut 同屬字節跳動，繁中介面、AI 字幕自動生成，適合中文使用者做短影音。</div><div class="sw-badges"><span class="sw-badge">Mac</span><span class="sw-badge">Windows</span><span class="sw-badge">繁中</span><span class="sw-badge">AI 字幕</span></div></div></a>
@@ -703,14 +702,8 @@ if ('serviceWorker' in navigator) {
     <a href="https://www.openshot.org/" target="_blank" class="sw-card"><div class="sw-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-video"/></svg></div><div class="sw-info"><div class="sw-name">OpenShot</div><span class="sw-level easy">新手友善</span><div class="sw-desc">介面直覺、學習曲線低，完全免費開源，三平台支援。</div><div class="sw-badges"><span class="sw-badge">Mac</span><span class="sw-badge">Windows</span><span class="sw-badge">Linux</span></div></div></a>
     <a href="https://apps.apple.com/tw/app/imovie/id408981434" target="_blank" class="sw-card"><div class="sw-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-monitor"/></svg></div><div class="sw-info"><div class="sw-name">iMovie</div><span class="sw-level easy">新手友善</span><div class="sw-desc">Mac / iPhone 內建免費，操作簡單，適合日常快速剪輯。</div><div class="sw-badges"><span class="sw-badge">Mac</span><span class="sw-badge">iOS</span><span class="sw-badge">Apple 內建</span></div></div></a>
     <a href="https://clipchamp.com/" target="_blank" class="sw-card"><div class="sw-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-globe"/></svg></div><div class="sw-info"><div class="sw-name">Clipchamp</div><span class="sw-level easy">新手友善</span><div class="sw-desc">Microsoft 出品，Windows 11 內建，網頁版也可用。</div><div class="sw-badges"><span class="sw-badge">Windows</span><span class="sw-badge">網頁</span><span class="sw-badge">Microsoft</span></div></div></a>
-  </div>
-  <div class="section-title">中階</div>
-  <div class="sw-grid">
     <a href="https://www.kdenlive.org/" target="_blank" class="sw-card"><div class="sw-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-film"/></svg></div><div class="sw-info"><div class="sw-name">Kdenlive</div><span class="sw-level mid">中階</span><div class="sw-desc">開源免費，功能完整，支援多軌道，適合進階使用者。</div><div class="sw-badges"><span class="sw-badge">Windows</span><span class="sw-badge">Linux</span><span class="sw-badge">開源</span></div></div></a>
     <a href="https://shotcut.org/" target="_blank" class="sw-card"><div class="sw-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-tool"/></svg></div><div class="sw-info"><div class="sw-name">Shotcut</div><span class="sw-level mid">中階</span><div class="sw-desc">輕量開源，格式支援廣，無浮水印，三平台皆支援。</div><div class="sw-badges"><span class="sw-badge">Mac</span><span class="sw-badge">Windows</span><span class="sw-badge">Linux</span></div></div></a>
-  </div>
-  <div class="section-title">專業</div>
-  <div class="sw-grid">
     <a href="https://www.blackmagicdesign.com/products/davinciresolve" target="_blank" class="sw-card"><div class="sw-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-sliders"/></svg></div><div class="sw-info"><div class="sw-name">DaVinci Resolve</div><span class="sw-level pro">專業級</span><div class="sw-desc">好萊塢級調色與剪輯，免費版功能完整，三平台支援。</div><div class="sw-badges"><span class="sw-badge">Mac</span><span class="sw-badge">Windows</span><span class="sw-badge">Linux</span><span class="sw-badge">調色強</span></div></div></a>
   </div>
 </div>
