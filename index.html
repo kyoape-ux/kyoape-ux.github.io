@@ -189,6 +189,22 @@ main{max-width:980px;margin:24px auto 0;padding:0 16px}
 footer{text-align:center;padding:36px 16px 0;color:var(--text3);font-size:12px;line-height:2}
 footer a{color:var(--indigo2);text-decoration:none}
 
+.c-orange::before{background:linear-gradient(90deg,#c2410c,#ea580c)}
+.c-orange .tool-icon{background:linear-gradient(135deg,#c2410c,#ea580c)}
+.c-orange .tool-btn{background:rgba(234,88,12,.12);color:#fb923c}
+.c-orange .drop-area{border-color:rgba(234,88,12,.3)}
+.c-orange .drop-area:hover,.c-orange .drop-area.drag-over{border-color:#ea580c;background:rgba(234,88,12,.06)}
+.c-orange .progress-bar{background:linear-gradient(90deg,#c2410c,#fb923c)}
+.c-orange .dl-btn{background:linear-gradient(135deg,#c2410c,#ea580c)}
+.wm-logo-pick{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.wm-logo-name{font-size:11px;color:var(--text3);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:italic}
+.wm-opts{display:none;margin-bottom:12px;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:11px 13px;flex-direction:column;gap:8px}
+.tool-card.wm-ready .wm-opts{display:flex}
+.tool-card.done .wm-opts,.tool-card.processing .wm-opts{display:none}
+.wm-pos-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;flex:1}
+.wm-pos-btn{padding:5px 6px;border-radius:6px;border:1px solid var(--border2);background:var(--bg2);color:var(--text3);font-size:11px;font-weight:600;cursor:pointer;transition:.15s;text-align:center}
+.c-orange .wm-pos-btn.active,.c-orange .wm-pos-btn:hover{border-color:#fb923c;color:#fb923c;background:rgba(251,146,60,.1)}
+
 /* ── c-teal ── */
 .c-teal::before{background:linear-gradient(90deg,#0d9488,#2dd4bf)}.c-teal:hover{box-shadow:0 0 24px rgba(20,184,166,.15)}.c-teal .tool-icon{background:rgba(20,184,166,.15)}.c-teal .tool-btn{background:rgba(20,184,166,.12);color:#2dd4bf}.c-teal .progress-bar{background:linear-gradient(90deg,#0d9488,#2dd4bf)}.c-teal .dl-btn{background:linear-gradient(135deg,#0d9488,#14b8a6)}.c-teal .fmt{background:rgba(20,184,166,.1);color:#2dd4bf;border-color:rgba(20,184,166,.2)}
 
@@ -324,6 +340,7 @@ if ('serviceWorker' in navigator) {
   <symbol id="ico-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
   <symbol id="ico-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></symbol>
   <symbol id="ico-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></symbol>
+  <symbol id="ico-wm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="15" rx="2"/><rect x="13" y="3" width="9" height="7" rx="1.5" fill="currentColor" stroke="currentColor" stroke-width="1.25"/></symbol>
 </svg>
 
 <header>
@@ -555,6 +572,55 @@ if ('serviceWorker' in navigator) {
       <div class="download-wrap">
         <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載無聲影片</button>
         <button class="reset-btn">再次處理</button>
+      </div>
+    </div>
+
+    <div class="tool-card c-orange" data-tool="watermark">
+      <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
+      <input type="file" hidden accept="image/*" class="wm-logo-input">
+      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-wm"/></svg></div>
+      <div class="tool-name">壓制浮水印</div>
+      <div class="tool-desc">將 LOGO 疊加在影片指定角落，支援 PNG 透明背景，適合加上頻道或品牌標誌。</div>
+      <div class="drop-area">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg>
+        <div class="drop-text">拖曳影片到這裡，或點擊選取</div>
+        <div class="drop-sub">支援 MP4、MOV、MKV、WebM</div>
+      </div>
+      <div class="file-info">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg>
+        <div class="file-meta"><div class="file-name"></div><div class="file-info-size"></div></div>
+        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
+      </div>
+      <div class="wm-logo-pick">
+        <button class="tool-btn wm-logo-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg>選擇 LOGO 圖片</button>
+        <span class="wm-logo-name">尚未選擇（PNG 透明背景建議）</span>
+      </div>
+      <div class="wm-opts">
+        <div class="trim-bit-row">
+          <span class="trim-bit-lbl">位置</span>
+          <div class="wm-pos-grid">
+            <button class="wm-pos-btn" data-pos="tl">↖ 左上</button>
+            <button class="wm-pos-btn active" data-pos="tr">↗ 右上</button>
+            <button class="wm-pos-btn" data-pos="bl">↙ 左下</button>
+            <button class="wm-pos-btn" data-pos="br">↘ 右下</button>
+          </div>
+        </div>
+        <div class="trim-bit-row">
+          <span class="trim-bit-lbl">大小</span>
+          <select class="fmt-select wm-size-sel" style="margin-bottom:0">
+            <option value="80">小（80px）</option>
+            <option value="120" selected>中（120px）</option>
+            <option value="180">大（180px）</option>
+            <option value="250">特大（250px）</option>
+          </select>
+        </div>
+      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">壓制浮水印中...</div></div>
+      <div class="error-msg"></div>
+      <button class="tool-btn start-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始壓制</button>
+      <div class="download-wrap">
+        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載加浮水印影片</button>
+        <button class="reset-btn">重新處理</button>
       </div>
     </div>
 
@@ -1126,6 +1192,141 @@ if ('serviceWorker' in navigator) {
     });
   }
 
+  function setupWatermarkCard(card) {
+    var input = card.querySelector('input[type=file]:not(.wm-logo-input)');
+    var logoInput = card.querySelector('.wm-logo-input');
+    var logoBtn = card.querySelector('.wm-logo-btn');
+    var logoNameEl = card.querySelector('.wm-logo-name');
+    var dropArea = card.querySelector('.drop-area');
+    var nameEl = card.querySelector('.file-name');
+    var sizeEl = card.querySelector('.file-info-size');
+    var clearBtn = card.querySelector('.file-clear');
+    var bar = card.querySelector('.progress-bar');
+    var startBtn = card.querySelector('.start-btn');
+    var dlBtn = card.querySelector('.dl-btn');
+    var resetBtn = card.querySelector('.reset-btn');
+    var errEl = card.querySelector('.error-msg');
+    var logoFile = null;
+
+    function updateReady() {
+      var ready = !!fileMap.get(card) && !!logoFile;
+      if (ready) { card.classList.add('wm-ready'); startBtn.style.display = ''; }
+      else { card.classList.remove('wm-ready'); startBtn.style.display = 'none'; }
+    }
+
+    function setFile(f) {
+      fileMap.set(card, f);
+      card.classList.remove('done','has-error','processing');
+      card.classList.add('has-file');
+      nameEl.textContent = f.name;
+      sizeEl.textContent = fmtBytes(f.size);
+      bar.style.width = '0%'; errEl.textContent = '';
+      updateReady();
+    }
+
+    function reset() {
+      fileMap.delete(card); logoFile = null;
+      logoNameEl.textContent = '尚未選擇（PNG 透明背景建議）';
+      var prevUrl = blobMap.get(card);
+      if (prevUrl) URL.revokeObjectURL(prevUrl);
+      blobMap.delete(card);
+      card.classList.remove('has-file','done','has-error','processing','wm-ready');
+      if (input) input.value = '';
+      if (logoInput) logoInput.value = '';
+      bar.style.width = '0%'; errEl.textContent = '';
+      startBtn.style.display = 'none';
+    }
+
+    logoBtn.addEventListener('click', function() { logoInput.click(); });
+    logoInput.addEventListener('change', function() {
+      if (logoInput.files[0]) {
+        logoFile = logoInput.files[0];
+        logoNameEl.textContent = logoFile.name;
+        updateReady();
+      }
+    });
+
+    card.querySelectorAll('.wm-pos-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        card.querySelectorAll('.wm-pos-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+      });
+    });
+
+    if (dropArea) {
+      dropArea.addEventListener('click', function() { input.click(); });
+      dropArea.addEventListener('dragover', function(e) { e.preventDefault(); dropArea.classList.add('drag-over'); });
+      dropArea.addEventListener('dragleave', function() { dropArea.classList.remove('drag-over'); });
+      dropArea.addEventListener('drop', function(e) {
+        e.preventDefault(); dropArea.classList.remove('drag-over');
+        if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+      });
+    }
+    if (input) input.addEventListener('change', function() { if (input.files[0]) setFile(input.files[0]); });
+    if (clearBtn) clearBtn.addEventListener('click', reset);
+    if (resetBtn) resetBtn.addEventListener('click', reset);
+
+    startBtn.addEventListener('click', async function() {
+      var file = fileMap.get(card);
+      if (!file || !logoFile) return;
+      if (card.classList.contains('processing')) return;
+      if (ffRunning) { errEl.textContent = '另一個工具正在處理中，請稍候再試'; return; }
+      card.classList.remove('has-error','done');
+      card.classList.add('processing');
+      bar.style.width = '5%'; errEl.textContent = '';
+      currentBar = bar;
+      currentProgressEl = card.querySelector('.progress-text');
+      currentProgressBase = currentProgressEl ? currentProgressEl.textContent.trim() : '';
+      ffRunning = true;
+      try {
+        await ensureFF(); bar.style.width = '15%';
+        var posBtn = card.querySelector('.wm-pos-btn.active');
+        var pos = posBtn ? posBtn.dataset.pos : 'tr';
+        var sizeSel = card.querySelector('.wm-size-sel');
+        var logoW = sizeSel ? sizeSel.value : '120';
+        var inExt = getExt(file.name), logoExt = getExt(logoFile.name);
+        var inN = 'in.' + inExt, logoN = 'logo.' + logoExt, outN = 'out.mp4';
+        try { ff.FS('unlink', inN); } catch(e) {}
+        try { ff.FS('unlink', logoN); } catch(e) {}
+        try { ff.FS('unlink', outN); } catch(e) {}
+        ff.FS('writeFile', inN, await fetchFile(file));
+        ff.FS('writeFile', logoN, await fetchFile(logoFile));
+        bar.style.width = '25%';
+        var overlayPos = { tl:'20:20', tr:'W-w-20:20', bl:'20:H-h-20', br:'W-w-20:H-h-20' }[pos] || 'W-w-20:20';
+        var filter = '[1:v]scale=' + logoW + ':-1[logo];[0:v][logo]overlay=' + overlayPos;
+        await ff.run(
+          '-i', inN, '-i', logoN,
+          '-filter_complex', filter,
+          '-vcodec', 'libx264', '-preset', 'ultrafast', '-crf', '20',
+          '-pix_fmt', 'yuv420p', '-acodec', 'aac', '-b:a', '128k',
+          '-max_muxing_queue_size', '1024', outN
+        );
+        var data = ff.FS('readFile', outN);
+        fsClean(inN, logoN, outN);
+        bar.style.width = '100%'; await sleep(350);
+        card.classList.remove('processing'); card.classList.add('done');
+        var blob = new Blob([data.buffer], { type: 'video/mp4' });
+        var url = URL.createObjectURL(blob);
+        blobMap.set(card, url);
+        dlBtn.onclick = function() {
+          var a = document.createElement('a'); a.href = url;
+          a.download = basename(file.name) + '_watermark.mp4'; a.click();
+        };
+      } catch(err) {
+        console.error(err);
+        card.classList.remove('processing'); card.classList.add('has-file','has-error');
+        bar.style.width = '0%';
+        errEl.textContent = '處理失敗：' + (err.message || '格式不支援或記憶體不足');
+        if (err.message && err.message.indexOf('one command at a time') >= 0) ffReady = false;
+      } finally {
+        currentBar = null;
+        if (currentProgressEl) currentProgressEl.textContent = currentProgressBase;
+        currentProgressEl = null; currentProgressBase = '';
+        ffRunning = false;
+      }
+    });
+  }
+
   function setupMergeCard(card) {
     var input = card.querySelector('input[type=file][multiple]');
     var dropzone = card.querySelector('.merge-dropzone');
@@ -1274,7 +1475,8 @@ if ('serviceWorker' in navigator) {
     }
   };
 
-  document.querySelectorAll('.tool-card[data-tool]:not([data-tool="merge"])').forEach(setupCard);
+  document.querySelectorAll('.tool-card[data-tool]:not([data-tool="merge"]):not([data-tool="watermark"])').forEach(setupCard);
+  document.querySelectorAll('.tool-card[data-tool="watermark"]').forEach(setupWatermarkCard);
   document.querySelectorAll('.tool-card[data-tool="merge"]').forEach(setupMergeCard);
 })();
 </script>
