@@ -1,36 +1,34 @@
-const { app, BrowserWindow, session } = require('electron');
+const { app, BrowserWindow, dialog, shell } = require('electron');
 const path = require('path');
 
-function createWindow() {
-  // FFmpeg.wasm needs SharedArrayBuffer → require COOP/COEP headers
-  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-    callback({
-      responseHeaders: {
-        ...details.responseHeaders,
-        'Cross-Origin-Opener-Policy': ['same-origin'],
-        'Cross-Origin-Embedder-Policy': ['require-corp'],
-      },
-    });
-  });
+// SharedArrayBuffer: webSecurity:false already enables it in Electron.
+// Also add the flag as belt-and-suspenders for all Electron versions.
+app.commandLine.appendSwitch('disable-site-isolation-trials');
+app.commandLine.appendSwitch('enable-features', 'SharedArrayBuffer');
 
+function createWindow() {
   const win = new BrowserWindow({
     width: 1440,
     height: 900,
     minWidth: 960,
     minHeight: 600,
     title: '光田影音小助手',
+    // titleBarStyle: 'hiddenInset', // uncomment for macOS native traffic-lights
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      // Allow local file access for video/audio assets
-      webSecurity: false,
+      webSecurity: false,          // allows local file:// access for media assets
     },
   });
 
   win.loadFile('index.html');
-
-  // Remove default menu bar
   win.setMenuBarVisibility(false);
+
+  // Open external links in the system browser instead of a new Electron window
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
 }
 
 app.whenReady().then(createWindow);
