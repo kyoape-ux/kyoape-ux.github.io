@@ -164,7 +164,7 @@ main{max-width:980px;margin:24px auto 0;padding:0 16px}
 .res-card:hover .res-arrow{color:var(--indigo2);opacity:1}
 
 .sw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-.sw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;gap:14px;align-items:flex-start;transition:.2s;text-decoration:none;align-self:stretch}
+.sw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;gap:14px;align-items:flex-start;transition:.2s;text-decoration:none}
 .sw-card:hover{transform:translateY(-2px);border-color:var(--border2);box-shadow:0 4px 20px rgba(0,0,0,.3)}
 .sw-icon{width:46px;height:46px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--surface2);color:var(--indigo2)}
 .sw-info{flex:1;min-width:0}
@@ -1493,6 +1493,31 @@ if ('serviceWorker' in navigator) {
     updateUI();
     genThumbs();
   };
+})();
+</script>
+<script>
+(function() {
+  function eqSwCards() {
+    var cards = [].slice.call(document.querySelectorAll('.sw-card'));
+    // Reset heights first to get natural sizes
+    cards.forEach(function(c) { c.style.height = ''; });
+    // Find the tallest card
+    var maxH = cards.reduce(function(m, c) { return Math.max(m, c.offsetHeight); }, 0);
+    // Apply equal height to all
+    if (maxH > 0) cards.forEach(function(c) { c.style.height = maxH + 'px'; });
+  }
+  // Run after layout is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', eqSwCards);
+  } else {
+    requestAnimationFrame(eqSwCards);
+  }
+  // Re-equalize on resize (e.g. font scaling or window resize)
+  var resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(eqSwCards, 120);
+  });
 })();
 </script>
 </body>
