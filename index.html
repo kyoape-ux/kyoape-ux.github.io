@@ -154,9 +154,9 @@ main{max-width:980px;margin:24px auto 0;padding:0 16px}
 .res-tag.tmpl{background:rgba(20,184,166,.1);color:#2dd4bf;border-color:rgba(20,184,166,.2)}
 .res-tag.paid{background:rgba(245,158,11,.1);color:var(--amber2);border-color:rgba(245,158,11,.2)}
 .price-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;align-self:flex-start;margin-top:2px}
-.price-badge.free{background:rgba(16,185,129,.1);color:var(--emerald2);border:1px solid rgba(16,185,129,.2)}
-.price-badge.freemium{background:rgba(14,165,233,.1);color:var(--sky2);border:1px solid rgba(14,165,233,.2)}
-.price-badge.paid-only{background:rgba(245,158,11,.1);color:var(--amber2);border:1px solid rgba(245,158,11,.2)}
+.price-badge.free{background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
+.price-badge.freemium{background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
+.price-badge.paid-only{background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
 .res-name{font-size:14px;font-weight:700;color:var(--text)}
 .res-desc{font-size:12px;color:var(--text2);line-height:1.55;flex:1}
 .res-card-bot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:8px}
@@ -339,7 +339,7 @@ if ('serviceWorker' in navigator) {
     </div>
     <div class="header-tags">
       <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-tool"/></svg>影音轉檔工具</span>
-      <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-palette"/></svg>免費素材資源</span>
+      <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-palette"/></svg>影音資源庫</span>
       <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-monitor"/></svg>剪輯軟體推薦</span>
     </div>
   </div>
@@ -351,7 +351,7 @@ if ('serviceWorker' in navigator) {
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-tool"/></svg>轉檔工具
     </button>
     <button class="nav-btn" onclick="showPanel('res',this)">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-palette"/></svg>免費素材
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-palette"/></svg>影音資源庫
     </button>
     <button class="nav-btn" onclick="showPanel('sw',this)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-monitor"/></svg>剪輯軟體
@@ -467,7 +467,8 @@ if ('serviceWorker' in navigator) {
           <div class="trim-bit-row">
             <span class="trim-bit-lbl">影片品質</span>
             <select class="fmt-select trim-vid-quality">
-              <option value="18">高品質（CRF 18）</option>
+              <option value="copy">原始品質（不重新編碼）</option>
+              <option value="18">高品質（CRF 18，視覺無損）</option>
               <option value="23" selected>標準（CRF 23）</option>
               <option value="28">小檔案（CRF 28）</option>
               <option value="35">極小（CRF 35）</option>
@@ -904,15 +905,27 @@ if ('serviceWorker' in navigator) {
         var crf = crfSel ? crfSel.value : '23';
         var audBrSel = card.querySelector('.trim-aud-br');
         var audBr = audBrSel ? audBrSel.value : '128k';
-        var outN = 'out.mp4';
-        var args = ['-i', inN, '-ss', String(start)];
-        if (end !== null && end > start) args.push('-to', String(end));
-        args.push('-vcodec', 'libx264', '-preset', 'fast', '-crf', crf,
-                  '-acodec', 'aac', '-b:a', audBr, '-movflags', '+faststart', outN);
-        await ff.run.apply(ff, args);
-        var data = ff.FS('readFile', outN);
-        fsClean(inN, outN);
-        return { data: data, ext: 'mp4', filename: basename(file.name) + '_trim.mp4' };
+        if (crf === 'copy') {
+          // Stream copy — no re-encode, keep original codec & quality
+          var outN = 'out.' + inExt;
+          var args = ['-i', inN, '-ss', String(start)];
+          if (end !== null && end > start) args.push('-to', String(end));
+          args.push('-c', 'copy', outN);
+          await ff.run.apply(ff, args);
+          var data = ff.FS('readFile', outN);
+          fsClean(inN, outN);
+          return { data: data, ext: inExt, filename: basename(file.name) + '_trim.' + inExt };
+        } else {
+          var outN = 'out.mp4';
+          var args = ['-i', inN, '-ss', String(start)];
+          if (end !== null && end > start) args.push('-to', String(end));
+          args.push('-vcodec', 'libx264', '-preset', 'fast', '-crf', crf,
+                    '-acodec', 'aac', '-b:a', audBr, '-movflags', '+faststart', outN);
+          await ff.run.apply(ff, args);
+          var data = ff.FS('readFile', outN);
+          fsClean(inN, outN);
+          return { data: data, ext: 'mp4', filename: basename(file.name) + '_trim.mp4' };
+        }
       }
     },
     mute: async function(file, card) {
@@ -1059,7 +1072,8 @@ if ('serviceWorker' in navigator) {
         card.classList.add('done');
         if (toolId === 'trim') {
           var svgEl = dlBtn.querySelector('svg');
-          dlBtn.textContent = result.ext === 'mp3' ? '下載裁切後音訊 (MP3)' : '下載裁切後影片 (MP4)';
+          var extLabel = result.ext.toUpperCase();
+          dlBtn.textContent = result.ext === 'mp3' ? '下載裁切後音訊 (' + extLabel + ')' : '下載裁切後影片 (' + extLabel + ')';
           if (svgEl) dlBtn.insertBefore(svgEl, dlBtn.firstChild);
         }
         var mime = MIME[result.ext] || 'application/octet-stream';
