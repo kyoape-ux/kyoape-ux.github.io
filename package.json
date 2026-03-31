@@ -1,0 +1,27 @@
+{
+  "name": "kuangtien-video-editor",
+  "version": "1.0.0",
+  "description": "光田影音剪輯工具 — 桌機版",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build-mac": "electron-builder --mac",
+    "build-win": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.kuangtien.videoeditor",
+    "productName": "光田影音小助手",
+    "files": ["index.html", "main.js", "coi-serviceworker.js"],
+    "mac": {
+      "category": "public.app-category.video",
+      "icon": "icon.icns"
+    },
+    "win": {
+      "icon": "icon.ico"
+    }
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.0.0"
+  }
+}

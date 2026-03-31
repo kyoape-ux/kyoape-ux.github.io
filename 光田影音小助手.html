@@ -274,6 +274,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 </style>
 </head>
 <body>
+<div id="hiddenMedia" style="position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none"></div>
 <div id="app">
 
 <!-- ── Topbar ── -->
@@ -778,7 +779,8 @@ async function handleFile(file){
       v.onseeked=()=>{const c=document.createElement('canvas');c.width=160;c.height=90;c.getContext('2d').drawImage(v,0,0,160,90);asset.thumbnail=c.toDataURL('image/jpeg',.7);res();};
       v.onerror=res;v.load();
     });
-    const ve=document.createElement('video');ve.src=url;ve.preload='auto';videoEls[asset.id]=ve;
+    const ve=document.createElement('video');ve.src=url;ve.preload='auto';ve.playsInline=true;videoEls[asset.id]=ve;
+    document.getElementById('hiddenMedia').appendChild(ve);
   }else if(t==='image'){
     await new Promise(res=>{const img=new Image();img.src=url;img.onload=()=>{asset.duration=5;asset.w=img.naturalWidth;asset.h=img.naturalHeight;asset.thumbnail=url;res();};});
   }else{
@@ -1099,11 +1101,13 @@ function onClipMouseDown(e,cid){
     const endSnapped=snapTime(raw+c.duration,dragState.cid);
     const useSnap=Math.abs(snapped-raw)<Math.abs(endSnapped-c.duration-raw)?snapped:endSnapped-c.duration;
     c.start=Math.max(0,useSnap);
+    // Fast path: only update this clip's DOM position — no full re-render
+    const el=document.querySelector(`.clip[data-cid="${dragState.cid}"]`);
+    if(el)el.style.left=(c.start*S.zoom)+'px';
     if(c.start!==raw)showSnapLine(c.start);else hideSnapLine();
-    renderTimeline();
   };
   const onUp=()=>{
-    if(dragState)saveU();
+    if(dragState){saveU();renderTimeline();}
     dragState=null;hideSnapLine();
     document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);
   };
@@ -1114,21 +1118,23 @@ function onClipResize(e,cid,isRight){
   const startX=e.clientX,startDur=cl.duration,startStart=cl.start;
   const onMove=ev=>{
     const dx=(ev.clientX-startX)/S.zoom;
+    const el=document.querySelector(`.clip[data-cid="${cid}"]`);
     if(isRight){
       const rawEnd=startStart+startDur+dx;
       const snapped=snapTime(rawEnd,cid);
       cl.duration=Math.max(0.1,snapped-startStart);
+      if(el)el.style.width=Math.max(8,cl.duration*S.zoom)+'px';
       if(snapped!==rawEnd)showSnapLine(snapped);else hideSnapLine();
     }else{
       const rawStart=Math.max(0,startStart+dx);
       const snapped=snapTime(rawStart,cid);
       const ns=Math.max(0,Math.min(snapped,startStart+startDur-0.1));
       cl.duration=startStart+startDur-ns;cl.start=ns;
+      if(el){el.style.left=(cl.start*S.zoom)+'px';el.style.width=Math.max(8,cl.duration*S.zoom)+'px';}
       if(snapped!==rawStart)showSnapLine(snapped);else hideSnapLine();
     }
-    renderTimeline();
   };
-  const onUp=()=>{saveU();hideSnapLine();document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);};
+  const onUp=()=>{saveU();hideSnapLine();renderTimeline();document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);};
   document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
 }
 
@@ -1511,6 +1517,25 @@ document.getElementById('txtEditTA').addEventListener('keydown',e=>{
 /* ===== PLAYBACK ===== */
 let lastRaf=null,lastTimestamp=null;
 
+function syncVideoClips(play){
+  for(const t of S.tracks){
+    for(const cl of t.clips){
+      if(cl.type!=='video')continue;
+      const ve=videoEls[cl.assetId];if(!ve)continue;
+      ve.muted=!!t.muted;
+      ve.volume=Math.min(1,(cl.volume||100)/100);
+      const active=S.currentTime>=cl.start&&S.currentTime<cl.start+cl.duration;
+      if(play&&active){
+        const targetT=(S.currentTime-cl.start)+(cl.sourceOffset||0);
+        if(Math.abs(ve.currentTime-targetT)>0.3)ve.currentTime=Math.max(0,targetT);
+        ve.play().catch(()=>{});
+      }else{
+        if(!ve.paused)ve.pause();
+      }
+    }
+  }
+}
+function syncAllMedia(play){syncVideoClips(play);syncAudioClips(play);}
 function syncAudioClips(play){
   for(const t of S.tracks){
     for(const cl of t.clips){
@@ -1536,14 +1561,10 @@ function togglePlay(){
   if(S.playing){
     // Resume AudioContext (needed after user gesture)
     if(sharedAudioCtx&&sharedAudioCtx.state==='suspended')sharedAudioCtx.resume();
-    // Sync videos
-    for(const t of S.tracks)for(const cl of t.clips){
-      if(cl.type==='video'){const ve=videoEls[cl.assetId];if(ve)ve.muted=t.muted;}}
-    syncAudioClips(true);
+    syncAllMedia(true);
     lastTimestamp=null;requestAnimationFrame(rafLoop);
   }else{
-    // Pause audio
-    syncAudioClips(false);
+    syncAllMedia(false);
   }
 }
 function rafLoop(ts){
@@ -1554,15 +1575,15 @@ function rafLoop(ts){
   if(S.currentTime>=pd){
     S.currentTime=pd;S.playing=false;
     document.getElementById('playIco').innerHTML='<polygon points="5,3 19,12 5,21"/>';
-    syncAudioClips(false);updatePlayhead();renderPreview();return;
+    syncAllMedia(false);updatePlayhead();renderPreview();return;
   }
-  // Sync audio every ~10 frames to avoid constant seeking
-  if(Math.round(S.currentTime*10)%3===0)syncAudioClips(true);
+  // Sync media every ~10 frames to avoid constant seeking
+  if(Math.round(S.currentTime*10)%3===0)syncAllMedia(true);
   updatePlayhead();renderPreview();
   requestAnimationFrame(rafLoop);
 }
-function seekToStart(){S.currentTime=0;S.playing=false;syncAudioClips(false);document.getElementById('playIco').innerHTML='<polygon points="5,3 19,12 5,21"/>';updatePlayhead();renderPreview();}
-function seekToEnd(){S.currentTime=getProjectDuration();S.playing=false;syncAudioClips(false);document.getElementById('playIco').innerHTML='<polygon points="5,3 19,12 5,21"/>';updatePlayhead();renderPreview();}
+function seekToStart(){S.currentTime=0;S.playing=false;syncAllMedia(false);document.getElementById('playIco').innerHTML='<polygon points="5,3 19,12 5,21"/>';updatePlayhead();renderPreview();}
+function seekToEnd(){S.currentTime=getProjectDuration();S.playing=false;syncAllMedia(false);document.getElementById('playIco').innerHTML='<polygon points="5,3 19,12 5,21"/>';updatePlayhead();renderPreview();}
 function toggleFullscreen(){const el=document.getElementById('previewArea');if(!document.fullscreenElement)el.requestFullscreen();else document.exitFullscreen();}
 function changeZoom(d){S.zoom=Math.max(20,Math.min(300,S.zoom+d));renderTimeline();}
 function toggleSnap(){snapEnabled=!snapEnabled;document.getElementById('tt-snap').classList.toggle('on',snapEnabled);toast(snapEnabled?'磁吸對齊已開啟':'磁吸對齊已關閉','info');}
