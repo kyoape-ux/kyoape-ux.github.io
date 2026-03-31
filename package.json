@@ -5,19 +5,41 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build-mac": "electron-builder --mac",
-    "build-win": "electron-builder --win"
+    "build-mac": "electron-builder --mac --x64 --arm64",
+    "build-win": "electron-builder --win --x64"
   },
   "build": {
     "appId": "com.kuangtien.videoeditor",
     "productName": "光田影音小助手",
-    "files": ["index.html", "main.js", "coi-serviceworker.js"],
+    "files": [
+      "index.html",
+      "main.js",
+      "coi-serviceworker.js"
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "kyoape-ux",
+      "repo": "kuangtien-video-tool"
+    },
     "mac": {
       "category": "public.app-category.video",
-      "icon": "icon.icns"
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] }
+      ]
+    },
+    "dmg": {
+      "title": "光田影音小助手",
+      "window": { "width": 540, "height": 380 }
     },
     "win": {
-      "icon": "icon.ico"
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerLanguages": ["zh_TW", "en_US"]
     }
   },
   "devDependencies": {
