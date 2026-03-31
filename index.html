@@ -792,6 +792,8 @@ if ('serviceWorker' in navigator) {
   var ffLoading = false;
   var ffRunning = false;
   var currentBar = null;
+  var currentProgressEl = null;
+  var currentProgressBase = '';
   var overlay = document.getElementById('ffOverlay');
 
   function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
@@ -826,7 +828,11 @@ if ('serviceWorker' in navigator) {
         log: false,
         corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
         progress: function(p) {
-          if (currentBar) currentBar.style.width = Math.min(96, Math.round(p.ratio * 100)) + '%';
+          var pct = Math.min(96, Math.round(p.ratio * 100));
+          if (currentBar) currentBar.style.width = pct + '%';
+          if (currentProgressEl && pct > 0) {
+            currentProgressEl.textContent = currentProgressBase + ' ' + pct + '%';
+          }
         }
       });
       await ff.load();
@@ -885,16 +891,22 @@ if ('serviceWorker' in navigator) {
     trim: async function(file, card) {
       var start = parseTime(card.querySelector('.time-start').value) || 0;
       var end = parseTime(card.querySelector('.time-end').value);
+      // duration for -t flag (relative to -ss input seek)
+      var dur = (end !== null && end > start) ? (end - start) : null;
       var outFmtSel = card.querySelector('.trim-out-fmt');
       var outFmt = outFmtSel ? outFmtSel.value : 'video';
       var inExt = getExt(file.name), inN = 'in.' + inExt;
+      // Pre-clean any leftover virtual FS files
+      try { ff.FS('unlink', inN); } catch(e) {}
       ff.FS('writeFile', inN, await fetchFile(file));
       if (outFmt === 'audio') {
         var mp3BrSel = card.querySelector('.trim-mp3-br');
         var mp3Br = mp3BrSel ? mp3BrSel.value : '192k';
         var outN = 'out.mp3';
-        var args = ['-i', inN, '-ss', String(start)];
-        if (end !== null && end > start) args.push('-to', String(end));
+        try { ff.FS('unlink', outN); } catch(e) {}
+        // -ss before -i = fast input seek (no full decode from start)
+        var args = ['-ss', String(start), '-i', inN];
+        if (dur !== null) args.push('-t', String(dur));
         args.push('-vn', '-acodec', 'libmp3lame', '-b:a', mp3Br, '-q:a', '0', outN);
         await ff.run.apply(ff, args);
         var data = ff.FS('readFile', outN);
@@ -906,10 +918,10 @@ if ('serviceWorker' in navigator) {
         var audBrSel = card.querySelector('.trim-aud-br');
         var audBr = audBrSel ? audBrSel.value : '128k';
         if (crf === 'copy') {
-          // Stream copy — no re-encode, keep original codec & quality
           var outN = 'out.' + inExt;
-          var args = ['-i', inN, '-ss', String(start)];
-          if (end !== null && end > start) args.push('-to', String(end));
+          try { ff.FS('unlink', outN); } catch(e) {}
+          var args = ['-ss', String(start), '-i', inN];
+          if (dur !== null) args.push('-t', String(dur));
           args.push('-c', 'copy', outN);
           await ff.run.apply(ff, args);
           var data = ff.FS('readFile', outN);
@@ -917,10 +929,12 @@ if ('serviceWorker' in navigator) {
           return { data: data, ext: inExt, filename: basename(file.name) + '_trim.' + inExt };
         } else {
           var outN = 'out.mp4';
-          var args = ['-i', inN, '-ss', String(start)];
-          if (end !== null && end > start) args.push('-to', String(end));
+          try { ff.FS('unlink', outN); } catch(e) {}
+          var args = ['-ss', String(start), '-i', inN];
+          if (dur !== null) args.push('-t', String(dur));
+          // Remove -movflags +faststart: causes second-pass hang in ffmpeg.wasm
           args.push('-vcodec', 'libx264', '-preset', 'fast', '-crf', crf,
-                    '-acodec', 'aac', '-b:a', audBr, '-movflags', '+faststart', outN);
+                    '-acodec', 'aac', '-b:a', audBr, outN);
           await ff.run.apply(ff, args);
           var data = ff.FS('readFile', outN);
           fsClean(inN, outN);
@@ -1067,6 +1081,8 @@ if ('serviceWorker' in navigator) {
       bar.style.width = '5%';
       errEl.textContent = '';
       currentBar = bar;
+      currentProgressEl = card.querySelector('.progress-text');
+      currentProgressBase = currentProgressEl ? currentProgressEl.textContent.trim() : '';
       ffRunning = true;
       try {
         await ensureFF();
@@ -1101,6 +1117,9 @@ if ('serviceWorker' in navigator) {
         }
       } finally {
         currentBar = null;
+        if (currentProgressEl) currentProgressEl.textContent = currentProgressBase;
+        currentProgressEl = null;
+        currentProgressBase = '';
         ffRunning = false;
       }
     });
@@ -1207,6 +1226,8 @@ if ('serviceWorker' in navigator) {
       card.classList.add('processing');
       bar.style.width = '5%'; errEl.textContent = '';
       currentBar = bar;
+      currentProgressEl = card.querySelector('.progress-text');
+      currentProgressBase = currentProgressEl ? currentProgressEl.textContent.trim() : '';
       ffRunning = true;
       try {
         await ensureFF(); bar.style.width = '10%';
@@ -1224,6 +1245,9 @@ if ('serviceWorker' in navigator) {
         }
       } finally {
         currentBar = null;
+        if (currentProgressEl) currentProgressEl.textContent = currentProgressBase;
+        currentProgressEl = null;
+        currentProgressBase = '';
         ffRunning = false;
       }
     });
