@@ -164,7 +164,7 @@ main{max-width:980px;margin:24px auto 0;padding:0 16px}
 .res-card:hover .res-arrow{color:var(--indigo2);opacity:1}
 
 .sw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-.sw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;gap:14px;align-items:flex-start;transition:.2s;text-decoration:none}
+.sw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;gap:14px;align-items:flex-start;transition:.2s;text-decoration:none;align-self:stretch}
 .sw-card:hover{transform:translateY(-2px);border-color:var(--border2);box-shadow:0 4px 20px rgba(0,0,0,.3)}
 .sw-icon{width:46px;height:46px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--surface2);color:var(--indigo2)}
 .sw-info{flex:1;min-width:0}
@@ -790,6 +790,7 @@ if ('serviceWorker' in navigator) {
   var ff = null;
   var ffReady = false;
   var ffLoading = false;
+  var ffRunning = false;
   var currentBar = null;
   var overlay = document.getElementById('ffOverlay');
 
@@ -1056,11 +1057,17 @@ if ('serviceWorker' in navigator) {
     startBtn.addEventListener('click', async function() {
       var file = fileMap.get(card);
       if (!file) return;
+      if (card.classList.contains('processing')) return;
+      if (ffRunning) {
+        errEl.textContent = '另一個工具正在處理中，請稍候再試';
+        return;
+      }
       card.classList.remove('has-error', 'done');
       card.classList.add('processing');
       bar.style.width = '5%';
       errEl.textContent = '';
       currentBar = bar;
+      ffRunning = true;
       try {
         await ensureFF();
         bar.style.width = '10%';
@@ -1088,7 +1095,14 @@ if ('serviceWorker' in navigator) {
         card.classList.add('has-file', 'has-error');
         bar.style.width = '0%';
         errEl.textContent = '處理失敗：' + (err.message || '格式不支援或記憶體不足');
-      } finally { currentBar = null; }
+        // 若 ffmpeg 內部狀態卡住，強制下次重新初始化
+        if (err.message && err.message.indexOf('one command at a time') >= 0) {
+          ffReady = false;
+        }
+      } finally {
+        currentBar = null;
+        ffRunning = false;
+      }
     });
   }
 
@@ -1184,10 +1198,16 @@ if ('serviceWorker' in navigator) {
 
     startBtn.addEventListener('click', async function() {
       if (files.length < 2) return;
+      if (card.classList.contains('processing')) return;
+      if (ffRunning) {
+        errEl.textContent = '另一個工具正在處理中，請稍候再試';
+        return;
+      }
       card.classList.remove('has-error','done');
       card.classList.add('processing');
       bar.style.width = '5%'; errEl.textContent = '';
       currentBar = bar;
+      ffRunning = true;
       try {
         await ensureFF(); bar.style.width = '10%';
         var result = await PROC.merge(files, card);
@@ -1199,7 +1219,13 @@ if ('serviceWorker' in navigator) {
       } catch(err) {
         console.error(err); card.classList.remove('processing'); card.classList.add('has-error');
         bar.style.width = '0%'; errEl.textContent = '合併失敗：' + (err.message || '格式不相容或記憶體不足');
-      } finally { currentBar = null; }
+        if (err.message && err.message.indexOf('one command at a time') >= 0) {
+          ffReady = false;
+        }
+      } finally {
+        currentBar = null;
+        ffRunning = false;
+      }
     });
 
     resetBtn.addEventListener('click', function(){
