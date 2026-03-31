@@ -201,6 +201,14 @@ footer a{color:var(--indigo2);text-decoration:none}
 .tool-card.done .trim-range-chip,.tool-card.processing .trim-range-chip{display:none}
 .trim-range-lbl{font-size:11px;color:var(--text3);font-weight:600}
 .trim-range-val{color:var(--sky2);font-weight:700;font-size:11px;font-variant-numeric:tabular-nums}
+/* ── trim output options panel ── */
+.trim-output-opts{display:none;margin-bottom:12px;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:11px 13px;flex-direction:column;gap:8px}
+.tool-card.has-file .trim-output-opts{display:flex}
+.tool-card.done .trim-output-opts,.tool-card.processing .trim-output-opts{display:none}
+.trim-bit-row{display:flex;align-items:center;gap:8px}
+.trim-bit-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap;min-width:60px;flex-shrink:0}
+.trim-bit-row .fmt-select{margin-bottom:0;font-size:12px}
+.trim-out-divider{height:1px;background:var(--border);margin:1px 0}
 
 /* ── trim modal ── */
 .trim-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:900;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:.22s}
@@ -446,6 +454,47 @@ if ('serviceWorker' in navigator) {
       </div>
       <button class="tool-btn trim-open-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-sliders"/></svg>開啟時間軸剪輯</button>
       <div class="trim-range-chip"><span class="trim-range-lbl">裁切範圍</span><span class="trim-range-val">尚未設定</span></div>
+      <div class="trim-output-opts">
+        <div class="trim-bit-row">
+          <span class="trim-bit-lbl">輸出格式</span>
+          <select class="fmt-select trim-out-fmt">
+            <option value="video">影片 MP4（H.264 + AAC）</option>
+            <option value="audio">音訊 MP3（僅提取聲音）</option>
+          </select>
+        </div>
+        <div class="trim-out-divider"></div>
+        <div class="trim-vid-opts">
+          <div class="trim-bit-row">
+            <span class="trim-bit-lbl">影片品質</span>
+            <select class="fmt-select trim-vid-quality">
+              <option value="18">高品質（CRF 18）</option>
+              <option value="23" selected>標準（CRF 23）</option>
+              <option value="28">小檔案（CRF 28）</option>
+              <option value="35">極小（CRF 35）</option>
+            </select>
+          </div>
+          <div class="trim-bit-row">
+            <span class="trim-bit-lbl">音訊位元率</span>
+            <select class="fmt-select trim-aud-br">
+              <option value="128k" selected>128 kbps（標準）</option>
+              <option value="192k">192 kbps（高品質）</option>
+              <option value="256k">256 kbps</option>
+              <option value="320k">320 kbps（最高）</option>
+            </select>
+          </div>
+        </div>
+        <div class="trim-mp3-opts" style="display:none">
+          <div class="trim-bit-row">
+            <span class="trim-bit-lbl">MP3 位元率</span>
+            <select class="fmt-select trim-mp3-br">
+              <option value="128k">128 kbps</option>
+              <option value="192k" selected>192 kbps（高品質）</option>
+              <option value="256k">256 kbps</option>
+              <option value="320k">320 kbps（最高）</option>
+            </select>
+          </div>
+        </div>
+      </div>
       <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">裁切中...</div></div>
       <div class="error-msg"></div>
       <button class="tool-btn start-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始裁切</button>
@@ -835,15 +884,36 @@ if ('serviceWorker' in navigator) {
     trim: async function(file, card) {
       var start = parseTime(card.querySelector('.time-start').value) || 0;
       var end = parseTime(card.querySelector('.time-end').value);
-      var inExt = getExt(file.name), inN = 'in.' + inExt, outN = 'out.' + inExt;
+      var outFmtSel = card.querySelector('.trim-out-fmt');
+      var outFmt = outFmtSel ? outFmtSel.value : 'video';
+      var inExt = getExt(file.name), inN = 'in.' + inExt;
       ff.FS('writeFile', inN, await fetchFile(file));
-      var args = ['-i', inN, '-ss', String(start)];
-      if (end !== null && end > start) args.push('-to', String(end));
-      args.push('-c', 'copy', outN);
-      await ff.run.apply(ff, args);
-      var data = ff.FS('readFile', outN);
-      fsClean(inN, outN);
-      return { data: data, ext: inExt, filename: basename(file.name) + '_trim.' + inExt };
+      if (outFmt === 'audio') {
+        var mp3BrSel = card.querySelector('.trim-mp3-br');
+        var mp3Br = mp3BrSel ? mp3BrSel.value : '192k';
+        var outN = 'out.mp3';
+        var args = ['-i', inN, '-ss', String(start)];
+        if (end !== null && end > start) args.push('-to', String(end));
+        args.push('-vn', '-acodec', 'libmp3lame', '-b:a', mp3Br, '-q:a', '0', outN);
+        await ff.run.apply(ff, args);
+        var data = ff.FS('readFile', outN);
+        fsClean(inN, outN);
+        return { data: data, ext: 'mp3', filename: basename(file.name) + '_trim.mp3' };
+      } else {
+        var crfSel = card.querySelector('.trim-vid-quality');
+        var crf = crfSel ? crfSel.value : '23';
+        var audBrSel = card.querySelector('.trim-aud-br');
+        var audBr = audBrSel ? audBrSel.value : '128k';
+        var outN = 'out.mp4';
+        var args = ['-i', inN, '-ss', String(start)];
+        if (end !== null && end > start) args.push('-to', String(end));
+        args.push('-vcodec', 'libx264', '-preset', 'fast', '-crf', crf,
+                  '-acodec', 'aac', '-b:a', audBr, '-movflags', '+faststart', outN);
+        await ff.run.apply(ff, args);
+        var data = ff.FS('readFile', outN);
+        fsClean(inN, outN);
+        return { data: data, ext: 'mp4', filename: basename(file.name) + '_trim.mp4' };
+      }
     },
     mute: async function(file, card) {
       var inN = 'in.' + getExt(file.name), outN = 'out.mp4';
@@ -958,6 +1028,19 @@ if ('serviceWorker' in navigator) {
       });
     }
 
+    var outFmtSel = card.querySelector('.trim-out-fmt');
+    if (outFmtSel) {
+      outFmtSel.addEventListener('change', function() {
+        var isAudio = outFmtSel.value === 'audio';
+        var vidOpts = card.querySelector('.trim-vid-opts');
+        var mp3Opts = card.querySelector('.trim-mp3-opts');
+        var progText = card.querySelector('.progress-text');
+        if (vidOpts) vidOpts.style.display = isAudio ? 'none' : '';
+        if (mp3Opts) mp3Opts.style.display = isAudio ? '' : 'none';
+        if (progText) progText.textContent = isAudio ? '提取音訊中...' : '裁切中...';
+      });
+    }
+
     startBtn.addEventListener('click', async function() {
       var file = fileMap.get(card);
       if (!file) return;
@@ -974,6 +1057,11 @@ if ('serviceWorker' in navigator) {
         await sleep(350);
         card.classList.remove('processing');
         card.classList.add('done');
+        if (toolId === 'trim') {
+          var svgEl = dlBtn.querySelector('svg');
+          dlBtn.textContent = result.ext === 'mp3' ? '下載裁切後音訊 (MP3)' : '下載裁切後影片 (MP4)';
+          if (svgEl) dlBtn.insertBefore(svgEl, dlBtn.firstChild);
+        }
         var mime = MIME[result.ext] || 'application/octet-stream';
         var blob = new Blob([result.data.buffer], { type: mime });
         var url = URL.createObjectURL(blob);
