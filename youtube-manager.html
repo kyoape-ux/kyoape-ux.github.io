@@ -239,14 +239,21 @@ tr:hover td{background:rgba(52,211,153,.03);}
 
     <!-- ═══ Page: Dashboard ═══ -->
     <div class="page active" id="page-dashboard">
-      <div class="page-title">
-        <span class="icon icon-lg"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="4" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/></svg></span>
-        本月儀表板 <span id="dash-month" style="font-size:13px;color:var(--txt3);font-weight:400;"></span>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div class="page-title" style="margin-bottom:0;">
+          <span class="icon icon-lg"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="4" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/></svg></span>
+          季度儀表板 <span id="dash-label" style="font-size:13px;color:var(--txt3);font-weight:400;"></span>
+        </div>
+        <div id="quarter-switcher" style="display:flex;gap:4px;background:var(--bg-2);border-radius:8px;padding:3px;border:1px solid var(--border);"></div>
       </div>
+
+      <!-- 待處理提醒 -->
+      <div id="pending-alert" style="display:none;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px;"></div>
+
       <div class="cards" id="kpi-cards"></div>
       <div class="chart-row">
         <div class="chart-box">
-          <h3><span class="icon"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></span>月度觀看趨勢（近 6 個月）</h3>
+          <h3><span class="icon"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></span>年度月觀看趨勢</h3>
           <canvas id="chart-monthly"></canvas>
         </div>
         <div class="chart-box">
@@ -260,7 +267,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
           <canvas id="chart-cat"></canvas>
         </div>
         <div class="chart-box">
-          <h3><span class="icon"><svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>本月 Top 5 影片</h3>
+          <h3><span class="icon"><svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>本季 Top 5 影片</h3>
           <canvas id="chart-top5"></canvas>
         </div>
       </div>
@@ -350,7 +357,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
         <button class="btn btn-secondary btn-sm" onclick="exportCSV()">匯出 CSV</button>
       </div>
       <div class="tbl-wrap">
-        <table><thead><tr><th>日期</th><th>標題</th><th>類型</th><th>類別</th><th>全平台觀看</th><th>YT 讚</th><th>YT CTR</th><th>企劃</th><th>操作</th></tr></thead>
+        <table><thead><tr><th>狀態</th><th>日期</th><th>標題</th><th>類型</th><th>類別</th><th>全平台觀看</th><th>數據日期</th><th>企劃</th><th>操作</th></tr></thead>
         <tbody id="video-tbody"></tbody></table>
       </div>
       <div id="list-empty" style="display:none;text-align:center;padding:48px;color:var(--txt3);">
@@ -535,6 +542,28 @@ const NUM_FIELDS = ['yt_views','yt_likes','yt_comments','yt_imp','yt_ctr','yt_ra
 const ALL_FORM_FIELDS = [...BASIC_FIELDS, ...YT_FIELDS, ...FB_FIELDS, ...IG_FIELDS];
 function totalViews(d){return(Number(d.yt_views)||0)+(Number(d.fb_views)||0)+(Number(d.ig_views)||0);}
 
+// ── 統計規則：發布後 1 個月內的數據為 KPI ──
+function getVideoStatus(d){
+  if(!d.date)return'unknown';
+  const pub=new Date(d.date),now=new Date(),cutoff=new Date(pub);
+  cutoff.setMonth(cutoff.getMonth()+1);
+  if(now<cutoff)return'collecting';
+  if((Number(d.yt_views)||0)===0&&!d.statsDate)return'pending';
+  return'locked';
+}
+const STATUS_CFG={
+  collecting:{label:'統計中',color:'var(--amber)',bg:'rgba(251,191,36,.12)',icon:'◐'},
+  pending:{label:'待抓取',color:'var(--red)',bg:'rgba(248,113,113,.12)',icon:'◉'},
+  locked:{label:'已定案',color:'var(--accent)',bg:'rgba(52,211,153,.12)',icon:'◎'},
+  unknown:{label:'—',color:'var(--txt3)',bg:'transparent',icon:''}
+};
+function getQuarter(date){return Math.floor(new Date(date).getMonth()/3)+1;}
+function getQuarterLabel(q){return'Q'+q+' ('+['1~3月','4~6月','7~9月','10~12月'][q-1]+')';}
+function getQuarterMonths(q){return[1,2,3].map(i=>String((q-1)*3+i).padStart(2,'0'));}
+function getCurQuarter(){return getQuarter(new Date());}
+let dashQuarter=getCurQuarter();
+let dashYear=new Date().getFullYear();
+
 // ============================================================
 // API
 // ============================================================
@@ -576,37 +605,58 @@ Chart.defaults.color='#5A6B80';Chart.defaults.borderColor='#1E2D3D';Chart.defaul
 // ============================================================
 // 儀表板
 // ============================================================
+function switchQuarter(q){dashQuarter=q;renderDashboard();}
 function renderDashboard(){
-  const now=new Date(),ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  document.getElementById('dash-month').textContent=ym;
-  const md=DATA.filter(d=>(d.date||'').startsWith(ym));
-  const tv=md.reduce((s,d)=>s+totalViews(d),0),ytv=md.reduce((s,d)=>s+(Number(d.yt_views)||0),0),fbv=md.reduce((s,d)=>s+(Number(d.fb_views)||0),0),igv=md.reduce((s,d)=>s+(Number(d.ig_views)||0),0);
-  const cnt=md.length,avgCtr=md.length?(md.reduce((s,d)=>s+(Number(d.yt_ctr)||0),0)/md.length):0;
-  const star=md.filter(d=>(Number(d.yt_views)||0)>=CFG.personalGoal).length;
-  const vp=Math.min(100,Math.round(tv/CFG.viewGoal*100)),cp=Math.min(100,Math.round(cnt/CFG.countGoal*100));
+  const yr=dashYear,q=dashQuarter,qms=getQuarterMonths(q);
+  document.getElementById('dash-label').textContent=yr+' '+getQuarterLabel(q);
+  // Quarter switcher
+  document.getElementById('quarter-switcher').innerHTML=[1,2,3,4].map(i=>`<button onclick="switchQuarter(${i})" style="padding:6px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:.12s;${i===q?'background:var(--accent);color:#000;':'background:transparent;color:var(--txt3);'}">${getQuarterLabel(i)}</button>`).join('');
+
+  const qd=DATA.filter(d=>{if(!d.date)return false;const m=d.date.substring(5,7);return d.date.startsWith(String(yr))&&qms.includes(m);});
+  const tv=qd.reduce((s,d)=>s+totalViews(d),0),ytv=qd.reduce((s,d)=>s+(Number(d.yt_views)||0),0),fbv=qd.reduce((s,d)=>s+(Number(d.fb_views)||0),0),igv=qd.reduce((s,d)=>s+(Number(d.ig_views)||0),0);
+  const cnt=qd.length,avgCtr=qd.length?(qd.reduce((s,d)=>s+(Number(d.yt_ctr)||0),0)/qd.length):0;
+  const star=qd.filter(d=>(Number(d.yt_views)||0)>=CFG.personalGoal).length;
+  const qGoalView=CFG.viewGoal*3,qGoalCnt=CFG.countGoal*3;
+  const vp=Math.min(100,Math.round(tv/qGoalView*100)),cp=Math.min(100,Math.round(cnt/qGoalCnt*100));
+
+  // Pending alert
+  const pendingList=DATA.filter(d=>getVideoStatus(d)==='pending');
+  const pa=document.getElementById('pending-alert');
+  if(pendingList.length>0){
+    pa.style.display='block';
+    pa.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:${pendingList.length>0?'10px':'0'};"><span style="font-size:18px;color:var(--red);">◉</span><div><b style="color:var(--red);">${pendingList.length} 部影片已滿 1 個月，請更新數據</b><div style="font-size:11px;color:var(--txt3);margin-top:2px;">點擊影片名稱可直接編輯並一鍵取得最新 YT 數據</div></div></div>`+pendingList.map(d=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(248,113,113,.1);font-size:12px;"><span style="color:var(--txt3);">${d.date}</span><a href="#" onclick="openEdit('${d.id}');return false;" style="color:var(--red);font-weight:500;">${esc(d.title)}</a></div>`).join('');
+  } else { pa.style.display='none'; }
+
   document.getElementById('kpi-cards').innerHTML=`
-    <div class="kpi-card"><div class="kpi-label">全平台觀看</div><div class="kpi-val">${tv.toLocaleString()}</div><div class="kpi-sub">目標 ${CFG.viewGoal.toLocaleString()}（${vp}%）</div><div class="kpi-bar"><div class="kpi-bar-fill ${vp>=100?'kpi-ok':vp>=60?'kpi-warn':'kpi-bad'}" style="width:${vp}%"></div></div><div class="platform-breakdown"><span class="plat-tag plat-yt">YT ${ytv.toLocaleString()}</span><span class="plat-tag plat-fb">FB ${fbv.toLocaleString()}</span><span class="plat-tag plat-ig">IG ${igv.toLocaleString()}</span></div></div>
-    <div class="kpi-card"><div class="kpi-label">上傳部數</div><div class="kpi-val">${cnt}</div><div class="kpi-sub">目標 ${CFG.countGoal} 部（${cp}%）</div><div class="kpi-bar"><div class="kpi-bar-fill ${cp>=100?'kpi-ok':cp>=60?'kpi-warn':'kpi-bad'}" style="width:${cp}%"></div></div></div>
-    <div class="kpi-card"><div class="kpi-label">YT 平均 CTR</div><div class="kpi-val">${(avgCtr*100).toFixed(1)}%</div><div class="kpi-sub">YouTube 曝光點閱率</div></div>
+    <div class="kpi-card"><div class="kpi-label">季度全平台觀看</div><div class="kpi-val">${tv.toLocaleString()}</div><div class="kpi-sub">季目標 ${qGoalView.toLocaleString()}（${vp}%）</div><div class="kpi-bar"><div class="kpi-bar-fill ${vp>=100?'kpi-ok':vp>=60?'kpi-warn':'kpi-bad'}" style="width:${vp}%"></div></div><div class="platform-breakdown"><span class="plat-tag plat-yt">YT ${ytv.toLocaleString()}</span><span class="plat-tag plat-fb">FB ${fbv.toLocaleString()}</span><span class="plat-tag plat-ig">IG ${igv.toLocaleString()}</span></div></div>
+    <div class="kpi-card"><div class="kpi-label">季度上傳數</div><div class="kpi-val">${cnt}</div><div class="kpi-sub">季目標 ${qGoalCnt} 部（${cp}%）</div><div class="kpi-bar"><div class="kpi-bar-fill ${cp>=100?'kpi-ok':cp>=60?'kpi-warn':'kpi-bad'}" style="width:${cp}%"></div></div></div>
+    <div class="kpi-card"><div class="kpi-label">YT 平均 CTR</div><div class="kpi-val">${(avgCtr*100).toFixed(1)}%</div><div class="kpi-sub">本季 YouTube 點閱率</div></div>
     <div class="kpi-card"><div class="kpi-label">達標影片</div><div class="kpi-val">${star}</div><div class="kpi-sub">單片 YT ≥${CFG.personalGoal.toLocaleString()}</div></div>`;
-  renderCharts(md);
+  renderCharts(qd);
 }
-function renderCharts(monthData){
-  const months=[],now=new Date();
-  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);}
+function renderCharts(qData){
+  // Full year monthly trend
+  const yr=dashYear,months=[];
+  for(let i=1;i<=12;i++)months.push(`${yr}-${String(i).padStart(2,'0')}`);
   const mYt=months.map(m=>DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.yt_views)||0),0));
   const mFb=months.map(m=>DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.fb_views)||0),0));
   const mIg=months.map(m=>DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.ig_views)||0),0));
+  // Highlight current quarter months
+  const qms=getQuarterMonths(dashQuarter);
+  const bgYt=months.map((_,i)=>qms.includes(String(i+1).padStart(2,'0'))?'rgba(255,68,68,0.8)':'rgba(255,68,68,0.25)');
+  const bgFb=months.map((_,i)=>qms.includes(String(i+1).padStart(2,'0'))?'rgba(76,139,245,0.8)':'rgba(76,139,245,0.25)');
+  const bgIg=months.map((_,i)=>qms.includes(String(i+1).padStart(2,'0'))?'rgba(225,48,108,0.8)':'rgba(225,48,108,0.25)');
   if(chartMonthly)chartMonthly.destroy();
-  chartMonthly=new Chart(document.getElementById('chart-monthly'),{type:'bar',data:{labels:months,datasets:[{label:'YouTube',data:mYt,backgroundColor:'rgba(255,68,68,0.7)',borderRadius:4},{label:'Facebook',data:mFb,backgroundColor:'rgba(76,139,245,0.7)',borderRadius:4},{label:'Instagram',data:mIg,backgroundColor:'rgba(225,48,108,0.7)',borderRadius:4}]},options:{responsive:true,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true}},plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:12,padding:16}}}}});
-  const allYt=DATA.reduce((s,d)=>s+(Number(d.yt_views)||0),0),allFb=DATA.reduce((s,d)=>s+(Number(d.fb_views)||0),0),allIg=DATA.reduce((s,d)=>s+(Number(d.ig_views)||0),0);
+  chartMonthly=new Chart(document.getElementById('chart-monthly'),{type:'bar',data:{labels:months.map(m=>m.substring(5)+'月'),datasets:[{label:'YouTube',data:mYt,backgroundColor:bgYt,borderRadius:3},{label:'Facebook',data:mFb,backgroundColor:bgFb,borderRadius:3},{label:'Instagram',data:mIg,backgroundColor:bgIg,borderRadius:3}]},options:{responsive:true,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true}},plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:12,padding:16}}}}});
+  // Platform pie (quarter data)
+  const qYt=qData.reduce((s,d)=>s+(Number(d.yt_views)||0),0),qFb=qData.reduce((s,d)=>s+(Number(d.fb_views)||0),0),qIg=qData.reduce((s,d)=>s+(Number(d.ig_views)||0),0);
   if(chartPlatform)chartPlatform.destroy();
-  chartPlatform=new Chart(document.getElementById('chart-platform'),{type:'doughnut',data:{labels:['YouTube','Facebook','Instagram'],datasets:[{data:[allYt,allFb,allIg],backgroundColor:['#FF4444','#4C8BF5','#E1306C'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:16}}}}});
+  chartPlatform=new Chart(document.getElementById('chart-platform'),{type:'doughnut',data:{labels:['YouTube','Facebook','Instagram'],datasets:[{data:[qYt,qFb,qIg],backgroundColor:['#FF4444','#4C8BF5','#E1306C'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:16}}}}});
   const cats=['疾病衛教','特色醫療','新服務流程','醫院形象','員工活動','教學','其他'];
   const catColors=['#34D399','#60A5FA','#FBBF24','#F87171','#A78BFA','#2DD4BF','#64748B'];
   if(chartCat)chartCat.destroy();
-  chartCat=new Chart(document.getElementById('chart-cat'),{type:'doughnut',data:{labels:cats,datasets:[{data:cats.map(c=>DATA.filter(d=>d.cat===c).length),backgroundColor:catColors,borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:16}}}}});
-  const top5=[...monthData].sort((a,b)=>totalViews(b)-totalViews(a)).slice(0,5);
+  chartCat=new Chart(document.getElementById('chart-cat'),{type:'doughnut',data:{labels:cats,datasets:[{data:cats.map(c=>qData.filter(d=>d.cat===c).length),backgroundColor:catColors,borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:16}}}}});
+  const top5=[...qData].sort((a,b)=>totalViews(b)-totalViews(a)).slice(0,5);
   if(chartTop5)chartTop5.destroy();
   chartTop5=new Chart(document.getElementById('chart-top5'),{type:'bar',data:{labels:top5.map(d=>(d.title||'').substring(0,14)+((d.title||'').length>14?'…':'')),datasets:[{label:'YT',data:top5.map(d=>Number(d.yt_views)||0),backgroundColor:'rgba(255,68,68,0.7)',borderRadius:3},{label:'FB',data:top5.map(d=>Number(d.fb_views)||0),backgroundColor:'rgba(76,139,245,0.7)',borderRadius:3},{label:'IG',data:top5.map(d=>Number(d.ig_views)||0),backgroundColor:'rgba(225,48,108,0.7)',borderRadius:3}]},options:{indexAxis:'y',responsive:true,scales:{x:{stacked:true,beginAtZero:true,grid:{display:false}},y:{stacked:true,grid:{display:false}}},plugins:{legend:{position:'top',labels:{font:{size:10},boxWidth:10,padding:12}}}}});
 }
@@ -614,7 +664,7 @@ function renderCharts(monthData){
 // ============================================================
 // 新增影片
 // ============================================================
-function buildEntryFromForm(p){const g=id=>document.getElementById(p+id);const e={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};ALL_FORM_FIELDS.forEach(f=>{const el=g(f);if(!el)return;if(NUM_FIELDS.includes(f))e[f]=Number(el.value)||0;else e[f]=el.value.trim?el.value.trim():el.value;});return e;}
+function buildEntryFromForm(p){const g=id=>document.getElementById(p+id);const e={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};ALL_FORM_FIELDS.forEach(f=>{const el=g(f);if(!el)return;if(NUM_FIELDS.includes(f))e[f]=Number(el.value)||0;else e[f]=el.value.trim?el.value.trim():el.value;});if(window._lastStatsFetchDate){e.statsDate=window._lastStatsFetchDate;window._lastStatsFetchDate=null;}return e;}
 async function saveEntry(){const t=document.getElementById('f-title').value.trim(),d=document.getElementById('f-date').value;if(!t){showAlert('entry-alert','請填寫影片標題','err');return;}if(!d){showAlert('entry-alert','請選擇發布日期','err');return;}const e=buildEntryFromForm('f-');DATA.push(e);saveData();showAlert('entry-alert','已儲存','ok');clearForm();renderAll();const ok=await pushToSheets('saveVideo',{data:e});showSyncBadge(ok?'已同步 Sheets':USE_API()?'本機已儲存，同步失敗':'已儲存至本機');}
 function clearForm(){ALL_FORM_FIELDS.forEach(id=>{const el=document.getElementById('f-'+id);if(el)el.value='';});document.getElementById('f-type').value='long';document.getElementById('f-cat').value='疾病衛教';document.getElementById('f-date').value=new Date().toISOString().slice(0,10);}
 
@@ -624,10 +674,14 @@ function clearForm(){ALL_FORM_FIELDS.forEach(id=>{const el=document.getElementBy
 function renderList(){
   const s=(document.getElementById('search-input').value||'').toLowerCase(),ft=document.getElementById('filter-type').value,fc=document.getElementById('filter-cat').value,fm=document.getElementById('filter-month').value;
   let f=DATA.filter(d=>{if(s&&!(d.title||'').toLowerCase().includes(s)&&!(d.planner||'').toLowerCase().includes(s)&&!(d.producer||'').toLowerCase().includes(s))return false;if(ft&&d.type!==ft)return false;if(fc&&d.cat!==fc)return false;if(fm&&!(d.date||'').startsWith(fm))return false;return true;});
+  // Sort: pending first, then collecting, then locked, then by date desc
+  const statusOrder={pending:0,collecting:1,locked:2,unknown:3};
+  f.sort((a,b)=>{const sa=statusOrder[getVideoStatus(a)]??3,sb=statusOrder[getVideoStatus(b)]??3;if(sa!==sb)return sa-sb;return(b.date||'').localeCompare(a.date||'');});
   const tb=document.getElementById('video-tbody'),em=document.getElementById('list-empty');
   if(f.length===0){tb.innerHTML='';em.style.display='block';return;}em.style.display='none';
   tb.innerHTML=f.map(d=>{const tv=totalViews(d),ytv=Number(d.yt_views)||0,fbv=Number(d.fb_views)||0,igv=Number(d.ig_views)||0,lk=d.yt_url||d.fb_url||d.ig_url||'';
-    return`<tr><td style="white-space:nowrap;">${d.date||'—'}</td><td style="max-width:200px;">${lk?`<a href="${esc(lk)}" target="_blank">${esc(d.title)}</a>`:esc(d.title)}</td><td><span class="type-badge type-${d.type}">${d.type==='short'?'Short':'Long'}</span></td><td>${esc(d.cat||'')}</td><td><div class="views-cell"><span class="total">${tv.toLocaleString()}</span><span class="plats">${ytv?`<span style="color:var(--yt)">YT ${ytv.toLocaleString()}</span>`:''}${fbv?`<span style="color:var(--fb)">FB ${fbv.toLocaleString()}</span>`:''}${igv?`<span style="color:var(--ig)">IG ${igv.toLocaleString()}</span>`:''}</span></div></td><td style="text-align:right;">${(Number(d.yt_likes)||0).toLocaleString()}</td><td style="text-align:right;">${((Number(d.yt_ctr)||0)*100).toFixed(1)}%</td><td>${esc(d.planner||'')}</td><td><div class="act-btns"><button class="act-btn" onclick="openEdit('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span></button><button class="act-btn del" onclick="deleteEntry('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></div></td></tr>`;}).join('');
+    const st=getVideoStatus(d),sc=STATUS_CFG[st];
+    return`<tr><td><span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${sc.bg};color:${sc.color};">${sc.icon} ${sc.label}</span></td><td style="white-space:nowrap;">${d.date||'—'}</td><td style="max-width:200px;">${lk?`<a href="${esc(lk)}" target="_blank">${esc(d.title)}</a>`:esc(d.title)}</td><td><span class="type-badge type-${d.type}">${d.type==='short'?'Short':'Long'}</span></td><td>${esc(d.cat||'')}</td><td><div class="views-cell"><span class="total">${tv.toLocaleString()}</span><span class="plats">${ytv?`<span style="color:var(--yt)">YT ${ytv.toLocaleString()}</span>`:''}${fbv?`<span style="color:var(--fb)">FB ${fbv.toLocaleString()}</span>`:''}${igv?`<span style="color:var(--ig)">IG ${igv.toLocaleString()}</span>`:''}</span></div></td><td style="white-space:nowrap;font-size:11px;color:var(--txt3);">${d.statsDate||'—'}</td><td>${esc(d.planner||'')}</td><td><div class="act-btns"><button class="act-btn" onclick="openEdit('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span></button><button class="act-btn del" onclick="deleteEntry('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></div></td></tr>`;}).join('');
 }
 function buildMonthFilter(){const ms=[...new Set(DATA.map(d=>(d.date||'').substring(0,7)).filter(Boolean))].sort().reverse();document.getElementById('filter-month').innerHTML='<option value="">全部月份</option>'+ms.map(m=>`<option value="${m}">${m}</option>`).join('');}
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
@@ -637,7 +691,7 @@ function esc(s){const d=document.createElement('div');d.textContent=s||'';return
 // ============================================================
 function openEdit(id){const d=DATA.find(v=>v.id===id);if(!d)return;document.getElementById('e-id').value=d.id;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(el)el.value=d[f]??'';});document.getElementById('edit-modal').classList.add('show');}
 function closeModal(){document.getElementById('edit-modal').classList.remove('show');}
-async function updateEntry(){const id=document.getElementById('e-id').value,idx=DATA.findIndex(d=>d.id===id);if(idx===-1)return;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(!el)return;if(NUM_FIELDS.includes(f))DATA[idx][f]=Number(el.value)||0;else DATA[idx][f]=el.value;});DATA[idx].updatedAt=new Date().toISOString();saveData();closeModal();renderAll();const ok=await pushToSheets('updateVideo',{data:DATA[idx]});showSyncBadge(ok?'已同步修改':USE_API()?'本機已更新，同步失敗':'已更新');}
+async function updateEntry(){const id=document.getElementById('e-id').value,idx=DATA.findIndex(d=>d.id===id);if(idx===-1)return;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(!el)return;if(NUM_FIELDS.includes(f))DATA[idx][f]=Number(el.value)||0;else DATA[idx][f]=el.value;});DATA[idx].updatedAt=new Date().toISOString();if(window._lastStatsFetchDate){DATA[idx].statsDate=window._lastStatsFetchDate;window._lastStatsFetchDate=null;}saveData();closeModal();renderAll();const ok=await pushToSheets('updateVideo',{data:DATA[idx]});showSyncBadge(ok?'已同步修改':USE_API()?'本機已更新，同步失敗':'已更新');}
 async function deleteEntry(id){if(!confirm('確定要刪除此影片紀錄？'))return;DATA=DATA.filter(d=>d.id!==id);saveData();renderAll();const ok=await pushToSheets('deleteVideo',{id});showSyncBadge(ok?'已從 Sheets 刪除':USE_API()?'本機已刪除':'已刪除');}
 
 // ============================================================
@@ -718,6 +772,8 @@ async function autoFetchYt(prefix){
   g('yt_views').value=d.yt_views;
   g('yt_likes').value=d.yt_likes;
   g('yt_comments').value=d.yt_comments;
+  // Record stats fetch date
+  window._lastStatsFetchDate=new Date().toISOString().slice(0,10);
   showAlert(prefix==='f-'?'entry-alert':'edit-alert','已自動填入 YouTube 數據：觀看 '+d.yt_views.toLocaleString()+' / 讚 '+d.yt_likes.toLocaleString(),'ok');
 }
 
@@ -744,6 +800,7 @@ async function batchUpdateYt(){
             match.yt_likes=Number(item.statistics.likeCount)||0;
             match.yt_comments=Number(item.statistics.commentCount)||0;
             match.updatedAt=new Date().toISOString();
+            match.statsDate=new Date().toISOString().slice(0,10);
             updated++;
           }
         });
