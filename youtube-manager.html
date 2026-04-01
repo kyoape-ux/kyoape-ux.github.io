@@ -573,7 +573,21 @@ let API_URL=localStorage.getItem('kt_yt_api')||'https://script.google.com/macros
 const USE_API=()=>!!API_URL;
 async function apiGet(a){if(!USE_API())return null;try{const r=await fetch(`${API_URL}?module=youtube&action=${a}`);return await r.json();}catch(e){console.warn('API GET:',e);return null;}}
 async function apiPost(a,p){if(!USE_API())return null;try{const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({module:'youtube',action:a,...p})});return await r.json();}catch(e){console.warn('API POST:',e);return null;}}
-async function syncFromSheets(){const r=await apiGet('getVideos');if(r&&r.videos){DATA=r.videos;saveData();return true;}return false;}
+async function syncFromSheets(){
+  const r=await apiGet('getVideos');
+  if(r&&r.videos){
+    if(r.videos.length===0&&DATA.length>0)return false; // Sheets 空但本機有資料，不覆蓋
+    // 合併：以 Sheets 為底，補入本機獨有的資料
+    const sheetIds=new Set(r.videos.map(v=>v.id));
+    const localOnly=DATA.filter(d=>!sheetIds.has(d.id));
+    DATA=[...r.videos,...localOnly];
+    saveData();
+    // 將本機獨有的資料推送到 Sheets
+    localOnly.forEach(d=>pushToSheets('saveVideo',{data:d}));
+    return true;
+  }
+  return false;
+}
 async function pushToSheets(a,p){const r=await apiPost(a,p);return r&&r.success;}
 async function syncConfigFromSheets(){const r=await apiGet('getConfig');if(r&&!r.error){CFG={...CFG,...r};localStorage.setItem('kt_yt_cfg',JSON.stringify(CFG));return true;}return false;}
 
