@@ -188,6 +188,11 @@ tr:hover td{background:rgba(52,211,153,.03);}
       <span class="icon"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>影片列表
     </div>
 
+    <div class="nav-section">Instagram</div>
+    <div class="nav-item" onclick="showPage('ig')">
+      <span class="icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></span>IG 貼文管理
+    </div>
+
     <div class="nav-section">系統</div>
     <div class="nav-item" onclick="showPage('config')">
       <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>設定
@@ -214,8 +219,8 @@ tr:hover td{background:rgba(52,211,153,.03);}
     <div class="nav-item" onclick="showPage('list')">
       <span class="icon"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>列表
     </div>
-    <div class="nav-item" onclick="showPage('config')">
-      <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>設定
+    <div class="nav-item" onclick="showPage('ig')">
+      <span class="icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/></svg></span>IG
     </div>
   </div>
 
@@ -353,6 +358,74 @@ tr:hover td{background:rgba(52,211,153,.03);}
       </div>
     </div>
 
+    <!-- ═══ Page: IG 貼文管理 ═══ -->
+    <div class="page" id="page-ig">
+      <div class="page-title">
+        <span class="icon icon-lg" style="color:var(--ig);"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></span>
+        IG 貼文管理 <span id="ig-month" style="font-size:13px;color:var(--txt3);font-weight:400;"></span>
+      </div>
+
+      <!-- IG KPI -->
+      <div class="cards" id="ig-kpi"></div>
+
+      <!-- IG 新增表單 -->
+      <div class="chart-box" style="margin-bottom:20px;">
+        <h3><span class="icon" style="color:var(--ig);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>新增 IG 貼文</h3>
+        <div id="ig-entry-alert" class="alert"></div>
+        <div class="form-grid cols3" style="margin-top:12px;">
+          <div class="form-group full"><label>標題 *</label><input type="text" id="ig-title" placeholder="貼文標題"></div>
+          <div class="form-group"><label>發布日期 *</label><input type="date" id="ig-date"></div>
+          <div class="form-group"><label>貼文類型</label>
+            <select id="ig-type"><option value="1">貼文</option><option value="2">測驗</option><option value="3">影片 Reels</option></select>
+          </div>
+          <div class="form-group"><label>類別</label><input type="text" id="ig-cat" placeholder="例：營養、日常、運動"></div>
+          <div class="form-group"><label>觀看次數</label><input type="number" id="ig-views" min="0" placeholder="0"></div>
+          <div class="form-group"><label>按讚數</label><input type="number" id="ig-likes" min="0" placeholder="0"></div>
+          <div class="form-group"><label>留言數</label><input type="number" id="ig-comments" min="0" placeholder="0"></div>
+          <div class="form-group"><label>互動次數</label><input type="number" id="ig-interactions" min="0" placeholder="0"></div>
+          <div class="form-group"><label>分享</label><input type="number" id="ig-shares" min="0" placeholder="0"></div>
+          <div class="form-group"><label>儲存</label><input type="number" id="ig-saves" min="0" placeholder="0"></div>
+          <div class="form-group"><label>觸及帳號</label><input type="number" id="ig-reach" min="0" placeholder="0"></div>
+          <div class="form-group full"><label>IG 連結</label><input type="url" id="ig-link" placeholder="https://www.instagram.com/p/..."></div>
+        </div>
+        <div class="form-actions" style="margin-top:12px;">
+          <button class="btn btn-primary" onclick="saveIgPost()">儲存貼文</button>
+          <button class="btn btn-secondary" onclick="clearIgForm()">清除</button>
+        </div>
+      </div>
+
+      <!-- IG 圖表 -->
+      <div class="chart-row">
+        <div class="chart-box">
+          <h3><span class="icon"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></span>月度觀看趨勢</h3>
+          <canvas id="ig-chart-monthly"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3><span class="icon"><svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>貼文類型分布</h3>
+          <canvas id="ig-chart-type"></canvas>
+        </div>
+      </div>
+
+      <!-- IG 列表 -->
+      <div style="margin-top:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <h3 style="font-size:14px;color:var(--txt2);">貼文列表</h3>
+          <div style="display:flex;gap:8px;">
+            <select id="ig-filter-month" onchange="renderIgList()" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-2);color:var(--txt);"><option value="">全部月份</option></select>
+            <select id="ig-filter-type" onchange="renderIgList()" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-2);color:var(--txt);"><option value="">全部類型</option><option value="1">貼文</option><option value="2">測驗</option><option value="3">影片</option></select>
+            <button class="btn btn-secondary btn-sm" onclick="exportIgCSV()">匯出 CSV</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr>
+            <th>日期</th><th>標題</th><th>類型</th><th>類別</th><th>觀看</th><th>互動</th><th>分享</th><th>儲存</th><th>觸及</th><th>操作</th>
+          </tr></thead>
+          <tbody id="ig-tbody"></tbody></table>
+        </div>
+        <div id="ig-empty" style="display:none;text-align:center;padding:40px;color:var(--txt3);">尚無 IG 貼文資料</div>
+      </div>
+    </div>
+
     <!-- ═══ Page: Config ═══ -->
     <div class="page" id="page-config">
       <div class="page-title">
@@ -482,7 +555,7 @@ async function loadData(){try{DATA=JSON.parse(localStorage.getItem('kt_yt_data')
 // ============================================================
 // 導覽
 // ============================================================
-function showPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>{const t=n.getAttribute('onclick')||'';n.classList.toggle('active',t.includes("'"+name+"'"));});if(name==='dashboard')renderDashboard();if(name==='list')renderList();if(name==='config')renderCfgForm();}
+function showPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>{const t=n.getAttribute('onclick')||'';n.classList.toggle('active',t.includes("'"+name+"'"));});if(name==='dashboard')renderDashboard();if(name==='list')renderList();if(name==='config')renderCfgForm();if(name==='ig')renderIgAll();}
 function renderAll(){renderDashboard();renderList();renderCfgForm();buildMonthFilter();}
 
 // ============================================================
@@ -585,9 +658,123 @@ function showAlert(id,msg,type){const el=document.getElementById(id);el.classNam
 function showSyncBadge(msg){let b=document.getElementById('sync-badge');if(!b){b=document.createElement('div');b.id='sync-badge';b.style.cssText='position:fixed;bottom:20px;right:20px;background:var(--bg-3);color:var(--accent);padding:10px 20px;border-radius:10px;font-size:12px;z-index:999;transition:opacity .3s;border:1px solid var(--border-l);backdrop-filter:blur(8px);';document.body.appendChild(b);}b.textContent=msg;b.style.opacity='1';setTimeout(()=>b.style.opacity='0',3500);}
 
 // ============================================================
+// ============================================================
+// IG 貼文管理
+// ============================================================
+let IG_DATA=[];
+let igChartMonthly=null, igChartType=null;
+const IG_TYPE_MAP={'1':'貼文','2':'測驗','3':'影片'};
+
+function loadIgData(){try{IG_DATA=JSON.parse(localStorage.getItem('kt_ig_data')||'[]');}catch(e){IG_DATA=[];}}
+function saveIgData(){IG_DATA.sort((a,b)=>(b.date||'').localeCompare(a.date||''));localStorage.setItem('kt_ig_data',JSON.stringify(IG_DATA));}
+
+function saveIgPost(){
+  const t=document.getElementById('ig-title').value.trim(),d=document.getElementById('ig-date').value;
+  if(!t){showAlert('ig-entry-alert','請填寫標題','err');return;}
+  if(!d){showAlert('ig-entry-alert','請選擇日期','err');return;}
+  const post={
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    title:t, date:d,
+    type:document.getElementById('ig-type').value,
+    cat:document.getElementById('ig-cat').value.trim(),
+    views:Number(document.getElementById('ig-views').value)||0,
+    likes:Number(document.getElementById('ig-likes').value)||0,
+    comments:Number(document.getElementById('ig-comments').value)||0,
+    interactions:Number(document.getElementById('ig-interactions').value)||0,
+    shares:Number(document.getElementById('ig-shares').value)||0,
+    saves:Number(document.getElementById('ig-saves').value)||0,
+    reach:Number(document.getElementById('ig-reach').value)||0,
+    link:document.getElementById('ig-link').value.trim(),
+    createdAt:new Date().toISOString()
+  };
+  IG_DATA.push(post);saveIgData();
+  showAlert('ig-entry-alert','已儲存','ok');clearIgForm();renderIgAll();
+  pushToSheets('saveIgPost',{data:post}).then(ok=>showSyncBadge(ok?'IG 已同步':'IG 本機已儲存'));
+}
+
+function clearIgForm(){
+  ['title','date','cat','views','likes','comments','interactions','shares','saves','reach','link'].forEach(f=>{const el=document.getElementById('ig-'+f);if(el)el.value='';});
+  document.getElementById('ig-type').value='1';
+  document.getElementById('ig-date').value=new Date().toISOString().slice(0,10);
+}
+
+function deleteIgPost(id){
+  if(!confirm('確定刪除此 IG 貼文？'))return;
+  IG_DATA=IG_DATA.filter(d=>d.id!==id);saveIgData();renderIgAll();
+  pushToSheets('deleteIgPost',{id}).then(ok=>showSyncBadge(ok?'已刪除':'本機已刪除'));
+}
+
+function renderIgAll(){renderIgKpi();renderIgList();renderIgCharts();buildIgMonthFilter();}
+
+function renderIgKpi(){
+  const now=new Date(),ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('ig-month').textContent=ym;
+  const md=IG_DATA.filter(d=>(d.date||'').startsWith(ym));
+  const tv=md.reduce((s,d)=>s+(Number(d.views)||0),0);
+  const ti=md.reduce((s,d)=>s+(Number(d.interactions)||0),0);
+  const tr=md.reduce((s,d)=>s+(Number(d.reach)||0),0);
+  const ts=md.reduce((s,d)=>s+(Number(d.saves)||0),0);
+  document.getElementById('ig-kpi').innerHTML=`
+    <div class="kpi-card"><div class="kpi-label">本月 IG 觀看</div><div class="kpi-val">${tv.toLocaleString()}</div><div class="kpi-sub">${md.length} 則貼文</div></div>
+    <div class="kpi-card"><div class="kpi-label">互動次數</div><div class="kpi-val">${ti.toLocaleString()}</div><div class="kpi-sub">按讚 + 留言 + 分享</div></div>
+    <div class="kpi-card"><div class="kpi-label">觸及帳號</div><div class="kpi-val">${tr.toLocaleString()}</div><div class="kpi-sub">本月累計觸及</div></div>
+    <div class="kpi-card"><div class="kpi-label">儲存數</div><div class="kpi-val">${ts.toLocaleString()}</div><div class="kpi-sub">本月貼文被儲存次數</div></div>`;
+}
+
+function renderIgList(){
+  const fm=document.getElementById('ig-filter-month').value;
+  const ft=document.getElementById('ig-filter-type').value;
+  let f=IG_DATA.filter(d=>{
+    if(fm&&!(d.date||'').startsWith(fm))return false;
+    if(ft&&String(d.type)!==ft)return false;
+    return true;
+  });
+  const tb=document.getElementById('ig-tbody'),em=document.getElementById('ig-empty');
+  if(f.length===0){tb.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  tb.innerHTML=f.map(d=>`<tr>
+    <td style="white-space:nowrap;">${d.date||'—'}</td>
+    <td style="max-width:220px;">${d.link?`<a href="${esc(d.link)}" target="_blank">${esc(d.title)}</a>`:esc(d.title)}</td>
+    <td><span class="type-badge" style="background:rgba(225,48,108,.12);color:var(--ig);">${IG_TYPE_MAP[d.type]||d.type}</span></td>
+    <td>${esc(d.cat||'')}</td>
+    <td style="text-align:right;">${(Number(d.views)||0).toLocaleString()}</td>
+    <td style="text-align:right;">${(Number(d.interactions)||0).toLocaleString()}</td>
+    <td style="text-align:right;">${(Number(d.shares)||0).toLocaleString()}</td>
+    <td style="text-align:right;">${(Number(d.saves)||0).toLocaleString()}</td>
+    <td style="text-align:right;">${(Number(d.reach)||0).toLocaleString()}</td>
+    <td><button class="act-btn del" onclick="deleteIgPost('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></td>
+  </tr>`).join('');
+}
+
+function renderIgCharts(){
+  const months=[],now=new Date();
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);}
+  const mv=months.map(m=>IG_DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.views)||0),0));
+  if(igChartMonthly)igChartMonthly.destroy();
+  igChartMonthly=new Chart(document.getElementById('ig-chart-monthly'),{type:'bar',data:{labels:months,datasets:[{label:'觀看數',data:mv,backgroundColor:'rgba(225,48,108,0.7)',borderRadius:4}]},options:{responsive:true,scales:{x:{grid:{display:false}},y:{beginAtZero:true}},plugins:{legend:{display:false}}}});
+
+  const types=['1','2','3'];const tLabels=['貼文','測驗','影片'];
+  const tCounts=types.map(t=>IG_DATA.filter(d=>String(d.type)===t).length);
+  if(igChartType)igChartType.destroy();
+  igChartType=new Chart(document.getElementById('ig-chart-type'),{type:'doughnut',data:{labels:tLabels,datasets:[{data:tCounts,backgroundColor:['rgba(225,48,108,0.7)','rgba(251,191,36,0.7)','rgba(96,165,250,0.7)'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12}}}}});
+}
+
+function buildIgMonthFilter(){
+  const ms=[...new Set(IG_DATA.map(d=>(d.date||'').substring(0,7)).filter(Boolean))].sort().reverse();
+  document.getElementById('ig-filter-month').innerHTML='<option value="">全部月份</option>'+ms.map(m=>`<option value="${m}">${m}</option>`).join('');
+}
+
+function exportIgCSV(){
+  if(IG_DATA.length===0){alert('無資料');return;}
+  const h=['日期','標題','類型','類別','觀看','按讚','留言','互動','分享','儲存','觸及','連結'];
+  const rows=IG_DATA.map(d=>[d.date,d.title,IG_TYPE_MAP[d.type]||d.type,d.cat,d.views,d.likes,d.comments,d.interactions,d.shares,d.saves,d.reach,d.link]);
+  const csv='\uFEFF'+[h,...rows].map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const b=new Blob([csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`ig_posts_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+
 // 初始化
 // ============================================================
-document.addEventListener('DOMContentLoaded',()=>{checkSetup();loadData();document.getElementById('f-date').value=new Date().toISOString().slice(0,10);});
+document.addEventListener('DOMContentLoaded',()=>{checkSetup();loadData();loadIgData();renderIgAll();document.getElementById('f-date').value=new Date().toISOString().slice(0,10);document.getElementById('ig-date').value=new Date().toISOString().slice(0,10);});
 </script>
 </body>
 </html>
