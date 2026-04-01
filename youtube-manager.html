@@ -812,8 +812,8 @@ async function batchUpdateYt(){
   }
   saveData();renderAll();
   showSyncBadge(`批次更新完成：${updated} 部成功${failed?' / '+failed+' 部失敗':''}`);
-  // Sync to Sheets
-  for(const d of DATA.filter(d=>d.yt_url)){await pushToSheets('updateVideo',{data:d});}
+  // Sync to Sheets in background (don't await to avoid blocking)
+  DATA.filter(d=>d.yt_url).forEach(d=>pushToSheets('updateVideo',{data:d}));
 }
 
 function saveYtApiKey(){
