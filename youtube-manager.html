@@ -576,14 +576,9 @@ async function apiPost(a,p){if(!USE_API())return null;try{const r=await fetch(AP
 async function syncFromSheets(){
   const r=await apiGet('getVideos');
   if(r&&r.videos){
-    if(r.videos.length===0&&DATA.length>0)return false; // Sheets 空但本機有資料，不覆蓋
-    // 合併：以 Sheets 為底，補入本機獨有的資料
-    const sheetIds=new Set(r.videos.map(v=>v.id));
-    const localOnly=DATA.filter(d=>!sheetIds.has(d.id));
-    DATA=[...r.videos,...localOnly];
+    // Sheets 是唯一資料源（多人多電腦同步）
+    DATA=r.videos;
     saveData();
-    // 將本機獨有的資料推送到 Sheets
-    localOnly.forEach(d=>pushToSheets('saveVideo',{data:d}));
     return true;
   }
   return false;
