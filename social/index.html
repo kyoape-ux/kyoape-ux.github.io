@@ -3,1047 +3,860 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>光田社群圖風格模擬產生器</title>
+<title>光田社群圖產生器</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --primary: #0F6E56;
-  --primary-dark: #0B5A46;
-  --primary-light: #2D8A6E;
-  --accent: #E8F4F0;
-  --bg: #F5F7F5;
-  --white: #FFFFFF;
-  --text: #1A1A1A;
-  --text-secondary: #666;
-  --preview-bg: #2A2A2A;
-  --danger: #D64545;
-  --shadow: 0 2px 12px rgba(0,0,0,0.08);
-  --radius: 12px;
-}
-
-body {
-  font-family: 'Noto Sans TC', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
-
-/* Header */
-.header {
-  background: var(--primary);
-  color: var(--white);
-  padding: 16px 32px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.header-logo {
-  width: 36px;
-  height: 36px;
-  background: var(--white);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  color: var(--primary);
-  font-size: 14px;
-  flex-shrink: 0;
-}
-.header h1 {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-.header-sub {
-  font-size: 12px;
-  opacity: 0.8;
-  margin-left: auto;
-}
-
-/* Main Layout */
-.main {
-  display: flex;
-  min-height: calc(100vh - 68px);
-}
-
-/* Left Panel */
-.left-panel {
-  width: 480px;
-  min-width: 480px;
-  padding: 24px;
-  overflow-y: auto;
-  max-height: calc(100vh - 68px);
-}
-
-/* Right Panel */
-.right-panel {
-  flex: 1;
-  background: var(--preview-bg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px;
-  min-height: calc(100vh - 68px);
-  position: sticky;
-  top: 68px;
-  max-height: calc(100vh - 68px);
-}
-
-/* Step Card */
-.step-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-.step-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.step-num {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: var(--white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-.step-title {
-  font-size: 16px;
-  font-weight: 700;
-}
-
-/* Upload Area */
-.upload-area {
-  border: 2px dashed #ccc;
-  border-radius: var(--radius);
-  padding: 40px 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  position: relative;
-  background: var(--bg);
-}
-.upload-area:hover, .upload-area.dragover {
-  border-color: var(--primary);
-  background: var(--accent);
-}
-.upload-area.has-image {
-  padding: 12px;
-  border-style: solid;
-  border-color: var(--primary);
-}
-.upload-icon {
-  font-size: 40px;
-  margin-bottom: 8px;
-  opacity: 0.5;
-}
-.upload-text {
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-.upload-text strong {
-  color: var(--primary);
-}
-.upload-preview {
-  max-width: 100%;
-  max-height: 200px;
-  border-radius: 8px;
-  object-fit: contain;
-}
-.upload-remove {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--danger);
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-.upload-input {
-  display: none;
-}
-
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans TC',sans-serif;background:#F5F7F5;color:#1A1A1A;min-height:100vh}
+.header{background:#0F6E56;color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:20px;font-weight:700}
+.header p{font-size:12px;opacity:.75;margin-top:2px}
+.main{display:flex;height:calc(100vh - 58px)}
+.left{width:420px;min-width:420px;background:#fff;overflow-y:auto;border-right:1px solid #E0E0E0;padding:20px}
+.right{flex:1;background:#2A2A2A;display:flex;align-items:center;justify-content:center;overflow:auto;padding:24px}
+.step-hd{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.step-num{width:26px;height:26px;background:#0F6E56;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.step-hd h2{font-size:15px;font-weight:700}
+.divider{border:none;border-top:1px solid #ECECEC;margin:18px 0}
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tpl-card{border:2px solid #E0E0E0;border-radius:10px;padding:12px 10px;cursor:pointer;transition:.18s;text-align:center;background:#fff}
+.tpl-card:hover{border-color:#0F6E56;background:#F0FAF6}
+.tpl-card.sel{border-color:#0F6E56;background:#E8F4F0}
+.tpl-card .ic{font-size:24px;margin-bottom:4px}
+.tpl-card .nm{font-size:13px;font-weight:700}
+.tpl-card .sz{font-size:11px;color:#777;margin-top:1px}
+.form-g{margin-bottom:14px}
+.form-g>label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#333}
+.form-g>label span{font-weight:400;color:#999;font-size:12px}
+input[type=text],textarea{width:100%;border:1.5px solid #E0E0E0;border-radius:7px;padding:9px 11px;font-family:'Noto Sans TC',sans-serif;font-size:14px;color:#1A1A1A;outline:none;transition:.18s}
+input[type=text]:focus,textarea:focus{border-color:#0F6E56}
+textarea{resize:vertical;min-height:72px}
+.theme-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.18s;flex-shrink:0}
+.swatch.sel{border-color:#222;transform:scale(1.15)}
+.upload-box{border:2px dashed #D0D0D0;border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:.18s;background:#FAFAFA}
+.upload-box:hover{border-color:#0F6E56;background:#F0FAF6}
+.upload-box.has{border-style:solid;border-color:#0F6E56;padding:6px}
+.upload-box .hint{font-size:12px;color:#999;margin-top:5px}
+.dual-upload{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.dual-upload .upload-label{font-size:12px;font-weight:600;color:#555;margin-bottom:4px}
+/* List field */
+.list-container{display:flex;flex-direction:column;gap:6px}
+.list-item{display:flex;gap:6px;align-items:center}
+.list-item input{flex:1}
+.btn-icon{width:30px;height:30px;border-radius:6px;border:1.5px solid #E0E0E0;background:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;line-height:1}
+.btn-icon:hover{border-color:#E53935;background:#FFF0F0;color:#E53935}
+.add-item-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:7px;border-radius:7px;border:1.5px dashed #0F6E56;background:transparent;color:#0F6E56;font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:.15s;margin-top:4px}
+.add-item-btn:hover{background:#E8F4F0}
+/* Section block */
+.section-block{border:1.5px solid #E8E8E8;border-radius:8px;padding:12px;margin-bottom:12px;background:#FAFAFA}
+.section-block .sec-title{font-size:12px;font-weight:700;color:#0F6E56;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
 /* Buttons */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-family: 'Noto Sans TC', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: 100%;
-}
-.btn-primary {
-  background: var(--primary);
-  color: var(--white);
-}
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-dark);
-}
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.btn-secondary {
-  background: var(--accent);
-  color: var(--primary);
-}
-.btn-secondary:hover {
-  background: #D0EBE3;
-}
-.btn-row {
-  display: flex;
-  gap: 8px;
-}
-.btn-row .btn {
-  flex: 1;
-}
-
-/* Form Fields */
-.field {
-  margin-bottom: 14px;
-}
-.field label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
-}
-.field input, .field textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-family: 'Noto Sans TC', sans-serif;
-  font-size: 14px;
-  transition: border-color 0.2s;
-  background: var(--bg);
-}
-.field input:focus, .field textarea:focus {
-  outline: none;
-  border-color: var(--primary);
-  background: var(--white);
-}
-.field textarea {
-  resize: vertical;
-  min-height: 60px;
-}
-
-/* Loading */
-.loading-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-}
-.loading-overlay.active {
-  display: flex;
-}
-.loading-box {
-  background: var(--white);
-  border-radius: 16px;
-  padding: 40px 48px;
-  text-align: center;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-}
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid var(--accent);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto 16px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-.loading-sub {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-/* Preview Placeholder */
-.preview-placeholder {
-  text-align: center;
-  color: #888;
-}
-.preview-placeholder-icon {
-  font-size: 64px;
-  margin-bottom: 12px;
-  opacity: 0.3;
-}
-.preview-placeholder p {
-  font-size: 14px;
-}
-
-/* Preview Canvas */
-#preview-canvas {
-  border-radius: 4px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-  background: #fff;
-}
-
-/* Preview Actions */
-.preview-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 20px;
-}
-.preview-actions .btn {
-  width: auto;
-  padding: 10px 20px;
-  font-size: 13px;
-}
-
+.btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:10px 18px;border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:.18s;width:100%}
+.btn-p{background:#0F6E56;color:#fff}
+.btn-p:hover{background:#0a5a45}
+.btn-o{background:#fff;color:#0F6E56;border:2px solid #0F6E56}
+.btn-o:hover{background:#E8F4F0}
+.exp-row{display:flex;gap:8px;margin-top:10px}
+.exp-row .btn{font-size:13px;padding:9px 10px}
+/* Preview */
+.preview-wrap{position:relative}
+.preview-lbl{position:absolute;top:-24px;left:0;color:#888;font-size:11px}
+canvas{display:block;border-radius:4px;box-shadow:0 8px 32px rgba(0,0,0,.45)}
+.empty-state{text-align:center;color:#666}
+.empty-state .ei{font-size:44px;margin-bottom:10px}
+.empty-state p{font-size:13px}
 /* Toast */
-.toast-container {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 300;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.toast {
-  padding: 12px 20px;
-  border-radius: 8px;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  animation: toastIn 0.3s ease-out;
-  max-width: 320px;
-}
-.toast.success { background: #2D8A6E; }
-.toast.error { background: var(--danger); }
-@keyframes toastIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Error Box */
-.error-box {
-  background: #FFF0F0;
-  border: 1px solid #FFCACA;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 12px;
-  font-size: 13px;
-  color: var(--danger);
-  display: none;
-}
-.error-box.visible { display: block; }
-.error-raw {
-  margin-top: 8px;
-  padding: 8px;
-  background: #fff;
-  border-radius: 4px;
-  font-size: 11px;
-  max-height: 120px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  color: #333;
-}
-
-/* API Key notice */
-.api-notice {
-  background: var(--accent);
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 12px;
-  color: var(--primary);
-  margin-bottom: 16px;
-  line-height: 1.5;
-}
-.api-notice strong {
-  display: block;
-  margin-bottom: 2px;
-}
-
-/* Responsive */
-@media (max-width: 960px) {
-  .main {
-    flex-direction: column;
-  }
-  .left-panel {
-    width: 100%;
-    min-width: unset;
-    max-height: unset;
-  }
-  .right-panel {
-    position: relative;
-    top: 0;
-    max-height: unset;
-    min-height: 500px;
-  }
-}
+.toast{position:fixed;bottom:24px;right:24px;padding:11px 18px;border-radius:8px;color:#fff;font-size:14px;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:.3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{background:#0F6E56}
+.toast.err{background:#E53935}
+@media(max-width:760px){.main{flex-direction:column;height:auto}.left{width:100%;min-width:0}.right{min-height:400px}}
 </style>
 </head>
 <body>
 
-<!-- Header -->
 <div class="header">
-  <div class="header-logo">光</div>
-  <h1>社群圖風格模擬產生器</h1>
-  <span class="header-sub">Powered by Claude AI</span>
-</div>
-
-<!-- Loading Overlay -->
-<div class="loading-overlay" id="loading">
-  <div class="loading-box">
-    <div class="spinner"></div>
-    <div class="loading-title" id="loading-title">AI 分析中...</div>
-    <div class="loading-sub" id="loading-sub">正在識別版面結構・配色・圖層</div>
+  <div>
+    <h1>光田社群圖產生器</h1>
+    <p>選版型 → 填內容 → 下載圖片　不需要帳號或 API</p>
   </div>
 </div>
 
-<!-- Toast Container -->
-<div class="toast-container" id="toasts"></div>
-
-<!-- Main -->
 <div class="main">
-  <!-- Left Panel -->
-  <div class="left-panel">
-
-    <!-- API Key Input -->
-    <div class="step-card">
-      <div class="step-header">
-        <div class="step-num" style="background:#666;">🔑</div>
-        <div class="step-title">API 設定</div>
+  <div class="left" id="left">
+    <div class="step-hd"><div class="step-num">1</div><h2>選擇版型</h2></div>
+    <div class="tpl-grid">
+      <div class="tpl-card" onclick="selectTpl('doctor')" id="card-doctor">
+        <div class="ic">👨‍⚕️</div><div class="nm">醫師介紹卡</div><div class="sz">1080 × 1080</div>
       </div>
-      <div class="api-notice">
-        <strong>需要 Anthropic API Key</strong>
-        輸入您的 API Key 以使用 Claude Vision 解析功能。<br>
-        Key 僅在瀏覽器端使用，不會傳至第三方伺服器。
+      <div class="tpl-card" onclick="selectTpl('health')" id="card-health">
+        <div class="ic">📋</div><div class="nm">衛教資訊圖</div><div class="sz">1080 × 1350</div>
       </div>
-      <div class="field">
-        <label>Anthropic API Key</label>
-        <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off">
+      <div class="tpl-card" onclick="selectTpl('event')" id="card-event">
+        <div class="ic">📢</div><div class="nm">活動公告</div><div class="sz">1080 × 1080</div>
+      </div>
+      <div class="tpl-card" onclick="selectTpl('clinic')" id="card-clinic">
+        <div class="ic">🏥</div><div class="nm">門診公告</div><div class="sz">1920 × 1080</div>
       </div>
     </div>
 
-    <!-- STEP 1: Upload -->
-    <div class="step-card">
-      <div class="step-header">
-        <div class="step-num">1</div>
-        <div class="step-title">上傳參考圖</div>
+    <div id="step2" style="display:none">
+      <hr class="divider">
+      <div class="step-hd"><div class="step-num">2</div><h2>填寫內容</h2></div>
+      <div class="form-g">
+        <label>配色主題</label>
+        <div class="theme-row" id="theme-row" style="margin-top:6px"></div>
       </div>
-      <div class="upload-area" id="uploadArea">
-        <div class="upload-icon">📁</div>
-        <div class="upload-text">拖曳圖片至此，或<strong>點擊上傳</strong></div>
-        <div class="upload-text" style="font-size:12px;margin-top:4px;">支援 JPG、PNG（建議 5MB 以下）</div>
-      </div>
-      <input type="file" class="upload-input" id="fileInput" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+      <div id="form-fields"></div>
     </div>
 
-    <!-- STEP 2: Analyze -->
-    <div class="step-card">
-      <div class="step-header">
-        <div class="step-num">2</div>
-        <div class="step-title">AI 解析風格</div>
+    <div id="step3" style="display:none">
+      <hr class="divider">
+      <div class="step-hd"><div class="step-num">3</div><h2>匯出</h2></div>
+      <button class="btn btn-p" onclick="dlPNG()">📥 下載 PNG</button>
+      <div class="exp-row">
+        <button class="btn btn-o" onclick="dlKt()">📄 .ktposter</button>
+        <button class="btn btn-o" onclick="copyJ()">📋 複製 JSON</button>
       </div>
-      <button class="btn btn-primary" id="btnAnalyze" disabled>
-        🔍 AI 解析風格
-      </button>
-      <div class="error-box" id="analyzeError"></div>
     </div>
-
-    <!-- STEP 3: Edit Content -->
-    <div class="step-card">
-      <div class="step-header">
-        <div class="step-num">3</div>
-        <div class="step-title">填寫文案 ＋ 微調</div>
-      </div>
-      <div class="field">
-        <label>主標題</label>
-        <input type="text" id="mainTitle" placeholder="例：健康檢查專案">
-      </div>
-      <div class="field">
-        <label>副標題</label>
-        <input type="text" id="subTitle" placeholder="例：早期發現・早期治療">
-      </div>
-      <div class="field">
-        <label>說明文字</label>
-        <textarea id="bodyText" rows="3" placeholder="例：全方位健檢項目包含..."></textarea>
-      </div>
-      <div class="field">
-        <label>姓名／職稱（選填）</label>
-        <input type="text" id="nameBadge" placeholder="例：王大明 醫師">
-      </div>
-      <div class="field">
-        <label>標籤文字（選填，逗號分隔）</label>
-        <input type="text" id="tags" placeholder="例：歡迎諮詢, 即日起">
-      </div>
-      <div class="field">
-        <label>風格微調 Prompt（選填）</label>
-        <textarea id="adjustPrompt" rows="2" placeholder="讓標題更大、換成光田綠色系、標題靠左對齊"></textarea>
-      </div>
-      <button class="btn btn-primary" id="btnGenerate" disabled>
-        ✨ 產生預覽
-      </button>
-      <div class="error-box" id="generateError"></div>
-    </div>
-
   </div>
 
-  <!-- Right Panel -->
-  <div class="right-panel">
-    <div class="preview-placeholder" id="previewPlaceholder">
-      <div class="preview-placeholder-icon">🖼️</div>
-      <p>完成左側步驟後，<br>預覽將在此顯示</p>
-    </div>
-    <div id="preview-canvas" style="display:none;"></div>
-    <div class="preview-actions" id="previewActions" style="display:none;">
-      <button class="btn btn-primary" onclick="exportKtposter()">📥 匯出 .ktposter</button>
-      <button class="btn btn-secondary" onclick="copyJson()">📋 複製 JSON</button>
-    </div>
+  <div class="right" id="right">
+    <div class="empty-state"><div class="ei">🖼️</div><p>請先選擇左側版型</p></div>
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="file-person" accept="image/*" style="display:none" onchange="handlePhoto(event,'person')">
+<input type="file" id="file-bg"     accept="image/*" style="display:none" onchange="handlePhoto(event,'bg')">
 
 <script>
-// --- State ---
-let uploadedBase64 = null;
-let uploadedMediaType = null;
-let analysisResult = null;
-let ktposterJson = null;
+// ── State ──────────────────────────────────────────────────────────────────
+let curTpl=null, theme=null;
+let photoURL=null, photoEl=null;       // person photo
+let bgPhotoURL=null, bgPhotoEl=null;   // background photo
+let cv=null, cx=null, ktData=null, renderTimer=null;
+let logoEl=new Image();
+logoEl.crossOrigin='anonymous';
+logoEl.src='./assets/ktgh-logo.png';
+logoEl.onerror=()=>{logoEl=null;};
 
-// --- DOM refs ---
-const uploadArea = document.getElementById('uploadArea');
-const fileInput = document.getElementById('fileInput');
-const btnAnalyze = document.getElementById('btnAnalyze');
-const btnGenerate = document.getElementById('btnGenerate');
-const loadingOverlay = document.getElementById('loading');
-const loadingTitle = document.getElementById('loading-title');
-const loadingSub = document.getElementById('loading-sub');
-const previewPlaceholder = document.getElementById('previewPlaceholder');
-const previewCanvas = document.getElementById('preview-canvas');
-const previewActions = document.getElementById('previewActions');
-const analyzeError = document.getElementById('analyzeError');
-const generateError = document.getElementById('generateError');
-const apiKeyInput = document.getElementById('apiKey');
+const THEMES=[
+  {name:'光田綠', p:'#0F6E56', s:'#2D8A6E', l:'#E8F4F0', dark:'#0A3D2E'},
+  {name:'深藍',   p:'#1A3A6E', s:'#2D5A9E', l:'#E8EEF8', dark:'#0D1F3C'},
+  {name:'深紫',   p:'#4A1A6E', s:'#6B2D9E', l:'#F0E8F8', dark:'#2A0D3C'},
+  {name:'深紅',   p:'#8B1A1A', s:'#B53030', l:'#F8E8E8', dark:'#3C0D0D'},
+];
+theme = THEMES[0];
 
-// --- Upload ---
-uploadArea.addEventListener('click', () => {
-  if (!uploadedBase64) fileInput.click();
-});
+// Template definitions
+const TPLS={
+  doctor:{name:'醫師介紹卡', W:1080, H:1080},
+  health:{name:'衛教資訊圖', W:1080, H:1350},
+  event: {name:'活動公告',   W:1080, H:1080},
+  clinic:{name:'門診公告',   W:1920, H:1080},
+};
 
-uploadArea.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  uploadArea.classList.add('dragover');
-});
-
-uploadArea.addEventListener('dragleave', () => {
-  uploadArea.classList.remove('dragover');
-});
-
-uploadArea.addEventListener('drop', (e) => {
-  e.preventDefault();
-  uploadArea.classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file) handleFile(file);
-});
-
-fileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (file) handleFile(file);
-});
-
-function handleFile(file) {
-  if (!file.type.match(/^image\/(jpeg|png)$/)) {
-    showToast('請上傳 JPG 或 PNG 格式的圖片', 'error');
-    return;
-  }
-
-  const processImage = (f) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const dataUrl = e.target.result;
-      uploadedMediaType = f.type;
-      uploadedBase64 = dataUrl.split(',')[1];
-
-      uploadArea.classList.add('has-image');
-      uploadArea.innerHTML = `
-        <button class="upload-remove" onclick="removeUpload(event)">&times;</button>
-        <img src="${dataUrl}" class="upload-preview" alt="參考圖預覽">
-      `;
-      btnAnalyze.disabled = false;
+// ── Init ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  const row=document.getElementById('theme-row');
+  THEMES.forEach((t,i)=>{
+    const s=document.createElement('div');
+    s.className='swatch'+(i===0?' sel':'');
+    s.style.background=t.p; s.title=t.name;
+    s.onclick=()=>{
+      theme=t;
+      document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('sel'));
+      s.classList.add('sel');
+      schedRender();
     };
-    reader.readAsDataURL(f);
-  };
-
-  // Compress if > 1MB
-  if (file.size > 1024 * 1024) {
-    compressImage(file, 0.7, 1600).then(processImage);
-  } else {
-    processImage(file);
-  }
-}
-
-function compressImage(file, quality, maxDim) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if (w > maxDim || h > maxDim) {
-        const ratio = Math.min(maxDim / w, maxDim / h);
-        w = Math.round(w * ratio);
-        h = Math.round(h * ratio);
-      }
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      canvas.toBlob((blob) => {
-        resolve(new File([blob], file.name, { type: 'image/jpeg' }));
-      }, 'image/jpeg', quality);
-    };
-    img.src = url;
+    row.appendChild(s);
   });
+});
+
+// ── Select template ────────────────────────────────────────────────────────
+function selectTpl(key){
+  curTpl=key;
+  photoURL=null; photoEl=null;
+  bgPhotoURL=null; bgPhotoEl=null;
+  document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('card-'+key).classList.add('sel');
+  document.getElementById('step2').style.display='block';
+  document.getElementById('step3').style.display='block';
+  buildForm(key);
+  setupCanvas(key);
+  schedRender();
 }
 
-function removeUpload(e) {
-  e.stopPropagation();
-  uploadedBase64 = null;
-  uploadedMediaType = null;
-  uploadArea.classList.remove('has-image');
-  uploadArea.innerHTML = `
-    <div class="upload-icon">📁</div>
-    <div class="upload-text">拖曳圖片至此，或<strong>點擊上傳</strong></div>
-    <div class="upload-text" style="font-size:12px;margin-top:4px;">支援 JPG、PNG（建議 5MB 以下）</div>
+// ── Form builders ──────────────────────────────────────────────────────────
+function buildForm(key){
+  const c=document.getElementById('form-fields');
+  c.innerHTML='';
+  if(key==='doctor') buildDoctorForm(c);
+  else if(key==='health') buildHealthForm(c);
+  else if(key==='event') buildEventForm(c);
+  else if(key==='clinic') buildClinicForm(c);
+}
+
+function mkInput(id,ph,def){
+  return `<input type="text" id="f-${id}" placeholder="${ph||''}" value="${def||''}" oninput="schedRender()">`;
+}
+function mkArea(id,ph,def){
+  return `<textarea id="f-${id}" placeholder="${ph||''}" oninput="schedRender()">${def||''}</textarea>`;
+}
+function mkGroup(label,html,opt){
+  return `<div class="form-g"><label>${label}${opt?' <span>（選填）</span>':''}</label>${html}</div>`;
+}
+function mkPhotoBox(slot,label){
+  return `<div>
+    <div class="upload-label">${label}</div>
+    <div class="upload-box" id="ubox-${slot}" onclick="document.getElementById('file-${slot}').click()">
+      <div id="uphint-${slot}"><div style="font-size:24px">📷</div><div class="hint">點擊上傳</div></div>
+    </div>
+  </div>`;
+}
+function mkList(id,placeholder,initCount){
+  let items='';
+  for(let i=0;i<(initCount||1);i++){
+    items+=listItemHTML(id,placeholder);
+  }
+  return `<div class="list-container" id="list-${id}">${items}</div>
+    <button class="add-item-btn" onclick="addItem('${id}','${placeholder}')">＋ 新增項目</button>`;
+}
+function listItemHTML(id,placeholder){
+  return `<div class="list-item">
+    <input type="text" placeholder="${placeholder||''}" oninput="schedRender()">
+    <button class="btn-icon" onclick="removeItem(this)" title="刪除">×</button>
+  </div>`;
+}
+function addItem(id,placeholder){
+  const c=document.getElementById('list-'+id);
+  if(!c)return;
+  c.insertAdjacentHTML('beforeend',listItemHTML(id,placeholder));
+  schedRender();
+}
+function removeItem(btn){
+  btn.parentElement.remove();
+  schedRender();
+}
+function getList(id){
+  const c=document.getElementById('list-'+id);
+  if(!c)return[];
+  return Array.from(c.querySelectorAll('input')).map(i=>i.value.trim()).filter(v=>v);
+}
+function fv(id){const el=document.getElementById('f-'+id);return el?el.value.trim():'';}
+
+// ── Doctor form ────────────────────────────────────────────────────────────
+function buildDoctorForm(c){
+  c.innerHTML=`
+    ${mkGroup('姓名', mkInput('doctorName','王大明'))}
+    ${mkGroup('職稱', mkInput('titleText','物理治療師'))}
+
+    <div class="dual-upload">
+      ${mkPhotoBox('bg','背景圖（診療室）')}
+      ${mkPhotoBox('person','人物照片')}
+    </div>
+
+    <div class="section-block">
+      <div class="sec-title">專長區塊</div>
+      ${mkGroup('區塊標題', mkInput('specialtyLabel','治療師專長','治療師專長'))}
+      <div class="form-g"><label>專長項目</label>${mkList('specialtyItems','骨科術前/術後物理治療',2)}</div>
+    </div>
+
+    <div class="section-block">
+      <div class="sec-title">學歷區塊 <span style="font-weight:400;color:#999">（選填）</span></div>
+      ${mkGroup('區塊標題', mkInput('eduLabel','學歷','學歷'))}
+      <div class="form-g"><label>學歷項目</label>${mkList('eduItems','國立臺灣大學物理治療系碩士',1)}</div>
+    </div>
+
+    <div class="section-block">
+      <div class="sec-title">經歷區塊 <span style="font-weight:400;color:#999">（選填）</span></div>
+      ${mkGroup('區塊標題', mkInput('expLabel','經歷','經歷'))}
+      <div class="form-g"><label>經歷項目</label>${mkList('expItems','2021年全國運動會 場邊物理治療師',1)}</div>
+    </div>
   `;
-  fileInput.value = '';
-  btnAnalyze.disabled = true;
 }
 
-// --- API Helpers ---
-function getApiKey() {
-  return apiKeyInput.value.trim();
+// ── Health form ────────────────────────────────────────────────────────────
+function buildHealthForm(c){
+  c.innerHTML=`
+    ${mkGroup('類別標籤', mkInput('tag','衛教資訊','衛教資訊'))}
+    ${mkGroup('主標題', mkInput('title','正確洗手，遠離感染'))}
+    ${mkGroup('副標題', mkInput('subtitle','光田醫院感染管制室提醒您'), true)}
+    ${mkGroup('說明內文', mkArea('body','勤洗手是預防疾病傳播最有效的方法之一…'))}
+    <div class="form-g"><label>配圖 <span>（選填）</span></label>
+      <div class="upload-box" id="ubox-person" onclick="document.getElementById('file-person').click()">
+        <div id="uphint-person"><div style="font-size:24px">📷</div><div class="hint">點擊上傳</div></div>
+      </div>
+    </div>
+  `;
 }
 
-async function callClaude(messages) {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    throw new Error('請先輸入 Anthropic API Key');
-  }
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
-      messages
-    })
-  });
-
-  if (!res.ok) {
-    const errBody = await res.text();
-    throw new Error(`API 錯誤 (${res.status}): ${errBody}`);
-  }
-
-  const data = await res.json();
-  return data.content[0].text;
+// ── Event form ─────────────────────────────────────────────────────────────
+function buildEventForm(c){
+  c.innerHTML=`
+    ${mkGroup('活動名稱', mkInput('title','健康講座：認識糖尿病'))}
+    ${mkGroup('日期', mkInput('date','2026年5月15日（四）'))}
+    ${mkGroup('時間', mkInput('time','上午 10:00 – 12:00'), true)}
+    ${mkGroup('地點', mkInput('location','光田沙鹿院區 第一會議室'), true)}
+    ${mkGroup('補充說明', mkArea('desc','免費入場，歡迎踴躍報名…'), true)}
+  `;
 }
 
-function safeParseJson(text) {
-  try {
-    const clean = text.replace(/```json\s*|```\s*/g, '').trim();
-    return JSON.parse(clean);
-  } catch (e) {
-    console.error('JSON parse error:', e, text);
-    return null;
-  }
+// ── Clinic form ────────────────────────────────────────────────────────────
+function buildClinicForm(c){
+  c.innerHTML=`
+    ${mkGroup('公告標題', mkInput('title','門診時間異動公告','門診時間異動公告'))}
+    ${mkGroup('醫師姓名', mkInput('doctorName','王大明 醫師'))}
+    ${mkGroup('公告內容', mkArea('content','因醫師出席研討會，\n原週四上午門診暫停一次。\n造成不便，敬請見諒。'))}
+    ${mkGroup('生效日期', mkInput('date','2026年5月15日'))}
+  `;
 }
 
-function showLoading(title, sub) {
-  loadingTitle.textContent = title;
-  loadingSub.textContent = sub;
-  loadingOverlay.classList.add('active');
-}
-
-function hideLoading() {
-  loadingOverlay.classList.remove('active');
-}
-
-function showError(el, message, raw) {
-  el.innerHTML = message + (raw ? `<div class="error-raw">${escapeHtml(raw)}</div>` : '');
-  el.classList.add('visible');
-}
-
-function hideError(el) {
-  el.classList.remove('visible');
-}
-
-function escapeHtml(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-// --- STEP 2: Analyze ---
-btnAnalyze.addEventListener('click', async () => {
-  if (!uploadedBase64) {
-    showToast('請先上傳參考圖片', 'error');
-    return;
-  }
-
-  hideError(analyzeError);
-  showLoading('AI 分析中...', '正在識別版面結構・配色・圖層');
-  btnAnalyze.disabled = true;
-
-  try {
-    const prompt = `你是一個專業平面設計師，請分析這張社群媒體圖片的設計結構。
-請以 JSON 格式輸出，不要有任何說明文字，只輸出純 JSON。
-
-輸出格式如下：
-{
-  "canvas": {
-    "width": 1080,
-    "height": 1080,
-    "aspectRatio": "1:1",
-    "bgColor": "#FFFFFF",
-    "bgType": "solid | gradient | image"
-  },
-  "colorPalette": {
-    "primary": "#色碼",
-    "secondary": "#色碼",
-    "accent": "#色碼",
-    "text": "#色碼",
-    "background": "#色碼"
-  },
-  "typography": {
-    "headingSize": "大 | 中 | 小",
-    "bodySize": "大 | 中 | 小",
-    "fontStyle": "無襯線粗體 | 無襯線細體 | 混合",
-    "textAlignment": "left | center | right | mixed"
-  },
-  "layout": {
-    "type": "左右分割 | 上下分割 | 全版背景 | 斜切 | 置中",
-    "imagePosition": "左 | 右 | 上 | 下 | 全版背景 | 無",
-    "hasLogo": true,
-    "logoPosition": "左上 | 右上 | 左下 | 右下"
-  },
-  "layers": [
-    {
-      "id": 1,
-      "type": "rect | txt | img | divider",
-      "description": "用途描述",
-      "x_percent": 0,
-      "y_percent": 0,
-      "w_percent": 100,
-      "h_percent": 15,
-      "color": "#色碼",
-      "opacity": 1,
-      "zIndex": 1
+// ── Photo upload ───────────────────────────────────────────────────────────
+function handlePhoto(e, slot){
+  const file=e.target.files[0]; if(!file)return;
+  const process=url=>{
+    if(slot==='bg'){
+      bgPhotoURL=url; bgPhotoEl=new Image();
+      bgPhotoEl.onload=()=>{updateUploadBox('bg',url);schedRender();};
+      bgPhotoEl.src=url;
+    }else{
+      photoURL=url; photoEl=new Image();
+      photoEl.onload=()=>{updateUploadBox('person',url);schedRender();};
+      photoEl.src=url;
     }
-  ],
-  "textContent": {
-    "mainTitle": "識別到的主標題文字",
-    "subTitle": "識別到的副標題文字",
-    "bodyText": "識別到的說明文字",
-    "nameBadge": "識別到的姓名",
-    "tags": ["標籤1", "標籤2"]
-  },
-  "styleKeywords": ["現代", "醫療", "專業"]
-}
-
-注意：
-- 座標使用百分比（0~100），方便任意尺寸縮放
-- layers 陣列從最底層到最上層排列
-- 如無法識別的欄位填 null`;
-
-    const response = await callClaude([{
-      role: 'user',
-      content: [
-        {
-          type: 'image',
-          source: {
-            type: 'base64',
-            media_type: uploadedMediaType || 'image/jpeg',
-            data: uploadedBase64
-          }
-        },
-        { type: 'text', text: prompt }
-      ]
-    }]);
-
-    analysisResult = safeParseJson(response);
-
-    if (!analysisResult) {
-      showError(analyzeError, 'AI 回傳格式錯誤，無法解析 JSON', response);
-      return;
-    }
-
-    // Auto-fill text fields
-    const tc = analysisResult.textContent || {};
-    if (tc.mainTitle) document.getElementById('mainTitle').value = tc.mainTitle;
-    if (tc.subTitle) document.getElementById('subTitle').value = tc.subTitle;
-    if (tc.bodyText) document.getElementById('bodyText').value = tc.bodyText;
-    if (tc.nameBadge) document.getElementById('nameBadge').value = tc.nameBadge;
-    if (tc.tags && Array.isArray(tc.tags)) {
-      document.getElementById('tags').value = tc.tags.filter(Boolean).join(', ');
-    }
-
-    btnGenerate.disabled = false;
-    showToast('風格解析完成！請確認文案後產生預覽');
-
-  } catch (err) {
-    console.error('Analysis error:', err);
-    showError(analyzeError, 'AI 解析失敗：' + err.message);
-  } finally {
-    hideLoading();
-    btnAnalyze.disabled = false;
-  }
-});
-
-// --- STEP 3/4: Generate ---
-btnGenerate.addEventListener('click', async () => {
-  if (!analysisResult) {
-    showToast('請先完成 AI 風格解析', 'error');
-    return;
-  }
-
-  const mainTitle = document.getElementById('mainTitle').value.trim();
-  const subTitle = document.getElementById('subTitle').value.trim();
-  const bodyText = document.getElementById('bodyText').value.trim();
-  const nameBadge = document.getElementById('nameBadge').value.trim();
-  const adjustPrompt = document.getElementById('adjustPrompt').value.trim();
-
-  hideError(generateError);
-  showLoading('產生海報中...', '正在依風格產生 ktposter 格式');
-  btnGenerate.disabled = true;
-
-  try {
-    const prompt = `你是光田醫院的平面設計師，請根據以下資訊產生海報的 JSON 資料。
-只輸出純 JSON，不要有任何說明文字或 markdown 符號。
-
-【參考圖分析結果】
-${JSON.stringify(analysisResult)}
-
-【使用者填寫的文案】
-主標題：${mainTitle || '（未填寫）'}
-副標題：${subTitle || '（未填寫）'}
-說明文字：${bodyText || '（未填寫）'}
-姓名／職稱：${nameBadge || '（未填寫）'}
-
-【風格微調需求】
-${adjustPrompt || '保持參考圖的整體風格，套用光田品牌色 #0F6E56'}
-
-【輸出格式規則 - 嚴格遵守】
-- 輸出必須是合法的 JSON，符合以下 schema
-- 畫布尺寸：W: 1080, H: 1080
-- v: 2（版本號固定）
-- type 只能是：txt | rect | img
-- 每個 obj 必須有：type, x, y, w, h, rot, opacity, id
-- txt 額外需要：text, size, color, weight, align, fontFamily
-- rect 額外需要：color
-- img 額外需要：imgDataUrl, aspectRatio
-- Logo 固定使用 "./assets/ktgh-logo.png"，放右上角或左上角
-- fontFamily 固定使用 "Noto Sans TC"
-- 所有座標為絕對像素值（0~1080）
-- id 從 1 開始遞增，不重複
-
-品牌色參考：
-- 光田深綠：#0F6E56
-- 輔助綠：#2D8A6E
-- 淺綠背景：#E8F4F0
-- 白色：#FFFFFF
-- 深色文字：#1A1A1A`;
-
-    const response = await callClaude([{
-      role: 'user',
-      content: prompt
-    }]);
-
-    ktposterJson = safeParseJson(response);
-
-    if (!ktposterJson) {
-      showError(generateError, 'AI 回傳格式錯誤，無法解析 ktposter JSON', response);
-      return;
-    }
-
-    // Ensure required fields with defaults
-    ktposterJson.v = ktposterJson.v || 2;
-    ktposterJson.W = ktposterJson.W || 1080;
-    ktposterJson.H = ktposterJson.H || 1080;
-    ktposterJson.bgColor = ktposterJson.bgColor || '#FFFFFF';
-    ktposterJson.bgImgDataUrl = ktposterJson.bgImgDataUrl || null;
-    ktposterJson.bgScale = ktposterJson.bgScale ?? 1;
-    ktposterJson.bgOffsetX = ktposterJson.bgOffsetX ?? 0;
-    ktposterJson.bgOffsetY = ktposterJson.bgOffsetY ?? 0;
-    ktposterJson.objs = ktposterJson.objs || [];
-
-    renderPreview(ktposterJson);
-    showToast('預覽已產生！可匯出 .ktposter 檔案');
-
-  } catch (err) {
-    console.error('Generate error:', err);
-    showError(generateError, '產生預覽失敗：' + err.message);
-  } finally {
-    hideLoading();
-    btnGenerate.disabled = false;
-  }
-});
-
-// --- Render Preview ---
-function renderPreview(json) {
-  previewPlaceholder.style.display = 'none';
-  previewCanvas.style.display = 'block';
-  previewActions.style.display = 'flex';
-
-  const maxW = Math.min(440, window.innerWidth - 80);
-  const scale = maxW / json.W;
-
-  previewCanvas.style.width = maxW + 'px';
-  previewCanvas.style.height = (json.H * scale) + 'px';
-  previewCanvas.style.position = 'relative';
-  previewCanvas.style.backgroundColor = json.bgColor;
-  previewCanvas.style.overflow = 'hidden';
-  previewCanvas.innerHTML = '';
-
-  json.objs.forEach(obj => {
-    const el = document.createElement('div');
-    el.style.position = 'absolute';
-    el.style.left = (obj.x * scale) + 'px';
-    el.style.top = (obj.y * scale) + 'px';
-    el.style.width = (obj.w * scale) + 'px';
-    el.style.height = (obj.h * scale) + 'px';
-    el.style.opacity = obj.opacity;
-    el.style.transform = `rotate(${obj.rot || 0}deg)`;
-    el.style.zIndex = obj.id;
-
-    if (obj.type === 'rect') {
-      el.style.backgroundColor = obj.color;
-    }
-
-    if (obj.type === 'txt') {
-      el.style.color = obj.color;
-      el.style.fontSize = (obj.size * scale) + 'px';
-      el.style.fontWeight = obj.weight || '700';
-      el.style.textAlign = obj.align || 'center';
-      el.style.fontFamily = (obj.fontFamily || 'Noto Sans TC') + ', sans-serif';
-      el.style.display = 'flex';
-      el.style.alignItems = 'center';
-      el.style.whiteSpace = 'pre-wrap';
-      el.style.lineHeight = '1.3';
-      el.style.overflow = 'hidden';
-      if (obj.align === 'center') el.style.justifyContent = 'center';
-      else if (obj.align === 'right') el.style.justifyContent = 'flex-end';
-      el.innerText = obj.text || '';
-    }
-
-    if (obj.type === 'img') {
-      const img = document.createElement('img');
-      img.src = obj.imgDataUrl;
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.objectFit = 'contain';
-      img.onerror = () => {
-        el.style.border = '1px dashed #ccc';
-        el.style.display = 'flex';
-        el.style.alignItems = 'center';
-        el.style.justifyContent = 'center';
-        el.style.fontSize = (12 * scale) + 'px';
-        el.style.color = '#999';
-        el.innerHTML = '<span>Logo</span>';
+  };
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    if(file.size>2e6){
+      const tmp=new Image();
+      tmp.onload=()=>{
+        const c2=document.createElement('canvas');
+        let w=tmp.width,h=tmp.height,m=1400;
+        if(w>m){h=h*m/w;w=m;} if(h>m){w=w*m/h;h=m;}
+        c2.width=w;c2.height=h;
+        c2.getContext('2d').drawImage(tmp,0,0,w,h);
+        process(c2.toDataURL('image/jpeg',0.88));
       };
-      el.appendChild(img);
+      tmp.src=ev.target.result;
+    }else process(ev.target.result);
+  };
+  reader.readAsDataURL(file);
+  e.target.value='';
+}
+
+function updateUploadBox(slot,url){
+  const box=document.getElementById('ubox-'+slot);
+  const hint=document.getElementById('uphint-'+slot);
+  if(!box||!hint)return;
+  box.classList.add('has');
+  hint.innerHTML=`<img src="${url}" style="max-width:100%;max-height:100px;border-radius:5px;object-fit:cover"><div class="hint" style="margin-top:3px">點擊更換</div>`;
+}
+
+// ── Canvas setup ───────────────────────────────────────────────────────────
+function setupCanvas(key){
+  const T=TPLS[key];
+  const right=document.getElementById('right');
+  right.innerHTML='';
+  const wrap=document.createElement('div');
+  wrap.className='preview-wrap';
+  const lbl=document.createElement('div');
+  lbl.className='preview-lbl';
+  lbl.textContent=T.name+' · '+T.W+' × '+T.H+'px';
+  wrap.appendChild(lbl);
+  cv=document.createElement('canvas');
+  cv.width=T.W; cv.height=T.H;
+  cx=cv.getContext('2d');
+  const pw=Math.min(right.clientWidth-48,430);
+  const ph=(right.clientHeight||600)-64;
+  const sc=Math.min(pw/T.W,ph/T.H);
+  cv.style.width=Math.round(T.W*sc)+'px';
+  cv.style.height=Math.round(T.H*sc)+'px';
+  wrap.appendChild(cv);
+  right.appendChild(wrap);
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────
+function schedRender(){clearTimeout(renderTimer);renderTimer=setTimeout(render,130);}
+function render(){
+  if(!curTpl||!cv||!cx)return;
+  const T=TPLS[curTpl];
+  cx.clearRect(0,0,T.W,T.H);
+  if(curTpl==='doctor')drawDoctor();
+  else if(curTpl==='health')drawHealth();
+  else if(curTpl==='event')drawEvent();
+  else if(curTpl==='clinic')drawClinic();
+  buildKt();
+}
+
+// ── Drawing helpers ────────────────────────────────────────────────────────
+function wrapText(x,y,text,maxW,lh,maxL){
+  if(!text)return y;
+  const sa=cx.textAlign; cx.textAlign='left';
+  let count=0;
+  for(const para of text.split('\n')){
+    let line='';
+    for(const ch of para){
+      const t=line+ch;
+      if(cx.measureText(t).width>maxW&&line){
+        cx.fillText(line,x,y); line=ch; y+=lh; count++;
+        if(maxL&&count>=maxL){cx.textAlign=sa;return y;}
+      }else line=t;
     }
+    if(line){cx.fillText(line,x,y);y+=lh;count++;}
+    if(maxL&&count>=maxL)break;
+  }
+  cx.textAlign=sa; return y;
+}
+function rRect(x,y,w,h,r){
+  cx.beginPath();
+  cx.moveTo(x+r,y);cx.lineTo(x+w-r,y);cx.quadraticCurveTo(x+w,y,x+w,y+r);
+  cx.lineTo(x+w,y+h-r);cx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  cx.lineTo(x+r,y+h);cx.quadraticCurveTo(x,y+h,x,y+h-r);
+  cx.lineTo(x,y+r);cx.quadraticCurveTo(x,y,x+r,y);
+  cx.closePath();
+}
+function coverImg(img,x,y,w,h){
+  if(!img)return;
+  const r=img.naturalWidth/img.naturalHeight;
+  let dw=w,dh=w/r;
+  if(dh<h){dh=h;dw=h*r;}
+  cx.drawImage(img,x+(w-dw)/2,y+(h-dh)/2,dw,dh);
+}
+function coverImgClipped(img,x,y,w,h,radius){
+  if(!img)return;
+  cx.save(); rRect(x,y,w,h,radius||0); cx.clip();
+  coverImg(img,x,y,w,h);
+  cx.restore();
+}
+function drawLogo(x,y,w,h,col){
+  if(logoEl&&logoEl.complete&&logoEl.naturalWidth>0){
+    const r=logoEl.naturalWidth/logoEl.naturalHeight;
+    const dw=Math.min(w,h*r),dh=dw/r;
+    cx.drawImage(logoEl,x,y+(h-dh)/2,dw,dh);
+  }else{
+    cx.fillStyle=col||'#fff';
+    cx.font=`bold ${Math.round(h*.5)}px "Noto Sans TC"`;
+    cx.textAlign='left'; cx.textBaseline='middle';
+    cx.fillText('光田醫院',x,y+h/2);
+  }
+}
+function autoSz(text,max,maxW,wt){
+  let sz=max;
+  cx.font=`${wt||'900'} ${sz}px "Noto Sans TC"`;
+  while(cx.measureText(text).width>maxW&&sz>28){sz-=4;cx.font=`${wt||'900'} ${sz}px "Noto Sans TC"`;}
+  return sz;
+}
+function drawFooter(W,H){
+  cx.fillStyle=theme.p; cx.fillRect(0,H-82,W,82);
+  cx.fillStyle='rgba(255,255,255,.8)';
+  cx.font=`400 22px "Noto Sans TC"`;
+  cx.textAlign='center'; cx.textBaseline='middle';
+  cx.fillText('光田綜合醫院　Kuangtien General Hospital',W/2,H-41);
+}
 
-    previewCanvas.appendChild(el);
+// ══════════════════════════════════════════════════════════════════════════
+// DOCTOR template — matches reference design
+// ══════════════════════════════════════════════════════════════════════════
+function drawDoctor(){
+  const W=1080, H=1080;
+  const P=theme.p, S=theme.s, DARK=theme.dark;
+  const name      = fv('doctorName')     || '姓名';
+  const titleTxt  = fv('titleText')      || '職稱';
+  const specLabel = fv('specialtyLabel') || '專長';
+  const eduLabel  = fv('eduLabel')       || '學歷';
+  const expLabel  = fv('expLabel')       || '經歷';
+  const specItems = getList('specialtyItems');
+  const eduItems  = getList('eduItems');
+  const expItems  = getList('expItems');
+
+  // ── 1. Background image (full canvas) ──────────────────────────────────
+  if(bgPhotoEl){
+    cx.save(); cx.beginPath(); cx.rect(0,0,W,H); cx.clip();
+    coverImg(bgPhotoEl,0,0,W,H);
+    cx.restore();
+    // dark overlay
+    cx.fillStyle='rgba(8,18,35,0.52)'; cx.fillRect(0,0,W,H);
+  }else{
+    // gradient fallback
+    const g=cx.createLinearGradient(0,0,W,H);
+    g.addColorStop(0,'#0D1B2E'); g.addColorStop(1,DARK);
+    cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  }
+
+  // ── 2. Dark diagonal polygon (right portion) ───────────────────────────
+  // Matches the reference: dark navy shape covers upper-right & sweeps to bottom-left
+  cx.fillStyle = hexAlpha(DARK, 0.88);
+  cx.beginPath();
+  cx.moveTo(W*0.36, 118);   // top start (diagonal left edge)
+  cx.lineTo(W,      118);   // top right
+  cx.lineTo(W,      H);     // bottom right
+  cx.lineTo(W*0.08, H);     // bottom left
+  cx.closePath();
+  cx.fill();
+
+  // Subtle accent line on diagonal edge
+  cx.strokeStyle = S;
+  cx.lineWidth = 4;
+  cx.beginPath();
+  cx.moveTo(W*0.36, 118);
+  cx.lineTo(W*0.08, H);
+  cx.stroke();
+
+  // ── 3. Top bar (full width) ────────────────────────────────────────────
+  cx.fillStyle = hexAlpha(DARK, 0.97);
+  cx.fillRect(0, 0, W, 118);
+
+  // Logo (top-left, white)
+  drawLogo(28, 18, 230, 82, '#fff');
+
+  // Name + title (top-right, white, bold)
+  cx.fillStyle = '#FFFFFF';
+  const nameStr = name + '　' + titleTxt;
+  autoSz(nameStr, 58, W*0.56, '900');
+  cx.textAlign = 'right';
+  cx.textBaseline = 'middle';
+  cx.fillText(nameStr, W-36, 59);
+
+  // ── 4. Person photo (left side, below top bar) ─────────────────────────
+  if(photoEl){
+    const photoW = W*0.5;
+    const photoH = H - 118;
+    cx.save();
+    cx.beginPath();
+    cx.rect(0, 118, photoW, photoH);
+    cx.clip();
+    // align bottom — so person's face shows at top of the area
+    const r = photoEl.naturalWidth / photoEl.naturalHeight;
+    let dw=photoW, dh=photoW/r;
+    if(dh<photoH){dh=photoH; dw=photoH*r;}
+    // bottom-align
+    cx.drawImage(photoEl, (photoW-dw)/2, 118+photoH-dh, dw, dh);
+    cx.restore();
+
+    // Right-fade gradient blending into dark polygon
+    const fadeG = cx.createLinearGradient(W*0.32, 0, W*0.52, 0);
+    fadeG.addColorStop(0, 'rgba(8,18,35,0)');
+    fadeG.addColorStop(1, hexAlpha(DARK, 0.95));
+    cx.fillStyle = fadeG;
+    cx.fillRect(W*0.32, 118, W*0.2, H-118);
+  }
+
+  // ── 5. Right content area ──────────────────────────────────────────────
+  const RX = W*0.41;   // content left edge
+  const RW = W - RX - 44; // content width
+  let contentY = 158;
+
+  // ── Specialty ──────────────────────────────────────────────────────────
+  if(specItems.length > 0){
+    // Section label
+    cx.fillStyle = '#FFFFFF';
+    cx.font = `700 34px "Noto Sans TC"`;
+    cx.textAlign = 'left';
+    cx.textBaseline = 'alphabetic';
+    cx.fillText(specLabel, RX, contentY);
+
+    // Accent underline
+    cx.strokeStyle = S;
+    cx.lineWidth = 3;
+    cx.beginPath();
+    cx.moveTo(RX, contentY+8);
+    cx.lineTo(RX+cx.measureText(specLabel).width+20, contentY+8);
+    cx.stroke();
+    contentY += 48;
+
+    specItems.forEach(item=>{
+      // Bullet dot
+      cx.fillStyle = S;
+      cx.beginPath(); cx.arc(RX+8, contentY-10, 5, 0, Math.PI*2); cx.fill();
+      // Text (auto size down if long)
+      cx.fillStyle = '#FFFFFF';
+      let sz=28;
+      cx.font=`400 ${sz}px "Noto Sans TC"`;
+      while(cx.measureText(item).width>RW-24&&sz>18){sz-=2;cx.font=`400 ${sz}px "Noto Sans TC"`;}
+      cx.fillText(item, RX+24, contentY);
+      contentY += sz+14;
+    });
+    contentY += 18;
+  }
+
+  // Divider (only if edu or exp exists)
+  const hasEdu = eduItems.length>0;
+  const hasExp = expItems.length>0;
+  if((hasEdu||hasExp) && specItems.length>0){
+    cx.strokeStyle = 'rgba(255,255,255,0.18)';
+    cx.lineWidth = 1;
+    cx.beginPath(); cx.moveTo(RX, contentY); cx.lineTo(W-44, contentY); cx.stroke();
+    contentY += 28;
+  }
+
+  // ── Education ──────────────────────────────────────────────────────────
+  if(hasEdu){
+    cx.fillStyle = '#FFFFFF';
+    cx.font = `700 28px "Noto Sans TC"`;
+    cx.textAlign = 'left'; cx.textBaseline = 'alphabetic';
+    cx.fillText(eduLabel, RX, contentY);
+    cx.strokeStyle = S; cx.lineWidth = 2;
+    cx.beginPath(); cx.moveTo(RX, contentY+7); cx.lineTo(RX+cx.measureText(eduLabel).width+16, contentY+7); cx.stroke();
+    contentY += 38;
+
+    eduItems.forEach(item=>{
+      cx.fillStyle = 'rgba(255,255,255,0.82)';
+      let sz=24; cx.font=`400 ${sz}px "Noto Sans TC"`;
+      while(cx.measureText(item).width>RW-12&&sz>16){sz-=2;cx.font=`400 ${sz}px "Noto Sans TC"`;}
+      contentY = wrapText(RX+8, contentY, item, RW-8, sz+10, 2);
+    });
+    contentY += 14;
+  }
+
+  // ── Experience ─────────────────────────────────────────────────────────
+  if(hasExp){
+    if(hasEdu){
+      cx.strokeStyle='rgba(255,255,255,0.12)'; cx.lineWidth=1;
+      cx.beginPath(); cx.moveTo(RX,contentY); cx.lineTo(W-44,contentY); cx.stroke();
+      contentY+=20;
+    }
+    cx.fillStyle = '#FFFFFF';
+    cx.font = `700 28px "Noto Sans TC"`;
+    cx.textAlign = 'left'; cx.textBaseline = 'alphabetic';
+    cx.fillText(expLabel, RX, contentY);
+    cx.strokeStyle = S; cx.lineWidth = 2;
+    cx.beginPath(); cx.moveTo(RX, contentY+7); cx.lineTo(RX+cx.measureText(expLabel).width+16, contentY+7); cx.stroke();
+    contentY += 38;
+
+    expItems.forEach(item=>{
+      cx.fillStyle = 'rgba(255,255,255,0.82)';
+      let sz=22; cx.font=`400 ${sz}px "Noto Sans TC"`;
+      while(cx.measureText(item).width>RW-12&&sz>14){sz-=2;cx.font=`400 ${sz}px "Noto Sans TC"`;}
+      contentY = wrapText(RX+8, contentY, item, RW-8, sz+10, 2);
+    });
+  }
+}
+
+// ── Hex + alpha helper ─────────────────────────────────────────────────────
+function hexAlpha(hex, a){
+  const r=parseInt(hex.slice(1,3),16);
+  const g=parseInt(hex.slice(3,5),16);
+  const b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// HEALTH template
+// ══════════════════════════════════════════════════════════════════════════
+function drawHealth(){
+  const W=1080,H=1350,P=theme.p,S=theme.s,L=theme.l;
+  const tag=fv('tag')||'衛教資訊';
+  const title=fv('title')||'標題文字';
+  const sub=fv('subtitle');
+  const body=fv('body');
+
+  cx.fillStyle='#F8FAF8'; cx.fillRect(0,0,W,H);
+  cx.fillStyle=P; cx.fillRect(0,0,W,400);
+
+  cx.fillStyle='rgba(255,255,255,.06)';
+  cx.beginPath();cx.arc(920,70,210,0,Math.PI*2);cx.fill();
+  cx.beginPath();cx.arc(80,360,150,0,Math.PI*2);cx.fill();
+
+  drawLogo(W-270,28,230,72,'#fff');
+
+  cx.fillStyle='rgba(255,255,255,.22)';rRect(46,56,168,46,23);cx.fill();
+  cx.fillStyle='#fff';cx.font=`700 23px "Noto Sans TC"`;
+  cx.textAlign='center';cx.textBaseline='middle';cx.fillText(tag,130,79);
+
+  cx.fillStyle='#fff';cx.textAlign='left';cx.textBaseline='alphabetic';
+  const tsz=autoSz(title,74,950,'900');
+  let ty=192,tl='';
+  for(const ch of title){
+    const t=tl+ch;
+    if(cx.measureText(t).width>950&&tl){cx.fillText(tl,46,ty);tl=ch;ty+=tsz+14;}
+    else tl=t;
+  }
+  if(tl)cx.fillText(tl,46,ty);
+  if(sub){
+    cx.fillStyle='rgba(255,255,255,.8)';cx.font=`400 30px "Noto Sans TC"`;
+    cx.fillText(sub,46,ty+tsz+18);
+  }
+
+  const cardY=365;
+  cx.fillStyle='#fff';rRect(36,cardY,W-72,H-cardY-82,18);
+  cx.shadowColor='rgba(0,0,0,.07)';cx.shadowBlur=20;cx.fill();cx.shadowBlur=0;
+
+  let contY=cardY+60;
+  if(photoEl){
+    const ph=270;
+    cx.save();rRect(56,contY,W-112,ph,10);cx.clip();
+    coverImg(photoEl,56,contY,W-112,ph);
+    cx.restore();
+    contY+=ph+30;
+  }
+  if(body){
+    cx.fillStyle='#333';cx.font=`400 30px "Noto Sans TC"`;
+    cx.textBaseline='alphabetic';
+    wrapText(66,contY+36,body,W-160,48,14);
+  }
+  drawFooter(W,H);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// EVENT template
+// ══════════════════════════════════════════════════════════════════════════
+function drawEvent(){
+  const W=1080,H=1080,P=theme.p,S=theme.s,L=theme.l;
+  const title=fv('title')||'活動標題';
+  const date=fv('date');
+  const time=fv('time');
+  const loc=fv('location');
+  const desc=fv('desc');
+
+  cx.fillStyle=L; cx.fillRect(0,0,W,H);
+  cx.fillStyle=hexAlpha(P,0.1);
+  cx.beginPath();cx.moveTo(0,0);cx.lineTo(W*.65,0);cx.lineTo(0,H*.65);cx.closePath();cx.fill();
+
+  cx.fillStyle=P; cx.fillRect(0,0,W,108);
+  drawLogo(34,16,220,76,'#fff');
+
+  cx.fillStyle='rgba(255,255,255,.22)';rRect(W-204,26,166,56,6);cx.fill();
+  cx.fillStyle='#fff';cx.font=`700 27px "Noto Sans TC"`;
+  cx.textAlign='center';cx.textBaseline='middle';cx.fillText('活動公告',W-121,54);
+
+  cx.fillStyle=P;cx.textAlign='center';cx.textBaseline='alphabetic';
+  const tsz=autoSz(title,82,940,'900');
+  let ty=245,tl='';
+  for(const ch of title){
+    const t=tl+ch;
+    if(cx.measureText(t).width>940&&tl){cx.fillText(tl,W/2,ty);tl=ch;ty+=tsz+12;}
+    else tl=t;
+  }
+  if(tl){cx.fillText(tl,W/2,ty);ty+=tsz+12;}
+
+  const items=[
+    {ic:'📅',lb:'日期',val:date},
+    {ic:'🕐',lb:'時間',val:time},
+    {ic:'📍',lb:'地點',val:loc},
+  ].filter(i=>i.val);
+  const cw=900,cx0=(W-cw)/2;
+  let cy=ty+36;
+  items.forEach(item=>{
+    cx.fillStyle='#fff';rRect(cx0,cy,cw,82,12);
+    cx.shadowColor='rgba(0,0,0,.08)';cx.shadowBlur=14;cx.fill();cx.shadowBlur=0;
+    cx.fillStyle=L;rRect(cx0+12,cy+13,56,56,8);cx.fill();
+    cx.font='26px sans-serif';cx.textAlign='center';cx.textBaseline='middle';
+    cx.fillText(item.ic,cx0+40,cy+41);
+    cx.fillStyle=P;cx.font=`700 20px "Noto Sans TC"`;cx.textAlign='left';cx.textBaseline='middle';
+    cx.fillText(item.lb,cx0+82,cy+26);
+    cx.fillStyle='#1A1A1A';cx.font=`500 26px "Noto Sans TC"`;
+    cx.fillText(item.val,cx0+82,cy+58);
+    cy+=96;
   });
+  if(desc){
+    cx.fillStyle='#555';cx.font=`400 26px "Noto Sans TC"`;cx.textBaseline='alphabetic';
+    wrapText(cx0,cy+36,desc,cw,40,4);
+  }
+  drawFooter(W,H);
 }
 
-// --- Export ---
-function exportKtposter() {
-  if (!ktposterJson) return;
-  const blob = new Blob([JSON.stringify(ktposterJson)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `光田海報_${new Date().toISOString().slice(0, 10)}.ktposter`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('已下載 .ktposter 檔案');
+// ══════════════════════════════════════════════════════════════════════════
+// CLINIC template
+// ══════════════════════════════════════════════════════════════════════════
+function drawClinic(){
+  const W=1920,H=1080,P=theme.p,S=theme.s,L=theme.l;
+  const title=fv('title')||'門診公告';
+  const dname=fv('doctorName');
+  const cont=fv('content');
+  const date=fv('date');
+
+  cx.fillStyle='#fff';cx.fillRect(0,0,W,H);
+  cx.fillStyle=P;cx.fillRect(W*.58,0,W*.42,H);
+  cx.fillStyle='rgba(255,255,255,.07)';
+  cx.beginPath();cx.arc(W*.83,H*.22,250,0,Math.PI*2);cx.fill();
+  cx.beginPath();cx.arc(W*.67,H*.78,190,0,Math.PI*2);cx.fill();
+
+  cx.fillStyle=P;cx.fillRect(0,0,W*.58,108);
+  drawLogo(56,16,280,76,'#fff');
+
+  cx.fillStyle=L;rRect(56,146,186,52,8);cx.fill();
+  cx.fillStyle=P;cx.font=`700 26px "Noto Sans TC"`;
+  cx.textAlign='left';cx.textBaseline='middle';cx.fillText('門診公告',76,172);
+
+  cx.fillStyle='#1A1A1A';cx.textBaseline='alphabetic';
+  autoSz(title,90,W*.52,'900');cx.fillText(title,56,316);
+
+  if(dname){cx.fillStyle=S;cx.font=`700 50px "Noto Sans TC"`;cx.fillText(dname,56,384);}
+
+  cx.strokeStyle=L;cx.lineWidth=3;
+  cx.beginPath();cx.moveTo(56,415);cx.lineTo(W*.54,415);cx.stroke();
+
+  if(cont){cx.fillStyle='#333';cx.font=`400 36px "Noto Sans TC"`;cx.textBaseline='alphabetic';wrapText(56,478,cont,W*.52,58,8);}
+
+  cx.fillStyle='#999';cx.font=`400 22px "Noto Sans TC"`;
+  cx.textAlign='left';cx.textBaseline='middle';
+  cx.fillText('光田綜合醫院　Kuangtien General Hospital',56,H-44);
+
+  const rx=W*.58+(W*.42)/2;
+  cx.fillStyle='#fff';cx.font=`700 36px "Noto Sans TC"`;
+  cx.textAlign='center';cx.textBaseline='middle';cx.fillText('生效日期',rx,H*.38);
+  cx.fillStyle='rgba(255,255,255,.14)';rRect(W*.62,H*.44,W*.34,140,16);cx.fill();
+  cx.fillStyle='#fff';
+  autoSz(date||'日期待定',66,W*.32,'900');
+  cx.textAlign='center';cx.textBaseline='middle';cx.fillText(date||'日期待定',rx,H*.51);
+  cx.fillStyle='rgba(255,255,255,.7)';
+  cx.font=`400 28px "Noto Sans TC"`;cx.fillText('光田綜合醫院',rx,H*.74);
+  cx.font=`400 22px "Noto Sans TC"`;cx.fillText('Kuangtien General Hospital',rx,H*.81);
 }
 
-function copyJson() {
-  if (!ktposterJson) return;
-  navigator.clipboard.writeText(JSON.stringify(ktposterJson, null, 2))
-    .then(() => showToast('JSON 已複製到剪貼簿'))
-    .catch(() => showToast('複製失敗，請手動複製', 'error'));
+// ── ktposter ───────────────────────────────────────────────────────────────
+function buildKt(){
+  if(!curTpl)return;
+  const T=TPLS[curTpl],P=theme.p;
+  let id=1,objs=[];
+  objs.push({type:'rect',x:0,y:0,w:T.W,h:T.H,color:'#1B2A4A',opacity:1,rot:0,id:id++});
+  objs.push({type:'rect',x:0,y:0,w:T.W,h:110,color:P,opacity:1,rot:0,id:id++});
+  objs.push({type:'img',x:30,y:16,w:220,h:76,rot:0,opacity:1,aspectRatio:220/76,id:id++,imgDataUrl:'./assets/ktgh-logo.png'});
+  if(bgPhotoURL) objs.push({type:'img',x:0,y:0,w:T.W,h:T.H,rot:0,opacity:0.5,aspectRatio:T.W/T.H,id:id++,imgDataUrl:bgPhotoURL});
+  if(photoURL)   objs.push({type:'img',x:0,y:110,w:T.W*0.5,h:T.H-110,rot:0,opacity:1,aspectRatio:0.5*T.W/(T.H-110),id:id++,imgDataUrl:photoURL});
+  const tf=curTpl==='doctor'?'doctorName':'title';
+  const tv=fv(tf);
+  if(tv)objs.push({type:'txt',text:tv,size:58,color:'#fff',weight:'900',align:'right',fontFamily:'Noto Sans TC',x:T.W*0.3,y:20,w:T.W*0.65,h:90,rot:0,opacity:1,id:id++});
+  objs.push({type:'rect',x:0,y:T.H-82,w:T.W,h:82,color:P,opacity:1,rot:0,id:id++});
+  ktData={v:2,W:T.W,H:T.H,bgColor:'#1B2A4A',bgImgDataUrl:bgPhotoURL||null,bgScale:1,bgOffsetX:0,bgOffsetY:0,objs};
 }
 
-// --- Toast ---
-function showToast(msg, type = 'success') {
-  const container = document.getElementById('toasts');
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.textContent = msg;
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.style.transition = 'opacity 0.3s';
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 300);
-  }, 2000);
+// ── Export ─────────────────────────────────────────────────────────────────
+function dlPNG(){
+  if(!cv)return;
+  render();
+  setTimeout(()=>{
+    cv.toBlob(blob=>{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download=`光田_${TPLS[curTpl].name}_${new Date().toISOString().slice(0,10)}.png`;
+      a.click(); toast('✅ PNG 已下載','ok');
+    },'image/png');
+  },200);
 }
-
-// --- Restore API key from sessionStorage ---
-(function() {
-  const saved = sessionStorage.getItem('ktposter_apikey');
-  if (saved) apiKeyInput.value = saved;
-  apiKeyInput.addEventListener('input', () => {
-    sessionStorage.setItem('ktposter_apikey', apiKeyInput.value);
-  });
-})();
+function dlKt(){
+  if(!ktData)return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(ktData,null,2)],{type:'application/json'}));
+  a.download=`光田_${TPLS[curTpl].name}_${new Date().toISOString().slice(0,10)}.ktposter`;
+  a.click(); toast('✅ .ktposter 已下載','ok');
+}
+function copyJ(){
+  if(!ktData)return;
+  navigator.clipboard.writeText(JSON.stringify(ktData,null,2))
+    .then(()=>toast('✅ JSON 已複製','ok'))
+    .catch(()=>toast('❌ 複製失敗','err'));
+}
+function toast(msg,type){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=`toast ${type} show`;
+  setTimeout(()=>el.classList.remove('show'),2400);
+}
 </script>
 </body>
 </html>
