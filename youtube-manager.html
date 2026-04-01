@@ -713,7 +713,7 @@ async function autoFetchYt(prefix){
   if(!d)return;
   const g=id=>document.getElementById(prefix+id);
   if(g('title')&&!g('title').value)g('title').value=d.title;
-  if(g('date')&&!g('date').value)g('date').value=d.date;
+  if(g('date'))g('date').value=d.date;
   if(g('dur'))g('dur').value=d.dur;
   g('yt_views').value=d.yt_views;
   g('yt_likes').value=d.yt_likes;
