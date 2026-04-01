@@ -292,7 +292,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
         YouTube 數據（主要平台）
       </div>
       <div class="form-grid cols3">
-        <div class="form-group full"><label>YouTube 連結</label><input type="url" id="f-yt_url" placeholder="https://youtu.be/..."></div>
+        <div class="form-group full"><label>YouTube 連結</label><div style="display:flex;gap:8px;"><input type="url" id="f-yt_url" placeholder="https://youtu.be/..." style="flex:1;"><button class="btn btn-secondary btn-sm" onclick="autoFetchYt('f-')" style="white-space:nowrap;background:rgba(255,68,68,.12);color:var(--yt);border:1px solid rgba(255,68,68,.2);">自動取得 YT 數據</button></div></div>
         <div class="form-group"><label>觀看次數</label><input type="number" id="f-yt_views" placeholder="0" min="0"></div>
         <div class="form-group"><label>按讚數</label><input type="number" id="f-yt_likes" placeholder="0" min="0"></div>
         <div class="form-group"><label>留言數</label><input type="number" id="f-yt_comments" placeholder="0" min="0"></div>
@@ -346,6 +346,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
         <select id="filter-type" onchange="renderList()"><option value="">全部類型</option><option value="short">Short</option><option value="long">Long</option></select>
         <select id="filter-cat" onchange="renderList()"><option value="">全部類別</option><option value="疾病衛教">疾病衛教</option><option value="特色醫療">特色醫療</option><option value="新服務流程">新服務流程</option><option value="醫院形象">醫院形象</option><option value="員工活動">員工活動</option><option value="教學">教學</option><option value="其他">其他</option></select>
         <select id="filter-month" onchange="renderList()"><option value="">全部月份</option></select>
+        <button class="btn btn-sm" onclick="batchUpdateYt()" style="background:rgba(255,68,68,.12);color:var(--yt);border:1px solid rgba(255,68,68,.2);">批次更新 YT 數據</button>
         <button class="btn btn-secondary btn-sm" onclick="exportCSV()">匯出 CSV</button>
       </div>
       <div class="tbl-wrap">
@@ -445,8 +446,9 @@ tr:hover td{background:rgba(52,211,153,.03);}
       <div class="cfg-card" style="margin-top:20px;">
         <h3>API 連線</h3>
         <div class="form-group" style="margin-top:14px;"><label>Apps Script Web App URL</label><input type="text" id="cfg-api-url" placeholder="https://script.google.com/macros/s/.../exec"></div>
+        <div class="form-group" style="margin-top:10px;"><label>YouTube Data API Key（<a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color:var(--accent);">免費申請</a>）</label><input type="text" id="cfg-yt-key" placeholder="AIzaSy..."></div>
         <div class="form-actions">
-          <button class="btn btn-primary" onclick="saveApiUrlFromCfg()">儲存</button>
+          <button class="btn btn-primary" onclick="saveApiUrlFromCfg();saveYtApiKey()">儲存</button>
           <button class="btn btn-secondary" onclick="testApi()">測試連線</button>
         </div>
         <div id="api-alert" class="alert" style="margin-top:14px;"></div>
@@ -482,7 +484,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
       <span class="icon"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z"/><polygon points="9.75,15.02 15.5,11.75 9.75,8.48" fill="currentColor" stroke="none"/></svg></span>YouTube
     </div>
     <div class="form-grid cols3">
-      <div class="form-group full"><label>YouTube 連結</label><input type="url" id="e-yt_url"></div>
+      <div class="form-group full"><label>YouTube 連結</label><div style="display:flex;gap:8px;"><input type="url" id="e-yt_url" style="flex:1;"><button class="btn btn-secondary btn-sm" onclick="autoFetchYt('e-')" style="white-space:nowrap;background:rgba(255,68,68,.12);color:var(--yt);border:1px solid rgba(255,68,68,.2);">自動取得</button></div></div>
       <div class="form-group"><label>觀看次數</label><input type="number" id="e-yt_views" min="0"></div>
       <div class="form-group"><label>按讚數</label><input type="number" id="e-yt_likes" min="0"></div>
       <div class="form-group"><label>留言數</label><input type="number" id="e-yt_comments" min="0"></div>
@@ -641,7 +643,7 @@ async function deleteEntry(id){if(!confirm('確定要刪除此影片紀錄？'))
 // ============================================================
 // 設定
 // ============================================================
-function renderCfgForm(){document.getElementById('cfg-viewGoal').value=CFG.viewGoal;document.getElementById('cfg-countGoal').value=CFG.countGoal;document.getElementById('cfg-personalGoal').value=CFG.personalGoal;document.getElementById('cfg-api-url').value=API_URL;}
+function renderCfgForm(){document.getElementById('cfg-viewGoal').value=CFG.viewGoal;document.getElementById('cfg-countGoal').value=CFG.countGoal;document.getElementById('cfg-personalGoal').value=CFG.personalGoal;document.getElementById('cfg-api-url').value=API_URL;document.getElementById('cfg-yt-key').value=YT_API_KEY;}
 async function saveCfg(){CFG.viewGoal=Number(document.getElementById('cfg-viewGoal').value)||5000;CFG.countGoal=Number(document.getElementById('cfg-countGoal').value)||6;CFG.personalGoal=Number(document.getElementById('cfg-personalGoal').value)||2000;localStorage.setItem('kt_yt_cfg',JSON.stringify(CFG));showAlert('cfg-alert','設定已儲存','ok');renderDashboard();await pushToSheets('saveConfig',{data:CFG});}
 async function forceSync(){if(!USE_API()){alert('請先設定 API URL');return;}showSyncBadge('同步中...');const ok=await syncFromSheets();await syncConfigFromSheets();renderAll();showSyncBadge(ok?'同步完成':'同步失敗');}
 function clearAllData(){if(!confirm('確定要清除所有本機資料？'))return;DATA=[];localStorage.removeItem('kt_yt_data');renderAll();showSyncBadge('本機資料已清除');}
@@ -659,6 +661,108 @@ function showSyncBadge(msg){let b=document.getElementById('sync-badge');if(!b){b
 
 // ============================================================
 // ============================================================
+// ============================================================
+// YouTube Data API 一鍵匯入
+// ============================================================
+let YT_API_KEY=localStorage.getItem('kt_yt_apikey')||'';
+
+function parseYtVideoId(url){
+  if(!url)return null;
+  const m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
+  return m?m[1]:null;
+}
+
+function parseIsoDuration(iso){
+  if(!iso)return '';
+  const m=iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if(!m)return iso;
+  const h=m[1]?parseInt(m[1]):0, min=m[2]?parseInt(m[2]):0, s=m[3]?parseInt(m[3]):0;
+  if(h>0)return `${h}:${String(min).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${min}:${String(s).padStart(2,'0')}`;
+}
+
+async function fetchYtData(videoId){
+  if(!YT_API_KEY){alert('請先在「設定」頁面填入 YouTube Data API Key');showPage('config');return null;}
+  try{
+    const url=`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${videoId}&key=${YT_API_KEY}`;
+    const res=await fetch(url);
+    const data=await res.json();
+    if(data.error){alert('YouTube API 錯誤：'+data.error.message);return null;}
+    if(!data.items||data.items.length===0){alert('找不到此影片，請確認連結是否正確');return null;}
+    const item=data.items[0];
+    return{
+      title:item.snippet.title,
+      date:item.snippet.publishedAt.substring(0,10),
+      dur:parseIsoDuration(item.contentDetails.duration),
+      yt_views:Number(item.statistics.viewCount)||0,
+      yt_likes:Number(item.statistics.likeCount)||0,
+      yt_comments:Number(item.statistics.commentCount)||0,
+    };
+  }catch(e){alert('取得 YouTube 資料失敗：'+e.message);return null;}
+}
+
+async function autoFetchYt(prefix){
+  const urlEl=document.getElementById(prefix+'yt_url');
+  const videoId=parseYtVideoId(urlEl.value);
+  if(!videoId){alert('請先貼上有效的 YouTube 連結');return;}
+  urlEl.style.borderColor='var(--yt)';
+  const btn=event.target;btn.textContent='取得中...';btn.disabled=true;
+  const d=await fetchYtData(videoId);
+  btn.textContent='自動取得 YT 數據';btn.disabled=false;
+  urlEl.style.borderColor='';
+  if(!d)return;
+  const g=id=>document.getElementById(prefix+id);
+  if(g('title')&&!g('title').value)g('title').value=d.title;
+  if(g('date')&&!g('date').value)g('date').value=d.date;
+  if(g('dur'))g('dur').value=d.dur;
+  g('yt_views').value=d.yt_views;
+  g('yt_likes').value=d.yt_likes;
+  g('yt_comments').value=d.yt_comments;
+  showAlert(prefix==='f-'?'entry-alert':'edit-alert','已自動填入 YouTube 數據：觀看 '+d.yt_views.toLocaleString()+' / 讚 '+d.yt_likes.toLocaleString(),'ok');
+}
+
+async function batchUpdateYt(){
+  if(!YT_API_KEY){alert('請先在「設定」頁面填入 YouTube Data API Key');showPage('config');return;}
+  const withUrl=DATA.filter(d=>d.yt_url&&parseYtVideoId(d.yt_url));
+  if(withUrl.length===0){alert('沒有包含 YouTube 連結的影片');return;}
+  if(!confirm(`將更新 ${withUrl.length} 部影片的 YouTube 觀看數、按讚數、留言數。繼續？`))return;
+  showSyncBadge('批次更新中... 0/'+withUrl.length);
+  let updated=0,failed=0;
+  // Batch in groups of 50 (API supports comma-separated IDs)
+  for(let i=0;i<withUrl.length;i+=50){
+    const batch=withUrl.slice(i,i+50);
+    const ids=batch.map(d=>parseYtVideoId(d.yt_url)).filter(Boolean).join(',');
+    try{
+      const url=`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${YT_API_KEY}`;
+      const res=await fetch(url);
+      const data=await res.json();
+      if(data.items){
+        data.items.forEach(item=>{
+          const match=DATA.find(d=>parseYtVideoId(d.yt_url)===item.id);
+          if(match){
+            match.yt_views=Number(item.statistics.viewCount)||0;
+            match.yt_likes=Number(item.statistics.likeCount)||0;
+            match.yt_comments=Number(item.statistics.commentCount)||0;
+            match.updatedAt=new Date().toISOString();
+            updated++;
+          }
+        });
+      }
+    }catch(e){failed+=batch.length;}
+    showSyncBadge(`更新中... ${Math.min(i+50,withUrl.length)}/${withUrl.length}`);
+  }
+  saveData();renderAll();
+  showSyncBadge(`批次更新完成：${updated} 部成功${failed?' / '+failed+' 部失敗':''}`);
+  // Sync to Sheets
+  for(const d of DATA.filter(d=>d.yt_url)){await pushToSheets('updateVideo',{data:d});}
+}
+
+function saveYtApiKey(){
+  const k=document.getElementById('cfg-yt-key').value.trim();
+  YT_API_KEY=k;localStorage.setItem('kt_yt_apikey',k);
+  showAlert('api-alert',k?'YouTube API Key 已儲存':'YouTube API Key 已清除','ok');
+}
+
 // IG 貼文管理
 // ============================================================
 let IG_DATA=[];
