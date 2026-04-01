@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>視覺多媒體設計組 · 專案管理</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg:#F4F5F7;--surface:#FFFFFF;--surface2:#F8F9FB;--surface3:#EEF0F5;
+  --navy:#1C2340;--teal:#00BFA6;--teal2:#00A693;--teal-dim:rgba(0,191,166,.1);
+  --coral:#FF6B6B;--amber:#FFC107;--purple:#8B5CF6;--blue:#3B82F6;
+  --text:#1C2340;--text-muted:#8B92A9;--text-dim:#B0B8D0;
+  --border:#E2E4EC;--border2:#C8CADB;
+  --radius:14px;--radius-sm:8px;
+  --shadow:0 2px 16px rgba(28,35,64,.08);--glow:0 0 20px rgba(0,191,166,.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── SETUP BANNER ── */
+#setup-banner{
+  background:linear-gradient(135deg,#FFF8E1,#FFF3CD);
+  border-bottom:1px solid #FFD54F;
+  padding:10px 24px;display:flex;align-items:center;gap:10px;font-size:12px;
+}
+#setup-banner input{
+  flex:1;padding:7px 12px;background:white;border:1.5px solid #FFD54F;
+  border-radius:7px;font-size:12px;font-family:'Noto Sans TC',sans-serif;
+  outline:none;color:var(--text);
+}
+#setup-banner input:focus{border-color:var(--amber)}
+#setup-banner input::placeholder{color:var(--text-muted)}
+.setup-label{color:var(--amber);font-weight:600;white-space:nowrap;font-size:11px}
+.btn-setup{
+  padding:7px 14px;background:var(--amber);color:#1a1200;border:none;border-radius:7px;
+  font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;
+  transition:all .2s;
+}
+.btn-setup:hover{background:#ffc85a;transform:translateY(-1px)}
+.btn-setup.grey{background:rgba(28,35,64,.08);color:var(--text-muted)}
+.btn-setup.grey:hover{background:rgba(255,255,255,.15)}
+
+/* ── HEADER ── */
+.header{
+  background:var(--navy);border-bottom:1px solid rgba(255,255,255,.08);
+  padding:0 28px;display:flex;align-items:center;justify-content:space-between;
+  height:62px;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 20px rgba(28,35,64,.3);
+  backdrop-filter:blur(12px);
+}
+.header-brand{display:flex;align-items:center;gap:14px}
+.brand-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,var(--teal),#00b89e);
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  box-shadow:var(--glow);
+}
+.brand-name{font-family:'DM Serif Display',serif;font-size:17px;color:white;letter-spacing:.3px}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px;letter-spacing:.5px;text-transform:uppercase}
+.header-right{display:flex;align-items:center;gap:8px}
+.conn-pill{
+  display:flex;align-items:center;gap:6px;padding:5px 12px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;
+  font-size:11px;color:rgba(255,255,255,.7);
+}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:#3D4460;flex-shrink:0;transition:all .3s}
+.conn-dot.ok{background:var(--teal);box-shadow:0 0 8px var(--teal)}
+.conn-dot.err{background:var(--coral);box-shadow:0 0 8px var(--coral)}
+.conn-dot.sync{background:var(--amber);animation:pulse .8s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hbtn{
+  padding:7px 14px;border-radius:8px;font-size:11px;font-weight:600;
+  cursor:pointer;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.1);
+  color:rgba(255,255,255,.8);display:flex;align-items:center;gap:6px;
+  font-family:'Noto Sans TC',sans-serif;transition:all .18s;white-space:nowrap;
+}
+.hbtn:hover{background:rgba(255,255,255,.18);color:white}
+.hbtn.accent{background:rgba(0,191,166,.2);border-color:rgba(0,191,166,.4);color:var(--teal)}
+.hbtn.accent:hover{background:rgba(0,191,166,.3)}
+
+/* ── TABS ── */
+.nav-bar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:4px;
+  position:sticky;top:62px;z-index:90;
+}
+.group-tab{
+  padding:14px 18px;font-size:13px;font-weight:500;color:var(--text-muted);
+  cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;
+  transition:all .2s;user-select:none;display:flex;align-items:center;gap:7px;
+}
+.group-tab.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:700}
+.group-tab:hover:not(.active){color:var(--text)}
+.nav-spacer{flex:1}
+.view-toggle{
+  display:flex;background:var(--surface2);border:1px solid var(--border);
+  border-radius:9px;overflow:hidden;margin:8px 0;
+}
+.vbtn{
+  padding:6px 13px;font-size:11px;font-weight:600;cursor:pointer;
+  border:none;background:transparent;color:var(--text-muted);
+  transition:all .18s;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;
+}
+.vbtn.active{background:var(--navy);color:white;border-radius:6px}
+
+/* ── MODE PILLS ── */
+.mode-bar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:8px 24px;gap:8px;
+  position:sticky;top:115px;z-index:85;
+}
+.mode-pill{
+  padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;
+  border:1px solid var(--border);background:transparent;color:var(--text-muted);
+  transition:all .2s;font-family:'Noto Sans TC',sans-serif;
+}
+.mode-pill.active{background:var(--teal);color:white;border-color:var(--teal)}
+.mode-pill.active-green{background:#E8F5E9;color:#1B5E20;border-color:#A5D6A7}
+.mode-pill:hover:not(.active):not(.active-green){background:var(--surface2);color:var(--text)}
+#sheets-link-btn{margin-left:auto}
+
+/* ── SUMMARY CARDS ── */
+.summary-bar{
+  display:flex;gap:10px;padding:16px 24px 4px;flex-wrap:wrap;
+}
+.summary-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:14px 20px;min-width:86px;text-align:center;cursor:pointer;
+  transition:all .2s;position:relative;overflow:hidden;
+}
+.summary-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--accent-color,var(--teal));opacity:0;transition:opacity .2s;
+}
+.summary-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:var(--shadow)}
+.summary-card:hover::before{opacity:1}
+.summary-num{font-family:'DM Sans',sans-serif;font-size:28px;font-weight:600;line-height:1}
+.summary-label{font-size:10px;color:var(--text-muted);margin-top:5px;letter-spacing:.4px}
+
+/* ── FILTER TOOLBAR ── */
+.toolbar{padding:10px 24px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fsel{
+  padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:11px;
+  font-family:'Noto Sans TC',sans-serif;color:var(--text);background:var(--surface2);
+  outline:none;cursor:pointer;transition:border-color .2s;
+}
+.fsel:focus{border-color:var(--teal)}
+.fsel option{background:var(--surface2)}
+.toolbar-hint{font-size:11px;color:var(--text-dim);margin-left:auto;display:flex;align-items:center;gap:6px}
+.sheets-chip{
+  display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+  background:rgba(0,191,166,.08);border:1px solid rgba(0,191,166,.2);
+  border-radius:6px;color:var(--teal2);font-size:10px;font-weight:700;
+  text-decoration:none;cursor:pointer;transition:all .15s;
+}
+.sheets-chip:hover{background:rgba(0,191,166,.16)}
+
+/* ── LIST HEADER ── */
+.list-header{
+  display:grid;grid-template-columns:28px 1fr 80px 90px 90px 100px 100px;
+  padding:7px 20px;gap:10px;font-size:10px;color:var(--text-dim);font-weight:700;
+  text-transform:uppercase;letter-spacing:.6px;margin:0 24px 4px;
+  border-bottom:1px solid var(--border);
+}
+
+/* ── PROJECT LIST ── */
+.project-list{padding:0 24px 40px}
+.project-card{
+  background:var(--surface);border-radius:12px;margin-bottom:6px;
+  border:1px solid var(--border);overflow:hidden;
+  transition:box-shadow .2s,border-color .2s,transform .15s;
+}
+.project-card:hover{box-shadow:var(--shadow);border-color:var(--border2);transform:translateY(-1px)}
+.project-card.archived{opacity:.55;border-style:dashed}
+.project-card.archived:hover{opacity:.8}
+.project-row{
+  display:grid;grid-template-columns:28px 1fr 80px 90px 90px 100px 100px;
+  align-items:center;padding:13px 20px;gap:10px;cursor:pointer;
+}
+.toggle-icon{
+  color:var(--text-dim);font-size:9px;transition:transform .2s;cursor:pointer;
+  width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+  border-radius:5px;flex-shrink:0;
+}
+.toggle-icon:hover{background:var(--surface3);color:var(--text-muted)}
+.toggle-icon.open{transform:rotate(90deg)}
+.toggle-icon.hidden{visibility:hidden}
+.project-title{font-size:13px;font-weight:600;color:var(--text)}
+.project-note{font-size:11px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.col-val{font-size:12px;color:var(--text-muted)}
+
+/* ── STATUS BADGES ── */
+.sbadge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.s-pending{background:#F1F3F7;color:#6B7280;border:1px solid #E2E4EC}
+.s-in-progress{background:#FFF3E0;color:#D04E00;border:1px solid #FFCC80}
+.s-discussion{background:#EDE7F6;color:#6A1B9A;border:1px solid #CE93D8}
+.s-completed{background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7}
+.cat-badge{
+  display:inline-flex;padding:2px 7px;border-radius:4px;
+  font-size:10px;font-weight:700;letter-spacing:.2px;
+}
+.src-self{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700}
+.src-ticket{background:#E3F2FD;color:#1565C0;border:1px solid #90CAF9;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700}
+.overdue-badge{background:#FFF0F0;color:var(--coral);border:1px solid #FFCDD2;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700}
+
+/* ── PROGRESS ── */
+.prog-wrap{background:rgba(28,35,64,.05);border-radius:3px;height:4px;overflow:hidden;margin-top:3px}
+.prog-fill{height:100%;border-radius:3px;background:var(--teal);transition:width .3s}
+.prog-label{font-size:11px;font-weight:600;color:var(--teal2)}
+
+/* ── SUBTASKS ── */
+.subtask-list{border-top:1px solid var(--border);background:#FAFAFA}
+.subtask-row{
+  display:grid;grid-template-columns:28px 1fr 80px 90px 90px 100px 100px;
+  align-items:center;padding:9px 20px;gap:10px;
+  border-bottom:1px solid rgba(28,35,64,.04);font-size:12px;
+}
+.subtask-row:last-child{border-bottom:none}
+.st-indent{display:flex;align-items:center;gap:7px}
+.st-line{width:12px;height:1px;background:var(--text-dim);flex-shrink:0}
+
+/* ── GANTT ── */
+.gantt-container{padding:0 24px 40px;overflow-x:auto}
+.gantt-wrap{min-width:900px;background:white;border-radius:12px;border:1px solid var(--border);overflow:hidden}
+.gantt-head{display:flex;border-bottom:1px solid var(--border);background:#FAFAFA}
+.g-label-col{width:220px;flex-shrink:0;padding:10px 16px;font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:.5px;text-transform:uppercase;border-right:1px solid var(--border)}
+.g-months{flex:1;display:flex}
+.g-month{flex:1;text-align:center;padding:10px 4px;font-size:10px;font-weight:700;color:var(--text-dim);border-right:1px solid var(--border)}
+.g-month:last-child{border-right:none}
+.g-month.current{color:var(--teal)}
+.g-row{display:flex;border-bottom:1px solid var(--border);min-height:44px;align-items:center}
+.g-row:last-child{border-bottom:none}
+.g-row:hover{background:#FAFAFA}
+.g-row-label{width:220px;flex-shrink:0;padding:8px 16px;border-right:1px solid var(--border);background:#FAFAFA}
+.g-row-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-row-meta{font-size:10px;color:var(--text-muted);margin-top:1px}
+.g-timeline{flex:1;position:relative;height:44px}
+.g-grid{position:absolute;inset:0;display:flex;pointer-events:none}
+.g-grid-cell{flex:1;border-right:1px solid rgba(28,35,64,.04);height:100%}
+.g-today{position:absolute;top:0;bottom:0;width:1px;background:var(--coral);z-index:5;opacity:.6}
+.g-today::after{content:'今';position:absolute;top:2px;left:3px;font-size:9px;color:var(--coral);font-weight:700}
+.g-bar{position:absolute;top:50%;transform:translateY(-50%);height:20px;border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:10px;font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default;transition:opacity .15s;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.g-bar:hover{opacity:.85}
+.g-bar.subtask{height:13px;top:70%;font-size:9px;opacity:.65}
+
+/* ── CALENDAR ── */
+#cal-panel{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:none}
+.cal-wrap{max-width:1100px}
+.cal-header{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.cal-nav{background:var(--surface2);border:1px solid var(--border);border-radius:7px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--text-muted);transition:all .15s}
+.cal-nav:hover{background:var(--surface3);color:var(--text)}
+.cal-month-title{font-family:'DM Serif Display',serif;font-size:18px;min-width:110px;color:var(--text)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-day-label{text-align:center;font-size:10px;font-weight:700;color:var(--text-dim);padding:4px 0;letter-spacing:.4px}
+.cal-day{min-height:66px;border-radius:8px;padding:5px 6px;background:#FAFAFA;border:1px solid var(--border);transition:box-shadow .15s}
+.cal-day:hover{box-shadow:var(--shadow)}
+.cal-day.today{border-color:var(--teal);background:rgba(0,191,166,.04)}
+.cal-day.other-month{opacity:.3}
+.cal-day-num{font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:3px}
+.cal-day.today .cal-day-num{color:var(--teal)}
+.cal-event{font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:white}
+.cal-event:hover{opacity:.8}
+
+/* ── STATS ── */
+#stats-view{padding:20px 24px 40px;display:none}
+.stats-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.stats-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text)}
+.stats-scope{display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px}
+.scope-btn{padding:5px 13px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--text-muted);font-family:'Noto Sans TC',sans-serif;transition:all .18s}
+.scope-btn.active{background:var(--teal);color:white}
+.kpi-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.kpi-card{
+  flex:1;min-width:130px;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:16px 18px;transition:all .2s;cursor:pointer;
+  position:relative;overflow:hidden;
+}
+.kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.kpi-teal::after{background:var(--teal)}
+.kpi-amber::after{background:var(--amber)}
+.kpi-green::after{background:#4ade80}
+.kpi-coral::after{background:var(--coral)}
+.kpi-purple::after{background:var(--purple)}
+.kpi-num{font-family:'DM Sans',sans-serif;font-size:30px;font-weight:600;line-height:1}
+.kpi-teal .kpi-num{color:var(--teal2)}
+.kpi-amber .kpi-num{color:#E65100}
+.kpi-green .kpi-num{color:#1B5E20}
+.kpi-coral .kpi-num{color:var(--coral)}
+.kpi-purple .kpi-num{color:#6A1B9A}
+.kpi-label{font-size:11px;color:var(--text-muted);margin-top:5px;font-weight:600}
+.kpi-sub{font-size:10px;color:var(--text-dim);margin-top:3px}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.chart-card{background:white;border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+.chart-card-wide{grid-column:1/-1}
+.chart-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.chart-sub{font-size:11px;color:var(--text-muted);margin-bottom:12px}
+.chart-canvas-wrap{position:relative}
+.person-table{width:100%;border-collapse:collapse;font-size:12px}
+.person-table th{padding:8px 10px;text-align:left;font-size:10px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border)}
+.person-table td{padding:9px 10px;border-bottom:1px solid rgba(28,35,64,.04)}
+.person-table tbody tr:last-child td{border-bottom:none}
+.person-bar-wrap{background:rgba(28,35,64,.05);border-radius:3px;height:5px;overflow:hidden;min-width:60px}
+.person-bar{height:100%;border-radius:3px;transition:width .3s}
+
+/* ── WEEKLY MODAL ── */
+#weekly-modal{position:fixed;inset:0;background:rgba(28,35,64,.55);z-index:250;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.weekly-card{background:white;border:1px solid var(--border);border-radius:18px;width:100%;max-width:600px;max-height:88vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.6);animation:slideUp .22s ease}
+.weekly-header{padding:20px 24px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:white;border-radius:18px 18px 0 0;z-index:1}
+.weekly-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;color:var(--text)}
+.weekly-body{padding:18px 24px}
+.weekly-preview{background:#F8F9FB;border:1px solid var(--border);border-radius:9px;padding:14px;font-size:12px;line-height:1.85;white-space:pre-wrap;font-family:'Noto Sans TC',monospace;color:var(--text);max-height:380px;overflow-y:auto}
+.weekly-footer{padding:14px 24px 18px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border)}
+
+/* ── LOG MODAL ── */
+#log-modal,#restore-modal{position:fixed;inset:0;background:rgba(28,35,64,.55);z-index:250;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.dark-modal{background:white;border:1px solid var(--border);border-radius:18px;width:100%;max-width:720px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.6);animation:slideUp .22s ease}
+.dark-modal.sm{max-width:560px}
+.dark-modal-header{padding:20px 24px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:white;border-radius:18px 18px 0 0;z-index:1}
+.dark-modal-title{font-size:15px;font-weight:700;color:var(--text)}
+.modal-x{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:14px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.modal-x:hover{background:var(--surface3);color:var(--text)}
+.dark-modal-body{padding:18px 24px}
+.dark-modal-footer{padding:14px 24px 18px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border)}
+
+/* ── BUTTONS ── */
+.btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:all .18s;font-family:'Noto Sans TC',sans-serif;white-space:nowrap}
+.btn-teal{background:var(--teal);color:white}
+.btn-teal:hover{background:var(--teal2);transform:translateY(-1px)}
+.btn-line{background:#06C755;color:white}
+.btn-line:hover{background:#05a849}
+.btn-dim{background:var(--surface2);color:var(--text-muted);border:1px solid var(--border)}
+.btn-dim:hover{background:var(--surface3);color:var(--text)}
+.fsel-dark{padding:7px 12px;border:1px solid var(--border);border-radius:7px;font-size:12px;font-family:'Noto Sans TC',sans-serif;color:var(--text);background:var(--surface2);outline:none;cursor:pointer}
+.fsel-dark:focus{border-color:var(--teal)}
+.fsel-dark option{background:var(--surface2)}
+
+/* ── EXPORT DROPDOWN ── */
+.export-wrap{position:relative;display:inline-flex}
+.export-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:white;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);min-width:200px;z-index:300;overflow:hidden;animation:slideUp .15s ease}
+.export-dropdown button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 16px;border:none;background:transparent;font-size:12px;font-family:'Noto Sans TC',sans-serif;color:var(--text);cursor:pointer;font-weight:500;text-align:left;transition:background .15s}
+.export-dropdown button:hover{background:var(--bg)}
+.export-dropdown hr{border:none;border-top:1px solid var(--border);margin:0}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;right:24px;z-index:500;background:var(--navy);color:white;padding:12px 20px;border-radius:10px;font-size:12px;font-weight:600;box-shadow:var(--shadow);transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+#toast.show{transform:translateY(0);opacity:1}
+
+/* ── LOADING ── */
+#loading{position:fixed;inset:0;background:rgba(255,255,255,.75);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;backdrop-filter:blur(4px)}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:12px;color:var(--text-muted);letter-spacing:.5px}
+
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 24px;color:var(--text-dim)}
+.empty-icon{font-size:40px;margin-bottom:12px;opacity:.5}
+.empty-msg{font-size:13px;line-height:1.7}
+
+/* ── PRINT ── */
+@media print{
+  #setup-banner,.hbtn,.mode-bar,.toolbar,.export-wrap,#log-modal,#restore-modal,#toast,#weekly-modal,.view-toggle,#sheets-link-btn{display:none!important}
+  .header{position:relative!important;box-shadow:none!important}
+  body{background:white!important;color:black!important}
+  .project-card{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<script>
+  const _DEFAULT_API = 'https://script.google.com/macros/s/AKfycbxXyKligVJXL-pGZy4plU6dTw-X8bA-ksbzA07SjK6R202dgH5okaqZYKK-Q1N43LjHuA/exec';
+  const _DEFAULT_SHEETS = 'https://docs.google.com/spreadsheets/d/1ZZG1Xco0S8K2k1DxpG9y0bK-nKxG_A2GxmpVcf02p90/edit';
+  let API_URL       = localStorage.getItem('pm_api_url') || _DEFAULT_API;
+  let OPERATOR      = localStorage.getItem('pm_operator') || '';
+  let SHEETS_URL    = localStorage.getItem('pm_sheets_url') || _DEFAULT_SHEETS;
+</script>
+
+<!-- SETUP BANNER -->
+<div id="setup-banner" style="display:none">
+  <span class="setup-label">⚙️ 連線設定</span>
+  <input type="text" id="api-url-input" placeholder="Apps Script 網址 https://script.google.com/…" style="flex:2;max-width:480px">
+  <input type="text" id="op-name-input" placeholder="您的姓名" style="max-width:130px">
+  <input type="text" id="sheets-url-input" placeholder="Google Sheets 網址（選填，方便開啟編輯）" style="max-width:300px">
+  <button class="btn-setup" onclick="saveSetup()">儲存</button>
+  <button class="btn-setup grey" onclick="document.getElementById('setup-banner').style.display='none'">略過</button>
+</div>
+
+<!-- LOADING -->
+<div id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text">讀取專案資料中…</div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <div class="brand-icon">🎨</div>
+    <div>
+      <div class="brand-name">視覺多媒體設計組</div>
+      <div class="brand-sub">115年度 · 專案進度控管系統</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="conn-pill">
+      <div class="conn-dot" id="conn-dot"></div>
+      <span id="conn-text">本機模式</span>
+    </div>
+    <div class="export-wrap" id="export-wrap">
+      <button class="hbtn" onclick="toggleExportMenu(event)">📤 匯出 ▾</button>
+      <div class="export-dropdown" id="export-menu" style="display:none">
+        <button onclick="openWeekly();closeExportMenu()">📋 本週工作摘要（LINE）</button>
+        <hr>
+        <button onclick="exportExcel();closeExportMenu()">📊 匯出 Excel 表格</button>
+        <button onclick="exportICS();closeExportMenu()">📅 匯出 Google 日曆 (.ics)</button>
+        <hr>
+        <button onclick="printView();closeExportMenu()">🖨️ 列印 / 存成 PDF</button>
+        <hr>
+        <button onclick="window.location.href='../youtube-manager.html';closeExportMenu()">🎬 影片管理系統</button>
+        <button onclick="window.location.href='../index.html';closeExportMenu()">🏥 工具站首頁</button>
+      </div>
+    </div>
+    <button class="hbtn accent" onclick="manualRefresh()">🔄 重新整理</button>
+    <button class="hbtn" onclick="openSetup()">⚙️</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="nav-bar">
+  <div class="group-tab active" id="tab-design" onclick="switchGroup('design')">🎨 美編組</div>
+  <div class="group-tab" id="tab-media" onclick="switchGroup('media')">🎬 多媒體組</div>
+  <div class="nav-spacer"></div>
+  <div class="view-toggle">
+    <button class="vbtn active" id="view-list" onclick="switchView('list')">☰ 列表</button>
+    <button class="vbtn" id="view-gantt" onclick="switchView('gantt')">📊 甘特圖</button>
+    <button class="vbtn" id="view-cal" onclick="switchView('cal')">📅 月曆</button>
+    <button class="vbtn" id="view-stats" onclick="switchView('stats')">📈 統計</button>
+  </div>
+</div>
+
+<!-- CALENDAR PANEL -->
+<div id="cal-panel">
+  <div class="cal-wrap">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="calPrev()">‹</button>
+      <div class="cal-month-title" id="cal-title"></div>
+      <button class="cal-nav" onclick="calNext()">›</button>
+      <span style="font-size:11px;color:var(--text-muted);margin-left:8px">● 截止日期標記</span>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div id="cal-legend" style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap"></div>
+  </div>
+</div>
+
+<!-- MODE BAR -->
+<div class="mode-bar" id="mode-bar">
+  <button class="mode-pill active" id="mode-active" onclick="setMode('active')">🔥 進行中</button>
+  <button class="mode-pill" id="mode-all" onclick="setMode('all')">☰ 全部</button>
+  <button class="mode-pill" id="mode-completed" onclick="setMode('completed')">✅ 已完成 <span id="done-count" style="background:rgba(74,222,128,.2);color:#4ade80;border-radius:8px;padding:0 6px;font-size:10px;margin-left:3px">0</span></button>
+  <div style="flex:1"></div>
+  <a id="sheets-link-btn" href="#" target="_blank" style="display:none">
+    <span class="sheets-chip">📊 在 Google Sheets 編輯</span>
+  </a>
+  <span style="font-size:11px;color:var(--text-dim)" id="active-hint">顯示執行中、討論中、未開始項目</span>
+</div>
+
+<!-- SUMMARY -->
+<div class="summary-bar" id="summary-bar"></div>
+
+<!-- FILTER TOOLBAR -->
+<div class="toolbar">
+  <select class="fsel" id="filter-status" onchange="renderAll()">
+    <option value="">全部狀態</option>
+    <option value="pending">未開始</option>
+    <option value="in-progress">執行中</option>
+    <option value="discussion">討論中</option>
+    <option value="completed">已完成</option>
+  </select>
+  <select class="fsel" id="filter-assignee" onchange="renderAll()">
+    <option value="">全部負責人</option>
+  </select>
+  <select class="fsel" id="filter-source" onchange="renderAll()">
+    <option value="">全部來源</option>
+    <option value="self">🟢 自主專案</option>
+    <option value="ticket">🔵 支援單接案</option>
+  </select>
+  <select class="fsel" id="filter-cat" onchange="renderAll()">
+    <option value="">全部類別</option>
+  </select>
+  <div class="toolbar-hint">✏️ 請至 Google Sheets 修改資料，再按 🔄 重新整理</div>
+</div>
+
+<!-- LIST VIEW -->
+<div id="list-view">
+  <div class="list-header">
+    <div></div><div>專案名稱</div>
+    <div>負責人</div><div>開始日期</div><div>預計完成</div>
+    <div>狀態</div><div>進度</div>
+  </div>
+  <div class="project-list" id="project-list"></div>
+</div>
+
+<!-- GANTT VIEW -->
+<div id="gantt-view" style="display:none">
+  <div class="gantt-container"><div class="gantt-wrap" id="gantt-wrap"></div></div>
+</div>
+
+<!-- STATS VIEW -->
+<div id="stats-view">
+  <div class="stats-header">
+    <div class="stats-title">📈 工作量統計分析</div>
+    <div class="stats-scope">
+      <button class="scope-btn active" id="scope-both" onclick="setStatsScope('both')">全部</button>
+      <button class="scope-btn" id="scope-design" onclick="setStatsScope('design')">🎨 美編組</button>
+      <button class="scope-btn" id="scope-media" onclick="setStatsScope('media')">🎬 多媒體組</button>
+    </div>
+  </div>
+  <div class="kpi-row" id="kpi-row"></div>
+  <div class="chart-grid">
+    <div class="chart-card"><div class="chart-title">👤 負責人工作量</div><div class="chart-sub">各人員負責件數分佈</div><div class="chart-canvas-wrap" style="height:200px"><canvas id="chart-assignee"></canvas></div></div>
+    <div class="chart-card"><div class="chart-title">📂 類別工作量</div><div class="chart-sub">各類別件數與平均進度</div><div class="chart-canvas-wrap" style="height:200px"><canvas id="chart-category"></canvas></div></div>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-card"><div class="chart-title">📅 月份截止熱度</div><div class="chart-sub">各月份截止件數</div><div class="chart-canvas-wrap" style="height:180px"><canvas id="chart-monthly"></canvas></div></div>
+    <div class="chart-card"><div class="chart-title">⚡ 狀態分佈</div><div class="chart-sub">四種狀態比例</div><div class="chart-canvas-wrap" style="height:180px"><canvas id="chart-status"></canvas></div></div>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-card"><div class="chart-title">🔗 來源分析</div><div class="chart-sub">自主 vs 支援單比例</div><div class="chart-canvas-wrap" style="height:180px"><canvas id="chart-source"></canvas></div></div>
+    <div class="chart-card"><div class="chart-title">⏱ 逾期風險</div><div class="chart-sub">各人員逾期件數</div><div class="chart-canvas-wrap" style="height:180px"><canvas id="chart-overdue"></canvas></div></div>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-card"><div class="chart-title">🎬 多媒體類別分佈</div><div class="chart-sub">7大製作類別件數</div><div class="chart-canvas-wrap" style="height:180px"><canvas id="chart-media-cat"></canvas></div></div>
+    <div class="chart-card"><div class="chart-title">⚖️ 美編 vs 多媒體</div><div class="chart-sub">兩組工作量比較</div><div class="chart-canvas-wrap" style="height:180px"><canvas id="chart-group-compare"></canvas></div></div>
+  </div>
+  <div class="chart-card chart-card-wide" style="margin-top:0"><div class="chart-title">👥 負責人工作明細</div><div class="chart-sub" style="margin-bottom:14px">各人員工作量、完成率、逾期件數一覽</div><table class="person-table" id="person-table"></table></div>
+</div>
+
+<!-- WEEKLY MODAL -->
+<div id="weekly-modal" style="display:none" onclick="closeWeeklyOutside(event)">
+  <div class="weekly-card">
+    <div class="weekly-header">
+      <div class="weekly-title">📋 本週工作摘要</div>
+      <button class="modal-x" onclick="closeWeekly()">✕</button>
+    </div>
+    <div class="weekly-body">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <select class="fsel-dark" id="weekly-scope" onchange="generateWeekly()">
+          <option value="both">美編 + 多媒體（全部）</option>
+          <option value="design">僅美編組</option>
+          <option value="media">僅多媒體組</option>
+        </select>
+        <select class="fsel-dark" id="weekly-style" onchange="generateWeekly()">
+          <option value="line">LINE 群組風格</option>
+          <option value="formal">正式報告風格</option>
+        </select>
+      </div>
+      <div class="weekly-preview" id="weekly-text"></div>
+    </div>
+    <div class="weekly-footer">
+      <button class="btn btn-dim" onclick="closeWeekly()">關閉</button>
+      <button class="btn btn-teal" onclick="copyWeekly()">📋 複製</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG MODAL -->
+<div id="log-modal" style="display:none" onclick="if(event.target===this)closeLogModal()">
+  <div class="dark-modal">
+    <div class="dark-modal-header">
+      <div class="dark-modal-title">📋 操作記錄 Log</div>
+      <button class="modal-x" onclick="closeLogModal()">✕</button>
+    </div>
+    <div class="dark-modal-body" style="padding:16px 20px">
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+        <select class="fsel-dark" id="log-limit" onchange="loadLog()" style="font-size:11px">
+          <option value="30">最近 30 筆</option>
+          <option value="100" selected>最近 100 筆</option>
+        </select>
+        <button class="btn btn-dim" onclick="loadLog()" style="font-size:11px">🔄 重整</button>
+        <span style="font-size:11px;color:var(--text-muted);margin-left:auto" id="log-count"></span>
+      </div>
+      <div style="overflow-x:auto;max-height:420px;overflow-y:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead style="position:sticky;top:0;background:var(--surface2);z-index:1">
+            <tr>
+              <th style="padding:7px 10px;text-align:left;font-size:10px;color:var(--text-dim);border-bottom:1px solid var(--border);white-space:nowrap">時間</th>
+              <th style="padding:7px 10px;text-align:left;font-size:10px;color:var(--text-dim);border-bottom:1px solid var(--border)">操作</th>
+              <th style="padding:7px 10px;text-align:left;font-size:10px;color:var(--text-dim);border-bottom:1px solid var(--border)">操作者</th>
+              <th style="padding:7px 10px;text-align:left;font-size:10px;color:var(--text-dim);border-bottom:1px solid var(--border)">摘要</th>
+            </tr>
+          </thead>
+          <tbody id="log-tbody"><tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted)">載入中…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="dark-modal-footer"><button class="btn btn-dim" onclick="closeLogModal()">關閉</button></div>
+  </div>
+</div>
+
+<!-- RESTORE MODAL -->
+<div id="restore-modal" style="display:none" onclick="if(event.target===this)closeRestoreModal()">
+  <div class="dark-modal sm">
+    <div class="dark-modal-header">
+      <div class="dark-modal-title">⏪ 版本還原</div>
+      <button class="modal-x" onclick="closeRestoreModal()">✕</button>
+    </div>
+    <div class="dark-modal-body">
+      <div style="background:rgba(255,181,71,.08);border:1px solid rgba(255,181,71,.2);border-radius:8px;padding:10px 14px;font-size:11px;margin-bottom:12px;color:#FFB547">⚠️ 還原後目前資料將被覆蓋，系統會自動備份當前版本。</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <select class="fsel-dark" id="restore-group" onchange="loadSnapshots()">
+          <option value="design">🎨 美編組</option>
+          <option value="media">🎬 多媒體組</option>
+        </select>
+        <button class="btn btn-dim" onclick="loadSnapshots()" style="font-size:11px">🔄 重整</button>
+      </div>
+      <div id="snapshot-list" style="max-height:320px;overflow-y:auto"><div style="text-align:center;padding:30px;color:var(--text-muted)">載入中…</div></div>
+    </div>
+    <div class="dark-modal-footer"><button class="btn btn-dim" onclick="closeRestoreModal()">關閉</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ══ CONSTANTS ══ */
+const STATUS = {
+  pending:{label:'未開始',cls:'s-pending'},
+  'in-progress':{label:'執行中',cls:'s-in-progress'},
+  discussion:{label:'討論中',cls:'s-discussion'},
+  completed:{label:'已完成',cls:'s-completed'}
+};
+const DESIGN_CATS = ['節慶專案','醫院形象','平面設計','數位資產','品牌規範','影片製作','教育訓練','社群貼文','其他'];
+const MEDIA_CATS  = ['系列節目','時令季節/形象/促銷','服務流程','院核心/形象/衛教','員工活動','教學','其他'];
+const BAR_COLOR   = {pending:'#6B7494','in-progress':'#FFB547',discussion:'#A78BFA',completed:'#4ade80'};
+const CHART_PALETTE = ['#00BFA6','#60A5FA','#A78BFA','#FFB547','#FF6B6B','#34D399','#F472B6','#FBBF24','#818CF8','#FB923C'];
+const CAT_COLOR = {
+  '節慶專案':'#FF8A65','醫院形象':'#60A5FA','平面設計':'#A78BFA','數位資產':'#00BFA6',
+  '品牌規範':'#FF6B6B','影片製作':'#4ade80','教育訓練':'#FFB547','社群貼文':'#F472B6',
+  '系列節目':'#42A5F5','時令季節/形象/促銷':'#FF8A65','服務流程':'#4ade80',
+  '院核心/形象/衛教':'#AB47BC','員工活動':'#FFB547','教學':'#00BFA6','其他':'#78909C'
+};
+
+let currentGroup = 'design';
+let currentView  = 'list';
+let currentMode  = 'active';
+let statsScope   = 'both';
+let calYear, calMonth;
+let _cache = { design:null, media:null };
+let _chartInstances = {};
+
+/* ══ SETUP ══ */
+function saveSetup() {
+  const url   = document.getElementById('api-url-input').value.trim();
+  const name  = document.getElementById('op-name-input').value.trim();
+  const surl  = document.getElementById('sheets-url-input').value.trim();
+  if (url && !url.startsWith('https://script.google.com')) { alert('Apps Script 網址格式不正確'); return; }
+  if (url)  { API_URL = url;  localStorage.setItem('pm_api_url', url); }
+  if (name) { OPERATOR = name; localStorage.setItem('pm_operator', name); }
+  if (surl) { SHEETS_URL = surl; localStorage.setItem('pm_sheets_url', surl); }
+  document.getElementById('setup-banner').style.display = 'none';
+  updateSheetsLink();
+  showToast('✅ 設定已儲存');
+  _cache = { design:null, media:null };
+  init();
+}
+function openSetup() {
+  document.getElementById('setup-banner').style.display = 'flex';
+  document.getElementById('api-url-input').value  = API_URL || '';
+  document.getElementById('op-name-input').value  = OPERATOR || '';
+  document.getElementById('sheets-url-input').value = SHEETS_URL || '';
+}
+function updateSheetsLink() {
+  const btn = document.getElementById('sheets-link-btn');
+  if (SHEETS_URL) { btn.href = SHEETS_URL; btn.style.display = ''; }
+  else btn.style.display = 'none';
+}
+function checkSetup() {
+  if (!API_URL) {
+    document.getElementById('setup-banner').style.display = 'flex';
+    setConn('local');
+  }
+  updateSheetsLink();
+}
+
+/* ══ CONNECTION ══ */
+function setConn(state) {
+  const dot  = document.getElementById('conn-dot');
+  const text = document.getElementById('conn-text');
+  dot.className = 'conn-dot';
+  if (state==='ok')    { dot.classList.add('ok');   text.textContent='已連線 Google Sheets'; }
+  if (state==='err')   { dot.classList.add('err');  text.textContent='連線失敗（本機備份）'; }
+  if (state==='sync')  { dot.classList.add('sync'); text.textContent='同步中…'; }
+  if (state==='local') { text.textContent='本機模式'; }
+}
+
+/* ══ DATA ══ */
+async function fetchProjects(group) {
+  if (!API_URL) return JSON.parse(localStorage.getItem('pm_'+group)||'[]');
+  try {
+    setConn('sync');
+    const res  = await fetch(`${API_URL}?group=${group}`, {cache:'no-cache'});
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    localStorage.setItem('pm_'+group, JSON.stringify(data));
+    setConn('ok');
+    return data;
+  } catch(e) {
+    console.warn('fetch failed', e);
+    setConn('err');
+    return JSON.parse(localStorage.getItem('pm_'+group)||'[]');
+  }
+}
+async function getProjects() {
+  if (!_cache[currentGroup]) _cache[currentGroup] = await fetchProjects(currentGroup);
+  return _cache[currentGroup];
+}
+
+/* ══ INIT ══ */
+async function init() {
+  showLoading(true);
+  _cache = { design:null, media:null };
+  const now = new Date();
+  calYear = now.getFullYear(); calMonth = now.getMonth();
+  await renderAll();
+  showLoading(false);
+}
+function showLoading(v) { document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
+async function manualRefresh() {
+  _cache[currentGroup] = null;
+  showLoading(true);
+  await renderAll();
+  showLoading(false);
+  showToast('🔄 已重新整理');
+}
+
+/* ══ GROUP / VIEW ══ */
+function switchGroup(g) {
+  currentGroup = g;
+  document.querySelectorAll('.group-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+g).classList.add('active');
+  renderAll();
+}
+function switchView(v) {
+  currentView = v;
+  document.querySelectorAll('.vbtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  ['list','gantt','stats'].forEach(n => document.getElementById(n+'-view').style.display = v===n ? '' : 'none');
+  document.getElementById('cal-panel').style.display = v==='cal' ? '' : 'none';
+  const hideBar = v==='stats';
+  document.getElementById('mode-bar').style.display     = hideBar ? 'none' : '';
+  document.querySelector('.toolbar').style.display      = hideBar ? 'none' : '';
+  document.querySelector('.list-header').style.display  = hideBar ? 'none' : '';
+  document.querySelector('.summary-bar').style.display  = hideBar ? 'none' : '';
+  renderAll();
+}
+function setMode(m) {
+  currentMode = m;
+  ['active','all','completed'].forEach(x => {
+    const el = document.getElementById('mode-'+x);
+    el.classList.remove('active','active-green');
+  });
+  if (m==='completed') document.getElementById('mode-completed').classList.add('active-green');
+  else document.getElementById('mode-'+m).classList.add('active');
+  const hints = {active:'顯示執行中、討論中、未開始項目',all:'顯示全部專案',completed:'已完成項目歸檔'};
+  document.getElementById('active-hint').textContent = hints[m]||'';
+  renderAll();
+}
+function setStatsScope(s) {
+  statsScope = s;
+  document.querySelectorAll('.scope-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('scope-'+s).classList.add('active');
+  renderStats();
+}
+
+/* ══ FILTERED ══ */
+function filtered(projects) {
+  let arr = [...projects];
+  if (currentMode==='active')    arr = arr.filter(p=>p.status!=='completed');
+  if (currentMode==='completed') arr = arr.filter(p=>p.status==='completed');
+  const sf = document.getElementById('filter-status')?.value;
+  const af = document.getElementById('filter-assignee')?.value;
+  const rf = document.getElementById('filter-source')?.value;
+  const cf = document.getElementById('filter-cat')?.value;
+  if (sf) arr = arr.filter(p=>p.status===sf);
+  if (af) arr = arr.filter(p=>p.assignee===af);
+  if (rf) arr = arr.filter(p=>(p.sourceType||'self')===rf);
+  if (cf) arr = arr.filter(p=>p.category===cf);
+  return arr;
+}
+
+/* ══ RENDER ALL ══ */
+async function renderAll() {
+  const projects = await getProjects();
+  renderSummary(projects);
+  renderList(projects);
+  renderGantt(projects);
+  renderCalendar(projects);
+  renderStats();
+  updateFilters(projects);
+}
+
+/* ══ SUMMARY ══ */
+function renderSummary(projects) {
+  const c = {total:projects.length,completed:0,'in-progress':0,pending:0,discussion:0};
+  projects.forEach(p=>{ if(c[p.status]!==undefined) c[p.status]++; });
+  document.getElementById('done-count').textContent = c.completed;
+  const cards = [
+    {num:c.total,label:'全部',color:'var(--teal)',mode:'all'},
+    {num:c['in-progress'],label:'執行中',color:'var(--amber)',mode:'active'},
+    {num:c.discussion,label:'討論中',color:'var(--purple)',mode:'active'},
+    {num:c.completed,label:'已完成',color:'#4ade80',mode:'completed'},
+    {num:c.pending,label:'未開始',color:'var(--text-muted)',mode:'active'},
+  ];
+  document.getElementById('summary-bar').innerHTML = cards.map(c=>
+    `<div class="summary-card" style="--accent-color:${c.color}" onclick="setMode('${c.mode}')">
+      <div class="summary-num" style="color:${c.color}">${c.num}</div>
+      <div class="summary-label">${c.label}</div>
+    </div>`
+  ).join('');
+}
+
+/* ══ FILTERS UPDATE ══ */
+function updateFilters(projects) {
+  const names = [...new Set(projects.map(p=>p.assignee).filter(Boolean))];
+  const asel = document.getElementById('filter-assignee');
+  if (asel) { const cur=asel.value; asel.innerHTML='<option value="">全部負責人</option>'+names.map(n=>`<option value="${n}"${n===cur?' selected':''}>${n}</option>`).join(''); }
+  const cats = [...new Set(projects.map(p=>p.category).filter(Boolean))];
+  const csel = document.getElementById('filter-cat');
+  if (csel) { const cur=csel.value; csel.innerHTML='<option value="">全部類別</option>'+cats.map(c=>`<option value="${c}"${c===cur?' selected':''}>${c}</option>`).join(''); }
+}
+
+/* ══ LIST VIEW ══ */
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderList(allProjects) {
+  const projects = filtered(allProjects);
+  const el = document.getElementById('project-list');
+  const today = new Date(); today.setHours(0,0,0,0);
+  if (!projects.length) {
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-msg">目前沒有符合條件的項目<br><span style="font-size:11px;color:var(--text-dim)">請至 Google Sheets 新增資料，再按 🔄 重新整理</span></div></div>`;
+    return;
+  }
+  el.innerHTML = projects.map(p => {
+    const st = STATUS[p.status]||{label:p.status||'—',cls:'s-pending'};
+    const catColor = CAT_COLOR[p.category]||'#6B7494';
+    const isOd = p.endDate && new Date(p.endDate)<today && p.status!=='completed';
+    const hasSubs = p.subtasks && p.subtasks.length;
+    const srcBadge = p.sourceType==='ticket'
+      ? `<span class="src-ticket">🔵 支援單${p.supNum?` ${p.supNum}`:''}</span>`
+      : `<span class="src-self">🟢 自主</span>`;
+    const subRows = hasSubs ? (p.subtasks||[]).map(s => {
+      const sst = STATUS[s.status]||{label:s.status||'—',cls:'s-pending'};
+      const sOd = s.endDate && new Date(s.endDate)<today && s.status!=='completed';
+      return `<div class="subtask-row">
+        <div></div>
+        <div class="st-indent"><span class="st-line"></span>
+          <div><div style="font-size:12px;color:var(--text-muted)">${esc(s.title)}</div></div>
+        </div>
+        <div class="col-val">${esc(s.assignee||'—')}</div>
+        <div class="col-val" style="font-size:11px">${s.startDate||'—'}</div>
+        <div class="col-val" style="font-size:11px">${sOd?`<span class="overdue-badge">⚠️ 逾期</span>`:s.endDate||'—'}</div>
+        <div><span class="sbadge ${sst.cls}">${sst.label}</span></div>
+        <div><div style="display:flex;align-items:center;gap:6px"><div class="prog-wrap" style="flex:1"><div class="prog-fill" style="width:${s.progress||0}%"></div></div><span class="prog-label">${s.progress||0}%</span></div></div>
+      </div>`;
+    }).join('') : '';
+    return `<div class="project-card${p.status==='completed'?' archived':''}">
+      <div class="project-row" onclick="toggleSub('sl-${p.id}','ti-${p.id}')">
+        <div class="toggle-icon${hasSubs?'':' hidden'} " id="ti-${p.id}">▶</div>
+        <div>
+          <div class="project-title">${esc(p.title)}${isOd?' <span class="overdue-badge">⚠️ 逾期</span>':''}</div>
+          <div class="project-note" style="display:flex;gap:5px;align-items:center;margin-top:4px">
+            <span class="cat-badge" style="background:${catColor}22;color:${catColor};border:1px solid ${catColor}44">${esc(p.category||'未分類')}</span>
+            ${srcBadge}
+            ${p.note?`<span style="color:var(--text-dim);font-size:10px">${esc(p.note)}</span>`:''}
+          </div>
+        </div>
+        <div class="col-val">${esc(p.assignee||'—')}</div>
+        <div class="col-val" style="font-size:11px">${p.startDate||'—'}</div>
+        <div class="col-val" style="font-size:11px">${p.endDate||'—'}</div>
+        <div><span class="sbadge ${st.cls}">${st.label}</span></div>
+        <div><div style="display:flex;align-items:center;gap:6px"><div class="prog-wrap" style="flex:1"><div class="prog-fill" style="width:${p.progress||0}%"></div></div><span class="prog-label">${p.progress||0}%</span></div></div>
+      </div>
+      ${hasSubs ? `<div class="subtask-list" id="sl-${p.id}" style="display:none">${subRows}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+function toggleSub(slId, tiId) {
+  const sl = document.getElementById(slId), ti = document.getElementById(tiId);
+  if (!sl) return;
+  const open = sl.style.display !== 'none';
+  sl.style.display = open ? 'none' : '';
+  if (ti) ti.classList.toggle('open', !open);
+}
+
+/* ══ GANTT ══ */
+function renderGantt(allProjects) {
+  if (currentView !== 'gantt') return;
+  const projects = filtered(allProjects);
+  const wrap = document.getElementById('gantt-wrap');
+  const now = new Date();
+  const yr = now.getFullYear();
+  const months = Array.from({length:12},(_,i)=>new Date(yr,i,1));
+  const start = months[0], end = new Date(yr,11,31);
+  const totalMs = end - start;
+  function pct(d){ if(!d) return null; const dt=new Date(d); if(isNaN(dt)) return null; return Math.max(0,Math.min(100,(dt-start)/totalMs*100)); }
+  const todayPct = pct(now.toISOString().slice(0,10));
+  const MNAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const gridCells = MNAMES.map((_,i)=>`<div class="g-grid-cell${i===now.getMonth()?' current':''}"></div>`).join('');
+  const header = `<div class="gantt-head"><div class="g-label-col">專案名稱</div><div class="g-months">${MNAMES.map((m,i)=>`<div class="g-month${i===now.getMonth()?' current':''}">${m}</div>`).join('')}</div></div>`;
+  let rows = '';
+  projects.forEach(p => {
+    const s0=pct(p.startDate), e0=pct(p.endDate), bc=BAR_COLOR[p.status]||'#6B7494';
+    rows += `<div class="g-row">
+      <div class="g-row-label"><div class="g-row-title">${esc(p.title)}</div><div class="g-row-meta">${esc(p.assignee||'—')}</div></div>
+      <div class="g-timeline">
+        <div class="g-grid">${gridCells}</div>
+        <div class="g-today" style="left:${todayPct}%"></div>
+        ${s0!==null&&e0!==null&&e0>s0?`<div class="g-bar" style="left:${s0}%;width:${e0-s0}%;background:${bc}">${esc(p.title)}</div>`:''}
+      </div></div>`;
+    (p.subtasks||[]).forEach(t=>{
+      const ts0=pct(t.startDate),te0=pct(t.endDate),tbc=BAR_COLOR[t.status]||'#6B7494';
+      rows+=`<div class="g-row">
+        <div class="g-row-label" style="padding-left:28px"><div class="g-row-title" style="font-weight:400;color:var(--text-muted);font-size:11px">└ ${esc(t.title)}</div></div>
+        <div class="g-timeline"><div class="g-grid">${gridCells}</div><div class="g-today" style="left:${todayPct}%"></div>
+          ${ts0!==null&&te0!==null&&te0>ts0?`<div class="g-bar subtask" style="left:${ts0}%;width:${te0-ts0}%;background:${tbc}">${esc(t.title)}</div>`:''}
+        </div></div>`;
+    });
+  });
+  wrap.innerHTML = !projects.length ? `<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-msg">尚無資料</div></div>` : header+rows;
+}
+
+/* ══ CALENDAR ══ */
+function renderCalendar(projects) {
+  if (currentView!=='cal') return;
+  const titleEl = document.getElementById('cal-title');
+  const gridEl  = document.getElementById('cal-grid');
+  titleEl.textContent = `${calYear} 年 ${calMonth+1} 月`;
+  const first = new Date(calYear, calMonth, 1);
+  const last  = new Date(calYear, calMonth+1, 0);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const evMap = {};
+  projects.forEach(p=>{
+    if (p.endDate) { const d=p.endDate; if(!evMap[d]) evMap[d]=[]; evMap[d].push(p); }
+    (p.subtasks||[]).forEach(s=>{ if(s.endDate){ if(!evMap[s.endDate]) evMap[s.endDate]=[]; evMap[s.endDate].push(s); } });
+  });
+  const DAY_LABELS = ['日','一','二','三','四','五','六'];
+  let html = DAY_LABELS.map(d=>`<div class="cal-day-label">${d}</div>`).join('');
+  for (let i=0; i<first.getDay(); i++) html += `<div class="cal-day other-month"></div>`;
+  for (let d=1; d<=last.getDate(); d++) {
+    const dt = new Date(calYear, calMonth, d);
+    const key = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = dt.getTime()===today.getTime();
+    const evs = evMap[key]||[];
+    html += `<div class="cal-day${isToday?' today':''}">
+      <div class="cal-day-num">${d}</div>
+      ${evs.slice(0,3).map(e=>{const c=BAR_COLOR[e.status]||'#6B7494';return `<div class="cal-event" style="background:${c}">${esc(e.title)}</div>`;}).join('')}
+      ${evs.length>3?`<div style="font-size:9px;color:var(--text-muted)">+${evs.length-3}件</div>`:''}
+    </div>`;
+  }
+  gridEl.innerHTML = html;
+}
+function calPrev(){ if(calMonth===0){calMonth=11;calYear--;}else calMonth--; renderAll(); }
+function calNext(){ if(calMonth===11){calMonth=0;calYear++;}else calMonth++; renderAll(); }
+
+/* ══ STATS ══ */
+function destroyChart(key){ if(_chartInstances[key]){_chartInstances[key].destroy();delete _chartInstances[key];} }
+async function renderStats() {
+  if (currentView!=='stats') return;
+  const GROUPS = {design:'美編組',media:'多媒體組'};
+  const scopes = statsScope==='both' ? ['design','media'] : [statsScope];
+  let allItems = [];
+  for (const g of scopes) {
+    const list = g===currentGroup ? (await getProjects()) : JSON.parse(localStorage.getItem('pm_'+g)||'[]');
+    list.forEach(p=>{ allItems.push({...p,_group:GROUPS[g]}); (p.subtasks||[]).forEach(s=>allItems.push({...s,_group:GROUPS[g],_isSubtask:true})); });
+  }
+  const mainItems = allItems.filter(p=>!p._isSubtask);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const totalMain=mainItems.length, totalSub=allItems.filter(p=>p._isSubtask).length;
+  const completed=mainItems.filter(p=>p.status==='completed').length;
+  const inProg=mainItems.filter(p=>p.status==='in-progress').length;
+  const discussion=mainItems.filter(p=>p.status==='discussion').length;
+  const overdue=mainItems.filter(p=>p.endDate&&new Date(p.endDate)<today&&p.status!=='completed').length;
+  const avgProg=mainItems.length?Math.round(mainItems.reduce((a,p)=>a+(parseInt(p.progress)||0),0)/mainItems.length):0;
+  const compRate=totalMain?Math.round(completed/totalMain*100):0;
+  const ticketCnt=mainItems.filter(p=>p.sourceType==='ticket').length;
+  document.getElementById('kpi-row').innerHTML=`
+    <div class="kpi-card kpi-teal" onclick="setMode('all');switchView('list')"><div class="kpi-num">${totalMain}</div><div class="kpi-label">主任務總數</div><div class="kpi-sub">含 ${totalSub} 個子任務</div></div>
+    <div class="kpi-card kpi-amber" onclick="setMode('active');switchView('list')"><div class="kpi-num">${inProg}</div><div class="kpi-label">執行中</div><div class="kpi-sub">討論中 ${discussion} 件</div></div>
+    <div class="kpi-card kpi-green" onclick="setMode('completed');switchView('list')"><div class="kpi-num">${compRate}%</div><div class="kpi-label">完成率</div><div class="kpi-sub">完成 ${completed}/${totalMain} 件</div></div>
+    <div class="kpi-card kpi-coral" onclick="setMode('active');switchView('list')"><div class="kpi-num">${overdue}</div><div class="kpi-label">逾期未完成</div><div class="kpi-sub">${overdue?'⚠️ 需關注':'✅ 目前無逾期'}</div></div>
+    <div class="kpi-card kpi-purple"><div class="kpi-num">${avgProg}%</div><div class="kpi-label">整體平均進度</div><div class="kpi-sub">支援單接案 ${ticketCnt} 件</div></div>`;
+  const chartDefs=[
+    {key:'assignee',id:'chart-assignee',type:'doughnut',getData:()=>{const m={};mainItems.forEach(p=>{const a=p.assignee||'未指派';m[a]=(m[a]||0)+1;});const l=Object.keys(m).sort((a,b)=>m[b]-m[a]);return{labels:l,data:l.map(k=>m[k])};},opts:{cutout:'62%',plugins:{legend:{position:'right',labels:{color:'#8B92A9',font:{size:11},boxWidth:10,padding:8}}}}},
+    {key:'status',id:'chart-status',type:'doughnut',getData:()=>({labels:['未開始','執行中','討論中','已完成'],data:[mainItems.filter(p=>p.status==='pending').length,inProg,discussion,completed]}),opts:{cutout:'58%',plugins:{legend:{position:'bottom',labels:{color:'#8B92A9',font:{size:11},boxWidth:10,padding:8}}}}},
+    {key:'source',id:'chart-source',type:'doughnut',getData:()=>({labels:['🟢 自主','🔵 支援單'],data:[mainItems.filter(p=>(p.sourceType||'self')==='self').length,ticketCnt]}),opts:{cutout:'58%',plugins:{legend:{position:'bottom',labels:{color:'#8B92A9',font:{size:11},boxWidth:10,padding:8}}}}},
+  ];
+  chartDefs.forEach(def=>{
+    destroyChart(def.key);
+    const ctx=document.getElementById(def.id)?.getContext('2d');
+    if(!ctx) return;
+    const {labels,data}=def.getData();
+    _chartInstances[def.key]=new Chart(ctx,{type:def.type,data:{labels,datasets:[{data,backgroundColor:CHART_PALETTE,borderWidth:2,borderColor:'#FFFFFF',hoverOffset:5}]},options:{responsive:true,maintainAspectRatio:false,...def.opts}});
+  });
+  // Cat bar
+  destroyChart('category');
+  const catMap={},catProg={};
+  mainItems.forEach(p=>{const c=p.category||'其他';catMap[c]=(catMap[c]||0)+1;if(!catProg[c])catProg[c]=[];catProg[c].push(parseInt(p.progress)||0);});
+  const catNames=Object.keys(catMap).sort((a,b)=>catMap[b]-catMap[a]);
+  const ctx2=document.getElementById('chart-category')?.getContext('2d');
+  if(ctx2&&catNames.length){_chartInstances.category=new Chart(ctx2,{type:'bar',indexAxis:'y',data:{labels:catNames,datasets:[{label:'件數',data:catNames.map(c=>catMap[c]),backgroundColor:catNames.map((_,i)=>CHART_PALETTE[i%CHART_PALETTE.length]+'CC'),borderRadius:4,yAxisID:'y'},{label:'平均進度%',data:catNames.map(c=>Math.round(catProg[c].reduce((a,v)=>a+v,0)/catProg[c].length)),type:'line',borderColor:'#00BFA6',backgroundColor:'rgba(0,191,166,.1)',pointRadius:4,pointBackgroundColor:'#00BFA6',tension:.3,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{ticks:{color:'#8B92A9',font:{size:10}}},y1:{display:false,min:0,max:100},x:{ticks:{color:'#8B92A9'}}},plugins:{legend:{labels:{color:'#8B92A9',font:{size:11},boxWidth:10}}}}});}
+  // Monthly
+  const monthly=Array(12).fill(0),monthlyDone=Array(12).fill(0);
+  allItems.forEach(p=>{if(!p.endDate)return;const m=parseInt(p.endDate.slice(5,7))-1;if(m>=0&&m<12){monthly[m]++;if(p.status==='completed')monthlyDone[m]++;}});
+  const curM=today.getMonth();
+  destroyChart('monthly');
+  const ctx3=document.getElementById('chart-monthly')?.getContext('2d');
+  if(ctx3){_chartInstances.monthly=new Chart(ctx3,{type:'bar',data:{labels:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],datasets:[{label:'截止件數',data:monthly,backgroundColor:monthly.map((_,i)=>i===curM?'#FF6B6B':i<curM?'rgba(107,116,148,.4)':'rgba(0,229,200,.5)'),borderRadius:4},{label:'已完成',data:monthlyDone,type:'line',borderColor:'#4ade80',backgroundColor:'rgba(74,222,128,.1)',pointRadius:3,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{ticks:{color:'#8B92A9',stepSize:1},beginAtZero:true,grid:{color:'rgba(28,35,64,.04)'}},x:{ticks:{color:'#8B92A9'}}},plugins:{legend:{labels:{color:'#8B92A9',font:{size:11},boxWidth:10}}}}});}
+  // Overdue
+  const odByP={},okByP={};
+  mainItems.forEach(p=>{const a=p.assignee||'未指派';const isOd=p.endDate&&new Date(p.endDate)<today&&p.status!=='completed';if(isOd)odByP[a]=(odByP[a]||0)+1;else okByP[a]=(okByP[a]||0)+1;});
+  const odPersons=[...new Set([...Object.keys(odByP),...Object.keys(okByP)])].sort();
+  destroyChart('overdue');
+  const ctx6=document.getElementById('chart-overdue')?.getContext('2d');
+  if(ctx6&&odPersons.length){_chartInstances.overdue=new Chart(ctx6,{type:'bar',data:{labels:odPersons,datasets:[{label:'正常',data:odPersons.map(p=>okByP[p]||0),backgroundColor:'rgba(74,222,128,.5)',borderRadius:4,stack:'s'},{label:'⚠️ 逾期',data:odPersons.map(p=>odByP[p]||0),backgroundColor:'rgba(255,107,107,.7)',borderRadius:4,stack:'s'}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{ticks:{color:'#8B92A9'}},y:{ticks:{stepSize:1,color:'#8B92A9'},beginAtZero:true,grid:{color:'rgba(28,35,64,.04)'}}},plugins:{legend:{labels:{color:'#8B92A9',font:{size:11},boxWidth:10}}}}});}
+  // Media cat
+  const mediaCatMap={};
+  MEDIA_CATS.forEach(c=>mediaCatMap[c]=0);
+  allItems.filter(p=>!p._isSubtask&&p._group==='多媒體組').forEach(p=>{const c=p.category||'其他';if(mediaCatMap[c]!==undefined)mediaCatMap[c]++;else mediaCatMap['其他']=(mediaCatMap['其他']||0)+1;});
+  destroyChart('media-cat');
+  const ctx7=document.getElementById('chart-media-cat')?.getContext('2d');
+  if(ctx7){const mC=Object.keys(mediaCatMap),mV=mC.map(c=>mediaCatMap[c]);_chartInstances['media-cat']=new Chart(ctx7,{type:'bar',data:{labels:mC,datasets:[{label:'件數',data:mV,backgroundColor:mC.map((_,i)=>CHART_PALETTE[i%CHART_PALETTE.length]),borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{ticks:{stepSize:1,color:'#8B92A9'},beginAtZero:true,grid:{color:'rgba(28,35,64,.04)'}},x:{ticks:{font:{size:9},color:'#8B92A9',maxRotation:30}}},plugins:{legend:{display:false}}}});}
+  // Group compare
+  const dCnt=mainItems.filter(p=>p._group==='美編組').length, mCnt=mainItems.filter(p=>p._group==='多媒體組').length;
+  const dDone=mainItems.filter(p=>p._group==='美編組'&&p.status==='completed').length, mDone=mainItems.filter(p=>p._group==='多媒體組'&&p.status==='completed').length;
+  destroyChart('group-compare');
+  const ctx8=document.getElementById('chart-group-compare')?.getContext('2d');
+  if(ctx8){_chartInstances['group-compare']=new Chart(ctx8,{type:'bar',data:{labels:['🎨 美編組','🎬 多媒體組'],datasets:[{label:'進行/待辦',data:[dCnt-dDone,mCnt-mDone],backgroundColor:['rgba(0,229,200,.4)','rgba(96,165,250,.4)'],borderRadius:5},{label:'已完成',data:[dDone,mDone],backgroundColor:['rgba(0,229,200,.9)','rgba(96,165,250,.9)'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,ticks:{color:'#8B92A9'}},y:{stacked:true,ticks:{stepSize:1,color:'#8B92A9'},beginAtZero:true,grid:{color:'rgba(28,35,64,.04)'}}},plugins:{legend:{labels:{color:'#8B92A9',font:{size:11},boxWidth:10}}}}});}
+  // Person table
+  const personData={};
+  mainItems.forEach(p=>{const a=p.assignee||'未指派';if(!personData[a])personData[a]={total:0,done:0,overdue:0,inprog:0,progSum:0,cats:new Set(),groups:new Set()};personData[a].total++;personData[a].progSum+=(parseInt(p.progress)||0);if(p.status==='completed')personData[a].done++;if(p.status==='in-progress')personData[a].inprog++;if(p.endDate&&new Date(p.endDate)<today&&p.status!=='completed')personData[a].overdue++;if(p.category)personData[a].cats.add(p.category);if(p._group)personData[a].groups.add(p._group);});
+  const maxT=Math.max(...Object.values(personData).map(d=>d.total),1);
+  const sorted=Object.entries(personData).sort((a,b)=>b[1].total-a[1].total);
+  document.getElementById('person-table').innerHTML=`<thead><tr><th>負責人</th><th>組別</th><th>工作量</th><th>件數</th><th>執行中</th><th>已完成</th><th>完成率</th><th>逾期</th><th>平均進度</th></tr></thead><tbody>${sorted.map(([name,d],i)=>{const avgP=d.total?Math.round(d.progSum/d.total):0;const rate=d.total?Math.round(d.done/d.total*100):0;const bc=CHART_PALETTE[i%CHART_PALETTE.length];const grps=[...d.groups].join('/');return`<tr><td><strong style="color:${bc}">${name}</strong></td><td style="font-size:11px;color:var(--text-muted)">${grps}</td><td><div class="person-bar-wrap"><div class="person-bar" style="width:${Math.round(d.total/maxT*100)}%;background:${bc}"></div></div></td><td><strong>${d.total}</strong></td><td style="color:var(--amber);font-weight:700">${d.inprog}</td><td style="color:#4ade80;font-weight:700">${d.done}</td><td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;background:rgba(28,35,64,.05);border-radius:3px;height:4px;min-width:40px;overflow:hidden"><div style="width:${rate}%;height:100%;background:${rate>=80?'#4ade80':rate>=50?'#FFB547':'#FF6B6B'};border-radius:3px"></div></div><span style="font-size:11px;font-weight:700">${rate}%</span></div></td><td style="color:${d.overdue?'#FF6B6B':'var(--text-dim)'};font-weight:700">${d.overdue||'—'}</td><td><div style="display:flex;align-items:center;gap:5px"><div style="flex:1;background:rgba(28,35,64,.05);border-radius:3px;height:4px;min-width:40px;overflow:hidden"><div style="width:${avgP}%;height:100%;background:var(--teal);border-radius:3px"></div></div><span style="font-size:11px;font-weight:700">${avgP}%</span></div></td></tr>`;}).join('')}</tbody>`;
+}
+
+/* ══ WEEKLY ══ */
+function openWeekly(){document.getElementById('weekly-modal').style.display='flex';generateWeekly();}
+function closeWeekly(){document.getElementById('weekly-modal').style.display='none';}
+function closeWeeklyOutside(e){if(e.target.id==='weekly-modal')closeWeekly();}
+async function generateWeekly(){
+  const scope=document.getElementById('weekly-scope').value;
+  const style=document.getElementById('weekly-style').value;
+  const today=new Date();const todayStr=`${today.getFullYear()}/${String(today.getMonth()+1).padStart(2,'0')}/${String(today.getDate()).padStart(2,'0')}`;
+  let groups=scope==='both'?['design','media']:scope==='design'?['design']:['media'];
+  let allP=[];
+  for(const g of groups){const p=g===currentGroup?(await getProjects()):JSON.parse(localStorage.getItem('pm_'+g)||'[]');allP.push({g,p});}
+  const GNAME={design:'🎨 美編組',media:'🎬 多媒體組'};
+  const STATUS_LINE={pending:'⬜ 未開始','in-progress':'🔶 執行中',discussion:'💬 討論中',completed:'✅ 已完成'};
+  if(style==='line'){
+    let txt=`📋 本週工作摘要\n🗓 ${todayStr}\n${'─'.repeat(25)}\n`;
+    allP.forEach(({g,p})=>{if(!p.length)return;txt+=`\n${GNAME[g]}\n`;p.filter(x=>x.status!=='completed').forEach(x=>{txt+=`${STATUS_LINE[x.status]||'▪'} ${x.title}（${x.assignee||'—'}）${x.progress?` ${x.progress}%`:''}\n`;(x.subtasks||[]).filter(s=>s.status!=='completed').forEach(s=>{txt+=`  └ ${s.title}（${s.assignee||'—'}）\n`;});});const done=p.filter(x=>x.status==='completed');if(done.length)txt+=`\n已完成 ${done.length} 件 ✅\n`;});
+    document.getElementById('weekly-text').textContent=txt;
+  } else {
+    let txt=`視覺多媒體設計組 週報\n日期：${todayStr}\n${'═'.repeat(30)}\n`;
+    allP.forEach(({g,p})=>{if(!p.length)return;txt+=`\n【${GNAME[g]}】\n`;const byStatus={'in-progress':[],'discussion':[],'pending':[],'completed':[]};p.forEach(x=>byStatus[x.status]?.push(x));if(byStatus['in-progress'].length){txt+=`▌執行中\n`;byStatus['in-progress'].forEach(x=>{txt+=`  • ${x.title}（負責人：${x.assignee||'—'}，進度：${x.progress||0}%）\n`;});}if(byStatus['discussion'].length){txt+=`▌討論中\n`;byStatus['discussion'].forEach(x=>{txt+=`  • ${x.title}\n`;});}if(byStatus['completed'].length)txt+=`▌本週完成 ${byStatus['completed'].length} 件\n`;});
+    document.getElementById('weekly-text').textContent=txt;
+  }
+}
+function copyWeekly(){navigator.clipboard.writeText(document.getElementById('weekly-text').textContent).then(()=>showToast('✅ 已複製'));}
+
+/* ══ EXPORT ══ */
+function toggleExportMenu(e){e.stopPropagation();const m=document.getElementById('export-menu');m.style.display=m.style.display==='none'?'block':'none';}
+function closeExportMenu(){document.getElementById('export-menu').style.display='none';}
+document.addEventListener('click',()=>closeExportMenu());
+async function exportExcel(){
+  const projects=await getProjects();
+  const rows=[['群組','類別','來源','支援單號','層級','名稱','負責人','申請單位','開始日期','預計完成','狀態','進度%','備註']];
+  const GN={design:'美編組',media:'多媒體組'}, SRC={self:'自主專案',ticket:'支援單接案'};
+  projects.forEach(p=>{
+    rows.push([GN[currentGroup],p.category,SRC[p.sourceType||'self']||'',p.supNum||'','主任務',p.title,p.assignee,p.unit,p.startDate,p.endDate,STATUS[p.status]?.label||'',p.progress||0,p.note]);
+    (p.subtasks||[]).forEach(s=>rows.push([GN[currentGroup],p.category,SRC[p.sourceType||'self']||'',p.supNum||'','子任務',s.title,s.assignee,s.unit,s.startDate,s.endDate,STATUS[s.status]?.label||'',s.progress||0,s.note]));
+  });
+  if(typeof XLSX!=='undefined'){const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[8,10,8,10,6,28,8,10,10,10,6,5,20].map(w=>({wch:w}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'工作表');XLSX.writeFile(wb,`視覺組專案_${new Date().toISOString().slice(0,10)}.xlsx`);}
+}
+async function exportICS(){
+  const projects=await getProjects();
+  let ics='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//視覺組專案管理//ZH\r\n';
+  const fmt=d=>d?d.replace(/-/g,''):'';
+  projects.forEach(p=>{if(!p.endDate)return;ics+=`BEGIN:VEVENT\r\nSUMMARY:${p.title}\r\nDTSTART;VALUE=DATE:${fmt(p.startDate||p.endDate)}\r\nDTEND;VALUE=DATE:${fmt(p.endDate)}\r\nDESCRIPTION:${p.assignee||''} | ${p.category||''}\r\nEND:VEVENT\r\n`;});
+  ics+='END:VCALENDAR';
+  const a=document.createElement('a');a.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);a.download='視覺組專案.ics';a.click();
+}
+function printView(){closeExportMenu();setTimeout(()=>window.print(),100);}
+
+/* ══ LOG ══ */
+function openLogModal(){document.getElementById('log-modal').style.display='flex';loadLog();}
+function closeLogModal(){document.getElementById('log-modal').style.display='none';}
+async function loadLog(){
+  const tbody=document.getElementById('log-tbody');
+  const limit=document.getElementById('log-limit').value;
+  tbody.innerHTML=`<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted)">載入中…</td></tr>`;
+  if(!API_URL){tbody.innerHTML=`<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted)">本機模式下無 Log 功能</td></tr>`;return;}
+  try{
+    const res=await fetch(`${API_URL}?action=log&limit=${limit}`,{cache:'no-cache'});
+    const data=await res.json();
+    document.getElementById('log-count').textContent=`共 ${data.length} 筆`;
+    if(!data.length){tbody.innerHTML=`<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted)">尚無記錄</td></tr>`;return;}
+    const AC={'新增項目':'#4ade80','刪除項目':'#FF6B6B','編輯項目':'#60A5FA','版本還原':'#FFB547','ACCESS_DENIED':'#A78BFA'};
+    tbody.innerHTML=data.map(r=>`<tr style="border-bottom:1px solid rgba(28,35,64,.04)"><td style="padding:7px 10px;color:var(--text-muted);white-space:nowrap;font-size:11px">${r.time}</td><td style="padding:7px 10px"><span style="background:${AC[r.action]||'#6B7494'}22;color:${AC[r.action]||'#6B7494'};padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap">${r.action}</span></td><td style="padding:7px 10px;font-weight:600;font-size:12px">${r.operator}</td><td style="padding:7px 10px;font-size:11px;color:var(--text-muted)">${r.detail}</td></tr>`).join('');
+  }catch(e){tbody.innerHTML=`<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--coral)">讀取失敗</td></tr>`;}
+}
+
+/* ══ RESTORE ══ */
+function openRestoreModal(){document.getElementById('restore-modal').style.display='flex';document.getElementById('restore-group').value=currentGroup;loadSnapshots();}
+function closeRestoreModal(){document.getElementById('restore-modal').style.display='none';}
+async function loadSnapshots(){
+  const wrap=document.getElementById('snapshot-list');
+  const group=document.getElementById('restore-group').value;
+  wrap.innerHTML=`<div style="text-align:center;padding:30px;color:var(--text-muted)">載入中…</div>`;
+  if(!API_URL){wrap.innerHTML=`<div style="text-align:center;padding:30px;color:var(--text-muted)">本機模式下無此功能</div>`;return;}
+  try{
+    const res=await fetch(`${API_URL}?action=snapshots&group=${group}`,{cache:'no-cache'});
+    const snaps=await res.json();
+    if(!snaps.length){wrap.innerHTML=`<div style="text-align:center;padding:30px;color:var(--text-muted)">尚無備份快照</div>`;return;}
+    wrap.innerHTML=snaps.map((s,i)=>{const ts=typeof s.timestamp==='string'?s.timestamp.replace('T',' ').slice(0,19):s.timestamp;return`<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;border:1px solid var(--border);border-radius:9px;margin-bottom:7px;background:var(--surface2)"><div style="flex:1"><div style="font-size:12px;font-weight:700">${i===0?'🕐 最新備份':'備份 #'+(i+1)}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${ts}・${s.itemCount}件</div></div><button class="btn btn-dim" style="font-size:11px" onclick="confirmRestore('${group}',${s.index})">⏪ 還原</button></div>`;}).join('');
+  }catch(e){wrap.innerHTML=`<div style="text-align:center;padding:24px;color:var(--coral)">讀取失敗</div>`;}
+}
+async function confirmRestore(group,index){
+  if(!confirm('確定還原此版本？目前資料將被覆蓋。'))return;
+  showToast('⏳ 還原中…');
+  try{
+    const res=await fetch(API_URL,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'restore',group,restoreIndex:index,operator:OPERATOR||'未登入'})});
+    const result=await res.json();
+    if(result.ok){_cache[group]=null;closeRestoreModal();await renderAll();showToast('✅ 還原成功！');}
+    else showToast('❌ 還原失敗');
+  }catch(e){showToast('❌ 錯誤：'+e.message);}
+}
+
+/* ══ TOAST ══ */
+let _toastTimer;
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(_toastTimer);_toastTimer=setTimeout(()=>t.classList.remove('show'),2800);}
+
+/* ══ BOOT ══ */
+checkSetup();
+init();
+</script>
+</body>
+</html>

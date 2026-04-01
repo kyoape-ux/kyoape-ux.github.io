@@ -1,0 +1,263 @@
+/**
+ * ╔══════════════════════════════════════════════════════════╗
+ * ║   光田醫院 視覺多媒體設計組 · 專案管理後台 v3.0          ║
+ * ║   架構：Google Sheets = 唯一資料來源                     ║
+ * ║   前台：純讀取展示，不寫入                               ║
+ * ╚══════════════════════════════════════════════════════════╝
+ *
+ * 【Sheets 欄位結構】（第1列為標頭，從第2列開始填資料）
+ *
+ * 美編組工作表名稱：design
+ * 多媒體組工作表名稱：media
+ *
+ * 欄位順序：
+ *  A: id          → 唯一識別碼（填任意英數字，不可重複，子任務也要有）
+ *  B: parentId    → 父任務 id（主任務留空；子任務填父任務的 id）
+ *  C: category    → 類別
+ *  D: title       → 名稱 ★直接在這裡改，前台馬上同步★
+ *  E: assignee    → 負責人
+ *  F: unit        → 申請單位
+ *  G: startDate   → 開始日期（格式：2026-01-03）
+ *  H: endDate     → 預計完成（格式：2026-04-30）
+ *  I: status      → 狀態（pending / in-progress / discussion / completed）
+ *  J: progress    → 進度（0~100 的數字）
+ *  K: sourceType  → 來源（self = 自主專案 / ticket = 支援單）
+ *  L: supNum      → 支援單號（選填）
+ *  M: collab      → 協同人員（選填，多人以逗號分隔）
+ *  N: note        → 備註
+ *
+ * 【狀態對照】
+ *  pending     = 未開始
+ *  in-progress = 執行中
+ *  discussion  = 討論中
+ *  completed   = 已完成
+ */
+
+/* ══════════════════════════════════
+   設定區
+══════════════════════════════════ */
+const HEADERS = ['id','parentId','category','title','assignee','unit',
+                 'startDate','endDate','status','progress','sourceType','supNum','collab','note'];
+
+const SHEET_NAMES = { design: 'design', media: 'media' };
+
+/* ══════════════════════════════════
+   GET：前台讀取資料
+══════════════════════════════════ */
+function doGet(e) {
+  try {
+    const group = (e.parameter.group || 'design');
+    const sheetName = SHEET_NAMES[group] || 'design';
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName(sheetName);
+
+    if (!sheet || sheet.getLastRow() < 2) {
+      return jsonResponse([]);
+    }
+
+    // 讀取所有資料列（跳過第1列標頭）
+    const lastRow = sheet.getLastRow();
+    const lastCol = HEADERS.length;
+    const rawData = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+
+    // 轉成物件陣列
+    const rows = rawData
+      .filter(r => r[0] && r[3]) // id 和 title 不能空
+      .map(r => {
+        const obj = {};
+        HEADERS.forEach((h, i) => {
+          let val = r[i];
+          // 日期格式處理
+          if ((h === 'startDate' || h === 'endDate') && val instanceof Date) {
+            val = Utilities.formatDate(val, 'Asia/Taipei', 'yyyy-MM-dd');
+          }
+          // 數字處理
+          if (h === 'progress') val = parseInt(val) || 0;
+          obj[h] = val === undefined ? '' : String(val === null ? '' : val);
+        });
+        return obj;
+      });
+
+    // 組裝父子結構
+    const mainItems = rows.filter(r => !r.parentId);
+    const subItems  = rows.filter(r => r.parentId);
+
+    mainItems.forEach(p => {
+      p.subtasks = subItems.filter(s => s.parentId === p.id);
+    });
+
+    return jsonResponse(mainItems);
+
+  } catch(err) {
+    return jsonResponse({ error: err.message });
+  }
+}
+
+/* ══════════════════════════════════
+   POST：初始化標頭（第一次使用時）
+══════════════════════════════════ */
+function doPost(e) {
+  try {
+    const body = JSON.parse(e.postData.contents);
+
+    // 初始化工作表標頭
+    if (body.action === 'init') {
+      initSheetHeaders(body.group || 'design');
+      return jsonResponse({ ok: true, message: '工作表標頭已建立' });
+    }
+
+    // 新增一筆任務
+    if (body.action === 'add') {
+      const group = body.group || 'design';
+      const item  = body.item;
+      if (!item || !item.title) return jsonResponse({ ok: false, error: '缺少 title' });
+      const sheetName = SHEET_NAMES[group] || 'design';
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      let sheet = ss.getSheetByName(sheetName);
+      if (!sheet) {
+        sheet = ss.insertSheet(sheetName);
+        sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+        sheet.getRange(1, 1, 1, HEADERS.length)
+          .setFontWeight('bold').setBackground('#1C2340').setFontColor('white');
+        sheet.setFrozenRows(1);
+        const widths = [80,80,100,200,80,100,100,100,100,60,80,100,120,200];
+        widths.forEach((w, i) => sheet.setColumnWidth(i + 1, w));
+      }
+      if (!item.id) item.id = 'T' + Date.now();
+      const row = HEADERS.map(h => item[h] !== undefined ? item[h] : '');
+      sheet.appendRow(row);
+      return jsonResponse({ ok: true, id: item.id });
+    }
+
+    // 批次新增多筆（匯入用）
+    if (body.action === 'batchAdd') {
+      const group = body.group || 'design';
+      const items = body.items || [];
+      if (!items.length) return jsonResponse({ ok: false, error: '無資料' });
+      const sheetName = SHEET_NAMES[group] || 'design';
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      let sheet = ss.getSheetByName(sheetName);
+      if (!sheet) {
+        sheet = ss.insertSheet(sheetName);
+        sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+        sheet.getRange(1, 1, 1, HEADERS.length)
+          .setFontWeight('bold').setBackground('#1C2340').setFontColor('white');
+        sheet.setFrozenRows(1);
+        const widths = [80,80,100,200,80,100,100,100,100,60,80,100,120,200];
+        widths.forEach((w, i) => sheet.setColumnWidth(i + 1, w));
+      }
+      // Batch write all rows at once (much faster than appendRow loop)
+      const rowsToWrite = items.map(item => {
+        if (!item.id) item.id = 'IMP' + Date.now() + Math.random().toString(36).slice(2,5);
+        return HEADERS.map(h => item[h] !== undefined ? item[h] : '');
+      });
+      if (rowsToWrite.length) {
+        const lastRow = sheet.getLastRow();
+        sheet.getRange(lastRow + 1, 1, rowsToWrite.length, HEADERS.length).setValues(rowsToWrite);
+      }
+      logAction('批次匯入', body.operator || 'import', `${rowsToWrite.length} 筆`);
+      return jsonResponse({ ok: true, added: rowsToWrite.length });
+    }
+
+    // 更新一筆任務
+    if (body.action === 'update') {
+      const group = body.group || 'design';
+      const item  = body.item;
+      if (!item || !item.id) return jsonResponse({ ok: false, error: '缺少 id' });
+      const sheetName = SHEET_NAMES[group] || 'design';
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      const sheet = ss.getSheetByName(sheetName);
+      if (!sheet) return jsonResponse({ ok: false, error: '工作表不存在：' + sheetName });
+      const lastRow = sheet.getLastRow();
+      if (lastRow < 2) return jsonResponse({ ok: false, error: '找不到資料' });
+      const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat();
+      const rowIdx = ids.indexOf(item.id);
+      if (rowIdx === -1) return jsonResponse({ ok: false, error: '找不到 id：' + item.id });
+      const row = HEADERS.map(h => item[h] !== undefined ? item[h] : '');
+      sheet.getRange(rowIdx + 2, 1, 1, HEADERS.length).setValues([row]);
+      return jsonResponse({ ok: true, id: item.id });
+    }
+
+    // 批次刪除多筆（前台複選刪除）
+    if (body.action === 'batchDelete') {
+      const group = body.group || 'design';
+      const ids = body.ids || [];
+      if (!ids.length) return jsonResponse({ ok: false, error: '無 id' });
+      const sheetName = SHEET_NAMES[group] || 'design';
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      const sheet = ss.getSheetByName(sheetName);
+      if (!sheet) return jsonResponse({ ok: false, error: '工作表不存在：' + sheetName });
+      const lastRow = sheet.getLastRow();
+      if (lastRow < 2) return jsonResponse({ ok: false, error: '無資料' });
+      const data = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+      const idSet = new Set(ids.map(String));
+      let deleted = 0;
+      for (let i = data.length - 1; i >= 0; i--) {
+        if (idSet.has(String(data[i][0]))) {
+          sheet.deleteRow(i + 2);
+          deleted++;
+        }
+      }
+      logAction('批次刪除', body.operator || 'admin', deleted + ' 筆');
+      return jsonResponse({ ok: true, deleted: deleted });
+    }
+
+    return jsonResponse({ ok: false, error: '未知的 action' });
+
+  } catch(err) {
+    return jsonResponse({ ok: false, error: err.message });
+  }
+}
+
+/* ══════════════════════════════════
+   初始化標頭
+══════════════════════════════════ */
+function initSheetHeaders(group) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetName = SHEET_NAMES[group] || group;
+  let sheet = ss.getSheetByName(sheetName);
+  if (!sheet) sheet = ss.insertSheet(sheetName);
+
+  // 寫入標頭
+  sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+  sheet.getRange(1, 1, 1, HEADERS.length)
+    .setFontWeight('bold')
+    .setBackground('#1C2340')
+    .setFontColor('white');
+  sheet.setFrozenRows(1);
+
+  // 設定欄寬
+  const widths = [80, 80, 100, 200, 80, 100, 100, 100, 100, 60, 80, 100, 120, 200];
+  widths.forEach((w, i) => sheet.setColumnWidth(i + 1, w));
+}
+
+/* ══════════════════════════════════
+   手動執行：一鍵初始化兩個工作表
+══════════════════════════════════ */
+function setupAllSheets() {
+  initSheetHeaders('design');
+  initSheetHeaders('media');
+  SpreadsheetApp.getUi().alert('✅ 完成！design 和 media 工作表標頭已建立，請開始填入資料。');
+}
+
+/* ══════════════════════════════════
+   工具
+══════════════════════════════════ */
+function jsonResponse(data) {
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function logAction(action, operator, detail) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let logSheet = ss.getSheetByName('_log');
+    if (!logSheet) {
+      logSheet = ss.insertSheet('_log');
+      logSheet.getRange(1,1,1,4).setValues([['時間','操作','執行者','說明']]);
+      logSheet.getRange(1,1,1,4).setFontWeight('bold').setBackground('#1C2340').setFontColor('white');
+    }
+    logSheet.appendRow([new Date(), action, operator, detail]);
+  } catch(e) { /* log 失敗不影響主流程 */ }
+}
