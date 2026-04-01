@@ -354,6 +354,8 @@ tr:hover td{background:rgba(52,211,153,.03);}
         <select id="filter-cat" onchange="renderList()"><option value="">全部類別</option><option value="疾病衛教">疾病衛教</option><option value="特色醫療">特色醫療</option><option value="新服務流程">新服務流程</option><option value="醫院形象">醫院形象</option><option value="員工活動">員工活動</option><option value="教學">教學</option><option value="其他">其他</option></select>
         <select id="filter-month" onchange="renderList()"><option value="">全部月份</option></select>
         <button class="btn btn-sm" onclick="batchUpdateYt()" style="background:rgba(255,68,68,.12);color:var(--yt);border:1px solid rgba(255,68,68,.2);">批次更新 YT 數據</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('csv-import').click()">匯入 YT Studio CSV</button>
+        <input type="file" id="csv-import" accept=".csv" style="display:none;" onchange="importYtStudioCSV(this)">
         <button class="btn btn-secondary btn-sm" onclick="exportCSV()">匯出 CSV</button>
       </div>
       <div class="tbl-wrap">
@@ -818,6 +820,53 @@ function saveYtApiKey(){
   const k=document.getElementById('cfg-yt-key').value.trim();
   YT_API_KEY=k;localStorage.setItem('kt_yt_apikey',k);
   showAlert('api-alert',k?'YouTube API Key 已儲存':'YouTube API Key 已清除','ok');
+}
+
+// ============================================================
+// YT Studio CSV 匯入
+// ============================================================
+function importYtStudioCSV(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const lines=e.target.result.split('\n');
+    if(lines.length<3){alert('CSV 格式不正確');return;}
+    const headers=lines[0].split(',');
+    const idCol=headers.indexOf('內容'),titleCol=headers.indexOf('影片標題'),pubCol=headers.indexOf('影片發布時間'),durCol=headers.indexOf('時間長度'),viewsCol=headers.indexOf('觀看次數'),impCol=headers.indexOf('曝光次數'),ctrCol=headers.indexOf('曝光點閱率 (%)');
+    if(idCol<0||titleCol<0){alert('找不到必要欄位（內容、影片標題）');return;}
+    let imported=0,skipped=0;
+    for(let i=1;i<lines.length;i++){
+      // Parse CSV respecting quotes
+      const row=[];let cur='',inQ=false;
+      for(const ch of lines[i]){if(ch==='"'){inQ=!inQ;}else if(ch===','&&!inQ){row.push(cur.trim());cur='';}else{cur+=ch;}}
+      row.push(cur.trim());
+      const vid=row[idCol];if(!vid||vid==='總計')continue;
+      // Parse date like "Mar 25, 2026"
+      let dateStr='';try{const d=new Date(row[pubCol]?.replace(/"/g,''));dateStr=d.toISOString().slice(0,10);}catch(e){continue;}
+      if(!dateStr.startsWith('2026')){skipped++;continue;}
+      // Skip if already exists
+      if(DATA.find(d=>d.id===vid)){skipped++;continue;}
+      const durSec=parseInt(row[durCol])||0;const mins=Math.floor(durSec/60),secs=durSec%60;
+      DATA.push({
+        id:vid,title:row[titleCol]?.replace(/"/g,'')||'',date:dateStr,
+        type:durSec<=60?'short':'long',cat:'',planner:'',producer:'',
+        dur:durSec>0?`${mins}:${String(secs).padStart(2,'0')}`:'',
+        yt_url:`https://www.youtube.com/watch?v=${vid}`,
+        yt_views:parseInt(row[viewsCol])||0,yt_likes:0,yt_comments:0,
+        yt_imp:parseInt(row[impCol])||0,yt_ctr:Math.round((parseFloat(row[ctrCol])||0)/100*10000)/10000,
+        yt_ratio:0,yt_avgdur:'',
+        fb_url:'',fb_views:0,fb_likes:0,fb_comments:0,fb_shares:0,fb_reach:0,
+        ig_url:'',ig_views:0,ig_likes:0,ig_comments:0,ig_shares:0,ig_reach:0,
+        note:'',statsDate:new Date().toISOString().slice(0,10),
+        createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()
+      });
+      imported++;
+    }
+    saveData();renderAll();
+    showSyncBadge(`匯入完成：${imported} 部新影片${skipped?'，'+skipped+' 部略過（已存在或非2026）':''}`);
+    input.value='';
+  };
+  reader.readAsText(file);
 }
 
 // IG 貼文管理
