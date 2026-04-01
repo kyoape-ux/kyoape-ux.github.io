@@ -6,201 +6,256 @@
 <title>影片管理系統｜光田綜合醫院</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
-/* ── Reset & Variables ─────────────────────────────── */
+/* ── Reset & Dark Theme Variables ──────────────────── */
 :root {
-  --g:#0F6E56; --g2:#0a5544; --gl:#E1F5EE; --gl2:#c8eadb;
-  --bg:#F4F5F2; --card:#fff; --border:#E2E2DC;
-  --txt:#1A1A18; --txt2:#555; --txt3:#999;
-  --red:#D94F4F; --amber:#E8A825; --blue:#2D7DD2;
-  --yt:#FF0000; --fb:#1877F2; --ig:#E4405F;
+  --accent:#34D399; --accent2:#10B981; --accent-dim:rgba(52,211,153,.12);
+  --bg-0:#0B0F14; --bg-1:#111820; --bg-2:#182030; --bg-3:#1E2A3A;
+  --border:#1E2D3D; --border-l:#2A3E54;
+  --txt:#E8ECF1; --txt2:#94A3B8; --txt3:#5A6B80;
+  --card:#131C28; --card-hover:#182438;
+  --red:#F87171; --amber:#FBBF24; --blue:#60A5FA;
+  --yt:#FF4444; --fb:#4C8BF5; --ig:#E1306C;
+  --radius:10px; --radius-lg:14px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Noto Sans TC',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;line-height:1.6;}
-a{color:var(--g);text-decoration:none;}
+body{font-family:'Noto Sans TC',system-ui,-apple-system,sans-serif;background:var(--bg-0);color:var(--txt);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);text-decoration:none;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-l);border-radius:3px;}
+
+/* ── SVG Icon Base ─────────────────────────────────── */
+.icon{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex-shrink:0;}
+.icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.icon-lg{width:28px;height:28px;}
+.icon-xl{width:36px;height:36px;}
 
 /* ── Layout ────────────────────────────────────────── */
 .app{display:flex;min-height:100vh;}
-.sidebar{width:230px;background:#fff;border-right:1px solid var(--border);padding:20px 16px;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;}
-.sidebar .logo{font-size:18px;font-weight:700;color:var(--g);margin-bottom:4px;}
-.sidebar .sub{font-size:11px;color:var(--txt3);margin-bottom:24px;}
-.nav-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;font-size:13px;cursor:pointer;color:var(--txt2);transition:.12s;}
-.nav-item:hover{background:var(--gl);}
-.nav-item.active{background:var(--gl);color:var(--g);font-weight:600;}
-.nav-item .ico{width:20px;text-align:center;}
-.sidebar-footer{margin-top:auto;padding-top:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;}
-.sidebar-footer a{font-size:12px;color:var(--txt3);display:flex;align-items:center;gap:6px;padding:4px 0;}
-.sidebar-footer a:hover{color:var(--g);}
+.sidebar{width:240px;background:var(--bg-1);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:6px;}
+.sidebar-brand .icon{color:var(--accent);width:26px;height:26px;}
+.sidebar-brand span{font-size:17px;font-weight:700;color:var(--txt);letter-spacing:.3px;}
+.sidebar-sub{font-size:11px;color:var(--txt3);padding:0 8px;margin-bottom:28px;}
+.nav-section{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--txt3);padding:0 12px;margin:20px 0 8px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);font-size:13px;cursor:pointer;color:var(--txt2);transition:all .15s;}
+.nav-item:hover{background:var(--accent-dim);color:var(--txt);}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:600;}
+.nav-item .icon{color:inherit;}
+.sidebar-footer{margin-top:auto;padding-top:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
+.sidebar-footer a{font-size:12px;color:var(--txt3);display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:6px;transition:.12s;}
+.sidebar-footer a:hover{color:var(--accent);background:var(--accent-dim);}
 
-.main{margin-left:230px;flex:1;padding:28px 32px;max-width:1200px;}
+.main{margin-left:240px;flex:1;padding:28px 36px;max-width:1200px;}
 .page{display:none;}
 .page.active{display:block;}
-.page-title{font-size:20px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.page-title{font-size:18px;font-weight:700;margin-bottom:22px;display:flex;align-items:center;gap:10px;color:var(--txt);}
+.page-title .icon{color:var(--accent);}
 
 /* ── Setup Banner ──────────────────────────────────── */
-.setup-banner{background:linear-gradient(135deg,#FFF3CD,#FFE69C);border:1px solid #FFDA6A;border-radius:12px;padding:18px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-.setup-banner .icon{font-size:24px;}
+.setup-banner{background:linear-gradient(135deg,var(--bg-2),var(--bg-3));border:1px solid var(--border-l);border-radius:var(--radius-lg);padding:18px 22px;margin-bottom:24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.setup-banner .icon{color:var(--amber);width:24px;height:24px;}
 .setup-banner .text{flex:1;min-width:200px;}
-.setup-banner .text b{display:block;font-size:14px;margin-bottom:2px;}
-.setup-banner .text span{font-size:12px;color:#856404;}
-.setup-banner input{flex:1;min-width:260px;padding:8px 12px;border:1px solid #FFDA6A;border-radius:8px;font-size:13px;}
-.setup-banner button{padding:8px 18px;background:var(--g);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;}
-.setup-banner button:hover{background:var(--g2);}
-.setup-ok{background:var(--gl)!important;border-color:var(--g)!important;}
-.setup-ok .text b{color:var(--g);}
-.setup-ok .text span{color:var(--g);}
+.setup-banner .text b{display:block;font-size:13px;color:var(--txt);margin-bottom:2px;}
+.setup-banner .text span{font-size:11px;color:var(--txt3);}
+.setup-banner input{flex:1;min-width:260px;padding:8px 14px;border:1px solid var(--border-l);border-radius:8px;font-size:12px;background:var(--bg-1);color:var(--txt);outline:none;}
+.setup-banner input:focus{border-color:var(--accent);}
+.setup-banner button{padding:8px 20px;background:var(--accent2);color:#000;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;}
+.setup-ok{border-color:var(--accent)!important;background:rgba(52,211,153,.06)!important;}
+.setup-ok .text b{color:var(--accent);}
 
-/* ── Cards ─────────────────────────────────────────── */
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:24px;}
-.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;}
-.kpi-label{font-size:12px;color:var(--txt3);margin-bottom:4px;}
-.kpi-val{font-size:26px;font-weight:700;color:var(--txt);}
+/* ── KPI Cards ─────────────────────────────────────── */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:26px;}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;transition:.2s;}
+.kpi-card:hover{border-color:var(--border-l);background:var(--card-hover);}
+.kpi-label{font-size:11px;color:var(--txt3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+.kpi-val{font-size:28px;font-weight:800;color:var(--txt);font-variant-numeric:tabular-nums;}
 .kpi-sub{font-size:11px;color:var(--txt3);margin-top:4px;}
-.kpi-bar{height:6px;background:#eee;border-radius:3px;margin-top:8px;overflow:hidden;}
-.kpi-bar-fill{height:100%;border-radius:3px;transition:width .4s;}
-.kpi-ok{background:var(--g);}
+.kpi-bar{height:4px;background:var(--bg-3);border-radius:2px;margin-top:10px;overflow:hidden;}
+.kpi-bar-fill{height:100%;border-radius:2px;transition:width .5s ease;}
+.kpi-ok{background:var(--accent);}
 .kpi-warn{background:var(--amber);}
 .kpi-bad{background:var(--red);}
-.platform-breakdown{display:flex;gap:8px;margin-top:6px;font-size:11px;}
-.plat-tag{display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:8px;font-weight:500;}
-.plat-yt{background:#FEE2E2;color:var(--yt);}
-.plat-fb{background:#DBEAFE;color:var(--fb);}
-.plat-ig{background:#FCE7F3;color:var(--ig);}
+.platform-breakdown{display:flex;gap:8px;margin-top:8px;font-size:11px;}
+.plat-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:6px;font-weight:500;font-variant-numeric:tabular-nums;}
+.plat-yt{background:rgba(255,68,68,.12);color:var(--yt);}
+.plat-fb{background:rgba(76,139,245,.12);color:var(--fb);}
+.plat-ig{background:rgba(225,48,108,.12);color:var(--ig);}
 
 /* ── Charts ────────────────────────────────────────── */
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
-.chart-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;}
-.chart-box h3{font-size:14px;margin-bottom:12px;color:var(--txt2);}
+.chart-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;}
+.chart-box h3{font-size:13px;margin-bottom:14px;color:var(--txt2);display:flex;align-items:center;gap:8px;font-weight:600;}
+.chart-box h3 .icon{color:var(--txt3);width:16px;height:16px;}
 canvas{max-height:260px;}
 
 /* ── Form ──────────────────────────────────────────── */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .form-grid.cols3{grid-template-columns:1fr 1fr 1fr;}
-.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
 .form-group.full{grid-column:1/-1;}
-.form-group label{font-size:12px;color:var(--txt3);font-weight:500;}
-.form-group input,.form-group select,.form-group textarea{padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:#fff;}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 3px rgba(15,110,86,.1);}
-textarea{resize:vertical;min-height:60px;}
-.form-actions{display:flex;gap:10px;margin-top:16px;}
-.btn{padding:10px 22px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:.12s;}
-.btn-primary{background:var(--g);color:#fff;}
-.btn-primary:hover{background:var(--g2);}
-.btn-secondary{background:#eee;color:var(--txt2);}
-.btn-secondary:hover{background:#ddd;}
-.btn-danger{background:var(--red);color:#fff;}
-.btn-sm{padding:6px 12px;font-size:12px;}
+.form-group label{font-size:11px;color:var(--txt3);font-weight:500;text-transform:uppercase;letter-spacing:.4px;}
+.form-group input,.form-group select,.form-group textarea{padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg-2);color:var(--txt);outline:none;transition:border .15s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(52,211,153,.1);}
+.form-group select{cursor:pointer;}
+.form-group select option{background:var(--bg-2);color:var(--txt);}
+textarea{resize:vertical;min-height:64px;}
+.form-actions{display:flex;gap:10px;margin-top:18px;}
+.btn{padding:10px 24px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:.15s;font-family:inherit;}
+.btn-primary{background:var(--accent2);color:#000;}
+.btn-primary:hover{background:var(--accent);transform:translateY(-1px);}
+.btn-secondary{background:var(--bg-3);color:var(--txt2);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--bg-2);color:var(--txt);border-color:var(--border-l);}
+.btn-danger{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.2);}
+.btn-sm{padding:7px 14px;font-size:12px;}
 .alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;}
-.alert-ok{background:var(--gl);color:var(--g);display:block;}
-.alert-err{background:#FDE8E8;color:var(--red);display:block;}
+.alert-ok{background:rgba(52,211,153,.1);color:var(--accent);display:block;border:1px solid rgba(52,211,153,.15);}
+.alert-err{background:rgba(248,113,113,.1);color:var(--red);display:block;border:1px solid rgba(248,113,113,.15);}
 
-.section-header{font-size:14px;font-weight:600;margin:18px 0 10px;padding:8px 12px;border-radius:8px;display:flex;align-items:center;gap:6px;}
-.section-yt{background:#FEE2E2;color:#B91C1C;}
-.section-fb{background:#DBEAFE;color:#1D4ED8;}
-.section-ig{background:#FCE7F3;color:#BE185D;}
+.section-header{font-size:12px;font-weight:700;margin:22px 0 12px;padding:10px 14px;border-radius:8px;display:flex;align-items:center;gap:8px;letter-spacing:.3px;}
+.section-yt{background:rgba(255,68,68,.08);color:var(--yt);border:1px solid rgba(255,68,68,.12);}
+.section-fb{background:rgba(76,139,245,.08);color:var(--fb);border:1px solid rgba(76,139,245,.12);}
+.section-ig{background:rgba(225,48,108,.08);color:var(--ig);border:1px solid rgba(225,48,108,.12);}
 
 /* ── Table ─────────────────────────────────────────── */
 .tbl-toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
-.tbl-toolbar input,.tbl-toolbar select{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;}
+.tbl-toolbar input,.tbl-toolbar select{padding:9px 14px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-2);color:var(--txt);outline:none;}
 .tbl-toolbar input{flex:1;min-width:180px;}
-.tbl-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--border);border-radius:12px;}
+.tbl-toolbar input:focus,.tbl-toolbar select:focus{border-color:var(--accent);}
+.tbl-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);}
 table{width:100%;border-collapse:collapse;font-size:13px;}
-th{background:#F8F8F6;text-align:left;padding:10px 12px;font-weight:600;color:var(--txt2);white-space:nowrap;border-bottom:1px solid var(--border);}
-td{padding:10px 12px;border-bottom:1px solid #F2F2EE;vertical-align:middle;}
+th{background:var(--bg-2);text-align:left;padding:12px 14px;font-weight:600;color:var(--txt3);white-space:nowrap;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.5px;}
+td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:#FAFAF8;}
-.type-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;}
-.type-short{background:#E8F4FD;color:var(--blue);}
-.type-long{background:#F3E8FD;color:#7C3AED;}
+tr:hover td{background:rgba(52,211,153,.03);}
+.type-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;}
+.type-short{background:rgba(96,165,250,.12);color:var(--blue);}
+.type-long{background:rgba(167,139,250,.12);color:#A78BFA;}
 .act-btns{display:flex;gap:4px;}
-.act-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;transition:.1s;}
-.act-btn:hover{border-color:var(--g);color:var(--g);}
+.act-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--txt3);transition:.12s;display:inline-flex;align-items:center;}
+.act-btn:hover{border-color:var(--accent);color:var(--accent);}
 .act-btn.del:hover{border-color:var(--red);color:var(--red);}
-.views-cell{display:flex;flex-direction:column;gap:2px;font-size:12px;}
-.views-cell .total{font-weight:600;font-size:13px;}
-.views-cell .plats{display:flex;gap:4px;font-size:10px;color:var(--txt3);}
+.act-btn .icon{width:14px;height:14px;}
+.views-cell .total{font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;}
+.views-cell .plats{display:flex;gap:6px;font-size:10px;margin-top:2px;}
 
 /* ── Config ────────────────────────────────────────── */
-.cfg-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:500px;}
-.cfg-card h3{font-size:15px;margin-bottom:16px;}
+.cfg-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;max-width:520px;}
+.cfg-card h3{font-size:14px;margin-bottom:16px;color:var(--txt);font-weight:700;}
 
 /* ── Edit Modal ────────────────────────────────────── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .modal-overlay.show{display:flex;}
-.modal{background:#fff;border-radius:14px;padding:28px;width:90%;max-width:720px;max-height:90vh;overflow-y:auto;position:relative;}
-.modal h2{font-size:17px;margin-bottom:18px;}
-.modal .close-btn{position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--txt3);}
+.modal{background:var(--bg-1);border:1px solid var(--border-l);border-radius:16px;padding:30px;width:90%;max-width:720px;max-height:90vh;overflow-y:auto;position:relative;}
+.modal h2{font-size:16px;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.modal h2 .icon{color:var(--accent);}
+.modal .close-btn{position:absolute;top:16px;right:16px;background:var(--bg-3);border:1px solid var(--border);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--txt3);transition:.12s;}
+.modal .close-btn:hover{color:var(--txt);border-color:var(--border-l);}
 
 /* ── Responsive ────────────────────────────────────── */
 @media(max-width:860px){
   .sidebar{display:none;}
-  .main{margin-left:0;}
+  .main{margin-left:0;padding:20px 16px;}
   .chart-row{grid-template-columns:1fr;}
   .form-grid{grid-template-columns:1fr;}
   .form-grid.cols3{grid-template-columns:1fr 1fr;}
   .mobile-nav{display:flex!important;}
 }
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:8px;gap:4px;z-index:50;justify-content:space-around;}
-.mobile-nav .nav-item{flex-direction:column;font-size:10px;padding:6px 8px;gap:2px;text-align:center;}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg-1);border-top:1px solid var(--border);padding:8px;gap:4px;z-index:50;justify-content:space-around;}
+.mobile-nav .nav-item{flex-direction:column;font-size:10px;padding:6px 8px;gap:3px;text-align:center;}
 </style>
 </head>
 <body>
 <div class="app">
-  <!-- Sidebar -->
+  <!-- ═══ Sidebar ═══ -->
   <nav class="sidebar">
-    <div class="logo">🎬 影片管理</div>
-    <div class="sub">光田綜合醫院 多媒體組</div>
-    <div class="nav-item active" onclick="showPage('dashboard')"><span class="ico">📊</span>儀表板</div>
-    <div class="nav-item" onclick="showPage('entry')"><span class="ico">➕</span>新增影片</div>
-    <div class="nav-item" onclick="showPage('list')"><span class="ico">📋</span>影片列表</div>
-    <div class="nav-item" onclick="showPage('config')"><span class="ico">⚙️</span>設定</div>
+    <div class="sidebar-brand">
+      <span class="icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8,21 16,21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+      <span>影片管理</span>
+    </div>
+    <div class="sidebar-sub">光田綜合醫院 多媒體組</div>
+
+    <div class="nav-section">總覽</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="4" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/></svg></span>儀表板
+    </div>
+
+    <div class="nav-section">管理</div>
+    <div class="nav-item" onclick="showPage('entry')">
+      <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>新增影片
+    </div>
+    <div class="nav-item" onclick="showPage('list')">
+      <span class="icon"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>影片列表
+    </div>
+
+    <div class="nav-section">系統</div>
+    <div class="nav-item" onclick="showPage('config')">
+      <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>設定
+    </div>
+
     <div class="sidebar-footer">
-      <a href="./index.html">← 返回工具站首頁</a>
-      <a href="./files/視覺多媒體設計組_專案管理_v3.html">📋 工作進度控管</a>
+      <a href="./index.html">
+        <span class="icon" style="width:14px;height:14px;"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></span>返回工具站首頁
+      </a>
+      <a href="./files/視覺多媒體設計組_專案管理_v3.html">
+        <span class="icon" style="width:14px;height:14px;"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></span>工作進度控管
+      </a>
     </div>
   </nav>
 
   <!-- Mobile Nav -->
   <div class="mobile-nav">
-    <div class="nav-item active" onclick="showPage('dashboard')"><span class="ico">📊</span>儀表板</div>
-    <div class="nav-item" onclick="showPage('entry')"><span class="ico">➕</span>新增</div>
-    <div class="nav-item" onclick="showPage('list')"><span class="ico">📋</span>列表</div>
-    <div class="nav-item" onclick="showPage('config')"><span class="ico">⚙️</span>設定</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="4" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/></svg></span>儀表板
+    </div>
+    <div class="nav-item" onclick="showPage('entry')">
+      <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>新增
+    </div>
+    <div class="nav-item" onclick="showPage('list')">
+      <span class="icon"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>列表
+    </div>
+    <div class="nav-item" onclick="showPage('config')">
+      <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>設定
+    </div>
   </div>
 
-  <!-- Main Content -->
+  <!-- ═══ Main Content ═══ -->
   <div class="main">
     <!-- Setup Banner -->
     <div class="setup-banner" id="setup-banner">
-      <div class="icon">⚡</div>
+      <span class="icon icon-lg"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor" stroke="none"/></svg></span>
       <div class="text">
         <b>設定 Google Sheets 後端</b>
         <span>請貼上 Apps Script Web App URL 以啟用雲端同步</span>
       </div>
       <input type="text" id="api-url-input" placeholder="https://script.google.com/macros/s/.../exec">
-      <button onclick="saveApiUrl()">儲存</button>
+      <button onclick="saveApiUrl()">連線</button>
     </div>
 
     <!-- ═══ Page: Dashboard ═══ -->
     <div class="page active" id="page-dashboard">
-      <div class="page-title">📊 本月儀表板 <span id="dash-month" style="font-size:14px;color:var(--txt3);font-weight:400;"></span></div>
+      <div class="page-title">
+        <span class="icon icon-lg"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="4" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/></svg></span>
+        本月儀表板 <span id="dash-month" style="font-size:13px;color:var(--txt3);font-weight:400;"></span>
+      </div>
       <div class="cards" id="kpi-cards"></div>
       <div class="chart-row">
         <div class="chart-box">
-          <h3>📈 月度觀看趨勢（近 6 個月・全平台合計）</h3>
+          <h3><span class="icon"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></span>月度觀看趨勢（近 6 個月）</h3>
           <canvas id="chart-monthly"></canvas>
         </div>
         <div class="chart-box">
-          <h3>🌐 各平台觀看占比（全期）</h3>
+          <h3><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><line x1="12" y1="2" x2="12" y2="22"/></svg></span>各平台觀看占比</h3>
           <canvas id="chart-platform"></canvas>
         </div>
       </div>
       <div class="chart-row">
         <div class="chart-box">
-          <h3>🗂 類別分布</h3>
+          <h3><span class="icon"><svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>類別分布</h3>
           <canvas id="chart-cat"></canvas>
         </div>
         <div class="chart-box">
-          <h3>🏆 本月 Top 5 影片（全平台觀看數）</h3>
+          <h3><span class="icon"><svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>本月 Top 5 影片</h3>
           <canvas id="chart-top5"></canvas>
         </div>
       </div>
@@ -208,75 +263,46 @@ tr:hover td{background:#FAFAF8;}
 
     <!-- ═══ Page: Entry ═══ -->
     <div class="page" id="page-entry">
-      <div class="page-title">➕ 新增影片</div>
+      <div class="page-title">
+        <span class="icon icon-lg"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>
+        新增影片
+      </div>
       <div id="entry-alert" class="alert"></div>
-
-      <!-- 基本資訊 -->
       <div class="form-grid">
-        <div class="form-group full">
-          <label>影片標題 *</label>
-          <input type="text" id="f-title" placeholder="輸入影片標題">
+        <div class="form-group full"><label>影片標題 *</label><input type="text" id="f-title" placeholder="輸入影片標題"></div>
+        <div class="form-group"><label>發布日期 *</label><input type="date" id="f-date"></div>
+        <div class="form-group"><label>影片類型</label>
+          <select id="f-type"><option value="long">Long（長片）</option><option value="short">Short（短片/Reels）</option></select>
         </div>
-        <div class="form-group">
-          <label>發布日期 *</label>
-          <input type="date" id="f-date">
+        <div class="form-group"><label>內容類別</label>
+          <select id="f-cat"><option value="疾病衛教">疾病衛教</option><option value="特色醫療">特色醫療</option><option value="新服務流程">新服務流程</option><option value="醫院形象">醫院形象</option><option value="員工活動">員工活動</option><option value="教學">教學</option><option value="其他">其他</option></select>
         </div>
-        <div class="form-group">
-          <label>影片類型</label>
-          <select id="f-type">
-            <option value="long">Long（長片）</option>
-            <option value="short">Short（短片/Reels）</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>內容類別</label>
-          <select id="f-cat">
-            <option value="疾病衛教">疾病衛教</option>
-            <option value="特色醫療">特色醫療</option>
-            <option value="新服務流程">新服務流程</option>
-            <option value="醫院形象">醫院形象</option>
-            <option value="員工活動">員工活動</option>
-            <option value="教學">教學</option>
-            <option value="其他">其他</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>影片時長</label>
-          <input type="text" id="f-dur" placeholder="例：3:25">
-        </div>
-        <div class="form-group">
-          <label>負責企劃</label>
-          <input type="text" id="f-planner" placeholder="企劃人員">
-        </div>
-        <div class="form-group">
-          <label>影片製作</label>
-          <input type="text" id="f-producer" placeholder="製作人員">
-        </div>
+        <div class="form-group"><label>影片時長</label><input type="text" id="f-dur" placeholder="例：3:25"></div>
+        <div class="form-group"><label>負責企劃</label><input type="text" id="f-planner" placeholder="企劃人員"></div>
+        <div class="form-group"><label>影片製作</label><input type="text" id="f-producer" placeholder="製作人員"></div>
       </div>
 
-      <!-- YouTube 數據 -->
-      <div class="section-header section-yt">▶ YouTube 數據（主要平台）</div>
+      <div class="section-header section-yt">
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z"/><polygon points="9.75,15.02 15.5,11.75 9.75,8.48" fill="currentColor" stroke="none"/></svg></span>
+        YouTube 數據（主要平台）
+      </div>
       <div class="form-grid cols3">
-        <div class="form-group full">
-          <label>YouTube 連結</label>
-          <input type="url" id="f-yt_url" placeholder="https://youtu.be/...">
-        </div>
+        <div class="form-group full"><label>YouTube 連結</label><input type="url" id="f-yt_url" placeholder="https://youtu.be/..."></div>
         <div class="form-group"><label>觀看次數</label><input type="number" id="f-yt_views" placeholder="0" min="0"></div>
         <div class="form-group"><label>按讚數</label><input type="number" id="f-yt_likes" placeholder="0" min="0"></div>
         <div class="form-group"><label>留言數</label><input type="number" id="f-yt_comments" placeholder="0" min="0"></div>
         <div class="form-group"><label>曝光次數</label><input type="number" id="f-yt_imp" placeholder="0" min="0"></div>
-        <div class="form-group"><label>曝光點閱率（0~1）</label><input type="number" id="f-yt_ctr" placeholder="0.00" step="0.01" min="0" max="1"></div>
-        <div class="form-group"><label>平均觀看比例（0~1）</label><input type="number" id="f-yt_ratio" placeholder="0.00" step="0.01" min="0" max="1"></div>
+        <div class="form-group"><label>點閱率 CTR（0~1）</label><input type="number" id="f-yt_ctr" placeholder="0.00" step="0.01" min="0" max="1"></div>
+        <div class="form-group"><label>觀看比例（0~1）</label><input type="number" id="f-yt_ratio" placeholder="0.00" step="0.01" min="0" max="1"></div>
         <div class="form-group"><label>平均觀看時長</label><input type="text" id="f-yt_avgdur" placeholder="例：1:15"></div>
       </div>
 
-      <!-- Facebook 數據 -->
-      <div class="section-header section-fb">📘 Facebook 數據</div>
+      <div class="section-header section-fb">
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></span>
+        Facebook 數據
+      </div>
       <div class="form-grid cols3">
-        <div class="form-group full">
-          <label>Facebook 連結</label>
-          <input type="url" id="f-fb_url" placeholder="https://www.facebook.com/...">
-        </div>
+        <div class="form-group full"><label>Facebook 連結</label><input type="url" id="f-fb_url" placeholder="https://www.facebook.com/..."></div>
         <div class="form-group"><label>觀看次數</label><input type="number" id="f-fb_views" placeholder="0" min="0"></div>
         <div class="form-group"><label>按讚/心情數</label><input type="number" id="f-fb_likes" placeholder="0" min="0"></div>
         <div class="form-group"><label>留言數</label><input type="number" id="f-fb_comments" placeholder="0" min="0"></div>
@@ -284,13 +310,12 @@ tr:hover td{background:#FAFAF8;}
         <div class="form-group"><label>觸及人數</label><input type="number" id="f-fb_reach" placeholder="0" min="0"></div>
       </div>
 
-      <!-- Instagram 數據 -->
-      <div class="section-header section-ig">📷 Instagram 數據</div>
+      <div class="section-header section-ig">
+        <span class="icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></span>
+        Instagram 數據
+      </div>
       <div class="form-grid cols3">
-        <div class="form-group full">
-          <label>Instagram 連結</label>
-          <input type="url" id="f-ig_url" placeholder="https://www.instagram.com/reel/...">
-        </div>
+        <div class="form-group full"><label>Instagram 連結</label><input type="url" id="f-ig_url" placeholder="https://www.instagram.com/reel/..."></div>
         <div class="form-group"><label>觀看次數</label><input type="number" id="f-ig_views" placeholder="0" min="0"></div>
         <div class="form-group"><label>按讚數</label><input type="number" id="f-ig_likes" placeholder="0" min="0"></div>
         <div class="form-group"><label>留言數</label><input type="number" id="f-ig_comments" placeholder="0" min="0"></div>
@@ -298,103 +323,66 @@ tr:hover td{background:#FAFAF8;}
         <div class="form-group"><label>觸及人數</label><input type="number" id="f-ig_reach" placeholder="0" min="0"></div>
       </div>
 
-      <div class="form-group full" style="margin-top:14px;">
-        <label>備註</label>
-        <textarea id="f-note" placeholder="備註內容..."></textarea>
-      </div>
+      <div class="form-group full" style="margin-top:14px;"><label>備註</label><textarea id="f-note" placeholder="備註內容..."></textarea></div>
       <div class="form-actions">
-        <button class="btn btn-primary" onclick="saveEntry()">💾 儲存影片</button>
+        <button class="btn btn-primary" onclick="saveEntry()">儲存影片</button>
         <button class="btn btn-secondary" onclick="clearForm()">清除表單</button>
       </div>
     </div>
 
     <!-- ═══ Page: List ═══ -->
     <div class="page" id="page-list">
-      <div class="page-title">📋 影片列表</div>
+      <div class="page-title">
+        <span class="icon icon-lg"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>
+        影片列表
+      </div>
       <div class="tbl-toolbar">
-        <input type="text" id="search-input" placeholder="🔍 搜尋標題、企劃、製作..." oninput="renderList()">
-        <select id="filter-type" onchange="renderList()">
-          <option value="">全部類型</option>
-          <option value="short">Short</option>
-          <option value="long">Long</option>
-        </select>
-        <select id="filter-cat" onchange="renderList()">
-          <option value="">全部類別</option>
-          <option value="疾病衛教">疾病衛教</option>
-          <option value="特色醫療">特色醫療</option>
-          <option value="新服務流程">新服務流程</option>
-          <option value="醫院形象">醫院形象</option>
-          <option value="員工活動">員工活動</option>
-          <option value="教學">教學</option>
-          <option value="其他">其他</option>
-        </select>
-        <select id="filter-month" onchange="renderList()">
-          <option value="">全部月份</option>
-        </select>
-        <button class="btn btn-secondary btn-sm" onclick="exportCSV()">📥 匯出 CSV</button>
+        <input type="text" id="search-input" placeholder="搜尋標題、企劃、製作..." oninput="renderList()">
+        <select id="filter-type" onchange="renderList()"><option value="">全部類型</option><option value="short">Short</option><option value="long">Long</option></select>
+        <select id="filter-cat" onchange="renderList()"><option value="">全部類別</option><option value="疾病衛教">疾病衛教</option><option value="特色醫療">特色醫療</option><option value="新服務流程">新服務流程</option><option value="醫院形象">醫院形象</option><option value="員工活動">員工活動</option><option value="教學">教學</option><option value="其他">其他</option></select>
+        <select id="filter-month" onchange="renderList()"><option value="">全部月份</option></select>
+        <button class="btn btn-secondary btn-sm" onclick="exportCSV()">匯出 CSV</button>
       </div>
       <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>日期</th>
-              <th>標題</th>
-              <th>類型</th>
-              <th>類別</th>
-              <th>全平台觀看</th>
-              <th>YT 讚</th>
-              <th>YT CTR</th>
-              <th>企劃</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody id="video-tbody"></tbody>
-        </table>
+        <table><thead><tr><th>日期</th><th>標題</th><th>類型</th><th>類別</th><th>全平台觀看</th><th>YT 讚</th><th>YT CTR</th><th>企劃</th><th>操作</th></tr></thead>
+        <tbody id="video-tbody"></tbody></table>
       </div>
-      <div id="list-empty" style="display:none;text-align:center;padding:40px;color:var(--txt3);">尚無影片資料，請先新增影片</div>
+      <div id="list-empty" style="display:none;text-align:center;padding:48px;color:var(--txt3);">
+        <span class="icon icon-xl" style="color:var(--txt3);margin-bottom:12px;display:block;margin:0 auto 12px;"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></span>
+        尚無影片資料，請先新增影片
+      </div>
     </div>
 
     <!-- ═══ Page: Config ═══ -->
     <div class="page" id="page-config">
-      <div class="page-title">⚙️ 績效目標設定</div>
+      <div class="page-title">
+        <span class="icon icon-lg"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+        設定
+      </div>
       <div class="cfg-card">
-        <h3>月度績效指標</h3>
+        <h3>績效目標</h3>
         <div class="form-grid" style="margin-top:14px;">
-          <div class="form-group">
-            <label>月觀看目標（全平台合計）</label>
-            <input type="number" id="cfg-viewGoal" placeholder="5000">
-          </div>
-          <div class="form-group">
-            <label>月上傳部數目標</label>
-            <input type="number" id="cfg-countGoal" placeholder="6">
-          </div>
-          <div class="form-group full">
-            <label>單片個人獎勵門檻（YT 觀看數）</label>
-            <input type="number" id="cfg-personalGoal" placeholder="2000">
-          </div>
+          <div class="form-group"><label>月觀看目標（全平台）</label><input type="number" id="cfg-viewGoal" placeholder="5000"></div>
+          <div class="form-group"><label>月上傳部數目標</label><input type="number" id="cfg-countGoal" placeholder="6"></div>
+          <div class="form-group full"><label>單片獎勵門檻（YT 觀看數）</label><input type="number" id="cfg-personalGoal" placeholder="2000"></div>
         </div>
-        <div class="form-actions">
-          <button class="btn btn-primary" onclick="saveCfg()">💾 儲存設定</button>
-        </div>
+        <div class="form-actions"><button class="btn btn-primary" onclick="saveCfg()">儲存設定</button></div>
         <div id="cfg-alert" class="alert" style="margin-top:14px;"></div>
       </div>
       <div class="cfg-card" style="margin-top:20px;">
-        <h3>API 連線設定</h3>
-        <div class="form-group" style="margin-top:14px;">
-          <label>Apps Script Web App URL</label>
-          <input type="text" id="cfg-api-url" placeholder="https://script.google.com/macros/s/.../exec">
-        </div>
+        <h3>API 連線</h3>
+        <div class="form-group" style="margin-top:14px;"><label>Apps Script Web App URL</label><input type="text" id="cfg-api-url" placeholder="https://script.google.com/macros/s/.../exec"></div>
         <div class="form-actions">
-          <button class="btn btn-primary" onclick="saveApiUrlFromCfg()">💾 儲存 API URL</button>
-          <button class="btn btn-secondary" onclick="testApi()">🧪 測試連線</button>
+          <button class="btn btn-primary" onclick="saveApiUrlFromCfg()">儲存</button>
+          <button class="btn btn-secondary" onclick="testApi()">測試連線</button>
         </div>
         <div id="api-alert" class="alert" style="margin-top:14px;"></div>
       </div>
       <div class="cfg-card" style="margin-top:20px;">
         <h3>資料管理</h3>
         <div class="form-actions">
-          <button class="btn btn-secondary" onclick="forceSync()">🔄 強制同步 Sheets</button>
-          <button class="btn btn-danger" onclick="clearAllData()">🗑 清除本機資料</button>
+          <button class="btn btn-secondary" onclick="forceSync()">強制同步</button>
+          <button class="btn btn-danger" onclick="clearAllData()">清除本機資料</button>
         </div>
       </div>
     </div>
@@ -404,41 +392,35 @@ tr:hover td{background:#FAFAF8;}
 <!-- ═══ Edit Modal ═══ -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
-    <button class="close-btn" onclick="closeModal()">&times;</button>
-    <h2>✏️ 編輯影片</h2>
+    <button class="close-btn" onclick="closeModal()"><span class="icon" style="width:16px;height:16px;"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
+    <h2><span class="icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>編輯影片</h2>
     <div id="edit-alert" class="alert"></div>
     <div class="form-grid">
       <input type="hidden" id="e-id">
       <div class="form-group full"><label>影片標題 *</label><input type="text" id="e-title"></div>
       <div class="form-group"><label>發布日期 *</label><input type="date" id="e-date"></div>
-      <div class="form-group"><label>影片類型</label>
-        <select id="e-type"><option value="long">Long</option><option value="short">Short</option></select>
-      </div>
-      <div class="form-group"><label>內容類別</label>
-        <select id="e-cat">
-          <option value="疾病衛教">疾病衛教</option><option value="特色醫療">特色醫療</option>
-          <option value="新服務流程">新服務流程</option><option value="醫院形象">醫院形象</option>
-          <option value="員工活動">員工活動</option><option value="教學">教學</option><option value="其他">其他</option>
-        </select>
-      </div>
+      <div class="form-group"><label>影片類型</label><select id="e-type"><option value="long">Long</option><option value="short">Short</option></select></div>
+      <div class="form-group"><label>內容類別</label><select id="e-cat"><option value="疾病衛教">疾病衛教</option><option value="特色醫療">特色醫療</option><option value="新服務流程">新服務流程</option><option value="醫院形象">醫院形象</option><option value="員工活動">員工活動</option><option value="教學">教學</option><option value="其他">其他</option></select></div>
       <div class="form-group"><label>影片時長</label><input type="text" id="e-dur"></div>
       <div class="form-group"><label>負責企劃</label><input type="text" id="e-planner"></div>
       <div class="form-group"><label>影片製作</label><input type="text" id="e-producer"></div>
     </div>
-
-    <div class="section-header section-yt" style="margin-top:14px;">▶ YouTube</div>
+    <div class="section-header section-yt" style="margin-top:14px;">
+      <span class="icon"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z"/><polygon points="9.75,15.02 15.5,11.75 9.75,8.48" fill="currentColor" stroke="none"/></svg></span>YouTube
+    </div>
     <div class="form-grid cols3">
       <div class="form-group full"><label>YouTube 連結</label><input type="url" id="e-yt_url"></div>
       <div class="form-group"><label>觀看次數</label><input type="number" id="e-yt_views" min="0"></div>
       <div class="form-group"><label>按讚數</label><input type="number" id="e-yt_likes" min="0"></div>
       <div class="form-group"><label>留言數</label><input type="number" id="e-yt_comments" min="0"></div>
       <div class="form-group"><label>曝光次數</label><input type="number" id="e-yt_imp" min="0"></div>
-      <div class="form-group"><label>曝光點閱率</label><input type="number" id="e-yt_ctr" step="0.01" min="0" max="1"></div>
-      <div class="form-group"><label>平均觀看比例</label><input type="number" id="e-yt_ratio" step="0.01" min="0" max="1"></div>
+      <div class="form-group"><label>點閱率 CTR</label><input type="number" id="e-yt_ctr" step="0.01" min="0" max="1"></div>
+      <div class="form-group"><label>觀看比例</label><input type="number" id="e-yt_ratio" step="0.01" min="0" max="1"></div>
       <div class="form-group"><label>平均觀看時長</label><input type="text" id="e-yt_avgdur"></div>
     </div>
-
-    <div class="section-header section-fb" style="margin-top:14px;">📘 Facebook</div>
+    <div class="section-header section-fb" style="margin-top:14px;">
+      <span class="icon"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></span>Facebook
+    </div>
     <div class="form-grid cols3">
       <div class="form-group full"><label>Facebook 連結</label><input type="url" id="e-fb_url"></div>
       <div class="form-group"><label>觀看次數</label><input type="number" id="e-fb_views" min="0"></div>
@@ -447,8 +429,9 @@ tr:hover td{background:#FAFAF8;}
       <div class="form-group"><label>分享數</label><input type="number" id="e-fb_shares" min="0"></div>
       <div class="form-group"><label>觸及人數</label><input type="number" id="e-fb_reach" min="0"></div>
     </div>
-
-    <div class="section-header section-ig" style="margin-top:14px;">📷 Instagram</div>
+    <div class="section-header section-ig" style="margin-top:14px;">
+      <span class="icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></span>Instagram
+    </div>
     <div class="form-grid cols3">
       <div class="form-group full"><label>Instagram 連結</label><input type="url" id="e-ig_url"></div>
       <div class="form-group"><label>觀看次數</label><input type="number" id="e-ig_views" min="0"></div>
@@ -457,13 +440,9 @@ tr:hover td{background:#FAFAF8;}
       <div class="form-group"><label>分享數</label><input type="number" id="e-ig_shares" min="0"></div>
       <div class="form-group"><label>觸及人數</label><input type="number" id="e-ig_reach" min="0"></div>
     </div>
-
-    <div class="form-group full" style="margin-top:12px;">
-      <label>備註</label>
-      <textarea id="e-note"></textarea>
-    </div>
+    <div class="form-group full" style="margin-top:12px;"><label>備註</label><textarea id="e-note"></textarea></div>
     <div class="form-actions">
-      <button class="btn btn-primary" onclick="updateEntry()">💾 儲存修改</button>
+      <button class="btn btn-primary" onclick="updateEntry()">儲存修改</button>
       <button class="btn btn-secondary" onclick="closeModal()">取消</button>
     </div>
   </div>
@@ -477,559 +456,138 @@ const BASIC_FIELDS = ['title','date','dur','type','cat','planner','producer','no
 const YT_FIELDS = ['yt_url','yt_views','yt_likes','yt_comments','yt_imp','yt_ctr','yt_ratio','yt_avgdur'];
 const FB_FIELDS = ['fb_url','fb_views','fb_likes','fb_comments','fb_shares','fb_reach'];
 const IG_FIELDS = ['ig_url','ig_views','ig_likes','ig_comments','ig_shares','ig_reach'];
-const NUM_FIELDS = ['yt_views','yt_likes','yt_comments','yt_imp','yt_ctr','yt_ratio',
-                    'fb_views','fb_likes','fb_comments','fb_shares','fb_reach',
-                    'ig_views','ig_likes','ig_comments','ig_shares','ig_reach'];
+const NUM_FIELDS = ['yt_views','yt_likes','yt_comments','yt_imp','yt_ctr','yt_ratio','fb_views','fb_likes','fb_comments','fb_shares','fb_reach','ig_views','ig_likes','ig_comments','ig_shares','ig_reach'];
 const ALL_FORM_FIELDS = [...BASIC_FIELDS, ...YT_FIELDS, ...FB_FIELDS, ...IG_FIELDS];
-
-function totalViews(d) { return (Number(d.yt_views)||0) + (Number(d.fb_views)||0) + (Number(d.ig_views)||0); }
-function totalLikes(d) { return (Number(d.yt_likes)||0) + (Number(d.fb_likes)||0) + (Number(d.ig_likes)||0); }
+function totalViews(d){return(Number(d.yt_views)||0)+(Number(d.fb_views)||0)+(Number(d.ig_views)||0);}
 
 // ============================================================
-// API 設定區
+// API
 // ============================================================
-let API_URL = localStorage.getItem('kt_yt_api') || '';
-const USE_API = () => !!API_URL;
-
-async function apiGet(action) {
-  if (!USE_API()) return null;
-  try {
-    const res = await fetch(`${API_URL}?module=youtube&action=${action}`);
-    return await res.json();
-  } catch(e) { console.warn('API GET failed:', e); return null; }
-}
-
-async function apiPost(action, payload) {
-  if (!USE_API()) return null;
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ module: 'youtube', action, ...payload }),
-    });
-    return await res.json();
-  } catch(e) { console.warn('API POST failed:', e); return null; }
-}
-
-async function syncFromSheets() {
-  const result = await apiGet('getVideos');
-  if (result && result.videos) {
-    DATA = result.videos;
-    saveData();
-    return true;
-  }
-  return false;
-}
-
-async function pushToSheets(action, payload) {
-  const result = await apiPost(action, payload);
-  return result && result.success;
-}
-
-async function syncConfigFromSheets() {
-  const result = await apiGet('getConfig');
-  if (result && !result.error) {
-    CFG = { ...CFG, ...result };
-    localStorage.setItem('kt_yt_cfg', JSON.stringify(CFG));
-    return true;
-  }
-  return false;
-}
+let API_URL=localStorage.getItem('kt_yt_api')||'';
+const USE_API=()=>!!API_URL;
+async function apiGet(a){if(!USE_API())return null;try{const r=await fetch(`${API_URL}?module=youtube&action=${a}`);return await r.json();}catch(e){console.warn('API GET:',e);return null;}}
+async function apiPost(a,p){if(!USE_API())return null;try{const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({module:'youtube',action:a,...p})});return await r.json();}catch(e){console.warn('API POST:',e);return null;}}
+async function syncFromSheets(){const r=await apiGet('getVideos');if(r&&r.videos){DATA=r.videos;saveData();return true;}return false;}
+async function pushToSheets(a,p){const r=await apiPost(a,p);return r&&r.success;}
+async function syncConfigFromSheets(){const r=await apiGet('getConfig');if(r&&!r.error){CFG={...CFG,...r};localStorage.setItem('kt_yt_cfg',JSON.stringify(CFG));return true;}return false;}
 
 // ============================================================
 // 資料層
 // ============================================================
-let DATA = [];
-let CFG = { viewGoal: 5000, countGoal: 6, personalGoal: 2000 };
-let chartMonthly = null, chartPlatform = null, chartCat = null, chartTop5 = null;
-
-function saveData() {
-  DATA.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-  localStorage.setItem('kt_yt_data', JSON.stringify(DATA));
-}
-
-async function loadData() {
-  try { DATA = JSON.parse(localStorage.getItem('kt_yt_data') || '[]'); } catch(e) { DATA = []; }
-  try { CFG = { ...CFG, ...JSON.parse(localStorage.getItem('kt_yt_cfg') || '{}') }; } catch(e) {}
-  renderAll();
-
-  if (USE_API()) {
-    const synced = await syncFromSheets();
-    if (synced) { renderAll(); showSyncBadge('已同步 Sheets'); }
-    await syncConfigFromSheets();
-    renderCfgForm();
-  }
-}
+let DATA=[];let CFG={viewGoal:5000,countGoal:6,personalGoal:2000};
+let chartMonthly=null,chartPlatform=null,chartCat=null,chartTop5=null;
+function saveData(){DATA.sort((a,b)=>(b.date||'').localeCompare(a.date||''));localStorage.setItem('kt_yt_data',JSON.stringify(DATA));}
+async function loadData(){try{DATA=JSON.parse(localStorage.getItem('kt_yt_data')||'[]');}catch(e){DATA=[];}try{CFG={...CFG,...JSON.parse(localStorage.getItem('kt_yt_cfg')||'{}')};}catch(e){}renderAll();if(USE_API()){const s=await syncFromSheets();if(s){renderAll();showSyncBadge('已同步 Sheets');}await syncConfigFromSheets();renderCfgForm();}}
 
 // ============================================================
-// 頁面導覽
+// 導覽
 // ============================================================
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach((n, i) => {
-    const pages = ['dashboard', 'entry', 'list', 'config'];
-    n.classList.toggle('active', pages[i % 4] === name);
-  });
-  if (name === 'dashboard') renderDashboard();
-  if (name === 'list') renderList();
-  if (name === 'config') renderCfgForm();
-}
-
-function renderAll() {
-  renderDashboard();
-  renderList();
-  renderCfgForm();
-  buildMonthFilter();
-}
+function showPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>{const t=n.getAttribute('onclick')||'';n.classList.toggle('active',t.includes("'"+name+"'"));});if(name==='dashboard')renderDashboard();if(name==='list')renderList();if(name==='config')renderCfgForm();}
+function renderAll(){renderDashboard();renderList();renderCfgForm();buildMonthFilter();}
 
 // ============================================================
-// Setup Banner
+// Setup
 // ============================================================
-function checkSetup() {
-  const banner = document.getElementById('setup-banner');
-  const input = document.getElementById('api-url-input');
-  if (API_URL) {
-    banner.classList.add('setup-ok');
-    banner.querySelector('.text b').textContent = '✅ Sheets 後端已連線';
-    banner.querySelector('.text span').textContent = API_URL.substring(0, 60) + '...';
-    input.value = API_URL;
-  }
-}
+function checkSetup(){const b=document.getElementById('setup-banner'),inp=document.getElementById('api-url-input');if(API_URL){b.classList.add('setup-ok');b.querySelector('.text b').textContent='Sheets 後端已連線';b.querySelector('.text span').textContent=API_URL.substring(0,55)+'...';inp.value=API_URL;}}
+function saveApiUrl(){const u=document.getElementById('api-url-input').value.trim();if(!u.startsWith('https://script.google.com')){alert('請輸入有效的 Apps Script URL');return;}API_URL=u;localStorage.setItem('kt_yt_api',u);checkSetup();document.getElementById('cfg-api-url').value=u;syncFromSheets().then(ok=>{if(ok){renderAll();showSyncBadge('首次同步完成');}});}
+function saveApiUrlFromCfg(){const u=document.getElementById('cfg-api-url').value.trim();if(!u.startsWith('https://script.google.com')){showAlert('api-alert','請輸入有效的 URL','err');return;}API_URL=u;localStorage.setItem('kt_yt_api',u);document.getElementById('api-url-input').value=u;checkSetup();showAlert('api-alert','API URL 已儲存','ok');}
+async function testApi(){if(!USE_API()){showAlert('api-alert','請先設定 API URL','err');return;}showAlert('api-alert','測試中...','ok');try{const r=await apiGet('getVideos');if(r&&!r.error)showAlert('api-alert','連線成功！Sheets 有 '+(r.videos||[]).length+' 筆','ok');else showAlert('api-alert','連線失敗：'+(r?.error||'未知'),'err');}catch(e){showAlert('api-alert','錯誤：'+e.message,'err');}}
 
-function saveApiUrl() {
-  const url = document.getElementById('api-url-input').value.trim();
-  if (!url.startsWith('https://script.google.com')) {
-    alert('請輸入有效的 Apps Script Web App URL');
-    return;
-  }
-  API_URL = url;
-  localStorage.setItem('kt_yt_api', url);
-  checkSetup();
-  document.getElementById('cfg-api-url').value = url;
-  syncFromSheets().then(ok => {
-    if (ok) { renderAll(); showSyncBadge('✅ 首次同步完成'); }
-  });
-}
-
-function saveApiUrlFromCfg() {
-  const url = document.getElementById('cfg-api-url').value.trim();
-  if (!url.startsWith('https://script.google.com')) {
-    showAlert('api-alert', '請輸入有效的 Apps Script URL', 'err');
-    return;
-  }
-  API_URL = url;
-  localStorage.setItem('kt_yt_api', url);
-  document.getElementById('api-url-input').value = url;
-  checkSetup();
-  showAlert('api-alert', '✅ API URL 已儲存', 'ok');
-}
-
-async function testApi() {
-  if (!USE_API()) { showAlert('api-alert', '請先設定 API URL', 'err'); return; }
-  showAlert('api-alert', '測試中...', 'ok');
-  try {
-    const res = await apiGet('getVideos');
-    if (res && !res.error) {
-      showAlert('api-alert', `✅ 連線成功！Sheets 中有 ${(res.videos||[]).length} 筆影片`, 'ok');
-    } else {
-      showAlert('api-alert', '❌ 連線失敗：' + (res?.error || '未知錯誤'), 'err');
-    }
-  } catch(e) {
-    showAlert('api-alert', '❌ 連線錯誤：' + e.message, 'err');
-  }
-}
+// ============================================================
+// Chart.js 深色主題
+// ============================================================
+Chart.defaults.color='#5A6B80';Chart.defaults.borderColor='#1E2D3D';Chart.defaults.font.family="'Noto Sans TC',system-ui";
 
 // ============================================================
 // 儀表板
 // ============================================================
-function renderDashboard() {
-  const now = new Date();
-  const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  document.getElementById('dash-month').textContent = ym;
-
-  const md = DATA.filter(d => (d.date||'').startsWith(ym));
-  const tv = md.reduce((s, d) => s + totalViews(d), 0);
-  const ytv = md.reduce((s, d) => s + (Number(d.yt_views)||0), 0);
-  const fbv = md.reduce((s, d) => s + (Number(d.fb_views)||0), 0);
-  const igv = md.reduce((s, d) => s + (Number(d.ig_views)||0), 0);
-  const cnt = md.length;
-  const avgCtr = md.length ? (md.reduce((s,d)=>s+(Number(d.yt_ctr)||0),0)/md.length) : 0;
-  const starVideos = md.filter(d => (Number(d.yt_views)||0) >= CFG.personalGoal).length;
-
-  const viewPct = Math.min(100, Math.round(tv / CFG.viewGoal * 100));
-  const cntPct = Math.min(100, Math.round(cnt / CFG.countGoal * 100));
-
-  document.getElementById('kpi-cards').innerHTML = `
-    <div class="kpi-card">
-      <div class="kpi-label">本月總觀看（全平台）</div>
-      <div class="kpi-val">${tv.toLocaleString()}</div>
-      <div class="kpi-sub">目標 ${CFG.viewGoal.toLocaleString()}（${viewPct}%）</div>
-      <div class="kpi-bar"><div class="kpi-bar-fill ${viewPct>=100?'kpi-ok':viewPct>=60?'kpi-warn':'kpi-bad'}" style="width:${viewPct}%"></div></div>
-      <div class="platform-breakdown">
-        <span class="plat-tag plat-yt">YT ${ytv.toLocaleString()}</span>
-        <span class="plat-tag plat-fb">FB ${fbv.toLocaleString()}</span>
-        <span class="plat-tag plat-ig">IG ${igv.toLocaleString()}</span>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">本月上傳數</div>
-      <div class="kpi-val">${cnt}</div>
-      <div class="kpi-sub">目標 ${CFG.countGoal} 部（${cntPct}%）</div>
-      <div class="kpi-bar"><div class="kpi-bar-fill ${cntPct>=100?'kpi-ok':cntPct>=60?'kpi-warn':'kpi-bad'}" style="width:${cntPct}%"></div></div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">YT 平均點閱率</div>
-      <div class="kpi-val">${(avgCtr*100).toFixed(1)}%</div>
-      <div class="kpi-sub">本月 YouTube 影片 CTR</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">YT 達標影片 ⭐</div>
-      <div class="kpi-val">${starVideos}</div>
-      <div class="kpi-sub">單片 YT 觀看 ≥${CFG.personalGoal.toLocaleString()}</div>
-    </div>
-  `;
-
+function renderDashboard(){
+  const now=new Date(),ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('dash-month').textContent=ym;
+  const md=DATA.filter(d=>(d.date||'').startsWith(ym));
+  const tv=md.reduce((s,d)=>s+totalViews(d),0),ytv=md.reduce((s,d)=>s+(Number(d.yt_views)||0),0),fbv=md.reduce((s,d)=>s+(Number(d.fb_views)||0),0),igv=md.reduce((s,d)=>s+(Number(d.ig_views)||0),0);
+  const cnt=md.length,avgCtr=md.length?(md.reduce((s,d)=>s+(Number(d.yt_ctr)||0),0)/md.length):0;
+  const star=md.filter(d=>(Number(d.yt_views)||0)>=CFG.personalGoal).length;
+  const vp=Math.min(100,Math.round(tv/CFG.viewGoal*100)),cp=Math.min(100,Math.round(cnt/CFG.countGoal*100));
+  document.getElementById('kpi-cards').innerHTML=`
+    <div class="kpi-card"><div class="kpi-label">全平台觀看</div><div class="kpi-val">${tv.toLocaleString()}</div><div class="kpi-sub">目標 ${CFG.viewGoal.toLocaleString()}（${vp}%）</div><div class="kpi-bar"><div class="kpi-bar-fill ${vp>=100?'kpi-ok':vp>=60?'kpi-warn':'kpi-bad'}" style="width:${vp}%"></div></div><div class="platform-breakdown"><span class="plat-tag plat-yt">YT ${ytv.toLocaleString()}</span><span class="plat-tag plat-fb">FB ${fbv.toLocaleString()}</span><span class="plat-tag plat-ig">IG ${igv.toLocaleString()}</span></div></div>
+    <div class="kpi-card"><div class="kpi-label">上傳部數</div><div class="kpi-val">${cnt}</div><div class="kpi-sub">目標 ${CFG.countGoal} 部（${cp}%）</div><div class="kpi-bar"><div class="kpi-bar-fill ${cp>=100?'kpi-ok':cp>=60?'kpi-warn':'kpi-bad'}" style="width:${cp}%"></div></div></div>
+    <div class="kpi-card"><div class="kpi-label">YT 平均 CTR</div><div class="kpi-val">${(avgCtr*100).toFixed(1)}%</div><div class="kpi-sub">YouTube 曝光點閱率</div></div>
+    <div class="kpi-card"><div class="kpi-label">達標影片</div><div class="kpi-val">${star}</div><div class="kpi-sub">單片 YT ≥${CFG.personalGoal.toLocaleString()}</div></div>`;
   renderCharts(md);
 }
-
-function renderCharts(monthData) {
-  const months = [];
-  const now = new Date();
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
-  }
-
-  const mYt = months.map(m => DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.yt_views)||0),0));
-  const mFb = months.map(m => DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.fb_views)||0),0));
-  const mIg = months.map(m => DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.ig_views)||0),0));
-
-  if (chartMonthly) chartMonthly.destroy();
-  chartMonthly = new Chart(document.getElementById('chart-monthly'), {
-    type: 'bar',
-    data: {
-      labels: months,
-      datasets: [
-        { label: 'YouTube', data: mYt, backgroundColor: 'rgba(255,0,0,0.65)', borderRadius: 4 },
-        { label: 'Facebook', data: mFb, backgroundColor: 'rgba(24,119,242,0.65)', borderRadius: 4 },
-        { label: 'Instagram', data: mIg, backgroundColor: 'rgba(228,64,95,0.65)', borderRadius: 4 },
-      ]
-    },
-    options: {
-      responsive: true,
-      scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
-      plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } }
-    }
-  });
-
-  // Platform pie
-  const allYt = DATA.reduce((s,d)=>s+(Number(d.yt_views)||0),0);
-  const allFb = DATA.reduce((s,d)=>s+(Number(d.fb_views)||0),0);
-  const allIg = DATA.reduce((s,d)=>s+(Number(d.ig_views)||0),0);
-
-  if (chartPlatform) chartPlatform.destroy();
-  chartPlatform = new Chart(document.getElementById('chart-platform'), {
-    type: 'doughnut',
-    data: {
-      labels: ['YouTube', 'Facebook', 'Instagram'],
-      datasets: [{ data: [allYt, allFb, allIg], backgroundColor: ['#FF0000','#1877F2','#E4405F'] }]
-    },
-    options: { responsive: true, plugins: { legend: { position: 'right', labels: { font: { size: 11 } } } } }
-  });
-
-  // Category
-  const cats = ['疾病衛教','特色醫療','新服務流程','醫院形象','員工活動','教學','其他'];
-  const catColors = ['#0F6E56','#2D7DD2','#E8A825','#D94F4F','#7C3AED','#059669','#888'];
-  const catCounts = cats.map(c => DATA.filter(d=>d.cat===c).length);
-
-  if (chartCat) chartCat.destroy();
-  chartCat = new Chart(document.getElementById('chart-cat'), {
-    type: 'doughnut',
-    data: { labels: cats, datasets: [{ data: catCounts, backgroundColor: catColors }] },
-    options: { responsive: true, plugins: { legend: { position: 'right', labels: { font: { size: 11 } } } } }
-  });
-
-  // Top 5
-  const top5 = [...monthData].sort((a,b)=>totalViews(b)-totalViews(a)).slice(0,5);
-  if (chartTop5) chartTop5.destroy();
-  chartTop5 = new Chart(document.getElementById('chart-top5'), {
-    type: 'bar',
-    data: {
-      labels: top5.map(d => (d.title||'').substring(0,15) + ((d.title||'').length>15?'...':'')),
-      datasets: [
-        { label: 'YT', data: top5.map(d=>Number(d.yt_views)||0), backgroundColor: 'rgba(255,0,0,0.7)', borderRadius: 4 },
-        { label: 'FB', data: top5.map(d=>Number(d.fb_views)||0), backgroundColor: 'rgba(24,119,242,0.7)', borderRadius: 4 },
-        { label: 'IG', data: top5.map(d=>Number(d.ig_views)||0), backgroundColor: 'rgba(228,64,95,0.7)', borderRadius: 4 },
-      ]
-    },
-    options: {
-      indexAxis: 'y', responsive: true,
-      scales: { x: { stacked: true, beginAtZero: true }, y: { stacked: true } },
-      plugins: { legend: { position: 'top', labels: { font: { size: 10 } } } }
-    }
-  });
+function renderCharts(monthData){
+  const months=[],now=new Date();
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);}
+  const mYt=months.map(m=>DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.yt_views)||0),0));
+  const mFb=months.map(m=>DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.fb_views)||0),0));
+  const mIg=months.map(m=>DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.ig_views)||0),0));
+  if(chartMonthly)chartMonthly.destroy();
+  chartMonthly=new Chart(document.getElementById('chart-monthly'),{type:'bar',data:{labels:months,datasets:[{label:'YouTube',data:mYt,backgroundColor:'rgba(255,68,68,0.7)',borderRadius:4},{label:'Facebook',data:mFb,backgroundColor:'rgba(76,139,245,0.7)',borderRadius:4},{label:'Instagram',data:mIg,backgroundColor:'rgba(225,48,108,0.7)',borderRadius:4}]},options:{responsive:true,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true}},plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:12,padding:16}}}}});
+  const allYt=DATA.reduce((s,d)=>s+(Number(d.yt_views)||0),0),allFb=DATA.reduce((s,d)=>s+(Number(d.fb_views)||0),0),allIg=DATA.reduce((s,d)=>s+(Number(d.ig_views)||0),0);
+  if(chartPlatform)chartPlatform.destroy();
+  chartPlatform=new Chart(document.getElementById('chart-platform'),{type:'doughnut',data:{labels:['YouTube','Facebook','Instagram'],datasets:[{data:[allYt,allFb,allIg],backgroundColor:['#FF4444','#4C8BF5','#E1306C'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:16}}}}});
+  const cats=['疾病衛教','特色醫療','新服務流程','醫院形象','員工活動','教學','其他'];
+  const catColors=['#34D399','#60A5FA','#FBBF24','#F87171','#A78BFA','#2DD4BF','#64748B'];
+  if(chartCat)chartCat.destroy();
+  chartCat=new Chart(document.getElementById('chart-cat'),{type:'doughnut',data:{labels:cats,datasets:[{data:cats.map(c=>DATA.filter(d=>d.cat===c).length),backgroundColor:catColors,borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:16}}}}});
+  const top5=[...monthData].sort((a,b)=>totalViews(b)-totalViews(a)).slice(0,5);
+  if(chartTop5)chartTop5.destroy();
+  chartTop5=new Chart(document.getElementById('chart-top5'),{type:'bar',data:{labels:top5.map(d=>(d.title||'').substring(0,14)+((d.title||'').length>14?'…':'')),datasets:[{label:'YT',data:top5.map(d=>Number(d.yt_views)||0),backgroundColor:'rgba(255,68,68,0.7)',borderRadius:3},{label:'FB',data:top5.map(d=>Number(d.fb_views)||0),backgroundColor:'rgba(76,139,245,0.7)',borderRadius:3},{label:'IG',data:top5.map(d=>Number(d.ig_views)||0),backgroundColor:'rgba(225,48,108,0.7)',borderRadius:3}]},options:{indexAxis:'y',responsive:true,scales:{x:{stacked:true,beginAtZero:true,grid:{display:false}},y:{stacked:true,grid:{display:false}}},plugins:{legend:{position:'top',labels:{font:{size:10},boxWidth:10,padding:12}}}}});
 }
 
 // ============================================================
 // 新增影片
 // ============================================================
-function buildEntryFromForm(prefix) {
-  const g = id => document.getElementById(prefix + id);
-  const entry = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-  ALL_FORM_FIELDS.forEach(f => {
-    const el = g(f);
-    if (!el) return;
-    if (NUM_FIELDS.includes(f)) entry[f] = Number(el.value) || 0;
-    else entry[f] = el.value.trim ? el.value.trim() : el.value;
-  });
-  return entry;
-}
-
-async function saveEntry() {
-  const title = document.getElementById('f-title').value.trim();
-  const date = document.getElementById('f-date').value;
-  if (!title) { showAlert('entry-alert', '請填寫影片標題', 'err'); return; }
-  if (!date)  { showAlert('entry-alert', '請選擇發布日期', 'err'); return; }
-
-  const entry = buildEntryFromForm('f-');
-  DATA.push(entry);
-  saveData();
-  showAlert('entry-alert', '✅ 已儲存（同步中...）', 'ok');
-  clearForm();
-  renderAll();
-
-  const ok = await pushToSheets('saveVideo', { data: entry });
-  showSyncBadge(ok ? '✅ 已同步 Sheets' : USE_API() ? '⚠️ 本機已儲存，Sheets 同步失敗' : '💾 已儲存至本機');
-}
-
-function clearForm() {
-  ALL_FORM_FIELDS.forEach(id => {
-    const el = document.getElementById('f-' + id);
-    if (el) el.value = '';
-  });
-  document.getElementById('f-type').value = 'long';
-  document.getElementById('f-cat').value = '疾病衛教';
-  document.getElementById('f-date').value = new Date().toISOString().slice(0, 10);
-}
+function buildEntryFromForm(p){const g=id=>document.getElementById(p+id);const e={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};ALL_FORM_FIELDS.forEach(f=>{const el=g(f);if(!el)return;if(NUM_FIELDS.includes(f))e[f]=Number(el.value)||0;else e[f]=el.value.trim?el.value.trim():el.value;});return e;}
+async function saveEntry(){const t=document.getElementById('f-title').value.trim(),d=document.getElementById('f-date').value;if(!t){showAlert('entry-alert','請填寫影片標題','err');return;}if(!d){showAlert('entry-alert','請選擇發布日期','err');return;}const e=buildEntryFromForm('f-');DATA.push(e);saveData();showAlert('entry-alert','已儲存','ok');clearForm();renderAll();const ok=await pushToSheets('saveVideo',{data:e});showSyncBadge(ok?'已同步 Sheets':USE_API()?'本機已儲存，同步失敗':'已儲存至本機');}
+function clearForm(){ALL_FORM_FIELDS.forEach(id=>{const el=document.getElementById('f-'+id);if(el)el.value='';});document.getElementById('f-type').value='long';document.getElementById('f-cat').value='疾病衛教';document.getElementById('f-date').value=new Date().toISOString().slice(0,10);}
 
 // ============================================================
 // 影片列表
 // ============================================================
-function renderList() {
-  const search = (document.getElementById('search-input').value || '').toLowerCase();
-  const fType = document.getElementById('filter-type').value;
-  const fCat = document.getElementById('filter-cat').value;
-  const fMonth = document.getElementById('filter-month').value;
-
-  let filtered = DATA.filter(d => {
-    if (search && !(d.title||'').toLowerCase().includes(search) && !(d.planner||'').toLowerCase().includes(search) && !(d.producer||'').toLowerCase().includes(search)) return false;
-    if (fType && d.type !== fType) return false;
-    if (fCat && d.cat !== fCat) return false;
-    if (fMonth && !(d.date||'').startsWith(fMonth)) return false;
-    return true;
-  });
-
-  const tbody = document.getElementById('video-tbody');
-  const empty = document.getElementById('list-empty');
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-
-  tbody.innerHTML = filtered.map(d => {
-    const tv = totalViews(d);
-    const ytv = Number(d.yt_views)||0;
-    const fbv = Number(d.fb_views)||0;
-    const igv = Number(d.ig_views)||0;
-    const link = d.yt_url || d.fb_url || d.ig_url || '';
-    return `
-    <tr>
-      <td style="white-space:nowrap;">${d.date||'—'}</td>
-      <td style="max-width:200px;">
-        ${link ? `<a href="${escHtml(link)}" target="_blank">${escHtml(d.title)}</a>` : escHtml(d.title)}
-      </td>
-      <td><span class="type-badge type-${d.type}">${d.type==='short'?'Short':'Long'}</span></td>
-      <td>${escHtml(d.cat||'')}</td>
-      <td>
-        <div class="views-cell">
-          <span class="total">${tv.toLocaleString()}</span>
-          <span class="plats">
-            ${ytv?`<span style="color:var(--yt)">YT ${ytv.toLocaleString()}</span>`:''}
-            ${fbv?`<span style="color:var(--fb)">FB ${fbv.toLocaleString()}</span>`:''}
-            ${igv?`<span style="color:var(--ig)">IG ${igv.toLocaleString()}</span>`:''}
-          </span>
-        </div>
-      </td>
-      <td style="text-align:right;">${(Number(d.yt_likes)||0).toLocaleString()}</td>
-      <td style="text-align:right;">${((Number(d.yt_ctr)||0)*100).toFixed(1)}%</td>
-      <td>${escHtml(d.planner||'')}</td>
-      <td>
-        <div class="act-btns">
-          <button class="act-btn" onclick="openEdit('${d.id}')">✏️</button>
-          <button class="act-btn del" onclick="deleteEntry('${d.id}')">🗑</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
+function renderList(){
+  const s=(document.getElementById('search-input').value||'').toLowerCase(),ft=document.getElementById('filter-type').value,fc=document.getElementById('filter-cat').value,fm=document.getElementById('filter-month').value;
+  let f=DATA.filter(d=>{if(s&&!(d.title||'').toLowerCase().includes(s)&&!(d.planner||'').toLowerCase().includes(s)&&!(d.producer||'').toLowerCase().includes(s))return false;if(ft&&d.type!==ft)return false;if(fc&&d.cat!==fc)return false;if(fm&&!(d.date||'').startsWith(fm))return false;return true;});
+  const tb=document.getElementById('video-tbody'),em=document.getElementById('list-empty');
+  if(f.length===0){tb.innerHTML='';em.style.display='block';return;}em.style.display='none';
+  tb.innerHTML=f.map(d=>{const tv=totalViews(d),ytv=Number(d.yt_views)||0,fbv=Number(d.fb_views)||0,igv=Number(d.ig_views)||0,lk=d.yt_url||d.fb_url||d.ig_url||'';
+    return`<tr><td style="white-space:nowrap;">${d.date||'—'}</td><td style="max-width:200px;">${lk?`<a href="${esc(lk)}" target="_blank">${esc(d.title)}</a>`:esc(d.title)}</td><td><span class="type-badge type-${d.type}">${d.type==='short'?'Short':'Long'}</span></td><td>${esc(d.cat||'')}</td><td><div class="views-cell"><span class="total">${tv.toLocaleString()}</span><span class="plats">${ytv?`<span style="color:var(--yt)">YT ${ytv.toLocaleString()}</span>`:''}${fbv?`<span style="color:var(--fb)">FB ${fbv.toLocaleString()}</span>`:''}${igv?`<span style="color:var(--ig)">IG ${igv.toLocaleString()}</span>`:''}</span></div></td><td style="text-align:right;">${(Number(d.yt_likes)||0).toLocaleString()}</td><td style="text-align:right;">${((Number(d.yt_ctr)||0)*100).toFixed(1)}%</td><td>${esc(d.planner||'')}</td><td><div class="act-btns"><button class="act-btn" onclick="openEdit('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span></button><button class="act-btn del" onclick="deleteEntry('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></div></td></tr>`;}).join('');
 }
-
-function buildMonthFilter() {
-  const months = [...new Set(DATA.map(d => (d.date||'').substring(0,7)).filter(Boolean))].sort().reverse();
-  const sel = document.getElementById('filter-month');
-  sel.innerHTML = '<option value="">全部月份</option>' + months.map(m => `<option value="${m}">${m}</option>`).join('');
-}
-
-function escHtml(s) { const d = document.createElement('div'); d.textContent = s||''; return d.innerHTML; }
+function buildMonthFilter(){const ms=[...new Set(DATA.map(d=>(d.date||'').substring(0,7)).filter(Boolean))].sort().reverse();document.getElementById('filter-month').innerHTML='<option value="">全部月份</option>'+ms.map(m=>`<option value="${m}">${m}</option>`).join('');}
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 
 // ============================================================
 // 編輯 / 刪除
 // ============================================================
-function openEdit(id) {
-  const d = DATA.find(v => v.id === id);
-  if (!d) return;
-  document.getElementById('e-id').value = d.id;
-  ALL_FORM_FIELDS.forEach(f => {
-    const el = document.getElementById('e-' + f);
-    if (el) el.value = d[f] ?? '';
-  });
-  document.getElementById('edit-modal').classList.add('show');
-}
-
-function closeModal() {
-  document.getElementById('edit-modal').classList.remove('show');
-}
-
-async function updateEntry() {
-  const id = document.getElementById('e-id').value;
-  const idx = DATA.findIndex(d => d.id === id);
-  if (idx === -1) return;
-
-  ALL_FORM_FIELDS.forEach(f => {
-    const el = document.getElementById('e-' + f);
-    if (!el) return;
-    if (NUM_FIELDS.includes(f)) DATA[idx][f] = Number(el.value) || 0;
-    else DATA[idx][f] = el.value;
-  });
-  DATA[idx].updatedAt = new Date().toISOString();
-  saveData();
-  closeModal();
-  renderAll();
-
-  const ok = await pushToSheets('updateVideo', { data: DATA[idx] });
-  showSyncBadge(ok ? '✅ 已同步修改' : USE_API() ? '⚠️ 本機已更新，Sheets 同步失敗' : '💾 已更新');
-}
-
-async function deleteEntry(id) {
-  if (!confirm('確定要刪除此影片紀錄？')) return;
-  DATA = DATA.filter(d => d.id !== id);
-  saveData();
-  renderAll();
-
-  const ok = await pushToSheets('deleteVideo', { id });
-  showSyncBadge(ok ? '✅ 已從 Sheets 刪除' : USE_API() ? '⚠️ 本機已刪除' : '🗑 已刪除');
-}
+function openEdit(id){const d=DATA.find(v=>v.id===id);if(!d)return;document.getElementById('e-id').value=d.id;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(el)el.value=d[f]??'';});document.getElementById('edit-modal').classList.add('show');}
+function closeModal(){document.getElementById('edit-modal').classList.remove('show');}
+async function updateEntry(){const id=document.getElementById('e-id').value,idx=DATA.findIndex(d=>d.id===id);if(idx===-1)return;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(!el)return;if(NUM_FIELDS.includes(f))DATA[idx][f]=Number(el.value)||0;else DATA[idx][f]=el.value;});DATA[idx].updatedAt=new Date().toISOString();saveData();closeModal();renderAll();const ok=await pushToSheets('updateVideo',{data:DATA[idx]});showSyncBadge(ok?'已同步修改':USE_API()?'本機已更新，同步失敗':'已更新');}
+async function deleteEntry(id){if(!confirm('確定要刪除此影片紀錄？'))return;DATA=DATA.filter(d=>d.id!==id);saveData();renderAll();const ok=await pushToSheets('deleteVideo',{id});showSyncBadge(ok?'已從 Sheets 刪除':USE_API()?'本機已刪除':'已刪除');}
 
 // ============================================================
 // 設定
 // ============================================================
-function renderCfgForm() {
-  document.getElementById('cfg-viewGoal').value = CFG.viewGoal;
-  document.getElementById('cfg-countGoal').value = CFG.countGoal;
-  document.getElementById('cfg-personalGoal').value = CFG.personalGoal;
-  document.getElementById('cfg-api-url').value = API_URL;
-}
-
-async function saveCfg() {
-  CFG.viewGoal = Number(document.getElementById('cfg-viewGoal').value) || 5000;
-  CFG.countGoal = Number(document.getElementById('cfg-countGoal').value) || 6;
-  CFG.personalGoal = Number(document.getElementById('cfg-personalGoal').value) || 2000;
-  localStorage.setItem('kt_yt_cfg', JSON.stringify(CFG));
-  showAlert('cfg-alert', '✅ 設定已儲存', 'ok');
-  renderDashboard();
-  await pushToSheets('saveConfig', { data: CFG });
-}
-
-async function forceSync() {
-  if (!USE_API()) { alert('請先設定 API URL'); return; }
-  showSyncBadge('同步中...');
-  const ok = await syncFromSheets();
-  await syncConfigFromSheets();
-  renderAll();
-  showSyncBadge(ok ? '✅ 強制同步完成' : '❌ 同步失敗');
-}
-
-function clearAllData() {
-  if (!confirm('確定要清除所有本機資料？（不影響 Sheets 端資料）')) return;
-  DATA = [];
-  localStorage.removeItem('kt_yt_data');
-  renderAll();
-  showSyncBadge('本機資料已清除');
-}
+function renderCfgForm(){document.getElementById('cfg-viewGoal').value=CFG.viewGoal;document.getElementById('cfg-countGoal').value=CFG.countGoal;document.getElementById('cfg-personalGoal').value=CFG.personalGoal;document.getElementById('cfg-api-url').value=API_URL;}
+async function saveCfg(){CFG.viewGoal=Number(document.getElementById('cfg-viewGoal').value)||5000;CFG.countGoal=Number(document.getElementById('cfg-countGoal').value)||6;CFG.personalGoal=Number(document.getElementById('cfg-personalGoal').value)||2000;localStorage.setItem('kt_yt_cfg',JSON.stringify(CFG));showAlert('cfg-alert','設定已儲存','ok');renderDashboard();await pushToSheets('saveConfig',{data:CFG});}
+async function forceSync(){if(!USE_API()){alert('請先設定 API URL');return;}showSyncBadge('同步中...');const ok=await syncFromSheets();await syncConfigFromSheets();renderAll();showSyncBadge(ok?'同步完成':'同步失敗');}
+function clearAllData(){if(!confirm('確定要清除所有本機資料？'))return;DATA=[];localStorage.removeItem('kt_yt_data');renderAll();showSyncBadge('本機資料已清除');}
 
 // ============================================================
 // CSV 匯出
 // ============================================================
-function exportCSV() {
-  if (DATA.length === 0) { alert('無資料可匯出'); return; }
-  const headers = ['日期','標題','類型','類別','企劃','製作','時長',
-    'YT觀看','YT讚','YT留言','YT曝光','YT_CTR','YT觀看比例','YT平均時長',
-    'FB觀看','FB讚','FB留言','FB分享','FB觸及',
-    'IG觀看','IG讚','IG留言','IG分享','IG觸及',
-    '全平台觀看','備註','YT連結','FB連結','IG連結'];
-  const rows = DATA.map(d => [
-    d.date, d.title, d.type, d.cat, d.planner, d.producer, d.dur,
-    d.yt_views, d.yt_likes, d.yt_comments, d.yt_imp, d.yt_ctr, d.yt_ratio, d.yt_avgdur,
-    d.fb_views, d.fb_likes, d.fb_comments, d.fb_shares, d.fb_reach,
-    d.ig_views, d.ig_likes, d.ig_comments, d.ig_shares, d.ig_reach,
-    totalViews(d), d.note, d.yt_url, d.fb_url, d.ig_url
-  ]);
-  const bom = '\uFEFF';
-  const csv = bom + [headers, ...rows].map(r => r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `video_data_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-}
+function exportCSV(){if(DATA.length===0){alert('無資料');return;}const h=['日期','標題','類型','類別','企劃','製作','時長','YT觀看','YT讚','YT留言','YT曝光','YT_CTR','YT觀看比例','YT平均時長','FB觀看','FB讚','FB留言','FB分享','FB觸及','IG觀看','IG讚','IG留言','IG分享','IG觸及','全平台觀看','備註','YT連結','FB連結','IG連結'];const rows=DATA.map(d=>[d.date,d.title,d.type,d.cat,d.planner,d.producer,d.dur,d.yt_views,d.yt_likes,d.yt_comments,d.yt_imp,d.yt_ctr,d.yt_ratio,d.yt_avgdur,d.fb_views,d.fb_likes,d.fb_comments,d.fb_shares,d.fb_reach,d.ig_views,d.ig_likes,d.ig_comments,d.ig_shares,d.ig_reach,totalViews(d),d.note,d.yt_url,d.fb_url,d.ig_url]);const csv='\uFEFF'+[h,...rows].map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');const b=new Blob([csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`video_${new Date().toISOString().slice(0,10)}.csv`;a.click();}
 
 // ============================================================
-// 工具函式
+// 工具
 // ============================================================
-function showAlert(id, msg, type) {
-  const el = document.getElementById(id);
-  el.className = 'alert alert-' + type;
-  el.textContent = msg;
-  if (type === 'ok') setTimeout(() => el.className = 'alert', 4000);
-}
-
-function showSyncBadge(msg) {
-  let badge = document.getElementById('sync-badge');
-  if (!badge) {
-    badge = document.createElement('div');
-    badge.id = 'sync-badge';
-    badge.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#0F6E56;color:#fff;padding:10px 18px;border-radius:22px;font-size:13px;z-index:999;transition:opacity .3s;box-shadow:0 2px 12px rgba(0,0,0,.15);';
-    document.body.appendChild(badge);
-  }
-  badge.textContent = msg;
-  badge.style.opacity = '1';
-  setTimeout(() => badge.style.opacity = '0', 3500);
-}
+function showAlert(id,msg,type){const el=document.getElementById(id);el.className='alert alert-'+type;el.textContent=msg;if(type==='ok')setTimeout(()=>el.className='alert',4000);}
+function showSyncBadge(msg){let b=document.getElementById('sync-badge');if(!b){b=document.createElement('div');b.id='sync-badge';b.style.cssText='position:fixed;bottom:20px;right:20px;background:var(--bg-3);color:var(--accent);padding:10px 20px;border-radius:10px;font-size:12px;z-index:999;transition:opacity .3s;border:1px solid var(--border-l);backdrop-filter:blur(8px);';document.body.appendChild(b);}b.textContent=msg;b.style.opacity='1';setTimeout(()=>b.style.opacity='0',3500);}
 
 // ============================================================
 // 初始化
 // ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-  checkSetup();
-  loadData();
-  document.getElementById('f-date').value = new Date().toISOString().slice(0, 10);
-});
+document.addEventListener('DOMContentLoaded',()=>{checkSetup();loadData();document.getElementById('f-date').value=new Date().toISOString().slice(0,10);});
 </script>
 </body>
 </html>
