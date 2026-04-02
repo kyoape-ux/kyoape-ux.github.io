@@ -622,6 +622,36 @@ tr:hover td{background:rgba(52,211,153,.03);}
   </div>
 </div>
 
+<!-- ═══ IG Edit Modal ═══ -->
+<div class="modal-overlay" id="ig-edit-modal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeIgModal()"><span class="icon" style="width:16px;height:16px;"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
+    <h2><span class="icon" style="color:var(--ig);"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></span>編輯 IG 貼文</h2>
+    <div id="ig-edit-alert" class="alert"></div>
+    <input type="hidden" id="ie-id">
+    <div class="form-grid cols3">
+      <div class="form-group full"><label>標題 *</label><input type="text" id="ie-title" placeholder="貼文標題"></div>
+      <div class="form-group"><label>發布日期 *</label><input type="date" id="ie-date"></div>
+      <div class="form-group"><label>貼文類型</label>
+        <select id="ie-type"><option value="1">貼文</option><option value="2">測驗</option><option value="3">影片 Reels</option></select>
+      </div>
+      <div class="form-group"><label>類別</label><input type="text" id="ie-cat" placeholder="例：營養、日常、運動"></div>
+      <div class="form-group"><label>觀看次數</label><input type="number" id="ie-views" min="0"></div>
+      <div class="form-group"><label>按讚數</label><input type="number" id="ie-likes" min="0"></div>
+      <div class="form-group"><label>留言數</label><input type="number" id="ie-comments" min="0"></div>
+      <div class="form-group"><label>互動次數</label><input type="number" id="ie-interactions" min="0"></div>
+      <div class="form-group"><label>分享</label><input type="number" id="ie-shares" min="0"></div>
+      <div class="form-group"><label>儲存</label><input type="number" id="ie-saves" min="0"></div>
+      <div class="form-group"><label>觸及帳號</label><input type="number" id="ie-reach" min="0"></div>
+      <div class="form-group full"><label>IG 連結</label><input type="url" id="ie-link" placeholder="https://www.instagram.com/p/..."></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary write-only" onclick="submitIgEdit()">儲存修改</button>
+      <button class="btn btn-secondary" onclick="closeIgModal()">取消</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ Edit Modal ═══ -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
@@ -734,6 +764,7 @@ async function syncFromSheets(){
 }
 async function pushToSheets(a,p){const r=await apiPost(a,p);return r&&r.success;}
 async function syncConfigFromSheets(){const r=await apiGet('getConfig');if(r&&!r.error){CFG={...CFG,...r};localStorage.setItem('kt_yt_cfg',JSON.stringify(CFG));return true;}return false;}
+async function syncIgFromSheets(){const r=await apiGet('getIgPosts');if(r&&r.posts){IG_DATA=r.posts;saveIgData();return true;}return false;}
 
 // ============================================================
 // 資料層
@@ -883,7 +914,7 @@ function esc(s){const d=document.createElement('div');d.textContent=s||'';return
 // ============================================================
 // 編輯 / 刪除
 // ============================================================
-function openEdit(id){const d=DATA.find(v=>v.id===id);if(!d)return;document.getElementById('e-id').value=d.id;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(el)el.value=d[f]??'';});document.getElementById('edit-modal').classList.add('show');}
+function openEdit(id){const d=DATA.find(v=>v.id===id);if(!d)return;document.getElementById('e-id').value=d.id;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(!el)return;const v=d[f]??'';el.value=(f==='dur'||f==='yt_avgdur')?normalizeDur(v):v;});document.getElementById('edit-modal').classList.add('show');}
 function closeModal(){document.getElementById('edit-modal').classList.remove('show');}
 async function updateEntry(){if(!canWrite()){showAlert('edit-alert','您的權限不足','err');return;}const id=document.getElementById('e-id').value,idx=DATA.findIndex(d=>d.id===id);if(idx===-1)return;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(!el)return;if(NUM_FIELDS.includes(f))DATA[idx][f]=Number(el.value)||0;else DATA[idx][f]=el.value;});DATA[idx].updatedAt=new Date().toISOString();if(window._lastStatsFetchDate){DATA[idx].statsDate=window._lastStatsFetchDate;window._lastStatsFetchDate=null;}saveData();closeModal();renderAll();const ok=await pushToSheets('updateVideo',{data:DATA[idx]});showSyncBadge(ok?'已同步修改':USE_API()?'本機已更新，同步失敗':'已更新');}
 async function deleteEntry(id){if(!canDelete()){alert('僅組長可刪除影片');return;}if(!confirm('確定要刪除此影片紀錄？'))return;DATA=DATA.filter(d=>d.id!==id);saveData();renderAll();const ok=await pushToSheets('deleteVideo',{id});showSyncBadge(ok?'已從 Sheets 刪除':USE_API()?'本機已刪除':'已刪除');}
@@ -918,6 +949,19 @@ function parseYtVideoId(url){
   if(!url)return null;
   const m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
   return m?m[1]:null;
+}
+
+// 修正 Google Sheets 將時間序列化成 1899-12-30T...Z 的問題
+function normalizeDur(val){
+  if(!val)return '';
+  const s=String(val);
+  if(s.startsWith('1899-12-30T')){
+    const d=new Date(s);
+    const h=d.getUTCHours(),m=d.getUTCMinutes(),sc=d.getUTCSeconds();
+    if(h>0)return`${h}:${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`;
+    return`${m}:${String(sc).padStart(2,'0')}`;
+  }
+  return s;
 }
 
 function parseIsoDuration(iso){
@@ -1108,6 +1152,27 @@ function deleteIgPost(id){
   pushToSheets('deleteIgPost',{id}).then(ok=>showSyncBadge(ok?'已刪除':'本機已刪除'));
 }
 
+function openEditIg(id){
+  const d=IG_DATA.find(p=>p.id===id);if(!d)return;
+  document.getElementById('ie-id').value=d.id;
+  ['title','date','type','cat','link'].forEach(f=>{const el=document.getElementById('ie-'+f);if(el)el.value=d[f]??'';});
+  ['views','likes','comments','interactions','shares','saves','reach'].forEach(f=>{const el=document.getElementById('ie-'+f);if(el)el.value=Number(d[f])||0;});
+  document.getElementById('ig-edit-alert').className='alert';
+  document.getElementById('ig-edit-modal').classList.add('show');
+}
+function closeIgModal(){document.getElementById('ig-edit-modal').classList.remove('show');}
+async function submitIgEdit(){
+  if(!canWrite()){showAlert('ig-edit-alert','您的權限不足','err');return;}
+  const id=document.getElementById('ie-id').value;
+  const idx=IG_DATA.findIndex(d=>d.id===id);if(idx===-1)return;
+  ['title','date','type','cat','link'].forEach(f=>{const el=document.getElementById('ie-'+f);if(el)IG_DATA[idx][f]=el.value;});
+  ['views','likes','comments','interactions','shares','saves','reach'].forEach(f=>{const el=document.getElementById('ie-'+f);if(el)IG_DATA[idx][f]=Number(el.value)||0;});
+  IG_DATA[idx].updatedAt=new Date().toISOString();
+  saveIgData();closeIgModal();renderIgAll();
+  const ok=await pushToSheets('updateIgPost',{data:IG_DATA[idx]});
+  showSyncBadge(ok?'IG 修改已同步':USE_API()?'本機已更新，同步失敗':'已更新');
+}
+
 function renderIgAll(){renderIgKpi();renderIgList();renderIgCharts();buildIgMonthFilter();}
 
 function renderIgKpi(){
@@ -1146,7 +1211,7 @@ function renderIgList(){
     <td style="text-align:right;">${(Number(d.shares)||0).toLocaleString()}</td>
     <td style="text-align:right;">${(Number(d.saves)||0).toLocaleString()}</td>
     <td style="text-align:right;">${(Number(d.reach)||0).toLocaleString()}</td>
-    <td><button class="act-btn del write-only" onclick="deleteIgPost('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></td>
+    <td><div class="act-btns"><button class="act-btn write-only" onclick="openEditIg('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span></button><button class="act-btn del write-only" onclick="deleteIgPost('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></div></td>
   </tr>`).join('');
 }
 
@@ -1447,6 +1512,7 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
 document.addEventListener('DOMContentLoaded',()=>{
   checkAuth();
   checkSetup();loadData();loadIgData();renderIgAll();
+  if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgAll();showSyncBadge('IG 已同步 Sheets');}});}
   document.getElementById('f-date').value=new Date().toISOString().slice(0,10);
   document.getElementById('ig-date').value=new Date().toISOString().slice(0,10);
   // 預設月報表月份為當月
