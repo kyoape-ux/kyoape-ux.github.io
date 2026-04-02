@@ -62,9 +62,10 @@ function doPost(e) {
       if (action === 'updateVideo')  return jsonRes(updateVideo(body.data));
       if (action === 'deleteVideo')  return jsonRes(deleteVideo(body.id));
       if (action === 'saveConfig')   return jsonRes(saveYtConfig(body.data));
-      if (action === 'saveIgPost')   return jsonRes(saveIgPost(body.data));
-      if (action === 'updateIgPost') return jsonRes(updateIgPost(body.data));
-      if (action === 'deleteIgPost') return jsonRes(deleteIgPost(body.id));
+      if (action === 'saveIgPost')       return jsonRes(saveIgPost(body.data));
+      if (action === 'updateIgPost')     return jsonRes(updateIgPost(body.data));
+      if (action === 'deleteIgPost')     return jsonRes(deleteIgPost(body.id));
+      if (action === 'createMonthlyReport') return jsonRes(createMonthlyReport(body.ym, body.moLabel, body.videos));
     }
     return jsonRes({ error: 'Unknown action' });
   } catch(err) {
@@ -229,6 +230,71 @@ function saveYtConfig(data) {
   sh.clearContents();
   Object.entries(data).forEach(([k,v]) => sh.appendRow([k, v]));
   return { success: true };
+}
+
+// ── 月報表匯出至 Google Sheets ────────────────────────────────
+
+function createMonthlyReport(ym, moLabel, videos) {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const shName = '月報_' + ym;
+  const existing = ss.getSheetByName(shName);
+  if (existing) ss.deleteSheet(existing);
+  const sh = ss.insertSheet(shName);
+
+  const GREEN = '#0F6E56', WHITE = '#FFFFFF', LIGHT = '#F2FAF6';
+
+  function tv(d) {
+    return (Number(d.yt_views)||0) + (Number(d.fb_views)||0) + (Number(d.ig_views)||0);
+  }
+
+  // ── KPI 標題列 ──
+  sh.appendRow(['月份', moLabel, '', '總觀看', videos.reduce((s,d)=>s+tv(d),0), '', '影片數', videos.length]);
+  sh.getRange(1,1,1,8).setBackground(GREEN).setFontColor(WHITE).setFontWeight('bold');
+
+  sh.appendRow([]);
+
+  // ── TOP 5 ──
+  const top5Row = sh.getLastRow() + 1;
+  sh.appendRow(['🏆 本月觀看次數 TOP 5']);
+  sh.getRange(top5Row, 1).setFontSize(12).setFontWeight('bold').setFontColor(GREEN);
+  sh.appendRow(['排名', '影片標題', '類型', '類別', 'YT 觀看', 'FB 觀看', 'IG 觀看', '全平台合計']);
+  const hdrTop5 = sh.getRange(sh.getLastRow(), 1, 1, 8);
+  hdrTop5.setBackground(GREEN).setFontColor(WHITE).setFontWeight('bold');
+
+  const sorted = videos.slice().sort((a,b) => tv(b) - tv(a));
+  sorted.slice(0, 5).forEach((d, i) => {
+    sh.appendRow([i+1, d.title||'', d.type||'', d.cat||'',
+      Number(d.yt_views)||0, Number(d.fb_views)||0, Number(d.ig_views)||0, tv(d)]);
+    sh.getRange(sh.getLastRow(), 1, 1, 8).setBackground(i%2===0 ? LIGHT : WHITE);
+    sh.getRange(sh.getLastRow(), 8).setFontWeight('bold').setFontColor(GREEN);
+  });
+
+  sh.appendRow([]);
+
+  // ── 完整清單 ──
+  const listRow = sh.getLastRow() + 1;
+  sh.appendRow(['📋 本月影片清單（共 ' + videos.length + ' 部）']);
+  sh.getRange(listRow, 1).setFontSize(12).setFontWeight('bold').setFontColor(GREEN);
+  sh.appendRow(['發布日期', '影片標題', '類型', '類別', 'YT 觀看', 'FB 觀看', 'IG 觀看', '全平台合計', '企劃', '製作']);
+  sh.getRange(sh.getLastRow(), 1, 1, 10).setBackground(GREEN).setFontColor(WHITE).setFontWeight('bold');
+
+  videos.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach((d, i) => {
+    sh.appendRow([d.date||'', d.title||'', d.type||'', d.cat||'',
+      Number(d.yt_views)||0, Number(d.fb_views)||0, Number(d.ig_views)||0, tv(d),
+      d.planner||'', d.producer||'']);
+    sh.getRange(sh.getLastRow(), 1, 1, 10).setBackground(i%2===0 ? LIGHT : WHITE);
+    sh.getRange(sh.getLastRow(), 8).setFontWeight('bold');
+  });
+
+  // ── 欄寬 ──
+  sh.setColumnWidth(1, 100);
+  sh.setColumnWidth(2, 320);
+  [3,4].forEach(c => sh.setColumnWidth(c, 70));
+  [5,6,7,8].forEach(c => sh.setColumnWidth(c, 80));
+  sh.setColumnWidth(9, 90);
+  sh.setColumnWidth(10, 90);
+
+  return { success: true, sheetId: SHEET_ID, gid: sh.getSheetId() };
 }
 
 // ── 工具函式 ─────────────────────────────────────────────────

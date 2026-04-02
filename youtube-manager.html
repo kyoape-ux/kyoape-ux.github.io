@@ -1329,6 +1329,7 @@ function openMonthlyReport(){
   const yr=document.getElementById('rpt-year').value;
   const mo=document.getElementById('rpt-month').value;
   const ym=`${yr}-${mo}`;
+  const SHEET_ID='1lhgsVhbfde4NA17ChK1XUkLax8S_TZmMB0rS4Z7dPDI';
   const mData=DATA.filter(d=>(d.date||'').substring(0,7)===ym).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   const moLabel=`${yr} 年 ${parseInt(mo)} 月`;
   const tv=mData.reduce((s,d)=>s+totalViews(d),0);
@@ -1400,10 +1401,47 @@ td:nth-child(2){text-align:left;}
 tr:last-child td{border-bottom:none;}
 tr:nth-child(even) td{background:#FAFAFA;}
 .footer{margin-top:32px;padding-top:12px;border-top:1px solid #E0E0E0;font-size:11px;color:#BBB;display:flex;justify-content:space-between;}
-.print-btn{position:fixed;bottom:24px;right:24px;background:#0F6E56;color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(15,110,86,.3);}
-@media print{.print-btn{display:none;}@page{size:A4;margin:15mm;}}
-</style></head><body>
-<button class="print-btn" onclick="window.print()">列印 / 存成 PDF</button>
+.action-bar{position:fixed;bottom:24px;right:24px;display:flex;gap:10px;z-index:99;}
+.print-btn,.sheets-btn,.csv-btn{border:none;border-radius:10px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+.print-btn{background:#0F6E56;color:#fff;box-shadow:0 4px 12px rgba(15,110,86,.3);}
+.sheets-btn{background:#1565C0;color:#fff;box-shadow:0 4px 12px rgba(21,101,192,.3);}
+.csv-btn{background:#fff;color:#0F6E56;border:2px solid #B8DFC9;}
+.sheets-btn:disabled,.csv-btn:disabled{opacity:.6;cursor:not-allowed;}
+@media print{.action-bar{display:none;}@page{size:A4;margin:15mm;}}
+</style>
+<script>
+const _API='${API_URL}';
+const _YM='${ym}';
+const _LABEL='${moLabel}';
+const _VIDEOS=${JSON.stringify(mData)};
+const _SHEET_ID='${SHEET_ID}';
+async function exportToSheets(){
+  const btn=document.getElementById('sheets-btn');
+  btn.disabled=true;btn.textContent='匯出中…';
+  try{
+    const r=await fetch(_API,{method:'POST',body:JSON.stringify({module:'youtube',action:'createMonthlyReport',ym:_YM,moLabel:_LABEL,videos:_VIDEOS})});
+    const j=await r.json();
+    if(j.success){
+      btn.textContent='✅ 已存入 Sheets';
+      window.open('https://docs.google.com/spreadsheets/d/'+j.sheetId+'/edit#gid='+j.gid,'_blank');
+    }else{btn.textContent='❌ 失敗：'+j.error;}
+  }catch(e){btn.textContent='❌ 錯誤';}
+  setTimeout(()=>{btn.textContent='📊 存入 Google Sheets';btn.disabled=false;},4000);
+}
+function exportCSV(){
+  const h=['發布日期','影片標題','類型','類別','YT觀看','FB觀看','IG觀看','全平台合計','企劃','製作'];
+  const rows=_VIDEOS.map(d=>[d.date||'',d.title||'',d.type||'',d.cat||'',Number(d.yt_views)||0,Number(d.fb_views)||0,Number(d.ig_views)||0,(Number(d.yt_views)||0)+(Number(d.fb_views)||0)+(Number(d.ig_views)||0),d.planner||'',d.producer||'']);
+  const csv='\uFEFF'+[h,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download=_LABEL+'_影片成效.csv';a.click();
+}
+</script>
+</head><body>
+<div class="action-bar">
+  <button class="csv-btn" onclick="exportCSV()">📥 下載 CSV</button>
+  <button class="sheets-btn" id="sheets-btn" onclick="exportToSheets()">📊 存入 Google Sheets</button>
+  <button class="print-btn" onclick="window.print()">🖨️ 列印 / PDF</button>
+</div>
 <div class="report">
   <div class="hd">
     <div class="hd-l"><h1>${moLabel} 影片發布成效報告</h1><p>光田綜合醫院 視覺多媒體設計組</p></div>
