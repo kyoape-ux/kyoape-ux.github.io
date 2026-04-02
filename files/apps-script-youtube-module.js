@@ -251,7 +251,7 @@ function createMonthlyReport(ym, moLabel, videos) {
   sh.appendRow(['月份', moLabel, '', '總觀看', videos.reduce((s,d)=>s+tv(d),0), '', '影片數', videos.length]);
   sh.getRange(1,1,1,8).setBackground(GREEN).setFontColor(WHITE).setFontWeight('bold');
 
-  sh.appendRow([]);
+  sh.appendRow(['']);
 
   // ── TOP 5 ──
   const top5Row = sh.getLastRow() + 1;
@@ -269,7 +269,7 @@ function createMonthlyReport(ym, moLabel, videos) {
     sh.getRange(sh.getLastRow(), 8).setFontWeight('bold').setFontColor(GREEN);
   });
 
-  sh.appendRow([]);
+  sh.appendRow(['']);
 
   // ── 完整清單 ──
   const listRow = sh.getLastRow() + 1;
