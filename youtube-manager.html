@@ -165,10 +165,31 @@ tr:hover td{background:rgba(52,211,153,.03);}
 .mobile-nav .nav-item{flex-direction:column;font-size:10px;padding:6px 8px;gap:3px;text-align:center;}
 
 /* ── Auth / Login ──────────────────────────────────────── */
-#login-overlay{position:fixed;inset:0;background:rgba(11,15,20,.96);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
-.login-box{background:var(--bg-1);border:1px solid var(--border-l);border-radius:20px;padding:36px 32px;width:360px;max-width:90vw;}
+#login-overlay{position:fixed;inset:0;background:var(--bg-0);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;background-image:radial-gradient(ellipse 70% 50% at 50% -5%,rgba(52,211,153,.06) 0%,transparent 70%);}
+.login-wrap{text-align:center;width:100%;max-width:480px;}
+.login-app-icon{width:68px;height:68px;background:linear-gradient(145deg,var(--bg-2),var(--bg-3));border:1px solid var(--border-l);border-radius:18px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 0 0 1px rgba(52,211,153,.08),0 12px 40px rgba(0,0,0,.45);}
+.login-title{font-size:24px;font-weight:800;color:var(--txt);margin-bottom:5px;letter-spacing:.3px;}
+.login-sub{font-size:12px;color:var(--txt3);margin-bottom:28px;}
+.login-panel{background:var(--bg-1);border:1px solid var(--border-l);border-radius:20px;padding:28px 24px 22px;}
+.login-hint{font-size:12px;color:var(--txt3);margin-bottom:18px;letter-spacing:.4px;}
+.role-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;}
+.role-card{background:var(--bg-2);border:2px solid var(--border);border-radius:14px;padding:22px 14px 18px;cursor:pointer;transition:.18s;display:flex;flex-direction:column;align-items:center;gap:9px;user-select:none;}
+.role-card:hover{border-color:var(--border-l);background:var(--bg-3);transform:translateY(-1px);}
+.role-card.sel{border-color:var(--accent);background:var(--accent-dim);}
+.rc-icon{width:50px;height:50px;background:var(--bg-3);border-radius:13px;display:flex;align-items:center;justify-content:center;color:var(--txt3);transition:.18s;}
+.role-card.sel .rc-icon{background:rgba(52,211,153,.15);color:var(--accent);}
+.rc-name{font-size:15px;font-weight:700;color:var(--txt);}
+.rc-desc{font-size:11px;color:var(--txt3);}
+.login-pw-wrap{margin-top:16px;display:none;flex-direction:column;gap:8px;}
+.login-pw-wrap.show{display:flex;}
 .login-input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg-2);color:var(--txt);outline:none;transition:border .15s;font-family:inherit;}
 .login-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(52,211,153,.1);}
+.login-err{display:none;background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2);padding:8px 12px;border-radius:7px;font-size:12px;}
+.login-submit{width:100%;padding:11px;background:var(--accent2);color:#000;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;}
+.login-submit:hover{background:var(--accent);}
+.login-readonly-btn{background:none;border:none;cursor:pointer;font-size:12px;color:var(--txt3);text-decoration:underline;text-underline-offset:3px;margin-top:18px;font-family:inherit;transition:.15s;display:block;width:100%;}
+.login-readonly-btn:hover{color:var(--txt2);}
+/* Role badge */
 .role-badge-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
 .role-readonly-chip{background:rgba(90,107,128,.15);color:var(--txt3);}
 .role-member-chip{background:rgba(96,165,250,.12);color:var(--blue);}
@@ -182,28 +203,48 @@ tr:hover td{background:rgba(52,211,153,.03);}
 
 <!-- ═══ Login Overlay ═══ -->
 <div id="login-overlay">
-  <div class="login-box">
-    <div style="text-align:center;margin-bottom:28px;">
-      <div style="width:52px;height:52px;background:var(--accent-dim);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;">
-        <span class="icon icon-lg" style="color:var(--accent);"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8,21 16,21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+  <div class="login-wrap">
+    <!-- App icon -->
+    <div class="login-app-icon">
+      <span class="icon icon-xl" style="color:var(--accent);"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8,21 16,21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+    </div>
+    <h1 class="login-title">影片發布資訊管理</h1>
+    <p class="login-sub">光田綜合醫院 視覺多媒體設計組</p>
+
+    <div class="login-panel">
+      <p class="login-hint">請選擇您的身份</p>
+
+      <!-- Role cards -->
+      <div class="role-cards">
+        <div class="role-card" id="rc-leader" onclick="selectRole('leader')">
+          <div class="rc-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 20h20M6 20V10l6-7 6 7v10"/><rect x="9" y="14" width="6" height="6" rx="1"/>
+            </svg>
+          </div>
+          <div class="rc-name">組長</div>
+          <div class="rc-desc">最高權限</div>
+        </div>
+        <div class="role-card" id="rc-member" onclick="selectRole('member')">
+          <div class="rc-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg>
+          </div>
+          <div class="rc-name">組員</div>
+          <div class="rc-desc">編輯與刪除</div>
+        </div>
       </div>
-      <div style="font-size:17px;font-weight:700;color:var(--txt);margin-bottom:4px;">影片發布資訊管理</div>
-      <div style="font-size:11px;color:var(--txt3);">光田綜合醫院 視覺多媒體設計組</div>
+
+      <!-- Password section -->
+      <div class="login-pw-wrap" id="login-pw-wrap">
+        <input type="password" id="login-pw" class="login-input" placeholder="請輸入密碼" onkeydown="if(event.key==='Enter')doLogin()">
+        <div class="login-err" id="login-err">密碼錯誤，請再試一次</div>
+        <button class="login-submit" onclick="doLogin()">確認登入</button>
+      </div>
+
+      <button class="login-readonly-btn" onclick="setRole('readonly')">以訪客身份瀏覽（唯讀）</button>
     </div>
-    <div style="margin-bottom:14px;">
-      <label style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:6px;">登入身份</label>
-      <select id="login-role" onchange="onRoleChange()" class="login-input" style="cursor:pointer;">
-        <option value="readonly">唯讀（僅瀏覽，無需密碼）</option>
-        <option value="member">組員</option>
-        <option value="leader">組長</option>
-      </select>
-    </div>
-    <div id="login-pw-group" style="display:none;margin-bottom:14px;">
-      <label style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:6px;">密碼</label>
-      <input type="password" id="login-pw" class="login-input" placeholder="請輸入密碼" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <div id="login-err" style="display:none;background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2);padding:8px 12px;border-radius:7px;font-size:12px;margin-bottom:12px;">密碼錯誤，請再試一次</div>
-    <button onclick="doLogin()" style="width:100%;padding:11px;background:var(--accent2);color:#000;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;">進入系統</button>
   </div>
 </div>
 
@@ -834,7 +875,7 @@ function renderList(){
   if(f.length===0){tb.innerHTML='';em.style.display='block';return;}em.style.display='none';
   tb.innerHTML=f.map(d=>{const tv=totalViews(d),ytv=Number(d.yt_views)||0,fbv=Number(d.fb_views)||0,igv=Number(d.ig_views)||0,lk=d.yt_url||d.fb_url||d.ig_url||'';
     const st=getVideoStatus(d),sc=STATUS_CFG[st];
-    return`<tr><td><span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${sc.bg};color:${sc.color};">${sc.icon} ${sc.label}</span></td><td style="white-space:nowrap;">${(d.date||'').substring(0,10)||'—'}</td><td style="max-width:200px;">${lk?`<a href="${esc(lk)}" target="_blank">${esc(d.title)}</a>`:esc(d.title)}</td><td><span class="type-badge type-${d.type}">${d.type==='short'?'Short':'Long'}</span></td><td>${esc(d.cat||'')}</td><td><div class="views-cell"><span class="total">${tv.toLocaleString()}</span><span class="plats">${ytv?`<span style="color:var(--yt)">YT ${ytv.toLocaleString()}</span>`:''}${fbv?`<span style="color:var(--fb)">FB ${fbv.toLocaleString()}</span>`:''}${igv?`<span style="color:var(--ig)">IG ${igv.toLocaleString()}</span>`:''}</span></div></td><td style="white-space:nowrap;font-size:11px;color:var(--txt3);">${d.statsDate||'—'}</td><td>${esc(d.planner||'')}</td><td><div class="act-btns"><button class="act-btn write-only" onclick="openEdit('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span></button><button class="act-btn del leader-only" onclick="deleteEntry('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></div></td></tr>`;}).join('');
+    return`<tr><td><span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${sc.bg};color:${sc.color};">${sc.icon} ${sc.label}</span></td><td style="white-space:nowrap;">${(d.date||'').substring(0,10)||'—'}</td><td style="max-width:200px;">${lk?`<a href="${esc(lk)}" target="_blank">${esc(d.title)}</a>`:esc(d.title)}</td><td><span class="type-badge type-${d.type}">${d.type==='short'?'Short':'Long'}</span></td><td>${esc(d.cat||'')}</td><td><div class="views-cell"><span class="total">${tv.toLocaleString()}</span><span class="plats">${ytv?`<span style="color:var(--yt)">YT ${ytv.toLocaleString()}</span>`:''}${fbv?`<span style="color:var(--fb)">FB ${fbv.toLocaleString()}</span>`:''}${igv?`<span style="color:var(--ig)">IG ${igv.toLocaleString()}</span>`:''}</span></div></td><td style="white-space:nowrap;font-size:11px;color:var(--txt3);">${d.statsDate||'—'}</td><td>${esc(d.planner||'')}</td><td><div class="act-btns"><button class="act-btn write-only" onclick="openEdit('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span></button><button class="act-btn del write-only" onclick="deleteEntry('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></div></td></tr>`;}).join('');
 }
 function buildMonthFilter(){const ms=[...new Set(DATA.map(d=>(d.date||'').substring(0,7)).filter(Boolean))].sort().reverse();document.getElementById('filter-month').innerHTML='<option value="">全部月份</option>'+ms.map(m=>`<option value="${m}">${m}</option>`).join('');}
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
@@ -1105,7 +1146,7 @@ function renderIgList(){
     <td style="text-align:right;">${(Number(d.shares)||0).toLocaleString()}</td>
     <td style="text-align:right;">${(Number(d.saves)||0).toLocaleString()}</td>
     <td style="text-align:right;">${(Number(d.reach)||0).toLocaleString()}</td>
-    <td><button class="act-btn del leader-only" onclick="deleteIgPost('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></td>
+    <td><button class="act-btn del write-only" onclick="deleteIgPost('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></td>
   </tr>`).join('');
 }
 
@@ -1142,20 +1183,23 @@ const ROLE_PASSWORDS={member:'ktgh20662088',leader:'ktghadmin2026'};
 const ROLE_LABELS={readonly:'唯讀',member:'組員',leader:'組長'};
 const ROLE_CLASSES={readonly:'role-readonly-chip',member:'role-member-chip',leader:'role-leader-chip'};
 let CURRENT_ROLE=sessionStorage.getItem('kt_role')||null;
+let _pendingRole=null;
 
-function onRoleChange(){
-  const r=document.getElementById('login-role').value;
-  const g=document.getElementById('login-pw-group');
-  g.style.display=(r==='readonly')?'none':'block';
+function selectRole(role){
+  _pendingRole=role;
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('rc-'+role).classList.add('sel');
+  const pw=document.getElementById('login-pw-wrap');
+  pw.classList.add('show');
   document.getElementById('login-err').style.display='none';
-  if(r!=='readonly')setTimeout(()=>document.getElementById('login-pw').focus(),50);
+  document.getElementById('login-pw').value='';
+  setTimeout(()=>document.getElementById('login-pw').focus(),50);
 }
 function doLogin(){
-  const role=document.getElementById('login-role').value;
+  if(!_pendingRole)return;
   const pw=(document.getElementById('login-pw').value||'');
-  if(role==='readonly'){setRole('readonly');return;}
-  if(pw===ROLE_PASSWORDS[role]){setRole(role);}
-  else{document.getElementById('login-err').style.display='block';document.getElementById('login-pw').value='';}
+  if(pw===ROLE_PASSWORDS[_pendingRole]){setRole(_pendingRole);}
+  else{document.getElementById('login-err').style.display='block';document.getElementById('login-pw').value='';document.getElementById('login-pw').focus();}
 }
 function setRole(role){
   CURRENT_ROLE=role;
@@ -1177,16 +1221,17 @@ function updateRoleBadge(){
 }
 function switchRole(){
   sessionStorage.removeItem('kt_role');
-  CURRENT_ROLE=null;
+  CURRENT_ROLE=null;_pendingRole=null;
   document.body.className='';
   document.getElementById('login-overlay').style.display='flex';
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('login-pw-wrap').classList.remove('show');
   document.getElementById('login-pw').value='';
   document.getElementById('login-err').style.display='none';
-  document.getElementById('login-role').value='readonly';
-  document.getElementById('login-pw-group').style.display='none';
 }
+// 組員與組長均可寫入與刪除；唯讀不可
 function canWrite(){return CURRENT_ROLE==='member'||CURRENT_ROLE==='leader';}
-function canDelete(){return CURRENT_ROLE==='leader';}
+function canDelete(){return CURRENT_ROLE==='member'||CURRENT_ROLE==='leader';}
 
 // ============================================================
 // 月報表
