@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>影片發布資訊管理 — 光田綜合醫院</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Noto Sans TC',system-ui,-apple-system,sans-serif;
+  min-height:100vh;
+  background-color:#0b0b10;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(154,52,18,.18) 0%, transparent 70%),
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size:100% 100%, 40px 40px, 40px 40px;
+  background-position:0 0, -1px -1px, -1px -1px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 20px;color:#e2e2e8;
+}
+.container{width:100%;max-width:520px;text-align:center}
+
+.icon-wrap{
+  width:72px;height:72px;border-radius:20px;
+  background:linear-gradient(145deg,#3a1208,#9a3412);
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-bottom:28px;
+  box-shadow:0 0 0 1px rgba(251,146,60,.2), 0 0 48px rgba(154,52,18,.35);
+  position:relative;
+}
+.icon-wrap::after{
+  content:'';position:absolute;inset:0;border-radius:20px;
+  background:linear-gradient(135deg,rgba(255,255,255,.07) 0%,transparent 50%);
+}
+
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.22);
+  color:#fb923c;font-size:11px;font-weight:700;letter-spacing:.8px;
+  padding:4px 12px;border-radius:20px;margin-bottom:20px;
+}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:#fb923c;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+h1{font-size:22px;font-weight:700;color:#f0f0f4;letter-spacing:.5px;margin-bottom:10px}
+.sub{font-size:13px;color:#565668;line-height:1.7;margin-bottom:36px}
+
+.divider{
+  display:flex;align-items:center;gap:12px;margin-bottom:28px;
+}
+.divider-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(251,146,60,.15),transparent)}
+.divider-text{font-size:11px;color:#3a3a4a;letter-spacing:.5px}
+
+.features{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;
+  margin-bottom:36px;text-align:left;
+}
+.feature{
+  background:#13131a;border:1px solid #1e1e28;border-radius:12px;
+  padding:14px 16px;display:flex;align-items:flex-start;gap:10px;
+}
+.feature-icon{
+  width:30px;height:30px;border-radius:8px;
+  background:rgba(154,52,18,.15);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.feature-name{font-size:12px;font-weight:600;color:#d4d4e0;margin-bottom:3px}
+.feature-desc{font-size:10.5px;color:#3a3a4a;line-height:1.5}
+
+.back-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:transparent;border:1px solid #2a2a38;border-radius:10px;
+  color:#565668;font-size:13px;padding:10px 20px;
+  cursor:pointer;text-decoration:none;transition:.18s;
+}
+.back-btn:hover{border-color:#3a3a4a;color:#e2e2e8}
+
+.footer{margin-top:40px;font-size:11px;color:#252530;letter-spacing:.6px}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="icon-wrap">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="23 7 16 12 23 17 23 7"/>
+      <rect x="1" y="5" width="15" height="14" rx="2"/>
+    </svg>
+  </div>
+
+  <div class="badge">
+    <div class="badge-dot"></div>
+    開發中
+  </div>
+
+  <h1>影片發布資訊管理</h1>
+  <p class="sub">跨平台影片成效追蹤系統正在建置中<br>預計支援 YouTube、Facebook、Instagram 三平台整合</p>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <span class="divider-text">預計功能</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22.54 6.42A2.78 2.78 0 0 0 20.7 4.56C19.07 4.06 12 4.06 12 4.06S4.93 4.06 3.3 4.56A2.78 2.78 0 0 0 1.46 6.42 29.15 29.15 0 0 0 1 12a29.15 29.15 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.3 19.44C4.93 19.94 12 19.94 12 19.94S19.07 19.94 20.7 19.44a2.78 2.78 0 0 0 1.84-1.86A29.15 29.15 0 0 0 23 12a29.15 29.15 0 0 0-.46-5.58z"/>
+          <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fb923c" stroke="none"/>
+        </svg>
+      </div>
+      <div>
+        <div class="feature-name">YouTube 整合</div>
+        <div class="feature-desc">觀看數、留言、按讚率追蹤</div>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="feature-name">Facebook 整合</div>
+        <div class="feature-desc">觸及率、互動數、分享追蹤</div>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="#fb923c" stroke="none"/>
+        </svg>
+      </div>
+      <div>
+        <div class="feature-name">Instagram 整合</div>
+        <div class="feature-desc">Reels 觀看數、珍藏、觸及</div>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+      </div>
+      <div>
+        <div class="feature-name">KPI 達標管理</div>
+        <div class="feature-desc">績效目標設定與達成率分析</div>
+      </div>
+    </div>
+  </div>
+
+  <a href="/" class="back-btn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"/>
+      <polyline points="12 19 5 12 12 5"/>
+    </svg>
+    返回工具站首頁
+  </a>
+
+</div>
+<p class="footer">光田綜合醫院 · 視覺多媒體設計組 · 僅供內部使用</p>
+</body>
+</html>
