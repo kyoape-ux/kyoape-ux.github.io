@@ -1351,6 +1351,19 @@ function openMonthlyReport(){
     <td style="font-weight:700;">${totalViews(d).toLocaleString()}</td>
   </tr>`).join(''):`<tr><td colspan="8" style="text-align:center;color:#aaa;padding:24px;">本月無影片資料</td></tr>`;
 
+  const top5=[...mData].sort((a,b)=>totalViews(b)-totalViews(a)).slice(0,5);
+  const medalColors=['#F5A623','#9B9B9B','#C47D3E','#0F6E56','#0F6E56'];
+  const top5rows=top5.length>0?top5.map((d,i)=>`<tr>
+    <td style="text-align:center;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:${i<3?medalColors[i]:'#E8F5F1'};color:${i<3?'#fff':'#0F6E56'};font-weight:900;font-size:12px;">${i+1}</span></td>
+    <td style="text-align:left;max-width:240px;">${d.title||''}</td>
+    <td>${d.type==='short'?'Short':'Long'}</td>
+    <td>${d.cat||''}</td>
+    <td>${(Number(d.yt_views)||0).toLocaleString()}</td>
+    <td>${(Number(d.fb_views)||0).toLocaleString()}</td>
+    <td>${(Number(d.ig_views)||0).toLocaleString()}</td>
+    <td style="font-weight:900;color:#0F6E56;">${totalViews(d).toLocaleString()}</td>
+  </tr>`).join(''):`<tr><td colspan="8" style="text-align:center;color:#aaa;padding:24px;">本月無影片資料</td></tr>`;
+
   const html=`<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"><title>${moLabel} 影片成效報告</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -1411,6 +1424,9 @@ tr:nth-child(even) td{background:#FAFAFA;}
     <div class="prog"><div class="prog-lbl"><span>觀看目標（${vGoal.toLocaleString()} 次）</span><span>${tv.toLocaleString()} / ${vGoal.toLocaleString()}</span></div><div class="prog-bg"><div class="prog-fill" style="width:${Math.min(100,vRate)}%"></div></div></div>
     <div class="prog"><div class="prog-lbl"><span>上架目標（${cGoal} 部）</span><span>${cnt} / ${cGoal}</span></div><div class="prog-bg"><div class="prog-fill" style="width:${Math.min(100,cRate)}%"></div></div></div>
   </div>
+  <div class="sec-title">🏆 本月觀看次數 TOP 5</div>
+  <table><thead><tr><th style="width:40px;">排名</th><th>影片標題</th><th>類型</th><th>類別</th><th>YT 觀看</th><th>FB 觀看</th><th>IG 觀看</th><th>全平台合計</th></tr></thead>
+  <tbody>${top5rows}</tbody></table>
   <div class="sec-title">本月影片清單（共 ${cnt} 部）</div>
   <table><thead><tr><th>發布日期</th><th>影片標題</th><th>類型</th><th>類別</th><th>YT 觀看</th><th>FB 觀看</th><th>IG 觀看</th><th>全平台合計</th></tr></thead>
   <tbody>${rows}</tbody></table>
