@@ -3,70 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>光田醫院 多媒體組 工具站</title>
+<title>光田綜合醫院 視覺多媒體設計工具站</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{
     font-family:'Noto Sans TC',system-ui,-apple-system,sans-serif;
     background:#0e0e12;
     min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:40px 20px;
-    color:#e2e2e8;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:48px 20px;color:#e2e2e8;
   }
-  .wrap{width:100%;max-width:860px}
-
-  /* ── header ── */
+  .wrap{width:100%;max-width:900px}
   .hdr{text-align:center;margin-bottom:52px}
   .hdr-logo{
     width:56px;height:56px;border-radius:16px;
     background:linear-gradient(135deg,#1a4d3a,#0f6e56);
     display:inline-flex;align-items:center;justify-content:center;
-    margin-bottom:18px;
-    box-shadow:0 0 32px rgba(15,110,86,.35);
+    margin-bottom:18px;box-shadow:0 0 32px rgba(15,110,86,.35);
   }
-  .hdr h1{font-size:22px;font-weight:700;color:#f0f0f4;letter-spacing:.4px;margin-bottom:6px}
+  .hdr h1{font-size:21px;font-weight:700;color:#f0f0f4;letter-spacing:.5px;margin-bottom:7px}
   .hdr p{font-size:13px;color:#6b6b7a;letter-spacing:.3px}
-
-  /* ── grid ── */
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-
-  /* ── card ── */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
   .card{
-    background:#17171f;
-    border:1px solid #24242f;
-    border-radius:16px;
-    padding:24px 22px;
-    text-decoration:none;
-    color:#e2e2e8;
-    display:flex;flex-direction:column;gap:0;
-    position:relative;overflow:hidden;
-    transition:border-color .2s,transform .2s,box-shadow .2s;
+    background:#17171f;border:1px solid #24242f;border-radius:16px;padding:24px 22px;
+    text-decoration:none;color:#e2e2e8;display:flex;flex-direction:column;
+    position:relative;overflow:hidden;transition:border-color .2s,transform .2s,box-shadow .2s;
   }
   .card::before{
     content:'';position:absolute;top:0;left:0;right:0;height:2px;
-    border-radius:16px 16px 0 0;
-    opacity:0;transition:opacity .2s;
+    border-radius:16px 16px 0 0;opacity:0;transition:opacity .2s;
   }
-  .card:hover{
-    border-color:#2e2e3e;
-    transform:translateY(-3px);
-    box-shadow:0 12px 36px rgba(0,0,0,.45);
-  }
+  .card:hover{border-color:#2e2e3e;transform:translateY(-3px)}
   .card:hover::before{opacity:1}
-
-  /* per-card accent */
   .card-pm::before{background:linear-gradient(90deg,#0f6e56,#2dd4bf)}
-  .card-pm:hover{box-shadow:0 12px 36px rgba(15,110,86,.2)}
+  .card-pm:hover  {box-shadow:0 12px 36px rgba(15,110,86,.22)}
   .card-yt::before{background:linear-gradient(90deg,#c2410c,#f97316)}
-  .card-yt:hover{box-shadow:0 12px 36px rgba(194,65,12,.2)}
+  .card-yt:hover  {box-shadow:0 12px 36px rgba(194,65,12,.22)}
   .card-mt::before{background:linear-gradient(90deg,#4f46e5,#818cf8)}
-  .card-mt:hover{box-shadow:0 12px 36px rgba(79,70,229,.2)}
-
-  /* icon box */
+  .card-mt:hover  {box-shadow:0 12px 36px rgba(79,70,229,.22)}
+  .card-ds::before{background:linear-gradient(90deg,#9333ea,#c084fc)}
+  .card-ds:hover  {box-shadow:0 12px 36px rgba(147,51,234,.22)}
   .card-icon{
     width:44px;height:44px;border-radius:12px;
     display:flex;align-items:center;justify-content:center;
@@ -75,26 +52,23 @@
   .card-pm .card-icon{background:rgba(15,110,86,.18)}
   .card-yt .card-icon{background:rgba(194,65,12,.18)}
   .card-mt .card-icon{background:rgba(79,70,229,.18)}
-
+  .card-ds .card-icon{background:rgba(147,51,234,.18)}
   .card-name{font-size:15px;font-weight:700;color:#f0f0f4;margin-bottom:6px}
-  .card-desc{font-size:12px;color:#6b6b7a;line-height:1.7;flex:1;margin-bottom:14px}
+  .card-desc{font-size:12px;color:#6b6b7a;line-height:1.75;flex:1;margin-bottom:16px}
   .card-badge{
-    display:inline-flex;align-items:center;gap:5px;
-    font-size:10px;font-weight:600;letter-spacing:.5px;
-    padding:3px 9px;border-radius:6px;align-self:flex-start;
+    display:inline-flex;align-items:center;font-size:10px;font-weight:600;
+    letter-spacing:.5px;padding:3px 9px;border-radius:6px;align-self:flex-start;
   }
   .card-pm .card-badge{background:rgba(15,110,86,.15);color:#2dd4bf;border:1px solid rgba(15,110,86,.3)}
   .card-yt .card-badge{background:rgba(194,65,12,.15);color:#fb923c;border:1px solid rgba(194,65,12,.3)}
   .card-mt .card-badge{background:rgba(79,70,229,.15);color:#818cf8;border:1px solid rgba(79,70,229,.3)}
-
-  /* ── footer ── */
+  .card-ds .card-badge{background:rgba(147,51,234,.15);color:#c084fc;border:1px solid rgba(147,51,234,.3)}
   .footer{text-align:center;font-size:11px;color:#3a3a4a;margin-top:40px;letter-spacing:.5px}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- header -->
   <div class="hdr">
     <div class="hdr-logo">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5eead4" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
@@ -102,18 +76,16 @@
         <polyline points="9 22 9 12 15 12 15 22"/>
       </svg>
     </div>
-    <h1>光田醫院 多媒體組 工具站</h1>
+    <h1>光田綜合醫院 視覺多媒體設計工具站</h1>
     <p>行銷暨多媒體製作團隊 · 內部工具</p>
   </div>
 
-  <!-- cards -->
   <div class="grid">
 
-    <!-- 工作進度控管 -->
     <a href="./files/視覺多媒體設計組_專案管理_v3.html" class="card card-pm">
       <div class="card-icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <rect x="9" y="9" width="13" height="13" rx="2"/>
           <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
         </svg>
       </div>
@@ -122,12 +94,11 @@
       <span class="card-badge">v3 Sheets 版</span>
     </a>
 
-    <!-- 影片發布資訊管理 -->
     <a href="./youtube-manager.html" class="card card-yt">
       <div class="card-icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="23 7 16 12 23 17 23 7"/>
-          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+          <rect x="1" y="5" width="15" height="14" rx="2"/>
         </svg>
       </div>
       <div class="card-name">影片發布資訊管理</div>
@@ -135,19 +106,32 @@
       <span class="card-badge">Sheets 後端</span>
     </a>
 
-    <!-- 影音小助手 -->
     <a href="./media-toolkit.html" class="card card-mt">
       <div class="card-icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="23 7 16 12 23 17 23 7"/>
-          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-          <line x1="6" y1="9" x2="6" y2="15"/>
-          <line x1="9" y1="11" x2="9" y2="13"/>
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <line x1="10" y1="9" x2="8" y2="9"/>
         </svg>
       </div>
       <div class="card-name">影音小助手</div>
       <div class="card-desc">影音格式轉換、裁切、合併、浮水印壓製，10+ 項本機處理工具</div>
       <span class="card-badge">Media Toolkit</span>
+    </a>
+
+    <a href="https://kyoape-ux.github.io/kuangtien-poster-generator/" class="card card-ds">
+      <div class="card-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+      </div>
+      <div class="card-name">美編小助手</div>
+      <div class="card-desc">光田品牌海報快速產生器，套版設計、批次輸出，統一視覺風格</div>
+      <span class="card-badge">Poster Generator</span>
     </a>
 
   </div>
