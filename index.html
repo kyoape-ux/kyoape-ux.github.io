@@ -237,7 +237,7 @@ body{
   <div class="grid">
 
     <!-- 美編小助手 -->
-    <a href="https://kyoape-ux.github.io/kuangtien-poster-generator/" class="card card-ds">
+    <a href="https://kyoape-ux.github.io/kuangtien-poster-generator/" target="_blank" rel="noopener" class="card card-ds">
       <div class="card-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -251,7 +251,7 @@ body{
     </a>
 
     <!-- 影音小助手 -->
-    <a href="./media-toolkit.html" class="card card-mt">
+    <a href="./media-toolkit.html" target="_blank" rel="noopener" class="card card-mt">
       <div class="card-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
@@ -363,7 +363,7 @@ document.querySelectorAll('[data-internal]').forEach(function(card) {
     e.preventDefault();
     var href = card.dataset.href;
     if (isAuthed()) {
-      window.location.href = href;
+      window.open(href, '_blank', 'noopener');
       return;
     }
     pendingHref = href;
@@ -382,7 +382,7 @@ function checkPw() {
   if (pwInput.value === ACCESS_PW) {
     sessionStorage.setItem(SESSION_KEY, '1');
     modal.classList.remove('open');
-    window.location.href = pendingHref;
+    window.open(pendingHref, '_blank', 'noopener');
   } else {
     pwErr.textContent = '密碼錯誤，請重試';
     pwInput.classList.add('shake');
