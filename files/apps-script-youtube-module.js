@@ -74,6 +74,13 @@ function doPost(e) {
 
 // ── 影片 CRUD ──────────────────────────────────────────────
 
+function fmtCell(v) {
+  if (v !== null && v !== undefined && typeof v === 'object' && typeof v.getFullYear === 'function') {
+    return Utilities.formatDate(v, 'Asia/Taipei', 'yyyy-MM-dd');
+  }
+  return v;
+}
+
 function getVideos() {
   const ss = SpreadsheetApp.openById(SHEET_ID);
   const sh = ss.getSheetByName(YT_SHEET);
@@ -83,7 +90,7 @@ function getVideos() {
   const headers = rows[0];
   const videos = rows.slice(1).map(row => {
     const obj = {};
-    headers.forEach((h, i) => { obj[h] = row[i]; });
+    headers.forEach((h, i) => { obj[h] = fmtCell(row[i]); });
     return obj;
   });
   return { videos };
@@ -149,7 +156,7 @@ function getIgPosts() {
   const headers = rows[0];
   const posts = rows.slice(1).map(row => {
     const obj = {};
-    headers.forEach((h, i) => { obj[h] = row[i]; });
+    headers.forEach((h, i) => { obj[h] = fmtCell(row[i]); });
     return obj;
   });
   return { posts };

@@ -763,7 +763,7 @@ async function syncFromSheets(){
   const r=await apiGet('getVideos');
   if(r&&r.videos){
     // Sheets 是唯一資料源（多人多電腦同步）
-    DATA=r.videos;
+    DATA=r.videos.map(v=>({...v,date:fixDate(v.date)}));
     saveData();
     return true;
   }
@@ -771,7 +771,8 @@ async function syncFromSheets(){
 }
 async function pushToSheets(a,p){const r=await apiPost(a,p);return r&&r.success;}
 async function syncConfigFromSheets(){const r=await apiGet('getConfig');if(r&&!r.error){CFG={...CFG,...r};localStorage.setItem('kt_yt_cfg',JSON.stringify(CFG));return true;}return false;}
-async function syncIgFromSheets(){const r=await apiGet('getIgPosts');if(r&&r.posts){if(r.posts.length===0&&IG_DATA.length>0){return false;}IG_DATA=r.posts;saveIgData();return true;}return false;}
+function fixDate(d){if(!d)return '';if(d.length===10)return d;try{const dt=new Date(d);const local=new Date(dt.getTime()+8*3600000);return local.toISOString().substring(0,10);}catch(e){return String(d).substring(0,10);}}
+async function syncIgFromSheets(){const r=await apiGet('getIgPosts');if(r&&r.posts){if(r.posts.length===0&&IG_DATA.length>0){return false;}IG_DATA=r.posts.map(p=>({...p,date:fixDate(p.date)}));saveIgData();return true;}return false;}
 
 // ============================================================
 // 資料層
