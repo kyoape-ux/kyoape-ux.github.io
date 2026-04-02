@@ -748,7 +748,7 @@ let dashYear=new Date().getFullYear();
 // ============================================================
 // API
 // ============================================================
-let API_URL=localStorage.getItem('kt_yt_api')||'https://script.google.com/macros/s/AKfycbwtLeYbAMBQcJl5i4_cEseIF6ObcvVoU8LEhuSY16rD8HMPIWR8-TfAY9OUnZFAbP1f6Q/exec';
+let API_URL=localStorage.getItem('kt_yt_api')||'https://script.google.com/macros/s/AKfycbwk15CyHVjq3cOQ9onJccEX-_puFO2VqR7et9nWk-1ta-LkAyG8O9CrlmKqlkWjdbIN/exec';
 const USE_API=()=>!!API_URL;
 async function apiGet(a){if(!USE_API())return null;try{const r=await fetch(`${API_URL}?module=youtube&action=${a}`);return await r.json();}catch(e){console.warn('API GET:',e);return null;}}
 async function apiPost(a,p){if(!USE_API())return null;try{const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({module:'youtube',action:a,...p})});return await r.json();}catch(e){console.warn('API POST:',e);return null;}}
