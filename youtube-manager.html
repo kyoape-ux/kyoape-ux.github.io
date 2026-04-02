@@ -1325,32 +1325,6 @@ function canDelete(){return CURRENT_ROLE==='member'||CURRENT_ROLE==='leader';}
 // ============================================================
 // 月報表
 // ============================================================
-let _rptCtx=null; // 儲存當前報表 context 供彈出視窗呼叫
-
-async function rptSheetsExport(btn){
-  if(!_rptCtx)return;
-  const {ym,moLabel,videos}=_rptCtx;
-  if(btn){btn.disabled=true;btn.textContent='匯出中…';}
-  try{
-    const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({module:'youtube',action:'createMonthlyReport',ym,moLabel,videos})});
-    const j=await r.json();
-    if(j.success){
-      if(btn){btn.textContent='✅ 已存入 Sheets';}
-      window.open('https://docs.google.com/spreadsheets/d/'+j.sheetId+'/edit#gid='+j.gid,'_blank');
-    }else{if(btn)btn.textContent='❌ 失敗：'+(j.error||'');}
-  }catch(e){if(btn)btn.textContent='❌ 錯誤：'+e.message;}
-  setTimeout(()=>{if(btn){btn.textContent='📊 存入 Google Sheets';btn.disabled=false;}},4000);
-}
-
-function rptCsvExport(){
-  if(!_rptCtx)return;
-  const {moLabel,videos}=_rptCtx;
-  const h=['發布日期','影片標題','類型','類別','YT觀看','FB觀看','IG觀看','全平台合計','企劃','製作'];
-  const rows=videos.map(d=>[d.date||'',d.title||'',d.type||'',d.cat||'',Number(d.yt_views)||0,Number(d.fb_views)||0,Number(d.ig_views)||0,(Number(d.yt_views)||0)+(Number(d.fb_views)||0)+(Number(d.ig_views)||0),d.planner||'',d.producer||'']);
-  const csv='\uFEFF'+[h,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download=moLabel+'_影片成效.csv';a.click();
-}
 
 function openMonthlyReport(){
   const yr=document.getElementById('rpt-year').value;
@@ -1427,19 +1401,10 @@ td:nth-child(2){text-align:left;}
 tr:last-child td{border-bottom:none;}
 tr:nth-child(even) td{background:#FAFAFA;}
 .footer{margin-top:32px;padding-top:12px;border-top:1px solid #E0E0E0;font-size:11px;color:#BBB;display:flex;justify-content:space-between;}
-.action-bar{position:fixed;bottom:24px;right:24px;display:flex;gap:10px;z-index:99;}
-.print-btn,.sheets-btn,.csv-btn{border:none;border-radius:10px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
-.print-btn{background:#0F6E56;color:#fff;box-shadow:0 4px 12px rgba(15,110,86,.3);}
-.sheets-btn{background:#1565C0;color:#fff;box-shadow:0 4px 12px rgba(21,101,192,.3);}
-.csv-btn{background:#fff;color:#0F6E56;border:2px solid #B8DFC9;}
-.sheets-btn:disabled,.csv-btn:disabled{opacity:.6;cursor:not-allowed;}
-@media print{.action-bar{display:none;}@page{size:A4;margin:15mm;}}
+.print-btn{position:fixed;bottom:24px;right:24px;background:#0F6E56;color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(15,110,86,.3);}
+@media print{.print-btn{display:none;}@page{size:A4;margin:15mm;}}
 </style></head><body>
-<div class="action-bar">
-  <button class="csv-btn" onclick="window.opener&&window.opener.rptCsvExport()">📥 下載 CSV</button>
-  <button class="sheets-btn" id="sheets-btn" onclick="window.opener&&window.opener.rptSheetsExport(this)">📊 存入 Google Sheets</button>
-  <button class="print-btn" onclick="window.print()">🖨️ 列印 / PDF</button>
-</div>
+<button class="print-btn" onclick="window.print()">🖨️ 列印 / 存成 PDF</button>
 <div class="report">
   <div class="hd">
     <div class="hd-l"><h1>${moLabel} 影片發布成效報告</h1><p>光田綜合醫院 視覺多媒體設計組</p></div>
@@ -1469,7 +1434,6 @@ tr:nth-child(even) td{background:#FAFAFA;}
   <div class="footer"><span>光田綜合醫院 視覺多媒體設計組 · 僅供內部使用</span><span>影片發布資訊管理系統 · 產製於 ${now}</span></div>
 </div></body></html>`;
 
-  _rptCtx={ym,moLabel,videos:mData};
   const w=window.open('','_blank');w.document.write(html);w.document.close();
 }
 
