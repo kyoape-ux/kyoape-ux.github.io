@@ -1408,13 +1408,12 @@ tr:nth-child(even) td{background:#FAFAFA;}
 .csv-btn{background:#fff;color:#0F6E56;border:2px solid #B8DFC9;}
 .sheets-btn:disabled,.csv-btn:disabled{opacity:.6;cursor:not-allowed;}
 @media print{.action-bar{display:none;}@page{size:A4;margin:15mm;}}
-</style>
-<script>
+\x3C/style>
+\x3Cscript>
 const _API='${API_URL}';
 const _YM='${ym}';
 const _LABEL='${moLabel}';
 const _VIDEOS=${JSON.stringify(mData)};
-const _SHEET_ID='${SHEET_ID}';
 async function exportToSheets(){
   const btn=document.getElementById('sheets-btn');
   btn.disabled=true;btn.textContent='匯出中…';
@@ -1435,8 +1434,8 @@ function exportCSV(){
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download=_LABEL+'_影片成效.csv';a.click();
 }
-</script>
-</head><body>
+\x3C/script>
+\x3C/head>\x3Cbody>
 <div class="action-bar">
   <button class="csv-btn" onclick="exportCSV()">📥 下載 CSV</button>
   <button class="sheets-btn" id="sheets-btn" onclick="exportToSheets()">📊 存入 Google Sheets</button>
