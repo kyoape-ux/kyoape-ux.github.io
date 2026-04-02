@@ -771,7 +771,7 @@ async function syncFromSheets(){
 }
 async function pushToSheets(a,p){const r=await apiPost(a,p);return r&&r.success;}
 async function syncConfigFromSheets(){const r=await apiGet('getConfig');if(r&&!r.error){CFG={...CFG,...r};localStorage.setItem('kt_yt_cfg',JSON.stringify(CFG));return true;}return false;}
-async function syncIgFromSheets(){const r=await apiGet('getIgPosts');if(r&&r.posts){IG_DATA=r.posts;saveIgData();return true;}return false;}
+async function syncIgFromSheets(){const r=await apiGet('getIgPosts');if(r&&r.posts){if(r.posts.length===0&&IG_DATA.length>0){return false;}IG_DATA=r.posts;saveIgData();return true;}return false;}
 
 // ============================================================
 // 資料層
@@ -1172,7 +1172,7 @@ async function bulkUploadIgToSheets(){
   }
   btn.disabled=false;btn.textContent='⬆ 上傳本機→Sheets';
   showSyncBadge(`✅ IG 上傳完成：${ok} 筆成功${fail?'，'+fail+' 筆失敗':''}`);
-  if(ok>0){syncIgFromSheets().then(()=>renderIgAll());}
+  if(ok>0){setTimeout(()=>syncIgFromSheets().then(ok2=>{if(ok2)renderIgAll();else renderIgAll();}),1500);}else{renderIgAll();}
 }
 
 function openEditIg(id){

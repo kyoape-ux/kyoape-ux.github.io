@@ -174,7 +174,7 @@ function saveIgPost(data) {
 function updateIgPost(data) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
   const sh = ss.getSheetByName(IG_SHEET);
-  if (!sh) return { success: false, error: 'Sheet not found' };
+  if (!sh) return saveIgPost(data); // sheet 不存在時自動建立並新增
   const rows = sh.getDataRange().getValues();
   const headers = rows[0];
   for (let i = 1; i < rows.length; i++) {
