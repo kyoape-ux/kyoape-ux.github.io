@@ -535,6 +535,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
             <select id="ig-filter-month" onchange="renderIgList()" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-2);color:var(--txt);"><option value="">全部月份</option></select>
             <select id="ig-filter-type" onchange="renderIgList()" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-2);color:var(--txt);"><option value="">全部類型</option><option value="1">貼文</option><option value="2">測驗</option><option value="3">影片</option></select>
             <button class="btn btn-secondary btn-sm" onclick="exportIgCSV()">匯出 CSV</button>
+            <button id="ig-upload-btn" class="btn btn-sm write-only" onclick="bulkUploadIgToSheets()" style="background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25);" title="將本機所有 IG 貼文上傳到 Google Sheets">⬆ 上傳本機→Sheets</button>
           </div>
         </div>
         <div class="tbl-wrap">
@@ -1156,6 +1157,22 @@ function deleteIgPost(id){
   if(!confirm('確定刪除此 IG 貼文？'))return;
   IG_DATA=IG_DATA.filter(d=>d.id!==id);saveIgData();renderIgAll();
   pushToSheets('deleteIgPost',{id}).then(ok=>showSyncBadge(ok?'已刪除':'本機已刪除'));
+}
+
+async function bulkUploadIgToSheets(){
+  if(!USE_API()){alert('請先設定 API URL');return;}
+  if(!IG_DATA.length){alert('本機沒有 IG 資料');return;}
+  const btn=document.getElementById('ig-upload-btn');
+  btn.disabled=true;btn.textContent='上傳中...';
+  let ok=0,fail=0;
+  for(const post of IG_DATA){
+    const r=await apiPost('updateIgPost',{data:post});
+    if(r&&r.success)ok++;else fail++;
+    btn.textContent=`上傳中 ${ok+fail}/${IG_DATA.length}`;
+  }
+  btn.disabled=false;btn.textContent='⬆ 上傳本機→Sheets';
+  showSyncBadge(`✅ IG 上傳完成：${ok} 筆成功${fail?'，'+fail+' 筆失敗':''}`);
+  if(ok>0){syncIgFromSheets().then(()=>renderIgAll());}
 }
 
 function openEditIg(id){
