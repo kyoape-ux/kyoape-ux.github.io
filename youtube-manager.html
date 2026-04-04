@@ -32,7 +32,13 @@ a{color:var(--accent);text-decoration:none;}
 
 /* ── Layout ────────────────────────────────────────── */
 .app{display:flex;min-height:100vh;}
-.sidebar{width:240px;background:var(--bg-1);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;}
+.topbar{position:fixed;top:0;left:0;right:0;height:44px;background:var(--bg-1);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 20px;z-index:200;}
+.topbar-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.15s;text-decoration:none;white-space:nowrap;user-select:none;}
+.topbar-btn-guide{background:rgba(251,191,36,.12);color:#FBBF24;border:1px solid rgba(251,191,36,.25);}
+.topbar-btn-guide:hover{background:rgba(251,191,36,.2);}
+.topbar-btn-sheets{background:rgba(52,211,153,.12);color:#34D399;border:1px solid rgba(52,211,153,.25);}
+.topbar-btn-sheets:hover{background:rgba(52,211,153,.2);}
+.sidebar{width:240px;background:var(--bg-1);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;position:fixed;top:44px;left:0;bottom:0;z-index:50;}
 .sidebar-brand{display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:6px;}
 .sidebar-brand .icon{color:var(--accent);width:26px;height:26px;}
 .sidebar-brand span{font-size:17px;font-weight:700;color:var(--txt);letter-spacing:.3px;}
@@ -46,7 +52,7 @@ a{color:var(--accent);text-decoration:none;}
 .sidebar-footer a{font-size:12px;color:var(--txt3);display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:6px;transition:.12s;}
 .sidebar-footer a:hover{color:var(--accent);background:var(--accent-dim);}
 
-.main{margin-left:240px;flex:1;padding:28px 36px;max-width:1200px;}
+.main{margin-left:240px;flex:1;padding:28px 36px;max-width:1200px;padding-top:72px;}
 .page{display:none;}
 .page.active{display:block;}
 .page-title{font-size:18px;font-weight:700;margin-bottom:22px;display:flex;align-items:center;gap:10px;color:var(--txt);}
@@ -155,7 +161,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
 /* ── Responsive ────────────────────────────────────── */
 @media(max-width:860px){
   .sidebar{display:none;}
-  .main{margin-left:0;padding:20px 16px;}
+  .main{margin-left:0;padding:20px 16px;padding-top:64px;}
   .chart-row{grid-template-columns:1fr;}
   .form-grid{grid-template-columns:1fr;}
   .form-grid.cols3{grid-template-columns:1fr 1fr;}
@@ -248,6 +254,18 @@ tr:hover td{background:rgba(52,211,153,.03);}
   </div>
 </div>
 
+<!-- ═══ 凍結頂欄 ═══ -->
+<div class="topbar">
+  <button class="topbar-btn topbar-btn-guide" onclick="(function(){window.open('https://docs.google.com/document/d/1lhgsVhbfde4NA17ChK1XUkLax8S_TZmMB0rS4Z7dPDI/edit','_blank')})()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    使用指南
+  </button>
+  <button class="topbar-btn topbar-btn-sheets" onclick="(function(){window.open('https://docs.google.com/spreadsheets/d/1lhgsVhbfde4NA17ChK1XUkLax8S_TZmMB0rS4Z7dPDI/edit','_blank')})()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+    Google Sheets
+  </button>
+</div>
+
 <div class="app">
   <!-- ═══ Sidebar ═══ -->
   <nav class="sidebar">
@@ -316,11 +334,6 @@ tr:hover td{background:rgba(52,211,153,.03);}
     </div>
   </div>
 
-  <!-- Google Sheets 快捷按鈕（固定右上角） -->
-  <a id="sheets-fab" href="https://docs.google.com/spreadsheets/d/1lhgsVhbfde4NA17ChK1XUkLax8S_TZmMB0rS4Z7dPDI/edit" target="_blank" title="開啟 Google Sheets 資料表" style="position:fixed;top:16px;right:20px;z-index:900;display:flex;align-items:center;gap:7px;background:#1e6b3f;color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.35);transition:background .15s,transform .1s;letter-spacing:.2px;" onmouseover="this.style.background='#25854d';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#1e6b3f';this.style.transform='translateY(0)'">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
-    Google Sheets
-  </a>
 
   <!-- ═══ Main Content ═══ -->
   <div class="main">
