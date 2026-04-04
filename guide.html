@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>使用指南｜影片管理中心</title>
+<style>
+:root{--accent:#0F6E56;--accent-light:#E8F5F0;--bg:#FAFBFC;--card:#FFFFFF;--txt:#1A1A2E;--txt2:#4A5568;--txt3:#718096;--border:#E2E8F0;--radius:12px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans TC',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:15px;line-height:1.8;-webkit-font-smoothing:antialiased;}
+.container{max-width:860px;margin:0 auto;padding:40px 24px 80px;}
+.header{text-align:center;margin-bottom:48px;padding:40px 20px;background:linear-gradient(135deg,#0F6E56,#1A9E78);border-radius:var(--radius);color:#fff;}
+.header h1{font-size:28px;font-weight:800;margin-bottom:6px;}
+.header p{font-size:14px;opacity:.85;}
+.header .ver{display:inline-block;margin-top:12px;padding:4px 12px;background:rgba(255,255,255,.2);border-radius:20px;font-size:12px;font-weight:600;}
+.toc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:36px;}
+.toc h2{font-size:16px;font-weight:700;margin-bottom:14px;color:var(--accent);}
+.toc ol{padding-left:20px;}
+.toc li{margin:6px 0;}
+.toc a{color:var(--accent);text-decoration:none;font-size:14px;font-weight:500;}
+.toc a:hover{text-decoration:underline;}
+.section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;margin-bottom:24px;}
+.section h2{font-size:20px;font-weight:800;color:var(--accent);margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--accent-light);display:flex;align-items:center;gap:10px;}
+.section h2 .num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:var(--accent);color:#fff;border-radius:8px;font-size:14px;flex-shrink:0;}
+.section h3{font-size:16px;font-weight:700;margin:20px 0 10px;color:var(--txt);}
+.section p{margin:8px 0;color:var(--txt2);}
+.section ul,.section ol{margin:8px 0 12px 20px;color:var(--txt2);}
+.section li{margin:4px 0;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;}
+.badge-leader{background:#DBEAFE;color:#1D4ED8;}
+.badge-member{background:#E0E7FF;color:#4338CA;}
+.badge-readonly{background:#F1F5F9;color:#64748B;}
+.badge-yt{background:#FEE2E2;color:#DC2626;}
+.badge-fb{background:#DBEAFE;color:#2563EB;}
+.badge-ig{background:#FCE7F3;color:#DB2777;}
+.tip{background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px;color:#92400E;}
+.tip::before{content:'💡 ';font-size:14px;}
+.warn{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px;color:#991B1B;}
+.warn::before{content:'⚠️ ';font-size:14px;}
+.key{display:inline-block;padding:2px 8px;background:#F1F5F9;border:1px solid #CBD5E1;border-radius:4px;font-size:12px;font-family:monospace;color:var(--txt);}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+th{background:var(--accent-light);color:var(--accent);text-align:left;padding:10px 12px;font-weight:600;}
+td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--txt2);}
+tr:last-child td{border-bottom:none;}
+.status-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;}
+.dot-red{background:#EF4444;}
+.dot-yellow{background:#F59E0B;}
+.dot-green{background:#10B981;}
+.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0;}
+.flow-step{background:var(--accent-light);color:var(--accent);padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;}
+.flow-arrow{color:var(--txt3);font-size:18px;}
+.back-btn{position:fixed;bottom:24px;right:24px;padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:100;text-decoration:none;}
+.back-btn:hover{background:#0D5F4A;}
+@media(max-width:640px){.container{padding:20px 12px 60px;}.section{padding:20px 18px;}.header{padding:28px 16px;}.header h1{font-size:22px;}}
+@media print{.back-btn{display:none;}.header{break-after:avoid;}}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+  <h1>影片管理中心 — 使用指南</h1>
+  <p>光田綜合醫院 視覺多媒體設計組</p>
+  <span class="ver">v2.0 · 2026</span>
+</div>
+
+<!-- 目錄 -->
+<div class="toc" id="top">
+  <h2>目錄</h2>
+  <ol>
+    <li><a href="#s1">系統簡介與登入</a></li>
+    <li><a href="#s2">身份權限說明</a></li>
+    <li><a href="#s3">儀表板 Dashboard</a></li>
+    <li><a href="#s4">新增影片</a></li>
+    <li><a href="#s5">影片列表</a></li>
+    <li><a href="#s6">IG 貼文管理</a></li>
+    <li><a href="#s7">匯出報表</a></li>
+    <li><a href="#s8">系統設定</a></li>
+    <li><a href="#s9">常見問題 FAQ</a></li>
+  </ol>
+</div>
+
+<!-- 1. 系統簡介 -->
+<div class="section" id="s1">
+  <h2><span class="num">1</span> 系統簡介與登入</h2>
+  <p>本系統用於管理多媒體組在 <strong>YouTube、Facebook、Instagram</strong> 三大平台的影片發布紀錄與數據追蹤，提供儀表板分析、報表匯出等功能。</p>
+
+  <h3>首次使用流程</h3>
+  <div class="flow">
+    <span class="flow-step">開啟網站</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">選擇身份</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">輸入密碼</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">進入系統</span>
+  </div>
+
+  <h3>資料儲存方式</h3>
+  <ul>
+    <li><strong>本機快取</strong>：資料暫存於瀏覽器 localStorage，切換裝置時不會自動同步。</li>
+    <li><strong>Google Sheets 雲端</strong>：設定 API 後，新增/編輯/刪除皆會自動同步至 Google Sheets。</li>
+  </ul>
+  <div class="tip">多台電腦使用時，請先按「同步」按鈕從 Google Sheets 取得最新資料。</div>
+</div>
+
+<!-- 2. 身份權限 -->
+<div class="section" id="s2">
+  <h2><span class="num">2</span> 身份權限說明</h2>
+  <p>系統設有三種身份，登入後可隨時點擊右上角身份按鈕切換：</p>
+  <table>
+    <tr><th>身份</th><th>權限</th><th>適用對象</th></tr>
+    <tr>
+      <td><span class="badge badge-readonly">唯讀</span></td>
+      <td>僅瀏覽儀表板、列表、報表（無法新增 / 編輯）</td>
+      <td>主管、外部查閱</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-member">組員</span></td>
+      <td>可新增、編輯、刪除影片及 IG 貼文</td>
+      <td>多媒體組成員</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-leader">組長</span></td>
+      <td>完整權限：含系統設定、績效目標修改、資料管理</td>
+      <td>組長</td>
+    </tr>
+  </table>
+  <div class="warn">密碼由組長管理，請勿外流。忘記密碼請聯繫組長重設。</div>
+</div>
+
+<!-- 3. 儀表板 -->
+<div class="section" id="s3">
+  <h2><span class="num">3</span> 儀表板 Dashboard</h2>
+  <p>儀表板是首頁，提供整體績效概覽與數據圖表。</p>
+
+  <h3>頂部按鈕列</h3>
+  <table>
+    <tr><th>按鈕</th><th>功能</th></tr>
+    <tr><td>Google Sheets</td><td>開啟後端 Google Sheets 查看原始資料</td></tr>
+    <tr><td>同步</td><td>手動從 Google Sheets 拉取最新資料</td></tr>
+    <tr><td>匯出月報</td><td>跳至報表頁面產生月報</td></tr>
+    <tr><td>匯入數據</td><td>跳至新增影片頁面</td></tr>
+    <tr><td>使用指南</td><td>開啟本頁面</td></tr>
+  </table>
+
+  <h3>檢視期間切換</h3>
+  <ul>
+    <li><strong>月</strong>：查看單月數據，可選擇月份。</li>
+    <li><strong>季</strong>：查看季度數據（Q1: 1-3 月、Q2: 4-6 月、Q3: 7-9 月、Q4: 10-12 月），點擊 Q1~Q4 切換。</li>
+    <li><strong>年</strong>：查看全年 12 個月的加總數據。</li>
+  </ul>
+
+  <h3>KPI 卡片（4 張）</h3>
+  <table>
+    <tr><th>指標</th><th>說明</th></tr>
+    <tr><td>全平台觀看</td><td>YouTube + Facebook + Instagram 的觀看數加總</td></tr>
+    <tr><td>上傳部數</td><td>該期間的影片發布數量</td></tr>
+    <tr><td>平均 CTR</td><td>YouTube 影片的平均點閱率</td></tr>
+    <tr><td>獎勵影片</td><td>單片 YT 觀看數達標的影片數量（預設門檻 2,000 次）</td></tr>
+  </table>
+
+  <h3>圖表說明</h3>
+  <ul>
+    <li><strong>觀看趨勢</strong>：長條圖，顯示各月份三大平台觀看數疊加。</li>
+    <li><strong>各平台觀看占比</strong>：圓餅圖，顯示 YT / FB / IG 各平台占比。</li>
+    <li><strong>類別分布</strong>：圓餅圖，依內容類別（疾病衛教、特色醫療…）分布。</li>
+    <li><strong>影片類型分布</strong>：圓餅圖，Long（長片）vs Short（短片/Reels）比例。</li>
+    <li><strong>Top 5 影片</strong>：橫條圖，全平台觀看數前 5 名。</li>
+  </ul>
+
+  <h3>待處理提醒</h3>
+  <p>發布超過 1 個月但觀看數仍為 0 的影片會出現紅色提醒，提醒您更新數據。</p>
+</div>
+
+<!-- 4. 新增影片 -->
+<div class="section" id="s4">
+  <h2><span class="num">4</span> 新增影片</h2>
+  <p>此頁面用於新增影片紀錄，包含基本資訊與三大平台數據。</p>
+
+  <h3>必填欄位</h3>
+  <ul>
+    <li><strong>影片標題</strong>：輸入影片名稱。</li>
+    <li><strong>發布日期</strong>：影片上線的日期。</li>
+  </ul>
+
+  <h3>選填欄位</h3>
+  <ul>
+    <li><strong>影片類型</strong>：Long（長片）/ Short（短片/Reels）。</li>
+    <li><strong>內容類別</strong>：疾病衛教、特色醫療、新服務流程、醫院形象、員工活動、教學、其他。</li>
+    <li><strong>影片時長</strong>：格式為 <span class="key">3:25</span>（分:秒）。</li>
+    <li><strong>負責企劃 / 影片製作</strong>：填寫人員姓名。</li>
+  </ul>
+
+  <h3>平台數據區</h3>
+  <p>分為三大平台，各自填入該平台的數據：</p>
+  <table>
+    <tr><th>平台</th><th>可填欄位</th></tr>
+    <tr><td><span class="badge badge-yt">YouTube</span></td><td>連結、觀看次數、按讚、留言、曝光次數、CTR、觀看比例、平均觀看時長</td></tr>
+    <tr><td><span class="badge badge-fb">Facebook</span></td><td>連結、觀看次數、按讚/心情、留言、分享、觸及人數</td></tr>
+    <tr><td><span class="badge badge-ig">Instagram</span></td><td>連結、觀看次數、按讚、留言、分享、觸及人數</td></tr>
+  </table>
+
+  <h3>自動取得 YT 數據</h3>
+  <div class="flow">
+    <span class="flow-step">貼上 YouTube 連結</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">點擊「自動取得 YT 數據」</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">系統自動填入數據</span>
+  </div>
+  <div class="tip">此功能需在「系統設定」頁面先設定 YouTube Data API Key。API Key 可至 Google Cloud Console 免費申請。</div>
+</div>
+
+<!-- 5. 影片列表 -->
+<div class="section" id="s5">
+  <h2><span class="num">5</span> 影片列表</h2>
+  <p>管理所有已建立的影片紀錄，支援搜尋、篩選、批次更新等功能。</p>
+
+  <h3>影片狀態標記</h3>
+  <table>
+    <tr><th>狀態</th><th>圖示</th><th>說明</th></tr>
+    <tr><td>待抓取</td><td><span class="status-dot dot-red"></span></td><td>發布超過 1 個月，但觀看數 = 0（需更新數據）</td></tr>
+    <tr><td>統計中</td><td><span class="status-dot dot-yellow"></span></td><td>發布未滿 1 個月（數據持續累積中）</td></tr>
+    <tr><td>已定案</td><td><span class="status-dot dot-green"></span></td><td>發布超過 1 個月且已有觀看數（數據已鎖定）</td></tr>
+  </table>
+  <div class="tip">統計規則：每部影片以「發布後 1 個月內」的觀看數為 KPI 基準。</div>
+
+  <h3>搜尋與篩選</h3>
+  <ul>
+    <li><strong>關鍵字搜尋</strong>：可搜尋標題、企劃、製作人員。</li>
+    <li><strong>篩選器</strong>：依類型（Short/Long）、類別、月份篩選。</li>
+  </ul>
+
+  <h3>批次操作</h3>
+  <table>
+    <tr><th>按鈕</th><th>功能</th></tr>
+    <tr><td>批次更新 YT 數據</td><td>自動更新所有已填入 YouTube 連結的影片數據（需 API Key）</td></tr>
+    <tr><td>匯入 YT Studio CSV</td><td>匯入從 YouTube Studio 匯出的 CSV 檔案，自動新增影片</td></tr>
+    <tr><td>匯出 CSV</td><td>將所有影片資料匯出為 CSV 檔案（UTF-8 編碼）</td></tr>
+  </table>
+
+  <h3>編輯 / 刪除</h3>
+  <p>每筆影片右側有「編輯」及「刪除」按鈕（僅組員/組長可見）。點擊編輯會開啟彈窗表單，修改後點「更新」即可。</p>
+</div>
+
+<!-- 6. IG 貼文管理 -->
+<div class="section" id="s6">
+  <h2><span class="num">6</span> IG 貼文管理</h2>
+  <p>獨立管理 Instagram 貼文（與影片管理中的 IG 數據欄位不同，此為純 IG 貼文追蹤）。</p>
+
+  <h3>新增 IG 貼文</h3>
+  <ul>
+    <li><strong>必填</strong>：標題、發布日期。</li>
+    <li><strong>貼文類型</strong>：貼文（圖片）、測驗、影片 Reels。</li>
+    <li><strong>數據欄位</strong>：觀看次數、按讚、留言、互動次數、分享、儲存、觸及帳號。</li>
+  </ul>
+
+  <h3>類型標籤顏色</h3>
+  <table>
+    <tr><th>類型</th><th>顏色</th></tr>
+    <tr><td>貼文</td><td><span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;background:rgba(225,48,108,.15);color:#E1306C;">粉紅色</span></td></tr>
+    <tr><td>測驗</td><td><span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;background:rgba(251,191,36,.15);color:#D97706;">琥珀色</span></td></tr>
+    <tr><td>影片</td><td><span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;background:rgba(96,165,250,.15);color:#3B82F6;">藍色</span></td></tr>
+  </table>
+
+  <h3>KPI 與圖表</h3>
+  <p>顯示當月 IG 的觀看、互動、觸及、儲存等 KPI 卡片，以及月度觀看趨勢圖和貼文類型分布圖。</p>
+
+  <h3>批次上傳至 Sheets</h3>
+  <p>點擊「上傳至 Sheets」可將所有本機 IG 貼文資料批次同步至 Google Sheets。</p>
+</div>
+
+<!-- 7. 匯出報表 -->
+<div class="section" id="s7">
+  <h2><span class="num">7</span> 匯出報表</h2>
+  <p>系統可產生月報表與年度報表，格式適合列印或儲存為 PDF。</p>
+
+  <h3>月報表</h3>
+  <div class="flow">
+    <span class="flow-step">選擇年月</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">點「產生月報表」</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">新視窗開啟報表</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">列印 / 儲存 PDF</span>
+  </div>
+  <p><strong>月報表包含：</strong></p>
+  <ul>
+    <li>4 張 KPI 卡片（上傳部數、總觀看、觀看達成率、上傳達成率）</li>
+    <li>三大平台觀看數與達成進度條</li>
+    <li>本月觀看次數 TOP 5 影片排名</li>
+    <li>完整影片清單（含各平台數據）</li>
+    <li>IG 貼文統計區塊（觀看、互動、分享、儲存 + 貼文列表）</li>
+  </ul>
+
+  <h3>年度報表</h3>
+  <p>選擇年份後點「產生年度報表」，包含：</p>
+  <ul>
+    <li>全年度 KPI 總覽</li>
+    <li>各季度 (Q1~Q4) 摘要表格</li>
+    <li>12 個月逐月趨勢表</li>
+    <li>年度 TOP 10 影片排名</li>
+  </ul>
+
+  <div class="tip">列印時請選擇「儲存為 PDF」以保存電子檔；建議使用 Chrome 瀏覽器列印效果最佳。</div>
+</div>
+
+<!-- 8. 系統設定 -->
+<div class="section" id="s8">
+  <h2><span class="num">8</span> 系統設定（僅組長）</h2>
+
+  <h3>績效目標</h3>
+  <table>
+    <tr><th>設定</th><th>說明</th><th>預設值</th></tr>
+    <tr><td>月觀看目標</td><td>全平台每月觀看數目標</td><td>5,000</td></tr>
+    <tr><td>月上傳部數目標</td><td>每月應上傳的影片數</td><td>6</td></tr>
+    <tr><td>單片獎勵門檻</td><td>單部影片 YT 觀看數達此數即列入獎勵</td><td>2,000</td></tr>
+  </table>
+
+  <h3>API 連線</h3>
+  <ul>
+    <li><strong>Apps Script Web App URL</strong>：後端 Google Sheets API 位址。部署方式請參考程式碼註解。</li>
+    <li><strong>YouTube Data API Key</strong>：用於自動取得 YT 數據的金鑰，可至 <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a> 免費申請。</li>
+    <li><strong>測試連線</strong>：驗證 API 是否正常運作。</li>
+  </ul>
+
+  <h3>資料管理</h3>
+  <ul>
+    <li><strong>強制同步</strong>：手動從 Google Sheets 重新拉取所有資料。</li>
+    <li><strong>清除本機資料</strong>：刪除瀏覽器中暫存的所有資料（Google Sheets 資料不受影響）。</li>
+  </ul>
+  <div class="warn">「清除本機資料」操作不可復原，請確認 Google Sheets 已有完整資料後再執行。</div>
+</div>
+
+<!-- 9. FAQ -->
+<div class="section" id="s9">
+  <h2><span class="num">9</span> 常見問題 FAQ</h2>
+
+  <h3>Q：換電腦後看不到之前的資料？</h3>
+  <p>資料存於瀏覽器本機，換電腦後需按「同步」從 Google Sheets 拉取。請確認已設定 API URL。</p>
+
+  <h3>Q：A 電腦新增資料後，B 電腦看不到？</h3>
+  <p>在 B 電腦按下儀表板右上角的「同步」按鈕，即可取得最新資料。</p>
+
+  <h3>Q：自動取得 YT 數據無反應？</h3>
+  <p>請至「系統設定 → API 連線」確認已填入 YouTube Data API Key。API Key 需在 Google Cloud Console 啟用 YouTube Data API v3。</p>
+
+  <h3>Q：影片狀態顯示「待抓取」怎麼辦？</h3>
+  <p>表示該影片發布已超過 1 個月但觀看數仍為 0。請點擊「編輯」後手動填入數據，或使用「自動取得 YT 數據」功能。</p>
+
+  <h3>Q：報表如何儲存成 PDF？</h3>
+  <p>產生報表後，點擊報表頁面的「列印」按鈕，在列印對話框中選擇目的地為「儲存為 PDF」。</p>
+
+  <h3>Q：IG 資料上傳後消失了？</h3>
+  <p>如果 Google Sheets 上的 IG 資料表（ig_posts）為空，同步時不會覆蓋本機資料。請先使用「上傳至 Sheets」將資料推送至雲端。</p>
+
+  <h3>Q：忘記密碼怎麼辦？</h3>
+  <p>請聯繫組長。唯讀模式不需密碼，可直接選取「唯讀」身份進入系統瀏覽。</p>
+</div>
+
+</div>
+
+<a href="./youtube-manager.html" class="back-btn">&larr; 返回管理系統</a>
+
+</body>
+</html>

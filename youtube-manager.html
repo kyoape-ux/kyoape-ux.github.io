@@ -368,7 +368,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
             匯入數據
           </button>
-          <button class="hdr-btn hdr-btn-guide" onclick="(function(){window.open('https://docs.google.com/document/d/1lhgsVhbfde4NA17ChK1XUkLax8S_TZmMB0rS4Z7dPDI/edit','_blank')})()">
+          <button class="hdr-btn hdr-btn-guide" onclick="(function(){window.open('./guide.html','_blank')})()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             使用指南
           </button>
@@ -392,7 +392,9 @@ tr:hover td{background:rgba(52,211,153,.03);}
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
           <span style="font-size:13px;color:var(--txt2);">檢視期間：</span>
           <div id="dash-mode-tabs" style="display:flex;gap:2px;background:var(--bg-2);border-radius:8px;padding:3px;border:1px solid var(--border);"></div>
-          <input type="number" id="dash-year-input" min="2020" max="2035" onchange="dashYear=parseInt(this.value)||2026;renderDashboard()" style="width:72px;padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--bg-2);color:var(--txt);outline:none;text-align:center;font-family:inherit;">
+          <select id="dash-year-input" onchange="dashYear=parseInt(this.value)||2026;renderDashboard()" style="padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--bg-2);color:var(--txt);outline:none;cursor:pointer;">
+            <option value="2024">2024</option><option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option><option value="2028">2028</option>
+          </select>
           <select id="dash-month-ctrl" onchange="dashMonth=parseInt(this.value);renderDashboard()" style="display:none;padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--bg-2);color:var(--txt);outline:none;cursor:pointer;">
             <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option><option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
           </select>
