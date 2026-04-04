@@ -32,18 +32,13 @@ a{color:var(--accent);text-decoration:none;}
 
 /* ── Layout ────────────────────────────────────────── */
 .app{display:flex;min-height:100vh;}
-.topbar{position:fixed;top:0;left:0;right:0;height:44px;background:var(--bg-1);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 20px;z-index:200;}
-.topbar-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.15s;text-decoration:none;white-space:nowrap;user-select:none;}
-.topbar-btn-guide{background:rgba(251,191,36,.12);color:#FBBF24;border:1px solid rgba(251,191,36,.25);}
-.topbar-btn-guide:hover{background:rgba(251,191,36,.2);}
-.topbar-btn-sheets{background:rgba(52,211,153,.12);color:#34D399;border:1px solid rgba(52,211,153,.25);}
-.topbar-btn-sheets:hover{background:rgba(52,211,153,.2);}
-.sidebar{width:240px;background:var(--bg-1);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;position:fixed;top:44px;left:0;bottom:0;z-index:50;}
-.sidebar-brand{display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:6px;}
-.sidebar-brand .icon{color:var(--accent);width:26px;height:26px;}
-.sidebar-brand span{font-size:17px;font-weight:700;color:var(--txt);letter-spacing:.3px;}
-.sidebar-sub{font-size:11px;color:var(--txt3);padding:0 8px;margin-bottom:28px;}
-.nav-section{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--txt3);padding:0 12px;margin:20px 0 8px;}
+.sidebar{width:240px;background:var(--bg-1);border-right:1px solid var(--border);padding:20px 14px;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;overflow-y:auto;}
+.sidebar-brand-label{font-size:10px;text-transform:uppercase;letter-spacing:1.8px;color:var(--txt3);padding:0 10px;margin-bottom:10px;font-weight:500;}
+.sidebar-brand{display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:4px;}
+.sidebar-brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;box-shadow:0 0 6px rgba(52,211,153,.5);}
+.sidebar-brand span{font-size:15px;font-weight:700;color:var(--txt);letter-spacing:.2px;line-height:1.3;}
+.sidebar-sub{font-size:11px;color:var(--txt3);padding:0 10px;margin-bottom:24px;}
+.nav-section{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--txt3);padding:0 12px;margin:20px 0 6px;}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);font-size:13px;cursor:pointer;color:var(--txt2);transition:all .15s;}
 .nav-item:hover{background:var(--accent-dim);color:var(--txt);}
 .nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:600;}
@@ -52,9 +47,23 @@ a{color:var(--accent);text-decoration:none;}
 .sidebar-footer a{font-size:12px;color:var(--txt3);display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:6px;transition:.12s;}
 .sidebar-footer a:hover{color:var(--accent);background:var(--accent-dim);}
 
-.main{margin-left:240px;flex:1;padding:28px 36px;max-width:1200px;padding-top:72px;}
-.page{display:none;}
-.page.active{display:block;}
+.main{margin-left:240px;flex:1;padding:0;display:flex;flex-direction:column;min-height:100vh;}
+.page{display:none;flex-direction:column;flex:1;}
+.page.active{display:flex;}
+.page-header{display:flex;align-items:center;justify-content:space-between;padding:18px 36px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px;background:var(--bg-0);position:sticky;top:0;z-index:40;}
+.page-header-left h1{font-size:21px;font-weight:800;color:var(--txt);line-height:1.2;}
+.page-header-left p{font-size:12px;color:var(--txt3);margin-top:3px;}
+.page-header-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.hdr-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border-l);background:transparent;color:var(--txt2);transition:.15s;white-space:nowrap;}
+.hdr-btn:hover{background:var(--bg-2);color:var(--txt);}
+.hdr-btn-primary{background:var(--accent2)!important;color:#000!important;border-color:var(--accent2)!important;}
+.hdr-btn-primary:hover{background:var(--accent)!important;border-color:var(--accent)!important;}
+.hdr-btn-guide{color:#FBBF24;border-color:rgba(251,191,36,.3);}
+.hdr-btn-guide:hover{background:rgba(251,191,36,.1)!important;}
+.hdr-btn-sheets{color:#34D399;border-color:rgba(52,211,153,.3);}
+.hdr-btn-sheets:hover{background:rgba(52,211,153,.1)!important;}
+.hdr-sync{font-size:11px;color:var(--txt3);display:flex;align-items:center;gap:4px;padding:0 4px;}
+.page-body{padding:24px 36px;flex:1;}
 .page-title{font-size:18px;font-weight:700;margin-bottom:22px;display:flex;align-items:center;gap:10px;color:var(--txt);}
 .page-title .icon{color:var(--accent);}
 
@@ -161,11 +170,15 @@ tr:hover td{background:rgba(52,211,153,.03);}
 /* ── Responsive ────────────────────────────────────── */
 @media(max-width:860px){
   .sidebar{display:none;}
-  .main{margin-left:0;padding:20px 16px;padding-top:64px;}
+  .main{margin-left:0;}
+  .page-header{padding:14px 16px;}
+  .page-body{padding:16px;}
   .chart-row{grid-template-columns:1fr;}
   .form-grid{grid-template-columns:1fr;}
   .form-grid.cols3{grid-template-columns:1fr 1fr;}
   .mobile-nav{display:flex!important;}
+  .page-header-right{gap:4px;}
+  .hdr-btn{padding:6px 10px;font-size:11px;}
 }
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg-1);border-top:1px solid var(--border);padding:8px;gap:4px;z-index:50;justify-content:space-around;}
 .mobile-nav .nav-item{flex-direction:column;font-size:10px;padding:6px 8px;gap:3px;text-align:center;}
@@ -254,24 +267,13 @@ tr:hover td{background:rgba(52,211,153,.03);}
   </div>
 </div>
 
-<!-- ═══ 凍結頂欄 ═══ -->
-<div class="topbar">
-  <button class="topbar-btn topbar-btn-guide" onclick="(function(){window.open('https://docs.google.com/document/d/1lhgsVhbfde4NA17ChK1XUkLax8S_TZmMB0rS4Z7dPDI/edit','_blank')})()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-    使用指南
-  </button>
-  <button class="topbar-btn topbar-btn-sheets" onclick="(function(){window.open('https://docs.google.com/spreadsheets/d/1lhgsVhbfde4NA17ChK1XUkLax8S_TZmMB0rS4Z7dPDI/edit','_blank')})()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
-    Google Sheets
-  </button>
-</div>
-
 <div class="app">
   <!-- ═══ Sidebar ═══ -->
   <nav class="sidebar">
+    <div class="sidebar-brand-label">KTGH HOSPITAL</div>
     <div class="sidebar-brand">
-      <span class="icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8,21 16,21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
-      <span>影片發布資訊管理</span>
+      <div class="sidebar-brand-dot"></div>
+      <span>影片管理中心</span>
     </div>
     <div class="sidebar-sub">光田綜合醫院 多媒體組</div>
 
@@ -315,6 +317,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
       <a href="./files/視覺多媒體設計組_專案管理_v3.html">
         <span class="icon" style="width:14px;height:14px;"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></span>工作進度控管
       </a>
+      <div style="font-size:11px;color:var(--txt3);padding:4px 8px;margin-top:4px;">v2.0 · 2026</div>
     </div>
   </nav>
 
@@ -337,38 +340,70 @@ tr:hover td{background:rgba(52,211,153,.03);}
 
   <!-- ═══ Main Content ═══ -->
   <div class="main">
-    <!-- Setup Banner -->
-    <div class="setup-banner" id="setup-banner">
-      <span class="icon icon-lg"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor" stroke="none"/></svg></span>
-      <div class="text">
-        <b>設定 Google Sheets 後端</b>
-        <span>請貼上 Apps Script Web App URL 以啟用雲端同步</span>
-      </div>
-      <input type="text" id="api-url-input" placeholder="https://script.google.com/macros/s/.../exec">
-      <button onclick="saveApiUrl()">連線</button>
-    </div>
 
     <!-- ═══ Page: Dashboard ═══ -->
     <div class="page active" id="page-dashboard">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-        <div class="page-title" style="margin-bottom:0;">
-          <span class="icon icon-lg"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="4" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/></svg></span>
-          儀表板 <span id="dash-label" style="font-size:13px;color:var(--txt3);font-weight:400;"></span>
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>儀表板 Dashboard</h1>
+          <p>光田綜合醫院行銷整合管理系統</p>
         </div>
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <div class="page-header-right">
+          <div id="role-badge-hdr"></div>
+          <span id="sync-status-hdr" class="hdr-sync"></span>
+          <button class="hdr-btn hdr-btn-sheets" onclick="(function(){window.open('https://docs.google.com/spreadsheets/d/1lhgsVhbfde4NA17ChK1XUkLax8S_TZmMB0rS4Z7dPDI/edit','_blank')})()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+            Google Sheets
+          </button>
+          <button class="hdr-btn" onclick="forceSync()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23,4 23,10 17,10"/><polyline points="1,20 1,14 7,14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            同步
+          </button>
+          <button class="hdr-btn" onclick="showPage('report')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+            匯出月報
+          </button>
+          <button class="hdr-btn hdr-btn-primary write-only" onclick="showPage('entry')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            匯入數據
+          </button>
+          <button class="hdr-btn hdr-btn-guide" onclick="(function(){window.open('https://docs.google.com/document/d/1lhgsVhbfde4NA17ChK1XUkLax8S_TZmMB0rS4Z7dPDI/edit','_blank')})()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            使用指南
+          </button>
+        </div>
+      </div>
+
+      <!-- Page Body -->
+      <div class="page-body">
+        <!-- Setup Banner -->
+        <div class="setup-banner" id="setup-banner">
+          <span class="icon icon-lg"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor" stroke="none"/></svg></span>
+          <div class="text">
+            <b>設定 Google Sheets 後端</b>
+            <span>請貼上 Apps Script Web App URL 以啟用雲端同步</span>
+          </div>
+          <input type="text" id="api-url-input" placeholder="https://script.google.com/macros/s/.../exec">
+          <button onclick="saveApiUrl()">連線</button>
+        </div>
+
+        <!-- 儀表板控制列 -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+          <span style="font-size:13px;color:var(--txt2);">檢視期間：</span>
           <div id="dash-mode-tabs" style="display:flex;gap:2px;background:var(--bg-2);border-radius:8px;padding:3px;border:1px solid var(--border);"></div>
           <input type="number" id="dash-year-input" min="2020" max="2035" onchange="dashYear=parseInt(this.value)||2026;renderDashboard()" style="width:72px;padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--bg-2);color:var(--txt);outline:none;text-align:center;font-family:inherit;">
           <select id="dash-month-ctrl" onchange="dashMonth=parseInt(this.value);renderDashboard()" style="display:none;padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--bg-2);color:var(--txt);outline:none;cursor:pointer;">
             <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option><option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
           </select>
           <div id="quarter-switcher" style="display:flex;gap:4px;"></div>
+          <span id="dash-label" style="font-size:12px;color:var(--txt3);"></span>
         </div>
-      </div>
 
-      <!-- 待處理提醒 -->
-      <div id="pending-alert" style="display:none;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px;"></div>
+        <!-- 待處理提醒 -->
+        <div id="pending-alert" style="display:none;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px;"></div>
 
-      <div class="cards" id="kpi-cards"></div>
+        <div class="cards" id="kpi-cards"></div>
       <div class="chart-row">
         <div class="chart-box">
           <h3><span class="icon"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></span>觀看趨勢</h3>
@@ -395,14 +430,18 @@ tr:hover td{background:rgba(52,211,153,.03);}
           <canvas id="chart-top5" style="max-height:200px;"></canvas>
         </div>
       </div>
+      </div><!-- /page-body -->
     </div>
 
     <!-- ═══ Page: Entry ═══ -->
     <div class="page" id="page-entry">
-      <div class="page-title">
-        <span class="icon icon-lg"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>
-        新增影片
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>新增影片</h1>
+          <p>填寫影片資訊與各平台數據</p>
+        </div>
       </div>
+      <div class="page-body">
       <div id="entry-alert" class="alert"></div>
       <div class="form-grid">
         <div class="form-group full"><label>影片標題 *</label><input type="text" id="f-title" placeholder="輸入影片標題"></div>
@@ -464,14 +503,18 @@ tr:hover td{background:rgba(52,211,153,.03);}
         <button class="btn btn-primary write-only" onclick="saveEntry()">儲存影片</button>
         <button class="btn btn-secondary" onclick="clearForm()">清除表單</button>
       </div>
+      </div><!-- /page-body -->
     </div>
 
     <!-- ═══ Page: List ═══ -->
     <div class="page" id="page-list">
-      <div class="page-title">
-        <span class="icon icon-lg"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>
-        影片列表
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>影片列表</h1>
+          <p>管理與搜尋所有影片資料</p>
+        </div>
       </div>
+      <div class="page-body">
       <div class="tbl-toolbar">
         <input type="text" id="search-input" placeholder="搜尋標題、企劃、製作..." oninput="renderList()">
         <select id="filter-type" onchange="renderList()"><option value="">全部類型</option><option value="short">Short</option><option value="long">Long</option></select>
@@ -490,14 +533,18 @@ tr:hover td{background:rgba(52,211,153,.03);}
         <span class="icon icon-xl" style="color:var(--txt3);margin-bottom:12px;display:block;margin:0 auto 12px;"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></span>
         尚無影片資料，請先新增影片
       </div>
+      </div><!-- /page-body -->
     </div>
 
     <!-- ═══ Page: IG 貼文管理 ═══ -->
     <div class="page" id="page-ig">
-      <div class="page-title">
-        <span class="icon icon-lg" style="color:var(--ig);"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></span>
-        IG 貼文管理 <span id="ig-month" style="font-size:13px;color:var(--txt3);font-weight:400;"></span>
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>IG 貼文管理 <span id="ig-month" style="font-size:14px;color:var(--txt3);font-weight:400;"></span></h1>
+          <p>Instagram 貼文數據追蹤與分析</p>
+        </div>
       </div>
+      <div class="page-body">
 
       <!-- IG KPI -->
       <div class="cards" id="ig-kpi"></div>
@@ -559,14 +606,18 @@ tr:hover td{background:rgba(52,211,153,.03);}
         </div>
         <div id="ig-empty" style="display:none;text-align:center;padding:40px;color:var(--txt3);">尚無 IG 貼文資料</div>
       </div>
+      </div><!-- /page-body -->
     </div>
 
     <!-- ═══ Page: Report ═══ -->
     <div class="page" id="page-report">
-      <div class="page-title">
-        <span class="icon icon-lg"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg></span>
-        匯出報表
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>匯出報表</h1>
+          <p>產生月報表、年度報告並列印 PDF</p>
+        </div>
       </div>
+      <div class="page-body">
 
       <!-- 月報表 -->
       <div class="cfg-card" style="max-width:none;margin-bottom:20px;">
@@ -603,14 +654,18 @@ tr:hover td{background:rgba(52,211,153,.03);}
           <button class="btn btn-primary" onclick="openAnnualReport()">產生年度報表</button>
         </div>
       </div>
+      </div><!-- /page-body -->
     </div>
 
     <!-- ═══ Page: Config ═══ -->
     <div class="page" id="page-config">
-      <div class="page-title">
-        <span class="icon icon-lg"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
-        設定
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>系統設定</h1>
+          <p>績效目標、API 連線與資料管理</p>
+        </div>
       </div>
+      <div class="page-body">
       <div class="cfg-card">
         <h3>績效目標</h3>
         <div class="form-grid" style="margin-top:14px;">
@@ -638,6 +693,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
           <button class="btn btn-danger leader-only" onclick="clearAllData()">清除本機資料</button>
         </div>
       </div>
+      </div><!-- /page-body -->
     </div>
   </div>
 </div>
@@ -1320,6 +1376,8 @@ function checkAuth(){
 function updateRoleBadge(){
   const b=document.getElementById('role-badge');
   if(b){b.textContent=ROLE_LABELS[CURRENT_ROLE]||'';b.className=`role-badge-chip ${ROLE_CLASSES[CURRENT_ROLE]||''}`;}
+  const h=document.getElementById('role-badge-hdr');
+  if(h){h.innerHTML=`<button class="hdr-btn" onclick="switchRole()" style="font-size:11px;padding:5px 10px;">${ROLE_LABELS[CURRENT_ROLE]||''}</button>`;}
 }
 function switchRole(){
   sessionStorage.removeItem('kt_role');
