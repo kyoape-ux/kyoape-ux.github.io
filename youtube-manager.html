@@ -368,7 +368,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
             匯入數據
           </button>
-          <button class="hdr-btn hdr-btn-guide" onclick="(function(){window.open('./guide.html','_blank')})()">
+          <button class="hdr-btn hdr-btn-guide" onclick="openGuide()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             使用指南
           </button>
@@ -700,6 +700,22 @@ tr:hover td{background:rgba(52,211,153,.03);}
   </div>
 </div>
 
+<!-- ═══ Guide Modal ═══ -->
+<div class="modal-overlay" id="guide-modal" onclick="if(event.target===this)closeGuide()">
+  <div class="modal" style="max-width:900px;width:95%;height:90vh;padding:0;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
+      <h2 style="margin:0;font-size:15px;display:flex;align-items:center;gap:8px;">
+        <span class="icon" style="color:var(--amber);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+        使用指南
+      </h2>
+      <button class="close-btn" onclick="closeGuide()" style="position:static;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <iframe id="guide-iframe" style="flex:1;border:none;width:100%;background:#FAFBFC;"></iframe>
+  </div>
+</div>
+
 <!-- ═══ IG Edit Modal ═══ -->
 <div class="modal-overlay" id="ig-edit-modal">
   <div class="modal">
@@ -1015,6 +1031,8 @@ function exportCSV(){if(DATA.length===0){alert('無資料');return;}const h=['�
 // 工具
 // ============================================================
 function showAlert(id,msg,type){const el=document.getElementById(id);el.className='alert alert-'+type;el.textContent=msg;if(type==='ok')setTimeout(()=>el.className='alert',4000);}
+function openGuide(){const m=document.getElementById('guide-modal'),f=document.getElementById('guide-iframe');if(!f.src||!f.src.includes('guide.html'))f.src='./guide.html';m.classList.add('show');}
+function closeGuide(){document.getElementById('guide-modal').classList.remove('show');}
 function showSyncBadge(msg){let b=document.getElementById('sync-badge');if(!b){b=document.createElement('div');b.id='sync-badge';b.style.cssText='position:fixed;bottom:20px;right:20px;background:var(--bg-3);color:var(--accent);padding:10px 20px;border-radius:10px;font-size:12px;z-index:999;transition:opacity .3s;border:1px solid var(--border-l);backdrop-filter:blur(8px);';document.body.appendChild(b);}b.textContent=msg;b.style.opacity='1';setTimeout(()=>b.style.opacity='0',3500);}
 
 // ============================================================
