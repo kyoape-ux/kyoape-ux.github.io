@@ -339,6 +339,9 @@ tr:hover td{background:rgba(52,211,153,.03);}
     <div class="nav-item leader-only" onclick="showPage('config')">
       <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>設定
     </div>
+    <div class="nav-item" onclick="showPage('backup')">
+      <span class="icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>資料備份還原
+    </div>
 
     <div class="sidebar-footer">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg-2);border-radius:8px;border:1px solid var(--border);margin-bottom:4px;">
@@ -784,12 +787,56 @@ tr:hover td{background:rgba(52,211,153,.03);}
       </div>
       <div class="cfg-card" style="margin-top:20px;">
         <h3>資料管理</h3>
-        <div class="form-actions">
+        <p style="font-size:12px;color:var(--txt3);margin-top:6px;">備份、回收筒、快照等請至「資料備份還原」頁。</p>
+        <div class="form-actions" style="margin-top:12px;">
           <button class="btn btn-secondary leader-only" onclick="forceSync()">強制同步</button>
+          <button class="btn btn-secondary leader-only" onclick="pushAllToSheets()">推送覆蓋 Sheets</button>
+          <button class="btn btn-secondary" onclick="showPage('backup')">開啟資料備份還原</button>
           <button class="btn btn-danger leader-only" onclick="clearAllData()">清除本機資料</button>
         </div>
       </div>
       </div><!-- /page-body -->
+    </div>
+
+    <!-- ═══ Page: Backup & Restore ═══ -->
+    <div class="page" id="page-backup">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>資料備份還原</h1>
+          <p>快照管理、JSON 備份、回收筒</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="cfg-card">
+          <h3>📥 下載 JSON 備份</h3>
+          <p style="font-size:12px;color:var(--txt3);margin-top:6px;">將目前所有影片、IG 貼文、設定與全部快照匯出為一個 JSON 檔案，存到本機作為離線備份。</p>
+          <div class="form-actions" style="margin-top:12px;">
+            <button class="btn btn-primary" onclick="downloadBackupJson()">下載備份檔（JSON）</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('backup-restore-file').click()">從 JSON 還原</button>
+            <input type="file" id="backup-restore-file" accept=".json" style="display:none;" onchange="restoreFromJsonFile(this)">
+          </div>
+          <div id="backup-alert" class="alert" style="margin-top:12px;"></div>
+        </div>
+
+        <div class="cfg-card" style="margin-top:20px;">
+          <h3>📸 本機快照（最多 5 份）</h3>
+          <p style="font-size:12px;color:var(--txt3);margin-top:6px;">每次同步、推送、匯入、刪除前系統會自動建立快照。也可以手動建立。</p>
+          <div class="form-actions" style="margin-top:12px;">
+            <button class="btn btn-secondary" onclick="createSnapshot('手動建立')">📸 建立快照（現況）</button>
+          </div>
+          <div id="snapshot-list" style="margin-top:16px;"></div>
+        </div>
+
+        <div class="cfg-card" style="margin-top:20px;">
+          <h3>🗑️ 回收筒</h3>
+          <p style="font-size:12px;color:var(--txt3);margin-top:6px;">被「刪除」的影片與 IG 貼文會先進入回收筒（軟刪除），可以還原，或由組長永久刪除。</p>
+          <div id="trash-tabs" style="display:flex;gap:2px;background:var(--bg-2);border-radius:8px;padding:3px;border:1px solid var(--border);margin-top:12px;width:fit-content;">
+            <button onclick="setTrashTab('video')" id="trash-tab-video" class="trash-tab-btn">影片</button>
+            <button onclick="setTrashTab('ig')" id="trash-tab-ig" class="trash-tab-btn">IG 貼文</button>
+          </div>
+          <div id="trash-list" style="margin-top:16px;"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1176,8 +1223,14 @@ async function apiPost(a,p){if(!USE_API())return null;try{const r=await fetch(AP
 async function syncFromSheets(){
   const r=await apiGet('getVideos');
   if(r&&r.videos){
-    // Sheets 是唯一資料源（多人多電腦同步）
-    DATA=r.videos.map(v=>({...v,date:fixDate(v.date)}));
+    // 保留本機軟刪除標記（若 Sheets 端尚未支援 deleted_at 欄位）
+    const localTrash=new Map(DATA.filter(d=>d.deleted_at).map(d=>[d.id,{deleted_at:d.deleted_at,deleted_by:d.deleted_by}]));
+    DATA=r.videos.map(v=>{
+      const row={...v,date:fixDate(v.date)};
+      const t=localTrash.get(v.id);
+      if(t&&!row.deleted_at){row.deleted_at=t.deleted_at;row.deleted_by=t.deleted_by;}
+      return row;
+    });
     saveData();
     return true;
   }
@@ -1186,7 +1239,7 @@ async function syncFromSheets(){
 async function pushToSheets(a,p){const r=await apiPost(a,p);return r&&r.success;}
 async function syncConfigFromSheets(){const r=await apiGet('getConfig');if(r&&!r.error){CFG={...CFG,...r};localStorage.setItem('kt_yt_cfg',JSON.stringify(CFG));return true;}return false;}
 function fixDate(d){if(!d)return '';if(d.length===10)return d;try{const dt=new Date(d);const local=new Date(dt.getTime()+8*3600000);return local.toISOString().substring(0,10);}catch(e){return String(d).substring(0,10);}}
-async function syncIgFromSheets(){const r=await apiGet('getIgPosts');if(r&&r.posts){if(r.posts.length===0&&IG_DATA.length>0){return false;}IG_DATA=r.posts.map(p=>({...p,date:fixDate(p.date)}));saveIgData();return true;}return false;}
+async function syncIgFromSheets(){const r=await apiGet('getIgPosts');if(r&&r.posts){if(r.posts.length===0&&IG_DATA.length>0){return false;}const localTrash=new Map(IG_DATA.filter(d=>d.deleted_at).map(d=>[d.id,{deleted_at:d.deleted_at,deleted_by:d.deleted_by}]));IG_DATA=r.posts.map(p=>{const row={...p,date:fixDate(p.date)};const t=localTrash.get(p.id);if(t&&!row.deleted_at){row.deleted_at=t.deleted_at;row.deleted_by=t.deleted_by;}return row;});saveIgData();return true;}return false;}
 
 // ============================================================
 // 資料層
@@ -1194,12 +1247,202 @@ async function syncIgFromSheets(){const r=await apiGet('getIgPosts');if(r&&r.pos
 let DATA=[];let CFG={viewGoal:5000,countGoal:6,personalGoal:2000};
 let chartMonthly=null,chartPlatform=null,chartCat=null,chartTop5=null,chartType=null;
 function saveData(){DATA.sort((a,b)=>(b.date||'').localeCompare(a.date||''));localStorage.setItem('kt_yt_data',JSON.stringify(DATA));}
-async function loadData(){try{DATA=JSON.parse(localStorage.getItem('kt_yt_data')||'[]');}catch(e){DATA=[];}try{CFG={...CFG,...JSON.parse(localStorage.getItem('kt_yt_cfg')||'{}')};}catch(e){}renderAll();if(USE_API()){const s=await syncFromSheets();if(s){renderAll();showSyncBadge('已同步 Sheets');}await syncConfigFromSheets();renderCfgForm();}}
+async function loadData(){try{DATA=JSON.parse(localStorage.getItem('kt_yt_data')||'[]');}catch(e){DATA=[];}try{CFG={...CFG,...JSON.parse(localStorage.getItem('kt_yt_cfg')||'{}')};}catch(e){}renderAll();if(USE_API()){createSnapshot('GAS 同步前（自動）',true);const s=await syncFromSheets();if(s){renderAll();showSyncBadge('已同步 Sheets');}await syncConfigFromSheets();renderCfgForm();}}
+
+// ============================================================
+// 軟刪除過濾器
+// ============================================================
+function activeVideos(){return DATA.filter(d=>!d.deleted_at);}
+function activeIgPosts(){return IG_DATA.filter(d=>!d.deleted_at);}
+function trashedVideos(){return DATA.filter(d=>d.deleted_at);}
+function trashedIgPosts(){return IG_DATA.filter(d=>d.deleted_at);}
+
+// ============================================================
+// 滾動快照（最多 5 份）
+// ============================================================
+const SNAPSHOT_KEY='kt_yt_snapshots';
+const SNAPSHOT_MAX=5;
+function loadSnapshots(){try{return JSON.parse(localStorage.getItem(SNAPSHOT_KEY)||'[]');}catch(e){return[];}}
+function saveSnapshots(arr){try{localStorage.setItem(SNAPSHOT_KEY,JSON.stringify(arr));}catch(e){console.warn('snapshot save failed',e);}}
+function createSnapshot(reason,silent){
+  const snap={
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    ts:new Date().toISOString(),
+    reason:reason||'手動建立',
+    role:(typeof CURRENT_ROLE!=='undefined'?CURRENT_ROLE:'unknown'),
+    data:JSON.parse(JSON.stringify(DATA||[])),
+    ig:JSON.parse(JSON.stringify(typeof IG_DATA!=='undefined'?IG_DATA:[])),
+    cfg:JSON.parse(JSON.stringify(CFG||{}))
+  };
+  const arr=loadSnapshots();
+  arr.unshift(snap);
+  while(arr.length>SNAPSHOT_MAX)arr.pop();
+  saveSnapshots(arr);
+  if(!silent){showSyncBadge('📸 已建立快照');renderBackupPage();}
+}
+function restoreSnapshot(id){
+  if(!canDelete()){alert('僅組長可還原快照');return;}
+  const arr=loadSnapshots();
+  const snap=arr.find(s=>s.id===id);
+  if(!snap){alert('找不到快照');return;}
+  if(!confirm(`確定要還原到「${snap.reason}」（${new Date(snap.ts).toLocaleString('zh-TW')}）？目前的資料會先建立一份新快照。`))return;
+  createSnapshot('還原前自動備份',true);
+  DATA=JSON.parse(JSON.stringify(snap.data||[]));
+  IG_DATA=JSON.parse(JSON.stringify(snap.ig||[]));
+  CFG={...CFG,...(snap.cfg||{})};
+  saveData();saveIgData();
+  localStorage.setItem('kt_yt_cfg',JSON.stringify(CFG));
+  renderAll();renderIgAll();renderBackupPage();
+  showSyncBadge('✅ 已還原快照');
+}
+function deleteSnapshot(id){
+  if(!canDelete()){alert('僅組長可刪除快照');return;}
+  if(!confirm('確定要刪除此快照？'))return;
+  saveSnapshots(loadSnapshots().filter(s=>s.id!==id));
+  renderBackupPage();
+}
+
+// ============================================================
+// JSON 備份下載 / 還原
+// ============================================================
+function downloadBackupJson(){
+  const payload={
+    schema:'kt_yt_backup_v1',
+    exportedAt:new Date().toISOString(),
+    exportedBy:(typeof CURRENT_ROLE!=='undefined'?CURRENT_ROLE:'unknown'),
+    data:DATA,
+    ig:IG_DATA,
+    cfg:CFG,
+    snapshots:loadSnapshots()
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const ts=new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  a.href=url;a.download=`kt_yt_backup_${ts}.json`;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},100);
+  showAlert('backup-alert','✅ 備份檔已下載','ok');
+}
+function restoreFromJsonFile(input){
+  if(!canDelete()){showAlert('backup-alert','僅組長可從 JSON 還原','err');input.value='';return;}
+  const file=input.files[0];if(!file){return;}
+  const confirmText=prompt('從 JSON 還原會覆蓋目前的本機資料。\n系統會先建立一份新快照。\n請輸入「確認還原」以繼續：');
+  if(confirmText!=='確認還原'){input.value='';showAlert('backup-alert','已取消','err');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const obj=JSON.parse(e.target.result);
+      if(!obj||obj.schema!=='kt_yt_backup_v1'){throw new Error('JSON 格式不正確');}
+      createSnapshot('JSON 還原前自動備份',true);
+      DATA=Array.isArray(obj.data)?obj.data:[];
+      IG_DATA=Array.isArray(obj.ig)?obj.ig:[];
+      CFG={...CFG,...(obj.cfg||{})};
+      saveData();saveIgData();
+      localStorage.setItem('kt_yt_cfg',JSON.stringify(CFG));
+      if(Array.isArray(obj.snapshots))saveSnapshots(obj.snapshots.slice(0,SNAPSHOT_MAX));
+      renderAll();renderIgAll();renderBackupPage();
+      showAlert('backup-alert','✅ 已從 JSON 還原','ok');
+    }catch(err){
+      showAlert('backup-alert','還原失敗：'+err.message,'err');
+    }
+    input.value='';
+  };
+  reader.readAsText(file);
+}
+
+// ============================================================
+// 回收筒
+// ============================================================
+let trashTab='video';
+function setTrashTab(t){trashTab=t;renderTrashList();}
+function restoreVideo(id){
+  const v=DATA.find(d=>d.id===id);if(!v)return;
+  delete v.deleted_at;delete v.deleted_by;
+  saveData();renderAll();renderTrashList();
+  showSyncBadge('✅ 已還原影片');
+  pushToSheets('updateVideo',{data:v});
+}
+function permanentDeleteVideo(id){
+  if(!canDelete()){alert('僅組長可永久刪除');return;}
+  if(!confirm('⚠️ 永久刪除後無法復原（快照中仍保留），確定？'))return;
+  createSnapshot('永久刪除前（自動）',true);
+  DATA=DATA.filter(d=>d.id!==id);saveData();renderTrashList();renderAll();
+  pushToSheets('deleteVideo',{id});
+  showSyncBadge('已永久刪除');
+}
+function restoreIgPostFromTrash(id){
+  const p=IG_DATA.find(d=>d.id===id);if(!p)return;
+  delete p.deleted_at;delete p.deleted_by;
+  saveIgData();
+  if(p.videoId)syncIgViewsToVideo(p);
+  renderIgAll();renderTrashList();
+  showSyncBadge('✅ 已還原 IG 貼文');
+  pushToSheets('updateIgPost',{data:p});
+}
+function permanentDeleteIgPost(id){
+  if(!canDelete()){alert('僅組長可永久刪除');return;}
+  if(!confirm('⚠️ 永久刪除後無法復原（快照中仍保留），確定？'))return;
+  createSnapshot('永久刪除前（自動）',true);
+  const removed=IG_DATA.find(d=>d.id===id);
+  IG_DATA=IG_DATA.filter(d=>d.id!==id);saveIgData();
+  if(removed&&removed.videoId)syncIgViewsToVideo({videoId:removed.videoId});
+  renderTrashList();renderIgAll();
+  pushToSheets('deleteIgPost',{id});
+  showSyncBadge('已永久刪除');
+}
+
+// ============================================================
+// 備份頁面渲染
+// ============================================================
+function renderBackupPage(){
+  renderSnapshotList();
+  renderTrashList();
+}
+function renderSnapshotList(){
+  const box=document.getElementById('snapshot-list');if(!box)return;
+  const arr=loadSnapshots();
+  if(arr.length===0){box.innerHTML='<p style="color:var(--txt3);font-size:12px;padding:12px 0;">尚無快照</p>';return;}
+  box.innerHTML=`<div style="display:flex;flex-direction:column;gap:8px;">${arr.map(s=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:var(--txt);">${esc(s.reason)}</div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:2px;">${new Date(s.ts).toLocaleString('zh-TW')} · ${(s.data||[]).length} 影片 / ${(s.ig||[]).length} IG · ${s.role||'?'}</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-secondary btn-sm leader-only" onclick="restoreSnapshot('${s.id}')">還原</button>
+        <button class="btn btn-danger btn-sm leader-only" onclick="deleteSnapshot('${s.id}')">刪除</button>
+      </div>
+    </div>`).join('')}</div>`;
+}
+function renderTrashList(){
+  const box=document.getElementById('trash-list');if(!box)return;
+  const vb=document.getElementById('trash-tab-video'),ib=document.getElementById('trash-tab-ig');
+  if(vb&&ib){
+    const active='padding:6px 16px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:var(--accent);color:#000;';
+    const inactive='padding:6px 16px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:var(--txt3);';
+    vb.style.cssText=trashTab==='video'?active:inactive;
+    ib.style.cssText=trashTab==='ig'?active:inactive;
+  }
+  const items=trashTab==='video'?trashedVideos():trashedIgPosts();
+  if(items.length===0){box.innerHTML='<p style="color:var(--txt3);font-size:12px;padding:12px 0;">回收筒是空的</p>';return;}
+  box.innerHTML=`<div style="display:flex;flex-direction:column;gap:8px;">${items.map(d=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(d.title||'(無標題)')}</div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:2px;">${(d.date||'').substring(0,10)} · 刪除於 ${new Date(d.deleted_at).toLocaleString('zh-TW')} · by ${d.deleted_by||'?'}</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-secondary btn-sm" onclick="${trashTab==='video'?`restoreVideo('${d.id}')`:`restoreIgPostFromTrash('${d.id}')`}">還原</button>
+        <button class="btn btn-danger btn-sm leader-only" onclick="${trashTab==='video'?`permanentDeleteVideo('${d.id}')`:`permanentDeleteIgPost('${d.id}')`}">永久刪除</button>
+      </div>
+    </div>`).join('')}</div>`;
+}
 
 // ============================================================
 // 導覽
 // ============================================================
-function showPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>{const t=n.getAttribute('onclick')||'';n.classList.toggle('active',t.includes("'"+name+"'"));});if(name==='dashboard')renderDashboard();if(name==='list')renderList();if(name==='config')renderCfgForm();if(name==='ig'){renderIgAll();if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgAll();showSyncBadge('IG 已同步 Sheets');}});}}if(name==='igstats'){renderIgCharts();if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgCharts();showSyncBadge('IG 已同步 Sheets');}});}}if(name==='report'){const now=new Date();document.getElementById('rpt-year').value=now.getFullYear();document.getElementById('rpt-month').value=String(now.getMonth()+1).padStart(2,'0');}}
+function showPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>{const t=n.getAttribute('onclick')||'';n.classList.toggle('active',t.includes("'"+name+"'"));});if(name==='dashboard')renderDashboard();if(name==='list')renderList();if(name==='config')renderCfgForm();if(name==='backup')renderBackupPage();if(name==='ig'){renderIgAll();if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgAll();showSyncBadge('IG 已同步 Sheets');}});}}if(name==='igstats'){renderIgCharts();if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgCharts();showSyncBadge('IG 已同步 Sheets');}});}}if(name==='report'){const now=new Date();document.getElementById('rpt-year').value=now.getFullYear();document.getElementById('rpt-month').value=String(now.getMonth()+1).padStart(2,'0');}}
 function renderAll(){renderDashboard();renderList();renderCfgForm();buildMonthFilter();}
 
 // ============================================================
@@ -1237,17 +1480,18 @@ function renderDashboard(){
   if(dashMode==='quarter')qs.innerHTML=[1,2,3,4].map(i=>`<button onclick="switchQuarter(${i})" style="padding:6px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:.12s;${i===q?'background:var(--accent);color:#000;':'background:var(--bg-2);color:var(--txt3);border:1px solid var(--border);'}">${getQuarterLabel(i)}</button>`).join('');
 
   // Filter data & set label / goal multiplier
+  const _AV=activeVideos();
   let vd,label,mult;
   if(dashMode==='month'){
     const ym=`${yr}-${String(dashMonth).padStart(2,'0')}`;
-    vd=DATA.filter(d=>(d.date||'').startsWith(ym));
+    vd=_AV.filter(d=>(d.date||'').startsWith(ym));
     label=`${yr} 年 ${dashMonth} 月`;mult=1;
   }else if(dashMode==='quarter'){
     const qms=getQuarterMonths(q);
-    vd=DATA.filter(d=>{if(!d.date)return false;const m=d.date.substring(5,7);return d.date.startsWith(String(yr))&&qms.includes(m);});
+    vd=_AV.filter(d=>{if(!d.date)return false;const m=d.date.substring(5,7);return d.date.startsWith(String(yr))&&qms.includes(m);});
     label=`${yr} ${getQuarterLabel(q)}`;mult=3;
   }else{
-    vd=DATA.filter(d=>(d.date||'').startsWith(String(yr)));
+    vd=_AV.filter(d=>(d.date||'').startsWith(String(yr)));
     label=`${yr} 年度`;mult=12;
   }
   document.getElementById('dash-label').textContent=label;
@@ -1262,7 +1506,7 @@ function renderDashboard(){
   const pLabel={month:'月',quarter:'季',year:'年'}[dashMode];
 
   // Pending alert
-  const pendingList=DATA.filter(d=>getVideoStatus(d)==='pending');
+  const pendingList=_AV.filter(d=>getVideoStatus(d)==='pending');
   const pa=document.getElementById('pending-alert');
   if(pendingList.length>0){pa.style.display='block';pa.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span style="font-size:18px;color:var(--red);">◉</span><div><b style="color:var(--red);">${pendingList.length} 部影片已滿 1 個月，請更新數據</b><div style="font-size:11px;color:var(--txt3);margin-top:2px;">點擊影片名稱可直接編輯並一鍵取得最新 YT 數據</div></div></div>`+pendingList.map(d=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(248,113,113,.1);font-size:12px;"><span style="color:var(--txt3);">${(d.date||'').substring(0,10)}</span><a href="#" onclick="openEdit('${d.id}');return false;" style="color:var(--red);font-weight:500;">${esc(d.title)}</a></div>`).join('');}else{pa.style.display='none';}
 
@@ -1276,10 +1520,11 @@ function renderDashboard(){
 }
 function renderCharts(viewData){
   const yr=dashYear,months=[];
+  const _AV=activeVideos();
   for(let i=1;i<=12;i++)months.push(`${yr}-${String(i).padStart(2,'0')}`);
-  const mYt=months.map(m=>DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.yt_views)||0),0));
-  const mFb=months.map(m=>DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.fb_views)||0),0));
-  const mIg=months.map(m=>DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.ig_views)||0),0));
+  const mYt=months.map(m=>_AV.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.yt_views)||0),0));
+  const mFb=months.map(m=>_AV.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.fb_views)||0),0));
+  const mIg=months.map(m=>_AV.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.ig_views)||0),0));
   // Highlight bars based on mode
   const isHl=(_,i)=>{
     const mm=String(i+1).padStart(2,'0');
@@ -1323,7 +1568,7 @@ function clearForm(){ALL_FORM_FIELDS.forEach(id=>{const el=document.getElementBy
 // ============================================================
 function renderList(){
   const s=(document.getElementById('search-input').value||'').toLowerCase(),ft=document.getElementById('filter-type').value,fc=document.getElementById('filter-cat').value,fm=document.getElementById('filter-month').value;
-  let f=DATA.filter(d=>{if(s&&!(d.title||'').toLowerCase().includes(s)&&!(d.planner||'').toLowerCase().includes(s)&&!(d.producer||'').toLowerCase().includes(s))return false;if(ft&&d.type!==ft)return false;if(fc&&d.cat!==fc)return false;if(fm&&!(d.date||'').startsWith(fm))return false;return true;});
+  let f=activeVideos().filter(d=>{if(s&&!(d.title||'').toLowerCase().includes(s)&&!(d.planner||'').toLowerCase().includes(s)&&!(d.producer||'').toLowerCase().includes(s))return false;if(ft&&d.type!==ft)return false;if(fc&&d.cat!==fc)return false;if(fm&&!(d.date||'').startsWith(fm))return false;return true;});
   // Sort: pending first, then collecting, then locked, then by date desc
   const statusOrder={pending:0,collecting:1,locked:2,unknown:3};
   f.sort((a,b)=>{const sa=statusOrder[getVideoStatus(a)]??3,sb=statusOrder[getVideoStatus(b)]??3;if(sa!==sb)return sa-sb;return(b.date||'').localeCompare(a.date||'');});
@@ -1333,7 +1578,7 @@ function renderList(){
     const st=getVideoStatus(d),sc=STATUS_CFG[st];
     return`<tr><td><span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${sc.bg};color:${sc.color};">${sc.icon} ${sc.label}</span></td><td style="white-space:nowrap;">${(d.date||'').substring(0,10)||'—'}</td><td style="max-width:200px;color:#fff;">${lk?`<a href="${esc(lk)}" target="_blank" style="color:#fff;">${esc(d.title)}</a>`:esc(d.title)}</td><td><span class="type-badge type-${d.type}">${d.type==='short'?'Short':'Long'}</span></td><td>${esc(d.cat||'')}</td><td><div class="views-cell"><span class="total">${tv.toLocaleString()}</span><span class="plats">${ytv?`<span style="color:var(--yt)">YT ${ytv.toLocaleString()}</span>`:''}${fbv?`<span style="color:var(--fb)">FB ${fbv.toLocaleString()}</span>`:''}${igv?`<span style="color:var(--ig)">IG ${igv.toLocaleString()}</span>`:''}</span></div></td><td style="white-space:nowrap;font-size:11px;color:var(--txt3);">${d.statsDate||'—'}</td><td>${esc(d.planner||'')}</td><td><div class="act-btns"><button class="act-btn write-only" onclick="openEdit('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span></button><button class="act-btn del write-only" onclick="deleteEntry('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></div></td></tr>`;}).join('');
 }
-function buildMonthFilter(){const ms=[...new Set(DATA.map(d=>(d.date||'').substring(0,7)).filter(Boolean))].sort().reverse();document.getElementById('filter-month').innerHTML='<option value="">全部月份</option>'+ms.map(m=>`<option value="${m}">${m}</option>`).join('');}
+function buildMonthFilter(){const ms=[...new Set(activeVideos().map(d=>(d.date||'').substring(0,7)).filter(Boolean))].sort().reverse();document.getElementById('filter-month').innerHTML='<option value="">全部月份</option>'+ms.map(m=>`<option value="${m}">${m}</option>`).join('');}
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 
 // ============================================================
@@ -1342,20 +1587,55 @@ function esc(s){const d=document.createElement('div');d.textContent=s||'';return
 function openEdit(id){const d=DATA.find(v=>v.id===id);if(!d)return;document.getElementById('e-id').value=d.id;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(!el)return;const v=d[f]??'';el.value=(f==='dur'||f==='yt_avgdur')?normalizeDur(v):v;});document.getElementById('edit-modal').classList.add('show');}
 function closeModal(){document.getElementById('edit-modal').classList.remove('show');}
 async function updateEntry(){if(!canWrite()){showAlert('edit-alert','您的權限不足','err');return;}const id=document.getElementById('e-id').value,idx=DATA.findIndex(d=>d.id===id);if(idx===-1)return;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(!el)return;if(NUM_FIELDS.includes(f))DATA[idx][f]=Number(el.value)||0;else DATA[idx][f]=el.value;});DATA[idx].updatedAt=new Date().toISOString();if(window._lastStatsFetchDate){DATA[idx].statsDate=window._lastStatsFetchDate;window._lastStatsFetchDate=null;}saveData();closeModal();renderAll();const ok=await pushToSheets('updateVideo',{data:DATA[idx]});showSyncBadge(ok?'已同步修改':USE_API()?'本機已更新，同步失敗':'已更新');}
-async function deleteEntry(id){if(!canDelete()){alert('僅組長可刪除影片');return;}if(!confirm('確定要刪除此影片紀錄？'))return;DATA=DATA.filter(d=>d.id!==id);saveData();renderAll();const ok=await pushToSheets('deleteVideo',{id});showSyncBadge(ok?'已從 Sheets 刪除':USE_API()?'本機已刪除':'已刪除');}
+async function deleteEntry(id){
+  if(!canDelete()){alert('僅組員或組長可刪除影片');return;}
+  if(!confirm('確定要刪除此影片紀錄？\n（將移至回收筒，可於「資料備份還原」頁還原）'))return;
+  createSnapshot('刪除影片前（自動）',true);
+  const idx=DATA.findIndex(d=>d.id===id);if(idx===-1)return;
+  DATA[idx].deleted_at=new Date().toISOString();
+  DATA[idx].deleted_by=CURRENT_ROLE||'unknown';
+  saveData();renderAll();
+  const ok=await pushToSheets('updateVideo',{data:DATA[idx]});
+  showSyncBadge(ok?'已移至回收筒（已同步）':'已移至回收筒');
+}
 
 // ============================================================
 // 設定
 // ============================================================
 function renderCfgForm(){document.getElementById('cfg-viewGoal').value=CFG.viewGoal;document.getElementById('cfg-countGoal').value=CFG.countGoal;document.getElementById('cfg-personalGoal').value=CFG.personalGoal;document.getElementById('cfg-api-url').value=API_URL;document.getElementById('cfg-yt-key').value=YT_API_KEY;}
 async function saveCfg(){if(!canDelete()){showAlert('cfg-alert','僅組長可修改設定','err');return;}CFG.viewGoal=Number(document.getElementById('cfg-viewGoal').value)||5000;CFG.countGoal=Number(document.getElementById('cfg-countGoal').value)||6;CFG.personalGoal=Number(document.getElementById('cfg-personalGoal').value)||2000;localStorage.setItem('kt_yt_cfg',JSON.stringify(CFG));showAlert('cfg-alert','設定已儲存','ok');renderDashboard();await pushToSheets('saveConfig',{data:CFG});}
-async function forceSync(){if(!USE_API()){alert('請先設定 API URL');return;}showSyncBadge('同步中...');const hdr=document.getElementById('sync-status-hdr');if(hdr)hdr.innerHTML='<span style="color:var(--txt3);">同步中...</span>';const ok=await syncFromSheets();await syncConfigFromSheets();await syncIgFromSheets();renderAll();renderIgAll();showSyncBadge(ok?'同步完成':'同步失敗');if(hdr&&ok){const t=new Date();const ts=t.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});hdr.innerHTML=`<span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);"></span>已同步 ${ts}</span>`;}}
-function clearAllData(){if(!confirm('確定要清除所有本機資料？'))return;DATA=[];localStorage.removeItem('kt_yt_data');renderAll();showSyncBadge('本機資料已清除');}
+async function forceSync(){if(!USE_API()){alert('請先設定 API URL');return;}createSnapshot('GAS 同步前（強制同步）',true);showSyncBadge('同步中...');const hdr=document.getElementById('sync-status-hdr');if(hdr)hdr.innerHTML='<span style="color:var(--txt3);">同步中...</span>';const ok=await syncFromSheets();await syncConfigFromSheets();await syncIgFromSheets();renderAll();renderIgAll();showSyncBadge(ok?'同步完成':'同步失敗');if(hdr&&ok){const t=new Date();const ts=t.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});hdr.innerHTML=`<span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);"></span>已同步 ${ts}</span>`;}}
+function clearAllData(){if(!canDelete()){alert('僅組長可清除本機資料');return;}if(!confirm('確定要清除所有本機資料？（會先建立快照）'))return;createSnapshot('清除本機前（自動）',true);DATA=[];IG_DATA=[];localStorage.removeItem('kt_yt_data');localStorage.removeItem('kt_ig_data');renderAll();renderIgAll();showSyncBadge('本機資料已清除（快照已保留）');}
+
+// ============================================================
+// 推送全部本機資料覆蓋 Sheets（僅組長，雙重確認）
+// ============================================================
+async function pushAllToSheets(){
+  if(!canDelete()){alert('僅組長可執行「推送覆蓋」');return;}
+  if(!USE_API()){alert('請先設定 API URL');return;}
+  const confirmText=prompt(`⚠️ 警告：即將把本機所有資料推送並覆蓋到 Google Sheets。\n目前本機：${activeVideos().length} 部影片 / ${activeIgPosts().length} 則 IG 貼文\n\n請輸入「推送覆蓋」以繼續：`);
+  if(confirmText!=='推送覆蓋'){showSyncBadge('已取消推送');return;}
+  createSnapshot('推送 Sheets 前（自動）',true);
+  showSyncBadge('推送中...');
+  let ok=0,fail=0;
+  for(const v of DATA){
+    const r=await apiPost('updateVideo',{data:v});
+    if(r&&r.success)ok++;else fail++;
+    showSyncBadge(`推送影片 ${ok+fail}/${DATA.length}`);
+  }
+  let igOk=0,igFail=0;
+  for(const p of IG_DATA){
+    const r=await apiPost('updateIgPost',{data:p});
+    if(r&&r.success)igOk++;else igFail++;
+    showSyncBadge(`推送 IG ${igOk+igFail}/${IG_DATA.length}`);
+  }
+  showSyncBadge(`✅ 推送完成：影片 ${ok}/${DATA.length}、IG ${igOk}/${IG_DATA.length}${fail+igFail?`（失敗 ${fail+igFail}）`:''}`);
+}
 
 // ============================================================
 // CSV 匯出
 // ============================================================
-function exportCSV(){if(DATA.length===0){alert('無資料');return;}const h=['日期','標題','類型','類別','企劃','製作','時長','YT觀看','YT讚','YT留言','YT曝光','YT_CTR','YT觀看比例','YT平均時長','FB觀看','FB讚','FB留言','FB分享','FB觸及','IG觀看','IG讚','IG留言','IG分享','IG觸及','全平台觀看','備註','YT連結','FB連結','IG連結'];const rows=DATA.map(d=>[d.date,d.title,d.type,d.cat,d.planner,d.producer,d.dur,d.yt_views,d.yt_likes,d.yt_comments,d.yt_imp,d.yt_ctr,d.yt_ratio,d.yt_avgdur,d.fb_views,d.fb_likes,d.fb_comments,d.fb_shares,d.fb_reach,d.ig_views,d.ig_likes,d.ig_comments,d.ig_shares,d.ig_reach,totalViews(d),d.note,d.yt_url,d.fb_url,d.ig_url]);const csv='\uFEFF'+[h,...rows].map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');const b=new Blob([csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`video_${new Date().toISOString().slice(0,10)}.csv`;a.click();}
+function exportCSV(){const AV=activeVideos();if(AV.length===0){alert('無資料');return;}const h=['日期','標題','類型','類別','企劃','製作','時長','YT觀看','YT讚','YT留言','YT曝光','YT_CTR','YT觀看比例','YT平均時長','FB觀看','FB讚','FB留言','FB分享','FB觸及','IG觀看','IG讚','IG留言','IG分享','IG觸及','全平台觀看','備註','YT連結','FB連結','IG連結'];const rows=AV.map(d=>[d.date,d.title,d.type,d.cat,d.planner,d.producer,d.dur,d.yt_views,d.yt_likes,d.yt_comments,d.yt_imp,d.yt_ctr,d.yt_ratio,d.yt_avgdur,d.fb_views,d.fb_likes,d.fb_comments,d.fb_shares,d.fb_reach,d.ig_views,d.ig_likes,d.ig_comments,d.ig_shares,d.ig_reach,totalViews(d),d.note,d.yt_url,d.fb_url,d.ig_url]);const csv='\uFEFF'+[h,...rows].map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');const b=new Blob([csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`video_${new Date().toISOString().slice(0,10)}.csv`;a.click();}
 
 // ============================================================
 // 工具
@@ -1445,7 +1725,7 @@ async function autoFetchYt(prefix){
 
 async function batchUpdateYt(){
   if(!YT_API_KEY){alert('請先在「設定」頁面填入 YouTube Data API Key');showPage('config');return;}
-  const withUrl=DATA.filter(d=>d.yt_url&&parseYtVideoId(d.yt_url));
+  const withUrl=activeVideos().filter(d=>d.yt_url&&parseYtVideoId(d.yt_url));
   if(withUrl.length===0){alert('沒有包含 YouTube 連結的影片');return;}
   if(!confirm(`將更新 ${withUrl.length} 部影片的 YouTube 觀看數、按讚數、留言數。繼續？`))return;
   showSyncBadge('批次更新中... 0/'+withUrl.length);
@@ -1477,7 +1757,7 @@ async function batchUpdateYt(){
   saveData();renderAll();
   showSyncBadge(`批次更新完成：${updated} 部成功${failed?' / '+failed+' 部失敗':''}`);
   // Sync to Sheets in background (don't await to avoid blocking)
-  DATA.filter(d=>d.yt_url).forEach(d=>pushToSheets('updateVideo',{data:d}));
+  activeVideos().filter(d=>d.yt_url).forEach(d=>pushToSheets('updateVideo',{data:d}));
 }
 
 function saveYtApiKey(){
@@ -1491,6 +1771,9 @@ function saveYtApiKey(){
 // ============================================================
 function importYtStudioCSV(input){
   const file=input.files[0];if(!file)return;
+  const confirmText=prompt(`⚠️ 即將從 CSV 匯入資料，可能新增多筆影片紀錄。\n檔案：${file.name}\n\n請輸入「確認匯入」以繼續：`);
+  if(confirmText!=='確認匯入'){input.value='';showSyncBadge('已取消匯入');return;}
+  createSnapshot('CSV 匯入前（自動）',true);
   const reader=new FileReader();
   reader.onload=function(e){
     const lines=e.target.result.split('\n');
@@ -1600,18 +1883,25 @@ function clearIgForm(){
 }
 
 function deleteIgPost(id){
-  if(!canDelete()){alert('僅組長可刪除貼文');return;}
-  if(!confirm('確定刪除此 IG 貼文？'))return;
-  const removed=IG_DATA.find(d=>d.id===id);
-  IG_DATA=IG_DATA.filter(d=>d.id!==id);saveIgData();
-  if(removed&&removed.videoId)syncIgViewsToVideo({videoId:removed.videoId});
+  if(!canDelete()){alert('僅組員或組長可刪除貼文');return;}
+  if(!confirm('確定刪除此 IG 貼文？\n（將移至回收筒，可於「資料備份還原」頁還原）'))return;
+  createSnapshot('刪除 IG 前（自動）',true);
+  const idx=IG_DATA.findIndex(d=>d.id===id);if(idx===-1)return;
+  IG_DATA[idx].deleted_at=new Date().toISOString();
+  IG_DATA[idx].deleted_by=CURRENT_ROLE||'unknown';
+  saveIgData();
+  if(IG_DATA[idx].videoId)syncIgViewsToVideo({videoId:IG_DATA[idx].videoId});
   renderIgAll();renderAll();
-  pushToSheets('deleteIgPost',{id}).then(ok=>showSyncBadge(ok?'已刪除':'本機已刪除'));
+  pushToSheets('updateIgPost',{data:IG_DATA[idx]}).then(ok=>showSyncBadge(ok?'已移至回收筒（已同步）':'已移至回收筒'));
 }
 
 async function bulkUploadIgToSheets(){
+  if(!canDelete()){alert('僅組長可執行批次上傳');return;}
   if(!USE_API()){alert('請先設定 API URL');return;}
   if(!IG_DATA.length){alert('本機沒有 IG 資料');return;}
+  const confirmText=prompt(`⚠️ 即將把本機 ${IG_DATA.length} 則 IG 貼文推送並覆蓋到 Sheets。\n請輸入「推送覆蓋」以繼續：`);
+  if(confirmText!=='推送覆蓋'){showSyncBadge('已取消上傳');return;}
+  createSnapshot('IG 推送前（自動）',true);
   const btn=document.getElementById('ig-upload-btn');
   btn.disabled=true;btn.textContent='上傳中...';
   let ok=0,fail=0;
@@ -1659,7 +1949,7 @@ function renderIgAll(){renderIgKpi();renderIgList();buildIgMonthFilter();rebuild
 function renderIgKpi(){
   const now=new Date(),ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
   document.getElementById('ig-month').textContent=ym;
-  const md=IG_DATA.filter(d=>(d.date||'').startsWith(ym));
+  const md=activeIgPosts().filter(d=>(d.date||'').startsWith(ym));
   const tv=md.reduce((s,d)=>s+(Number(d.views)||0),0);
   const ti=md.reduce((s,d)=>s+(Number(d.interactions)||0),0);
   const tr=md.reduce((s,d)=>s+(Number(d.reach)||0),0);
@@ -1674,7 +1964,7 @@ function renderIgKpi(){
 function renderIgList(){
   const fm=document.getElementById('ig-filter-month').value;
   const ft=document.getElementById('ig-filter-type').value;
-  let f=IG_DATA.filter(d=>{
+  let f=activeIgPosts().filter(d=>{
     if(fm&&!(d.date||'').startsWith(fm))return false;
     if(ft&&String(d.type)!==ft)return false;
     return true;
@@ -1749,17 +2039,18 @@ function getIgFilteredData(){
   igsYear=parseInt(document.getElementById('igs-year')?.value||igsYear);
   if(igsMode==='month')igsMonth=parseInt(document.getElementById('igs-month')?.value||igsMonth);
   const kindLabel=igsKind==='reel'?'影片 Reels':'貼文+測驗';
+  const _AIG=activeIgPosts();
   let base,rangeLabel;
   if(igsMode==='year'){
-    base=IG_DATA.filter(d=>(d.date||'').startsWith(String(igsYear)));
+    base=_AIG.filter(d=>(d.date||'').startsWith(String(igsYear)));
     rangeLabel=`${igsYear} 年度`;
   }else if(igsMode==='quarter'){
     const qms=[1,2,3].map(i=>String((igsQuarter-1)*3+i).padStart(2,'0'));
-    base=IG_DATA.filter(d=>(d.date||'').startsWith(String(igsYear))&&qms.includes((d.date||'').substring(5,7)));
+    base=_AIG.filter(d=>(d.date||'').startsWith(String(igsYear))&&qms.includes((d.date||'').substring(5,7)));
     rangeLabel=`${igsYear} Q${igsQuarter}`;
   }else{
     const ym=`${igsYear}-${String(igsMonth).padStart(2,'0')}`;
-    base=IG_DATA.filter(d=>(d.date||'').startsWith(ym));
+    base=_AIG.filter(d=>(d.date||'').startsWith(ym));
     rangeLabel=`${igsYear} 年 ${igsMonth} 月`;
   }
   return{data:base.filter(matchKind),label:`${rangeLabel} · ${kindLabel}`};
@@ -1778,14 +2069,15 @@ function renderIgCharts(){
   // 月度趨勢：年模式顯示 12 個月、季模式顯示季內 3 個月、月模式顯示該月每則貼文
   let xLabels,mv;
   const inKind=arr=>arr.filter(matchKind);
+  const _AIG2=activeIgPosts();
   if(igsMode==='year'){
     const months=[];for(let i=1;i<=12;i++)months.push(`${igsYear}-${String(i).padStart(2,'0')}`);
-    mv=months.map(m=>inKind(IG_DATA.filter(d=>(d.date||'').startsWith(m))).reduce((s,d)=>s+(Number(d.views)||0),0));
+    mv=months.map(m=>inKind(_AIG2.filter(d=>(d.date||'').startsWith(m))).reduce((s,d)=>s+(Number(d.views)||0),0));
     xLabels=months.map(m=>m.substring(5)+'月');
   }else if(igsMode==='quarter'){
     const qms=[1,2,3].map(i=>(igsQuarter-1)*3+i);
     const months=qms.map(m=>`${igsYear}-${String(m).padStart(2,'0')}`);
-    mv=months.map(m=>inKind(IG_DATA.filter(d=>(d.date||'').startsWith(m))).reduce((s,d)=>s+(Number(d.views)||0),0));
+    mv=months.map(m=>inKind(_AIG2.filter(d=>(d.date||'').startsWith(m))).reduce((s,d)=>s+(Number(d.views)||0),0));
     xLabels=qms.map(m=>m+'月');
   }else{
     const sorted=[...filtered].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
@@ -1863,14 +2155,14 @@ function setRptScope(scope,btn){
 }
 
 function buildIgMonthFilter(){
-  const ms=[...new Set(IG_DATA.map(d=>(d.date||'').substring(0,7)).filter(Boolean))].sort().reverse();
+  const ms=[...new Set(activeIgPosts().map(d=>(d.date||'').substring(0,7)).filter(Boolean))].sort().reverse();
   document.getElementById('ig-filter-month').innerHTML='<option value="">全部月份</option>'+ms.map(m=>`<option value="${m}">${m}</option>`).join('');
 }
 
 function exportIgCSV(){
   if(IG_DATA.length===0){alert('無資料');return;}
   const h=['日期','標題','類型','類別','觀看','按讚','留言','互動','分享','儲存','觸及','連結'];
-  const rows=IG_DATA.map(d=>[d.date,d.title,IG_TYPE_MAP[d.type]||d.type,d.cat,d.views,d.likes,d.comments,d.interactions,d.shares,d.saves,d.reach,d.link]);
+  const rows=activeIgPosts().map(d=>[d.date,d.title,IG_TYPE_MAP[d.type]||d.type,d.cat,d.views,d.likes,d.comments,d.interactions,d.shares,d.saves,d.reach,d.link]);
   const csv='\uFEFF'+[h,...rows].map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
   const b=new Blob([csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`ig_posts_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 }
@@ -1945,7 +2237,7 @@ function openMonthlyReport(){
   const showVideo=scope==='all'||scope==='youtube';
   const showIg=scope==='all'||scope==='instagram';
   const ym=`${yr}-${mo}`;
-  const mData=showVideo?DATA.filter(d=>(d.date||'').substring(0,7)===ym).sort((a,b)=>(a.date||'').localeCompare(b.date||'')):[];
+  const mData=showVideo?activeVideos().filter(d=>(d.date||'').substring(0,7)===ym).sort((a,b)=>(a.date||'').localeCompare(b.date||'')):[];
   const moLabel=`${yr} 年 ${parseInt(mo)} 月`;
   const tv=mData.reduce((s,d)=>s+totalViews(d),0);
   const ytv=mData.reduce((s,d)=>s+(Number(d.yt_views)||0),0);
@@ -1958,7 +2250,7 @@ function openMonthlyReport(){
   const vRate=Math.min(Math.round(tv/vGoal*100),999),cRate=Math.min(Math.round(cnt/cGoal*100),999);
   const now=new Date().toLocaleDateString('zh-TW');
   // IG 貼文統計
-  const igPosts=showIg?IG_DATA.filter(d=>(d.date||'').substring(0,7)===ym).sort((a,b)=>(b.date||'').localeCompare(a.date||'')):[];
+  const igPosts=showIg?activeIgPosts().filter(d=>(d.date||'').substring(0,7)===ym).sort((a,b)=>(b.date||'').localeCompare(a.date||'')):[];
   const igpViews=igPosts.reduce((s,d)=>s+(Number(d.views)||0),0);
   const igpInter=igPosts.reduce((s,d)=>s+(Number(d.interactions)||0),0);
   const igpShares=igPosts.reduce((s,d)=>s+(Number(d.shares)||0),0);
@@ -2155,8 +2447,8 @@ function openAnnualReport(){
   const scope=document.getElementById('rpt-scope').value||'all';
   const showVideo=scope==='all'||scope==='youtube';
   const showIg=scope==='all'||scope==='instagram';
-  const yrData=showVideo?DATA.filter(d=>(d.date||'').startsWith(String(yr))):[];
-  const yrIgPosts=showIg?IG_DATA.filter(d=>(d.date||'').startsWith(String(yr))):[];
+  const yrData=showVideo?activeVideos().filter(d=>(d.date||'').startsWith(String(yr))):[];
+  const yrIgPosts=showIg?activeIgPosts().filter(d=>(d.date||'').startsWith(String(yr))):[];
   const tv=yrData.reduce((s,d)=>s+totalViews(d),0);
   const ytv=yrData.reduce((s,d)=>s+(Number(d.yt_views)||0),0);
   const fbv=yrData.reduce((s,d)=>s+(Number(d.fb_views)||0),0);
