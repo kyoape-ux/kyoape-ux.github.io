@@ -83,6 +83,63 @@ body{
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:28px}
 @media(max-width:560px){.grid{grid-template-columns:1fr}}
 
+/* 行銷組專屬：精簡三欄、點擊展開說明 */
+.grid-compact{grid-template-columns:repeat(3,1fr);gap:10px;overflow:visible}
+@media(max-width:560px){.grid-compact{grid-template-columns:1fr}}
+.grid-compact .card{
+  padding:14px 16px;
+  flex-direction:row;
+  align-items:center;
+  gap:10px;
+  overflow:visible;
+}
+.grid-compact .card::after{display:none}
+.grid-compact .card-icon{
+  width:34px;height:34px;
+  margin-bottom:0;
+  border-radius:9px;
+}
+.grid-compact .card-icon svg{width:17px;height:17px}
+.grid-compact .card-name{
+  font-size:12.5px;
+  margin-bottom:0;
+  flex:1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.grid-compact .card-lock{
+  position:static;
+  width:18px;height:18px;
+  flex-shrink:0;
+}
+.grid-compact .card-lock svg{width:9px;height:9px}
+.grid-compact .card-chevron{
+  flex-shrink:0;
+  width:18px;height:18px;
+  display:flex;align-items:center;justify-content:center;
+  color:#4a4a5a;
+  transition:transform .22s,color .22s;
+  cursor:pointer;
+}
+.grid-compact .card:hover .card-chevron{color:#8a8a98}
+.grid-compact .card.expanded .card-chevron{transform:rotate(180deg);color:#f0f0f4}
+.grid-compact .card-desc{
+  display:none;
+  flex-basis:100%;
+  font-size:11.5px;
+  color:#8a8a98;
+  line-height:1.75;
+  margin:4px 0 0 0;
+  padding-top:12px;
+  border-top:1px solid #1e1e28;
+}
+.grid-compact .card.expanded{
+  flex-wrap:wrap;
+}
+.grid-compact .card.expanded .card-desc{display:block}
+.grid-compact .card-badge{display:none}
+
 /* ── Card ── */
 .card{
   background:#13131a;
@@ -279,7 +336,7 @@ body{
     <div class="section-label-line"></div>
   </div>
 
-  <div class="grid">
+  <div class="grid grid-compact">
 
     <!-- 工作進度控管 -->
     <div class="card card-pm" data-internal data-href="./files/視覺多媒體設計組_專案管理_v3.html">
@@ -295,6 +352,7 @@ body{
         </svg>
       </div>
       <div class="card-name">工作進度控管</div>
+      <div class="card-chevron" data-expand><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
       <div class="card-desc">美編組 &amp; 多媒體組專案進度、甘特圖、週報產生器</div>
       <span class="card-badge">v3 Sheets 版</span>
     </div>
@@ -313,6 +371,7 @@ body{
         </svg>
       </div>
       <div class="card-name">影片發布資訊管理</div>
+      <div class="card-chevron" data-expand><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
       <div class="card-desc">YouTube / Facebook / Instagram 跨平台影片成效追蹤、績效達標管理</div>
       <span class="card-badge">Sheets 後端</span>
     </div>
@@ -335,6 +394,7 @@ body{
         </svg>
       </div>
       <div class="card-name">行銷整合分析中心</div>
+      <div class="card-chevron" data-expand><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
       <div class="card-desc">跨平台數據整合、成效儀表板、行銷 KPI 綜合分析與決策支援</div>
       <span class="card-badge">Marketing Hub</span>
     </div>
@@ -378,9 +438,20 @@ function isAuthed() {
   return sessionStorage.getItem(SESSION_KEY) === '1';
 }
 
+// 展開按鈕（行銷組專屬精簡卡片）
+document.querySelectorAll('[data-expand]').forEach(function(btn) {
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var card = btn.closest('.card');
+    card.classList.toggle('expanded');
+  });
+});
+
 // 內部卡片點擊
 document.querySelectorAll('[data-internal]').forEach(function(card) {
   card.addEventListener('click', function(e) {
+    if (e.target.closest('[data-expand]')) return;
     e.preventDefault();
     var href = card.dataset.href;
     if (isAuthed()) {
