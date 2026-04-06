@@ -14,7 +14,7 @@
   --txt:#E8ECF1; --txt2:#94A3B8; --txt3:#5A6B80;
   --card:#131C28; --card-hover:#182438;
   --red:#F87171; --amber:#FBBF24; --blue:#60A5FA;
-  --yt:#FF4444; --fb:#4C8BF5; --ig:#E1306C;
+  --yt:#FF4444; --fb:#4C8BF5; --ig:#F472B6; --ig-deep:#BE185D;
   --radius:10px; --radius-lg:14px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -95,7 +95,7 @@ a{color:var(--accent);text-decoration:none;}
 .plat-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:6px;font-weight:500;font-variant-numeric:tabular-nums;}
 .plat-yt{background:rgba(255,68,68,.12);color:var(--yt);}
 .plat-fb{background:rgba(76,139,245,.12);color:var(--fb);}
-.plat-ig{background:rgba(225,48,108,.12);color:var(--ig);}
+.plat-ig{background:rgba(244,114,182,.12);color:var(--ig);}
 
 /* ── Charts ────────────────────────────────────────── */
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
@@ -130,7 +130,7 @@ textarea{resize:vertical;min-height:64px;}
 .section-header{font-size:12px;font-weight:700;margin:22px 0 12px;padding:10px 14px;border-radius:8px;display:flex;align-items:center;gap:8px;letter-spacing:.3px;}
 .section-yt{background:rgba(255,68,68,.08);color:var(--yt);border:1px solid rgba(255,68,68,.12);}
 .section-fb{background:rgba(76,139,245,.08);color:var(--fb);border:1px solid rgba(76,139,245,.12);}
-.section-ig{background:rgba(225,48,108,.08);color:var(--ig);border:1px solid rgba(225,48,108,.12);}
+.section-ig{background:rgba(244,114,182,.08);color:var(--ig);border:1px solid rgba(244,114,182,.12);}
 
 /* ── Table ─────────────────────────────────────────── */
 .tbl-toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
@@ -836,7 +836,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
             <tr><th>功能</th><th>說明</th></tr>
             <tr><td><span class="gtag" style="background:rgba(96,165,250,.15);color:var(--blue);">儀表板</span></td><td>KPI 卡片、觀看趨勢圖、平台占比、類別分布、Top 5 排名</td></tr>
             <tr><td><span class="gtag" style="background:rgba(52,211,153,.15);color:var(--accent);">影片管理</span></td><td>新增 / 編輯 / 刪除影片，三大平台數據追蹤</td></tr>
-            <tr><td><span class="gtag" style="background:rgba(225,48,108,.15);color:var(--ig);">IG 管理</span></td><td>獨立管理 Instagram 貼文，含觀看、互動、觸及等數據</td></tr>
+            <tr><td><span class="gtag" style="background:rgba(244,114,182,.15);color:var(--ig);">IG 管理</span></td><td>獨立管理 Instagram 貼文，含觀看、互動、觸及等數據</td></tr>
             <tr><td><span class="gtag" style="background:rgba(251,191,36,.15);color:var(--amber);">匯出報表</span></td><td>月報表、年度報表，可列印或儲存為 PDF</td></tr>
             <tr><td><span class="gtag" style="background:rgba(248,113,113,.15);color:var(--red);">自動取得</span></td><td>透過 YouTube API 自動抓取影片觀看數、按讚數等數據</td></tr>
           </table>
@@ -916,7 +916,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
             <tr><th>平台</th><th>可填欄位</th></tr>
             <tr><td><span class="gtag" style="background:rgba(255,68,68,.12);color:var(--yt);">YouTube</span></td><td>連結、觀看、按讚、留言、曝光、CTR、觀看比例、平均時長</td></tr>
             <tr><td><span class="gtag" style="background:rgba(76,139,245,.12);color:var(--fb);">Facebook</span></td><td>連結、觀看、按讚/心情、留言、分享、觸及人數</td></tr>
-            <tr><td><span class="gtag" style="background:rgba(225,48,108,.12);color:var(--ig);">Instagram</span></td><td>連結、觀看、按讚、留言、分享、觸及人數</td></tr>
+            <tr><td><span class="gtag" style="background:rgba(244,114,182,.12);color:var(--ig);">Instagram</span></td><td>連結、觀看、按讚、留言、分享、觸及人數</td></tr>
           </table>
           <h4>自動取得 YT 數據</h4>
           <div class="gflow"><span>貼上 YouTube 連結</span><span class="gflow-arrow">&rarr;</span><span>點擊「自動取得 YT 數據」</span><span class="gflow-arrow">&rarr;</span><span>系統自動填入</span></div>
@@ -951,7 +951,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
           <h4>貼文類型標籤</h4>
           <table class="gtbl">
             <tr><th>類型</th><th>標籤顏色</th></tr>
-            <tr><td>貼文（圖片）</td><td><span class="gtag" style="background:rgba(225,48,108,.15);color:#E1306C;">粉紅色</span></td></tr>
+            <tr><td>貼文（圖片）</td><td><span class="gtag" style="background:rgba(244,114,182,.15);color:#F472B6;">粉紅色</span></td></tr>
             <tr><td>測驗</td><td><span class="gtag" style="background:rgba(251,191,36,.15);color:#D97706;">琥珀色</span></td></tr>
             <tr><td>影片 Reels</td><td><span class="gtag" style="background:rgba(96,165,250,.15);color:#3B82F6;">藍色</span></td></tr>
           </table>
@@ -1289,13 +1289,13 @@ function renderCharts(viewData){
   };
   const bgYt=months.map((_,i)=>isHl(_,i)?'rgba(255,68,68,0.8)':'rgba(255,68,68,0.22)');
   const bgFb=months.map((_,i)=>isHl(_,i)?'rgba(76,139,245,0.8)':'rgba(76,139,245,0.22)');
-  const bgIg=months.map((_,i)=>isHl(_,i)?'rgba(225,48,108,0.8)':'rgba(225,48,108,0.22)');
+  const bgIg=months.map((_,i)=>isHl(_,i)?'rgba(244,114,182,0.8)':'rgba(244,114,182,0.22)');
   if(chartMonthly)chartMonthly.destroy();
   chartMonthly=new Chart(document.getElementById('chart-monthly'),{type:'bar',data:{labels:months.map(m=>m.substring(5)+'月'),datasets:[{label:'YouTube',data:mYt,backgroundColor:bgYt,borderRadius:3},{label:'Facebook',data:mFb,backgroundColor:bgFb,borderRadius:3},{label:'Instagram',data:mIg,backgroundColor:bgIg,borderRadius:3}]},options:{responsive:true,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true}},plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:12,padding:16}}}}});
   // Platform doughnut
   const vYt=viewData.reduce((s,d)=>s+(Number(d.yt_views)||0),0),vFb=viewData.reduce((s,d)=>s+(Number(d.fb_views)||0),0),vIg=viewData.reduce((s,d)=>s+(Number(d.ig_views)||0),0);
   if(chartPlatform)chartPlatform.destroy();
-  chartPlatform=new Chart(document.getElementById('chart-platform'),{type:'doughnut',data:{labels:['YouTube','Facebook','Instagram'],datasets:[{data:[vYt,vFb,vIg],backgroundColor:['#FF4444','#4C8BF5','#E1306C'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:16}}}}});
+  chartPlatform=new Chart(document.getElementById('chart-platform'),{type:'doughnut',data:{labels:['YouTube','Facebook','Instagram'],datasets:[{data:[vYt,vFb,vIg],backgroundColor:['#FF4444','#4C8BF5','#F472B6'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:16}}}}});
   // Category doughnut
   const cats=['疾病衛教','特色醫療','新服務流程','醫院形象','員工活動','教學','其他'];
   const catColors=['#34D399','#60A5FA','#FBBF24','#F87171','#A78BFA','#2DD4BF','#64748B'];
@@ -1308,7 +1308,7 @@ function renderCharts(viewData){
   // Top 5
   const top5=[...viewData].sort((a,b)=>totalViews(b)-totalViews(a)).slice(0,5);
   if(chartTop5)chartTop5.destroy();
-  chartTop5=new Chart(document.getElementById('chart-top5'),{type:'bar',data:{labels:top5.map(d=>(d.title||'').substring(0,18)+((d.title||'').length>18?'…':'')),datasets:[{label:'YT',data:top5.map(d=>Number(d.yt_views)||0),backgroundColor:'rgba(255,68,68,0.7)',borderRadius:3},{label:'FB',data:top5.map(d=>Number(d.fb_views)||0),backgroundColor:'rgba(76,139,245,0.7)',borderRadius:3},{label:'IG',data:top5.map(d=>Number(d.ig_views)||0),backgroundColor:'rgba(225,48,108,0.7)',borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,beginAtZero:true,grid:{display:false}},y:{stacked:true,grid:{display:false}}},plugins:{legend:{position:'top',labels:{font:{size:10},boxWidth:10,padding:12}}}}});
+  chartTop5=new Chart(document.getElementById('chart-top5'),{type:'bar',data:{labels:top5.map(d=>(d.title||'').substring(0,18)+((d.title||'').length>18?'…':'')),datasets:[{label:'YT',data:top5.map(d=>Number(d.yt_views)||0),backgroundColor:'rgba(255,68,68,0.7)',borderRadius:3},{label:'FB',data:top5.map(d=>Number(d.fb_views)||0),backgroundColor:'rgba(76,139,245,0.7)',borderRadius:3},{label:'IG',data:top5.map(d=>Number(d.ig_views)||0),backgroundColor:'rgba(244,114,182,0.7)',borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,beginAtZero:true,grid:{display:false}},y:{stacked:true,grid:{display:false}}},plugins:{legend:{position:'top',labels:{font:{size:10},boxWidth:10,padding:12}}}}});
 }
 
 // ============================================================
@@ -1685,7 +1685,7 @@ function renderIgList(){
   tb.innerHTML=f.map(d=>`<tr>
     <td style="white-space:nowrap;">${(d.date||'').substring(0,10)||'—'}</td>
     <td style="max-width:220px;">${d.link?`<a href="${esc(d.link)}" target="_blank">${esc(d.title)}</a>`:esc(d.title)}</td>
-    <td><span class="type-badge" style="${String(d.type)==='1'?'background:rgba(225,48,108,.15);color:#E1306C;':String(d.type)==='2'?'background:rgba(251,191,36,.15);color:#D97706;':'background:rgba(96,165,250,.15);color:#3B82F6;'}">${IG_TYPE_MAP[d.type]||d.type}</span></td>
+    <td><span class="type-badge" style="${String(d.type)==='1'?'background:rgba(244,114,182,.15);color:#F472B6;':String(d.type)==='2'?'background:rgba(251,191,36,.15);color:#D97706;':'background:rgba(96,165,250,.15);color:#3B82F6;'}">${IG_TYPE_MAP[d.type]||d.type}</span></td>
     <td>${esc(d.cat||'')}</td>
     <td style="text-align:right;">${(Number(d.views)||0).toLocaleString()}</td>
     <td style="text-align:right;">${(Number(d.interactions)||0).toLocaleString()}</td>
@@ -1793,7 +1793,7 @@ function renderIgCharts(){
     mv=sorted.map(d=>Number(d.views)||0);
   }
   if(igChartMonthly)igChartMonthly.destroy();
-  const trendColor=igsKind==='reel'?'rgba(96,165,250,0.7)':'rgba(225,48,108,0.7)';
+  const trendColor=igsKind==='reel'?'rgba(96,165,250,0.7)':'rgba(244,114,182,0.7)';
   igChartMonthly=new Chart(document.getElementById('ig-chart-monthly'),{type:'bar',data:{labels:xLabels,datasets:[{label:'觀看數',data:mv,backgroundColor:trendColor,borderRadius:4}]},options:{responsive:true,scales:{x:{grid:{display:false}},y:{beginAtZero:true}},plugins:{legend:{display:false}}}});
 
   // 第二格：依內容類型顯示不同 KPI summary
@@ -1831,10 +1831,10 @@ function renderIgCharts(){
       const quiz2=filtered.filter(d=>String(d.type)==='2').length;
       kpiBox.innerHTML=`
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;font-size:12px;">
-          <div style="background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">總互動</div><div style="font-size:20px;font-weight:800;color:#E1306C;margin-top:4px;">${sumInter.toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">平均 ${avg(sumInter).toLocaleString()} / 則</div></div>
-          <div style="background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">按讚 + 留言</div><div style="font-size:20px;font-weight:800;color:#E1306C;margin-top:4px;">${(sumLikes+sumComments).toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">讚 ${sumLikes.toLocaleString()} · 留言 ${sumComments.toLocaleString()}</div></div>
-          <div style="background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">儲存數</div><div style="font-size:20px;font-weight:800;color:#E1306C;margin-top:4px;">${sumSaves.toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">平均 ${avg(sumSaves).toLocaleString()} / 則</div></div>
-          <div style="background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">貼文 / 測驗</div><div style="font-size:20px;font-weight:800;color:#E1306C;margin-top:4px;">${post1} / ${quiz2}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">共 ${cntF} 則</div></div>
+          <div style="background:rgba(244,114,182,.1);border:1px solid rgba(244,114,182,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">總互動</div><div style="font-size:20px;font-weight:800;color:#F472B6;margin-top:4px;">${sumInter.toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">平均 ${avg(sumInter).toLocaleString()} / 則</div></div>
+          <div style="background:rgba(244,114,182,.1);border:1px solid rgba(244,114,182,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">按讚 + 留言</div><div style="font-size:20px;font-weight:800;color:#F472B6;margin-top:4px;">${(sumLikes+sumComments).toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">讚 ${sumLikes.toLocaleString()} · 留言 ${sumComments.toLocaleString()}</div></div>
+          <div style="background:rgba(244,114,182,.1);border:1px solid rgba(244,114,182,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">儲存數</div><div style="font-size:20px;font-weight:800;color:#F472B6;margin-top:4px;">${sumSaves.toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">平均 ${avg(sumSaves).toLocaleString()} / 則</div></div>
+          <div style="background:rgba(244,114,182,.1);border:1px solid rgba(244,114,182,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">貼文 / 測驗</div><div style="font-size:20px;font-weight:800;color:#F472B6;margin-top:4px;">${post1} / ${quiz2}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">共 ${cntF} 則</div></div>
         </div>`;
     }
   }
@@ -1850,7 +1850,7 @@ function renderIgCharts(){
   // 類別分布
   const igCats=[...new Set(filtered.map(d=>d.cat).filter(Boolean))];
   const igCatCounts=igCats.map(c=>filtered.filter(d=>d.cat===c).length);
-  const igCatColors=['#E1306C','#FBBF24','#60A5FA','#34D399','#A78BFA','#F87171','#2DD4BF','#64748B'];
+  const igCatColors=['#F472B6','#FBBF24','#60A5FA','#34D399','#A78BFA','#F87171','#2DD4BF','#64748B'];
   if(igChartCat)igChartCat.destroy();
   const catEl=document.getElementById('ig-chart-cat');
   if(catEl)igChartCat=new Chart(catEl,{type:'doughnut',data:{labels:igCats,datasets:[{data:igCatCounts,backgroundColor:igCatColors.slice(0,igCats.length),borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12}}}}});
@@ -2017,9 +2017,9 @@ body{font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;color:#1A1A1A;ba
 .plat{background:#fff;border-radius:10px;padding:14px;text-align:center;}
 .plat-yt{border:1px solid rgba(255,68,68,.35);}
 .plat-fb{border:1px solid rgba(76,139,245,.35);}
-.plat-ig{border:1px solid rgba(225,48,108,.35);}
+.plat-ig{border:1px solid rgba(244,114,182,.35);}
 .plat .val{font-size:22px;font-weight:800;}
-.plat-yt .val{color:#FF4444;}.plat-fb .val{color:#4C8BF5;}.plat-ig .val{color:#E1306C;}
+.plat-yt .val{color:#FF4444;}.plat-fb .val{color:#4C8BF5;}.plat-ig .val{color:#F472B6;}
 .plat .lbl{font-size:11px;color:#999;margin-top:3px;}
 .ig-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:8px;}
 .ig-kpi{background:#FFF0F5;border:1px solid #F9A8D4;border-radius:10px;padding:12px 14px;text-align:center;}
@@ -2075,15 +2075,72 @@ tr:nth-child(even) td{background:#FAFAFA;}
   ${showVideo?`<div class="sec-title">本月影片清單（共 ${cnt} 部）</div>
   <table><thead><tr><th>發布日期</th><th>影片標題</th><th>類型</th><th>類別</th><th>YT 觀看</th><th>FB 觀看</th><th>IG 觀看</th><th>全平台合計</th></tr></thead>
   <tbody>${rows}</tbody></table>`:''}
-  ${showIg?`<div class="sec-title" style="border-color:#E1306C;color:#BE185D;margin-top:28px;">📸 Instagram 貼文統計（共 ${igPosts.length} 篇）</div>
-  <div class="ig-kpi-row">
-    <div class="ig-kpi"><div class="val">${igpViews.toLocaleString()}</div><div class="lbl">總觀看數</div></div>
-    <div class="ig-kpi"><div class="val">${igpInter.toLocaleString()}</div><div class="lbl">總互動數</div></div>
-    <div class="ig-kpi"><div class="val">${igpShares.toLocaleString()}</div><div class="lbl">總分享數</div></div>
-    <div class="ig-kpi"><div class="val">${igpSaves.toLocaleString()}</div><div class="lbl">總儲存數</div></div>
-  </div>
-  <table style="margin-top:8px;"><thead><tr><th>發布日期</th><th>標題</th><th>類型</th><th>類別</th><th>觀看</th><th>互動</th><th>分享</th><th>儲存</th></tr></thead>
-  <tbody>${igPostRows}</tbody></table>`:''}
+  ${showIg?(()=>{
+    const postQuiz=igPosts.filter(d=>String(d.type)==='1'||String(d.type)==='2');
+    const reels=igPosts.filter(d=>String(d.type)==='3');
+    const sumOf=(arr,k)=>arr.reduce((s,d)=>s+(Number(d[k])||0),0);
+    const renderRows=arr=>arr.length>0?arr.map(d=>`<tr>
+      <td>${(d.date||'').substring(0,10)}</td>
+      <td style="text-align:left;max-width:220px;">${d.title||''}</td>
+      <td>${d.cat||''}</td>
+      <td>${(Number(d.views)||0).toLocaleString()}</td>
+      <td>${(Number(d.interactions)||0).toLocaleString()}</td>
+      <td>${(Number(d.shares)||0).toLocaleString()}</td>
+      <td>${(Number(d.saves)||0).toLocaleString()}</td>
+    </tr>`).join(''):`<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">無資料</td></tr>`;
+    const renderTopRows=arr=>{
+      const top=[...arr].sort((a,b)=>(Number(b.views)||0)-(Number(a.views)||0)).slice(0,5);
+      if(top.length===0)return `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">無資料</td></tr>`;
+      const medal=['#F5A623','#9B9B9B','#C47D3E','#BE185D','#BE185D'];
+      return top.map((d,i)=>`<tr>
+        <td style="text-align:center;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:${i<3?medal[i]:'#FCE7F3'};color:${i<3?'#fff':'#BE185D'};font-weight:900;font-size:12px;">${i+1}</span></td>
+        <td style="text-align:left;max-width:220px;">${d.title||''}</td>
+        <td>${d.cat||''}</td>
+        <td>${(Number(d.views)||0).toLocaleString()}</td>
+        <td>${(Number(d.interactions)||0).toLocaleString()}</td>
+        <td>${(Number(d.shares)||0).toLocaleString()}</td>
+        <td style="font-weight:900;color:#BE185D;">${(Number(d.saves)||0).toLocaleString()}</td>
+      </tr>`).join('');
+    };
+    let html='';
+    // 貼文 + 測驗
+    if(postQuiz.length>0){
+      const pV=sumOf(postQuiz,'views'),pI=sumOf(postQuiz,'interactions'),pS=sumOf(postQuiz,'shares'),pSv=sumOf(postQuiz,'saves'),pL=sumOf(postQuiz,'likes'),pC=sumOf(postQuiz,'comments');
+      html+=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;">📸 Instagram 貼文 + 測驗（共 ${postQuiz.length} 則）</div>
+      <div class="ig-kpi-row">
+        <div class="ig-kpi"><div class="val">${pI.toLocaleString()}</div><div class="lbl">總互動</div></div>
+        <div class="ig-kpi"><div class="val">${(pL+pC).toLocaleString()}</div><div class="lbl">按讚 + 留言</div></div>
+        <div class="ig-kpi"><div class="val">${pS.toLocaleString()}</div><div class="lbl">分享</div></div>
+        <div class="ig-kpi"><div class="val">${pSv.toLocaleString()}</div><div class="lbl">儲存</div></div>
+      </div>
+      <div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:14px;font-size:12px;">🏆 貼文 + 測驗 TOP 5（依觀看）</div>
+      <table><thead><tr><th style="width:40px;">排名</th><th>標題</th><th>類別</th><th>觀看</th><th>互動</th><th>分享</th><th>儲存</th></tr></thead>
+      <tbody>${renderTopRows(postQuiz)}</tbody></table>
+      <div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:14px;font-size:12px;">本月清單</div>
+      <table><thead><tr><th>發布日期</th><th>標題</th><th>類別</th><th>觀看</th><th>互動</th><th>分享</th><th>儲存</th></tr></thead>
+      <tbody>${renderRows(postQuiz)}</tbody></table>`;
+    }
+    // 影片 Reels
+    if(reels.length>0){
+      const rV=sumOf(reels,'views'),rI=sumOf(reels,'interactions'),rR=sumOf(reels,'reach'),rS=sumOf(reels,'shares'),rSv=sumOf(reels,'saves');
+      const eRate=rR>0?(rI/rR*100).toFixed(1):'0.0';
+      html+=`<div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:28px;">🎬 Instagram 影片 Reels（共 ${reels.length} 則）</div>
+      <div class="ig-kpi-row" style="background:rgba(96,165,250,.05);">
+        <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rV.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">觀看總數</div></div>
+        <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rR.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">觸及帳號</div></div>
+        <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rI.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">互動率 ${eRate}%</div></div>
+        <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rS.toLocaleString()} / ${rSv.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">分享 / 儲存</div></div>
+      </div>
+      <div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:14px;font-size:12px;">🏆 Reels TOP 5（依觀看）</div>
+      <table><thead><tr><th style="width:40px;">排名</th><th>標題</th><th>類別</th><th>觀看</th><th>互動</th><th>分享</th><th>儲存</th></tr></thead>
+      <tbody>${renderTopRows(reels)}</tbody></table>
+      <div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:14px;font-size:12px;">本月清單</div>
+      <table><thead><tr><th>發布日期</th><th>標題</th><th>類別</th><th>觀看</th><th>互動</th><th>分享</th><th>儲存</th></tr></thead>
+      <tbody>${renderRows(reels)}</tbody></table>`;
+    }
+    if(!html)html=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;">📸 Instagram 統計</div><p style="text-align:center;color:#aaa;padding:24px;">本月無 IG 資料</p>`;
+    return html;
+  })():''}
   <div class="footer"><span>光田綜合醫院 視覺多媒體設計組 · 僅供內部使用</span><span>影片發布資訊管理系統 · 產製於 ${now}</span></div>
 </div></body></html>`;
 
@@ -2096,8 +2153,10 @@ tr:nth-child(even) td{background:#FAFAFA;}
 function openAnnualReport(){
   const yr=parseInt(document.getElementById('rpt-yr-annual').value);
   const scope=document.getElementById('rpt-scope').value||'all';
-  if(scope==='instagram'){alert('年度報表目前僅涵蓋影片數據。請切換至「全部」或「YouTube」範圍。');return;}
-  const yrData=DATA.filter(d=>(d.date||'').startsWith(String(yr)));
+  const showVideo=scope==='all'||scope==='youtube';
+  const showIg=scope==='all'||scope==='instagram';
+  const yrData=showVideo?DATA.filter(d=>(d.date||'').startsWith(String(yr))):[];
+  const yrIgPosts=showIg?IG_DATA.filter(d=>(d.date||'').startsWith(String(yr))):[];
   const tv=yrData.reduce((s,d)=>s+totalViews(d),0);
   const ytv=yrData.reduce((s,d)=>s+(Number(d.yt_views)||0),0);
   const fbv=yrData.reduce((s,d)=>s+(Number(d.fb_views)||0),0);
@@ -2155,9 +2214,13 @@ body{font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;color:#1A1A1A;ba
 .kpi .val{font-size:24px;font-weight:900;color:#0F6E56;}.kpi .lbl{font-size:11px;color:#888;margin-top:3px;}
 .plat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
 .plat{background:#fff;border-radius:10px;padding:14px;text-align:center;}
-.plat-yt{border:1px solid rgba(255,68,68,.35);}.plat-fb{border:1px solid rgba(76,139,245,.35);}.plat-ig{border:1px solid rgba(225,48,108,.35);}
-.plat .val{font-size:22px;font-weight:800;}.plat-yt .val{color:#FF4444;}.plat-fb .val{color:#4C8BF5;}.plat-ig .val{color:#E1306C;}
+.plat-yt{border:1px solid rgba(255,68,68,.35);}.plat-fb{border:1px solid rgba(76,139,245,.35);}.plat-ig{border:1px solid rgba(244,114,182,.35);}
+.plat .val{font-size:22px;font-weight:800;}.plat-yt .val{color:#FF4444;}.plat-fb .val{color:#4C8BF5;}.plat-ig .val{color:#F472B6;}
 .plat .lbl{font-size:11px;color:#999;margin-top:3px;}
+.ig-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:8px;}
+.ig-kpi{background:#FFF0F5;border:1px solid #F9A8D4;border-radius:10px;padding:12px 14px;text-align:center;}
+.ig-kpi .val{font-size:20px;font-weight:900;color:#BE185D;}
+.ig-kpi .lbl{font-size:11px;color:#9D174D;margin-top:3px;}
 .sec-title{font-size:13px;font-weight:700;color:#0F6E56;border-left:3px solid #0F6E56;padding-left:10px;margin:22px 0 12px;}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
@@ -2175,7 +2238,7 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
     <div class="hd-l"><h1>${yr} 年度 影片發布績效報告</h1><p>光田綜合醫院 視覺多媒體設計組</p></div>
     <div class="hd-r">產製日期：${now}<br>統計年度：${yr} 年<br>年觀看目標：${vGoal.toLocaleString()}</div>
   </div>
-  <div class="kpi-row">
+  ${showVideo?`<div class="kpi-row">
     <div class="kpi"><div class="val">${cnt}</div><div class="lbl">年度上架總數（部）</div></div>
     <div class="kpi"><div class="val">${tv.toLocaleString()}</div><div class="lbl">全平台年度總觀看</div></div>
     <div class="kpi"><div class="val">${vRate}%</div><div class="lbl">年觀看達成率</div></div>
@@ -2185,14 +2248,14 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
     <div class="plat plat-yt"><div class="val">${ytv.toLocaleString()}</div><div class="lbl">YouTube</div></div>
     <div class="plat plat-fb"><div class="val">${fbv.toLocaleString()}</div><div class="lbl">Facebook</div></div>
     <div class="plat plat-ig"><div class="val">${igv.toLocaleString()}</div><div class="lbl">Instagram</div></div>
-  </div>
-  ${(embedV>0||webPV>0)?`<div class="sec-title" style="border-color:#0F6E56;">🌐 官網曝光（內部歸因 · 不計入 KPI 加總）</div>
+  </div>`:''}
+  ${showVideo&&(embedV>0||webPV>0)?`<div class="sec-title" style="border-color:#0F6E56;">🌐 官網曝光（內部歸因 · 不計入 KPI 加總）</div>
   <div class="plat-row" style="grid-template-columns:repeat(3,1fr);">
     <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${embedV.toLocaleString()}</div><div class="lbl">YT 外部嵌入觀看</div></div>
     <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${webPV.toLocaleString()}</div><div class="lbl">官網頁面瀏覽量（PV）</div></div>
     <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${ytv>0?Math.round(embedV/ytv*100):0}%</div><div class="lbl">官網嵌入佔 YT 比例</div></div>
   </div>`:''}
-  <div class="sec-title">季度摘要</div>
+  ${showVideo?`<div class="sec-title">季度摘要</div>
   <table><thead><tr><th>季度</th><th>上架數</th><th>YT 觀看</th><th>FB 觀看</th><th>IG 觀看</th><th>全平台合計</th></tr></thead>
   <tbody>${qRows}</tbody></table>
   <div style="margin-top:20px;">
@@ -2204,7 +2267,75 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
     <div class="sec-title">年度 Top 10 影片（全平台觀看）</div>
     <table><thead><tr><th>#</th><th class="left">標題</th><th>日期</th><th>類別</th><th>YT</th><th>FB</th><th>IG</th><th>合計</th></tr></thead>
     <tbody>${top10Rows}</tbody></table>
-  </div>
+  </div>`:''}
+  ${showIg?(()=>{
+    const postQuiz=yrIgPosts.filter(d=>String(d.type)==='1'||String(d.type)==='2');
+    const reels=yrIgPosts.filter(d=>String(d.type)==='3');
+    const sumOf=(arr,k)=>arr.reduce((s,d)=>s+(Number(d[k])||0),0);
+    const renderTopRows=arr=>{
+      const top=[...arr].sort((a,b)=>(Number(b.views)||0)-(Number(a.views)||0)).slice(0,5);
+      if(top.length===0)return `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">無資料</td></tr>`;
+      const medal=['#F5A623','#9B9B9B','#C47D3E','#BE185D','#BE185D'];
+      return top.map((d,i)=>`<tr>
+        <td style="text-align:center;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:${i<3?medal[i]:'#FCE7F3'};color:${i<3?'#fff':'#BE185D'};font-weight:900;font-size:12px;">${i+1}</span></td>
+        <td style="text-align:left;max-width:220px;">${d.title||''}</td>
+        <td>${(d.date||'').substring(0,10)}</td>
+        <td>${d.cat||''}</td>
+        <td>${(Number(d.views)||0).toLocaleString()}</td>
+        <td>${(Number(d.interactions)||0).toLocaleString()}</td>
+        <td style="font-weight:900;color:#BE185D;">${(Number(d.saves)||0).toLocaleString()}</td>
+      </tr>`).join('');
+    };
+    // 季度 IG 摘要
+    const igQRows=[1,2,3,4].map(q=>{
+      const qms=[1,2,3].map(i=>String((q-1)*3+i).padStart(2,'0'));
+      const qPq=postQuiz.filter(d=>qms.includes((d.date||'').substring(5,7)));
+      const qRl=reels.filter(d=>qms.includes((d.date||'').substring(5,7)));
+      return `<tr>
+        <td style="font-weight:700;color:#BE185D;">${qLabels[q-1]}</td>
+        <td>${qPq.length}</td>
+        <td>${sumOf(qPq,'views').toLocaleString()}</td>
+        <td>${sumOf(qPq,'interactions').toLocaleString()}</td>
+        <td>${qRl.length}</td>
+        <td>${sumOf(qRl,'views').toLocaleString()}</td>
+        <td>${sumOf(qRl,'interactions').toLocaleString()}</td>
+      </tr>`;
+    }).join('');
+    let html=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;">📸 Instagram 年度成效（依貼文類型）</div>
+    <table><thead><tr><th>季度</th><th>貼文+測驗 數</th><th>觀看</th><th>互動</th><th>Reels 數</th><th>觀看</th><th>互動</th></tr></thead>
+    <tbody>${igQRows}</tbody></table>`;
+    // 貼文+測驗
+    if(postQuiz.length>0){
+      const pV=sumOf(postQuiz,'views'),pI=sumOf(postQuiz,'interactions'),pS=sumOf(postQuiz,'shares'),pSv=sumOf(postQuiz,'saves'),pL=sumOf(postQuiz,'likes'),pC=sumOf(postQuiz,'comments');
+      html+=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:24px;">📸 貼文 + 測驗 年度總覽（共 ${postQuiz.length} 則）</div>
+      <div class="ig-kpi-row">
+        <div class="ig-kpi"><div class="val">${pI.toLocaleString()}</div><div class="lbl">總互動</div></div>
+        <div class="ig-kpi"><div class="val">${(pL+pC).toLocaleString()}</div><div class="lbl">按讚 + 留言</div></div>
+        <div class="ig-kpi"><div class="val">${pS.toLocaleString()}</div><div class="lbl">分享</div></div>
+        <div class="ig-kpi"><div class="val">${pSv.toLocaleString()}</div><div class="lbl">儲存</div></div>
+      </div>
+      <div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:14px;font-size:12px;">🏆 貼文 + 測驗 年度 TOP 5</div>
+      <table><thead><tr><th style="width:40px;">排名</th><th>標題</th><th>日期</th><th>類別</th><th>觀看</th><th>互動</th><th>儲存</th></tr></thead>
+      <tbody>${renderTopRows(postQuiz)}</tbody></table>`;
+    }
+    // Reels
+    if(reels.length>0){
+      const rV=sumOf(reels,'views'),rI=sumOf(reels,'interactions'),rR=sumOf(reels,'reach'),rS=sumOf(reels,'shares'),rSv=sumOf(reels,'saves');
+      const eRate=rR>0?(rI/rR*100).toFixed(1):'0.0';
+      html+=`<div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:24px;">🎬 影片 Reels 年度總覽（共 ${reels.length} 則）</div>
+      <div class="ig-kpi-row">
+        <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rV.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">觀看總數</div></div>
+        <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rR.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">觸及帳號</div></div>
+        <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rI.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">互動率 ${eRate}%</div></div>
+        <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rS.toLocaleString()} / ${rSv.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">分享 / 儲存</div></div>
+      </div>
+      <div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:14px;font-size:12px;">🏆 Reels 年度 TOP 5</div>
+      <table><thead><tr><th style="width:40px;">排名</th><th>標題</th><th>日期</th><th>類別</th><th>觀看</th><th>互動</th><th>儲存</th></tr></thead>
+      <tbody>${renderTopRows(reels)}</tbody></table>`;
+    }
+    if(postQuiz.length===0&&reels.length===0)html+=`<p style="text-align:center;color:#aaa;padding:24px;">本年度無 IG 資料</p>`;
+    return html;
+  })():''}
   <div class="footer"><span>光田綜合醫院 視覺多媒體設計組 · 僅供內部使用</span><span>影片發布資訊管理系統 · 產製於 ${now}</span></div>
 </div></body></html>`;
 
