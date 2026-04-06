@@ -157,6 +157,9 @@ tr:hover td{background:rgba(52,211,153,.03);}
 /* ── Config ────────────────────────────────────────── */
 .cfg-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;max-width:520px;}
 .cfg-card h3{font-size:14px;margin-bottom:16px;color:var(--txt);font-weight:700;}
+.rpt-scope-btn{padding:6px 16px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:var(--txt3);transition:.15s;font-family:inherit;}
+.rpt-scope-btn:hover{color:var(--txt);}
+.rpt-scope-btn.active{background:var(--accent);color:#000;}
 
 /* ── Edit Modal ────────────────────────────────────── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
@@ -618,6 +621,18 @@ tr:hover td{background:rgba(52,211,153,.03);}
         </div>
       </div>
 
+      <!-- IG 成效總覽 -->
+      <div class="chart-row" style="margin-top:20px;">
+        <div class="chart-box">
+          <h3><span class="icon"><svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>IG TOP 5 貼文</h3>
+          <canvas id="ig-chart-top5" style="max-height:200px;"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3><span class="icon"><svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>類別分布</h3>
+          <canvas id="ig-chart-cat"></canvas>
+        </div>
+      </div>
+
       <!-- IG 列表 -->
       <div style="margin-top:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -649,6 +664,17 @@ tr:hover td{background:rgba(52,211,153,.03);}
         </div>
       </div>
       <div class="page-body">
+
+      <!-- 報表篩選 -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+        <span style="font-size:13px;color:var(--txt2);">報表範圍：</span>
+        <div style="display:flex;gap:2px;background:var(--bg-2);border-radius:8px;padding:3px;border:1px solid var(--border);">
+          <button class="rpt-scope-btn active" onclick="setRptScope('all',this)">全部</button>
+          <button class="rpt-scope-btn" onclick="setRptScope('youtube',this)">YouTube</button>
+          <button class="rpt-scope-btn" onclick="setRptScope('instagram',this)">Instagram</button>
+        </div>
+        <input type="hidden" id="rpt-scope" value="all">
+      </div>
 
       <!-- 月報表 -->
       <div class="cfg-card" style="max-width:none;margin-bottom:20px;">
@@ -1224,7 +1250,7 @@ function renderCharts(viewData){
   // Type distribution (Long / Short)
   const longCnt=viewData.filter(d=>d.type==='long').length,shortCnt=viewData.filter(d=>d.type==='short').length;
   if(chartType)chartType.destroy();
-  chartType=new Chart(document.getElementById('chart-type'),{type:'doughnut',data:{labels:['Long（長片）','Short（短片/Reels）'],datasets:[{data:[longCnt,shortCnt],backgroundColor:['#A78BFA','#60A5FA'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:16}},tooltip:{callbacks:{label:ctx=>{const tot=longCnt+shortCnt;const pct=tot>0?Math.round(ctx.raw/tot*100):0;return ` ${ctx.label}: ${ctx.raw} 部（${pct}%）`;}}}}}});
+  chartType=new Chart(document.getElementById('chart-type'),{type:'doughnut',data:{labels:['Long（長片）','Short（短片/Reels）'],datasets:[{data:[longCnt,shortCnt],backgroundColor:['#FBBF24','#818CF8'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:16}},tooltip:{callbacks:{label:ctx=>{const tot=longCnt+shortCnt;const pct=tot>0?Math.round(ctx.raw/tot*100):0;return ` ${ctx.label}: ${ctx.raw} 部（${pct}%）`;}}}}}});
   // Top 5
   const top5=[...viewData].sort((a,b)=>totalViews(b)-totalViews(a)).slice(0,5);
   if(chartTop5)chartTop5.destroy();
@@ -1456,7 +1482,7 @@ function importYtStudioCSV(input){
 // IG 貼文管理
 // ============================================================
 let IG_DATA=[];
-let igChartMonthly=null, igChartType=null;
+let igChartMonthly=null, igChartType=null, igChartTop5=null, igChartCat=null;
 const IG_TYPE_MAP={'1':'貼文','2':'測驗','3':'影片'};
 
 function loadIgData(){try{IG_DATA=JSON.parse(localStorage.getItem('kt_ig_data')||'[]');}catch(e){IG_DATA=[];}}
@@ -1590,6 +1616,28 @@ function renderIgCharts(){
   const tCounts=types.map(t=>IG_DATA.filter(d=>String(d.type)===t).length);
   if(igChartType)igChartType.destroy();
   igChartType=new Chart(document.getElementById('ig-chart-type'),{type:'doughnut',data:{labels:tLabels,datasets:[{data:tCounts,backgroundColor:['rgba(225,48,108,0.7)','rgba(251,191,36,0.7)','rgba(96,165,250,0.7)'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12}}}}});
+
+  // TOP 5 IG 貼文（依觀看數）
+  const top5=[...IG_DATA].sort((a,b)=>(Number(b.views)||0)-(Number(a.views)||0)).slice(0,5);
+  const t5Labels=top5.map(d=>(d.title||'').substring(0,18)+((d.title||'').length>18?'…':''));
+  const t5Data=top5.map(d=>Number(d.views)||0);
+  if(igChartTop5)igChartTop5.destroy();
+  const t5El=document.getElementById('ig-chart-top5');
+  if(t5El)igChartTop5=new Chart(t5El,{type:'bar',data:{labels:t5Labels,datasets:[{label:'觀看數',data:t5Data,backgroundColor:'rgba(225,48,108,0.75)',borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{beginAtZero:true,grid:{display:false}},y:{grid:{display:false}}},plugins:{legend:{display:false}}}});
+
+  // 類別分布
+  const igCats=[...new Set(IG_DATA.map(d=>d.cat).filter(Boolean))];
+  const igCatCounts=igCats.map(c=>IG_DATA.filter(d=>d.cat===c).length);
+  const igCatColors=['#E1306C','#FBBF24','#60A5FA','#34D399','#A78BFA','#F87171','#2DD4BF','#64748B'];
+  if(igChartCat)igChartCat.destroy();
+  const catEl=document.getElementById('ig-chart-cat');
+  if(catEl)igChartCat=new Chart(catEl,{type:'doughnut',data:{labels:igCats,datasets:[{data:igCatCounts,backgroundColor:igCatColors.slice(0,igCats.length),borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12}}}}});
+}
+
+function setRptScope(scope,btn){
+  document.getElementById('rpt-scope').value=scope;
+  document.querySelectorAll('.rpt-scope-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
 }
 
 function buildIgMonthFilter(){
@@ -1671,8 +1719,11 @@ function canDelete(){return CURRENT_ROLE==='member'||CURRENT_ROLE==='leader';}
 function openMonthlyReport(){
   const yr=document.getElementById('rpt-year').value;
   const mo=document.getElementById('rpt-month').value;
+  const scope=document.getElementById('rpt-scope').value||'all';
+  const showVideo=scope==='all'||scope==='youtube';
+  const showIg=scope==='all'||scope==='instagram';
   const ym=`${yr}-${mo}`;
-  const mData=DATA.filter(d=>(d.date||'').substring(0,7)===ym).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const mData=showVideo?DATA.filter(d=>(d.date||'').substring(0,7)===ym).sort((a,b)=>(a.date||'').localeCompare(b.date||'')):[];
   const moLabel=`${yr} 年 ${parseInt(mo)} 月`;
   const tv=mData.reduce((s,d)=>s+totalViews(d),0);
   const ytv=mData.reduce((s,d)=>s+(Number(d.yt_views)||0),0);
@@ -1683,7 +1734,7 @@ function openMonthlyReport(){
   const vRate=Math.min(Math.round(tv/vGoal*100),999),cRate=Math.min(Math.round(cnt/cGoal*100),999);
   const now=new Date().toLocaleDateString('zh-TW');
   // IG 貼文統計
-  const igPosts=IG_DATA.filter(d=>(d.date||'').substring(0,7)===ym).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const igPosts=showIg?IG_DATA.filter(d=>(d.date||'').substring(0,7)===ym).sort((a,b)=>(b.date||'').localeCompare(a.date||'')):[];
   const igpViews=igPosts.reduce((s,d)=>s+(Number(d.views)||0),0);
   const igpInter=igPosts.reduce((s,d)=>s+(Number(d.interactions)||0),0);
   const igpShares=igPosts.reduce((s,d)=>s+(Number(d.shares)||0),0);
@@ -1788,13 +1839,13 @@ tr:nth-child(even) td{background:#FAFAFA;}
     <div class="prog"><div class="prog-lbl"><span>觀看目標（${vGoal.toLocaleString()} 次）</span><span>${tv.toLocaleString()} / ${vGoal.toLocaleString()}</span></div><div class="prog-bg"><div class="prog-fill" style="width:${Math.min(100,vRate)}%"></div></div></div>
     <div class="prog"><div class="prog-lbl"><span>上架目標（${cGoal} 部）</span><span>${cnt} / ${cGoal}</span></div><div class="prog-bg"><div class="prog-fill" style="width:${Math.min(100,cRate)}%"></div></div></div>
   </div>
-  <div class="sec-title">🏆 本月觀看次數 TOP 5</div>
+  ${showVideo?`<div class="sec-title">🏆 本月觀看次數 TOP 5</div>
   <table><thead><tr><th style="width:40px;">排名</th><th>影片標題</th><th>類型</th><th>類別</th><th>YT 觀看</th><th>FB 觀看</th><th>IG 觀看</th><th>全平台合計</th></tr></thead>
-  <tbody>${top5rows}</tbody></table>
-  <div class="sec-title">本月影片清單（共 ${cnt} 部）</div>
+  <tbody>${top5rows}</tbody></table>`:''}
+  ${showVideo?`<div class="sec-title">本月影片清單（共 ${cnt} 部）</div>
   <table><thead><tr><th>發布日期</th><th>影片標題</th><th>類型</th><th>類別</th><th>YT 觀看</th><th>FB 觀看</th><th>IG 觀看</th><th>全平台合計</th></tr></thead>
-  <tbody>${rows}</tbody></table>
-  <div class="sec-title" style="border-color:#E1306C;color:#BE185D;margin-top:28px;">📸 Instagram 貼文統計（共 ${igPosts.length} 篇）</div>
+  <tbody>${rows}</tbody></table>`:''}
+  ${showIg?`<div class="sec-title" style="border-color:#E1306C;color:#BE185D;margin-top:28px;">📸 Instagram 貼文統計（共 ${igPosts.length} 篇）</div>
   <div class="ig-kpi-row">
     <div class="ig-kpi"><div class="val">${igpViews.toLocaleString()}</div><div class="lbl">總觀看數</div></div>
     <div class="ig-kpi"><div class="val">${igpInter.toLocaleString()}</div><div class="lbl">總互動數</div></div>
@@ -1802,7 +1853,7 @@ tr:nth-child(even) td{background:#FAFAFA;}
     <div class="ig-kpi"><div class="val">${igpSaves.toLocaleString()}</div><div class="lbl">總儲存數</div></div>
   </div>
   <table style="margin-top:8px;"><thead><tr><th>發布日期</th><th>標題</th><th>類型</th><th>類別</th><th>觀看</th><th>互動</th><th>分享</th><th>儲存</th></tr></thead>
-  <tbody>${igPostRows}</tbody></table>
+  <tbody>${igPostRows}</tbody></table>`:''}
   <div class="footer"><span>光田綜合醫院 視覺多媒體設計組 · 僅供內部使用</span><span>影片發布資訊管理系統 · 產製於 ${now}</span></div>
 </div></body></html>`;
 
@@ -1814,6 +1865,8 @@ tr:nth-child(even) td{background:#FAFAFA;}
 // ============================================================
 function openAnnualReport(){
   const yr=parseInt(document.getElementById('rpt-yr-annual').value);
+  const scope=document.getElementById('rpt-scope').value||'all';
+  if(scope==='instagram'){alert('年度報表目前僅涵蓋影片數據。請切換至「全部」或「YouTube」範圍。');return;}
   const yrData=DATA.filter(d=>(d.date||'').startsWith(String(yr)));
   const tv=yrData.reduce((s,d)=>s+totalViews(d),0);
   const ytv=yrData.reduce((s,d)=>s+(Number(d.yt_views)||0),0);
