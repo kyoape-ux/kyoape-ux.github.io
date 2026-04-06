@@ -118,6 +118,8 @@ body{
 .card-pm:hover{border-color:#0d2520;box-shadow:0 12px 40px rgba(15,110,86,.2)}
 .card-yt::before{background:linear-gradient(90deg,#9a3412,#fb923c)}
 .card-yt:hover{border-color:#2a1810;box-shadow:0 12px 40px rgba(154,52,18,.2)}
+.card-ma::before{background:linear-gradient(90deg,#be185d,#f472b6)}
+.card-ma:hover{border-color:#2a1020;box-shadow:0 12px 40px rgba(190,24,93,.2)}
 
 /* icon */
 .card-icon{
@@ -129,6 +131,7 @@ body{
 .card-mt .card-icon{background:rgba(79,70,229,.18)}
 .card-pm .card-icon{background:rgba(15,110,86,.18)}
 .card-yt .card-icon{background:rgba(154,52,18,.18)}
+.card-ma .card-icon{background:rgba(190,24,93,.18)}
 
 .card-name{font-size:14.5px;font-weight:700;color:#f0f0f4;margin-bottom:5px}
 .card-desc{font-size:11.5px;color:#565668;line-height:1.75;flex:1;margin-bottom:14px}
@@ -143,6 +146,7 @@ body{
 .card-mt .card-badge{background:rgba(79,70,229,.12);color:#818cf8;border:1px solid rgba(79,70,229,.25)}
 .card-pm .card-badge{background:rgba(15,110,86,.12);color:#2dd4bf;border:1px solid rgba(15,110,86,.25)}
 .card-yt .card-badge{background:rgba(154,52,18,.12);color:#fb923c;border:1px solid rgba(154,52,18,.25)}
+.card-ma .card-badge{background:rgba(190,24,93,.12);color:#f472b6;border:1px solid rgba(190,24,93,.25)}
 
 /* ── 內部限定卡片 lock 標記 ── */
 .card-lock{
@@ -316,6 +320,28 @@ body{
       <div class="card-name">影片發布資訊管理</div>
       <div class="card-desc">YouTube / Facebook / Instagram 跨平台影片成效追蹤、績效達標管理</div>
       <span class="card-badge">Sheets 後端</span>
+    </div>
+
+    <!-- 行銷整合分析中心 -->
+    <div class="card card-ma" data-internal data-href="https://kyoape-ux.github.io/ktgh-marketing-hub/">
+      <div class="card-lock">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <div class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v18h18"/>
+          <path d="M7 15l4-4 4 4 6-6"/>
+          <circle cx="7" cy="15" r="1.2"/>
+          <circle cx="11" cy="11" r="1.2"/>
+          <circle cx="15" cy="15" r="1.2"/>
+          <circle cx="21" cy="9" r="1.2"/>
+        </svg>
+      </div>
+      <div class="card-name">行銷整合分析中心</div>
+      <div class="card-desc">跨平台數據整合、成效儀表板、行銷 KPI 綜合分析與決策支援</div>
+      <span class="card-badge">Marketing Hub</span>
     </div>
 
   </div>
