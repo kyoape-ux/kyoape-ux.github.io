@@ -144,8 +144,8 @@ td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:rgba(52,211,153,.03);}
 .type-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;}
-.type-short{background:rgba(96,165,250,.12);color:var(--blue);}
-.type-long{background:rgba(167,139,250,.12);color:#A78BFA;}
+.type-short{background:rgba(129,140,248,.15);color:#818CF8;}
+.type-long{background:rgba(251,191,36,.15);color:#FBBF24;}
 .act-btns{display:flex;gap:4px;}
 .act-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--txt3);transition:.12s;display:inline-flex;align-items:center;}
 .act-btn:hover{border-color:var(--accent);color:var(--accent);}
@@ -656,6 +656,15 @@ tr:hover td{background:rgba(52,211,153,.03);}
         </div>
       </div>
       <div class="page-body">
+        <!-- 篩選器 -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;">
+          <span style="font-size:13px;color:var(--txt2);font-weight:600;">篩選範圍：</span>
+          <div style="display:flex;gap:2px;background:var(--bg-2);border-radius:8px;padding:3px;border:1px solid var(--border);" id="igs-mode-tabs"></div>
+          <select id="igs-year" onchange="renderIgCharts()" style="padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--bg-2);color:var(--txt);outline:none;cursor:pointer;"></select>
+          <div id="igs-quarter-switcher" style="display:none;gap:4px;"></div>
+          <select id="igs-month" onchange="renderIgCharts()" style="display:none;padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--bg-2);color:var(--txt);outline:none;cursor:pointer;"></select>
+          <span id="igs-label" style="font-size:12px;color:var(--txt3);margin-left:auto;"></span>
+        </div>
         <div class="chart-row">
           <div class="chart-box">
             <h3><span class="icon"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></span>月度觀看趨勢</h3>
@@ -1681,20 +1690,87 @@ function renderIgList(){
   </tr>`).join('');
 }
 
+// IG 成效篩選狀態
+let igsMode='year';
+let igsYear=new Date().getFullYear();
+let igsQuarter=Math.floor(new Date().getMonth()/3)+1;
+let igsMonth=new Date().getMonth()+1;
+function setIgsMode(m){igsMode=m;renderIgCharts();}
+function setIgsQuarter(q){igsQuarter=q;renderIgCharts();}
+
+function buildIgsFilters(){
+  const tabs=document.getElementById('igs-mode-tabs');
+  if(!tabs)return;
+  const modeCfg=[['year','年'],['quarter','季'],['month','月']];
+  tabs.innerHTML=modeCfg.map(([m,l])=>`<button onclick="setIgsMode('${m}')" style="padding:5px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:.12s;${m===igsMode?'background:var(--accent);color:#000;':'background:transparent;color:var(--txt3);'}">${l}</button>`).join('');
+  // 年份下拉（依資料中存在的年份 + 當年）
+  const ySet=new Set(IG_DATA.map(d=>(d.date||'').substring(0,4)).filter(Boolean));
+  ySet.add(String(new Date().getFullYear()));
+  const years=[...ySet].sort().reverse();
+  const ySel=document.getElementById('igs-year');
+  ySel.innerHTML=years.map(y=>`<option value="${y}">${y}</option>`).join('');
+  ySel.value=String(igsYear);
+  // 季度切換
+  const qs=document.getElementById('igs-quarter-switcher');
+  qs.style.display=igsMode==='quarter'?'flex':'none';
+  if(igsMode==='quarter'){
+    qs.innerHTML=[1,2,3,4].map(q=>`<button onclick="setIgsQuarter(${q})" style="padding:6px 12px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;${q===igsQuarter?'background:var(--accent);color:#000;':'background:var(--bg-2);color:var(--txt3);border:1px solid var(--border);'}">Q${q}</button>`).join('');
+  }
+  // 月份下拉
+  const mSel=document.getElementById('igs-month');
+  mSel.style.display=igsMode==='month'?'':'none';
+  if(igsMode==='month'){
+    mSel.innerHTML=[1,2,3,4,5,6,7,8,9,10,11,12].map(m=>`<option value="${m}">${m} 月</option>`).join('');
+    mSel.value=String(igsMonth);
+  }
+}
+
+function getIgFilteredData(){
+  igsYear=parseInt(document.getElementById('igs-year')?.value||igsYear);
+  if(igsMode==='month')igsMonth=parseInt(document.getElementById('igs-month')?.value||igsMonth);
+  if(igsMode==='year'){
+    return{data:IG_DATA.filter(d=>(d.date||'').startsWith(String(igsYear))),label:`${igsYear} 年度`};
+  }else if(igsMode==='quarter'){
+    const qms=[1,2,3].map(i=>String((igsQuarter-1)*3+i).padStart(2,'0'));
+    return{data:IG_DATA.filter(d=>(d.date||'').startsWith(String(igsYear))&&qms.includes((d.date||'').substring(5,7))),label:`${igsYear} Q${igsQuarter}`};
+  }else{
+    const ym=`${igsYear}-${String(igsMonth).padStart(2,'0')}`;
+    return{data:IG_DATA.filter(d=>(d.date||'').startsWith(ym)),label:`${igsYear} 年 ${igsMonth} 月`};
+  }
+}
+
 function renderIgCharts(){
-  const months=[],now=new Date();
-  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);}
-  const mv=months.map(m=>IG_DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.views)||0),0));
+  buildIgsFilters();
+  const{data:filtered,label}=getIgFilteredData();
+  const labelEl=document.getElementById('igs-label');if(labelEl)labelEl.textContent=`${label} · 共 ${filtered.length} 則`;
+
+  // 月度趨勢：年模式顯示 12 個月、季模式顯示季內 3 個月、月模式顯示該月按週
+  let months,mv,xLabels;
+  if(igsMode==='year'){
+    months=[];for(let i=1;i<=12;i++)months.push(`${igsYear}-${String(i).padStart(2,'0')}`);
+    mv=months.map(m=>IG_DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.views)||0),0));
+    xLabels=months.map(m=>m.substring(5)+'月');
+  }else if(igsMode==='quarter'){
+    const qms=[1,2,3].map(i=>(igsQuarter-1)*3+i);
+    months=qms.map(m=>`${igsYear}-${String(m).padStart(2,'0')}`);
+    mv=months.map(m=>IG_DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.views)||0),0));
+    xLabels=qms.map(m=>m+'月');
+  }else{
+    // 月模式：顯示該月內每則貼文（依日期排序）
+    const sorted=[...filtered].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    xLabels=sorted.map(d=>(d.date||'').substring(8,10)+'日');
+    mv=sorted.map(d=>Number(d.views)||0);
+  }
   if(igChartMonthly)igChartMonthly.destroy();
-  igChartMonthly=new Chart(document.getElementById('ig-chart-monthly'),{type:'bar',data:{labels:months,datasets:[{label:'觀看數',data:mv,backgroundColor:'rgba(225,48,108,0.7)',borderRadius:4}]},options:{responsive:true,scales:{x:{grid:{display:false}},y:{beginAtZero:true}},plugins:{legend:{display:false}}}});
+  igChartMonthly=new Chart(document.getElementById('ig-chart-monthly'),{type:'bar',data:{labels:xLabels,datasets:[{label:'觀看數',data:mv,backgroundColor:'rgba(225,48,108,0.7)',borderRadius:4}]},options:{responsive:true,scales:{x:{grid:{display:false}},y:{beginAtZero:true}},plugins:{legend:{display:false}}}});
 
   const types=['1','2','3'];const tLabels=['貼文','測驗','影片'];
-  const tCounts=types.map(t=>IG_DATA.filter(d=>String(d.type)===t).length);
+  const tCounts=types.map(t=>filtered.filter(d=>String(d.type)===t).length);
   if(igChartType)igChartType.destroy();
   igChartType=new Chart(document.getElementById('ig-chart-type'),{type:'doughnut',data:{labels:tLabels,datasets:[{data:tCounts,backgroundColor:['rgba(225,48,108,0.7)','rgba(251,191,36,0.7)','rgba(96,165,250,0.7)'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12}}}}});
 
   // TOP 5 IG 貼文（依觀看數）
-  const top5=[...IG_DATA].sort((a,b)=>(Number(b.views)||0)-(Number(a.views)||0)).slice(0,5);
+  const top5=[...filtered].sort((a,b)=>(Number(b.views)||0)-(Number(a.views)||0)).slice(0,5);
   const t5Labels=top5.map(d=>(d.title||'').substring(0,18)+((d.title||'').length>18?'…':''));
   const t5Data=top5.map(d=>Number(d.views)||0);
   if(igChartTop5)igChartTop5.destroy();
@@ -1702,8 +1778,8 @@ function renderIgCharts(){
   if(t5El)igChartTop5=new Chart(t5El,{type:'bar',data:{labels:t5Labels,datasets:[{label:'觀看數',data:t5Data,backgroundColor:'rgba(225,48,108,0.75)',borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{beginAtZero:true,grid:{display:false}},y:{grid:{display:false}}},plugins:{legend:{display:false}}}});
 
   // 類別分布
-  const igCats=[...new Set(IG_DATA.map(d=>d.cat).filter(Boolean))];
-  const igCatCounts=igCats.map(c=>IG_DATA.filter(d=>d.cat===c).length);
+  const igCats=[...new Set(filtered.map(d=>d.cat).filter(Boolean))];
+  const igCatCounts=igCats.map(c=>filtered.filter(d=>d.cat===c).length);
   const igCatColors=['#E1306C','#FBBF24','#60A5FA','#34D399','#A78BFA','#F87171','#2DD4BF','#64748B'];
   if(igChartCat)igChartCat.destroy();
   const catEl=document.getElementById('ig-chart-cat');
