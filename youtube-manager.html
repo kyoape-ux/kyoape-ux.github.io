@@ -657,7 +657,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
       </div>
       <div class="page-body">
         <!-- 篩選器 -->
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;">
           <span style="font-size:13px;color:var(--txt2);font-weight:600;">篩選範圍：</span>
           <div style="display:flex;gap:2px;background:var(--bg-2);border-radius:8px;padding:3px;border:1px solid var(--border);" id="igs-mode-tabs"></div>
           <select id="igs-year" onchange="renderIgCharts()" style="padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--bg-2);color:var(--txt);outline:none;cursor:pointer;"></select>
@@ -665,13 +665,19 @@ tr:hover td{background:rgba(52,211,153,.03);}
           <select id="igs-month" onchange="renderIgCharts()" style="display:none;padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--bg-2);color:var(--txt);outline:none;cursor:pointer;"></select>
           <span id="igs-label" style="font-size:12px;color:var(--txt3);margin-left:auto;"></span>
         </div>
+        <!-- 內容類型 Tabs -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;">
+          <span style="font-size:13px;color:var(--txt2);font-weight:600;">內容類型：</span>
+          <div style="display:flex;gap:2px;background:var(--bg-2);border-radius:8px;padding:3px;border:1px solid var(--border);" id="igs-kind-tabs"></div>
+          <span style="font-size:11px;color:var(--txt3);">「貼文+測驗」與「影片 Reels」屬不同成效模式，請分開檢視</span>
+        </div>
         <div class="chart-row">
           <div class="chart-box">
             <h3><span class="icon"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></span>月度觀看趨勢</h3>
             <canvas id="ig-chart-monthly"></canvas>
           </div>
           <div class="chart-box">
-            <h3><span class="icon"><svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>貼文類型分布</h3>
+            <h3 id="igs-kpi-title"><span class="icon"><svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>成效摘要</h3>
             <canvas id="ig-chart-type"></canvas>
           </div>
         </div>
@@ -1695,14 +1701,22 @@ let igsMode='year';
 let igsYear=new Date().getFullYear();
 let igsQuarter=Math.floor(new Date().getMonth()/3)+1;
 let igsMonth=new Date().getMonth()+1;
+let igsKind='post'; // 'post' = 貼文+測驗, 'reel' = 影片 Reels
 function setIgsMode(m){igsMode=m;renderIgCharts();}
 function setIgsQuarter(q){igsQuarter=q;renderIgCharts();}
+function setIgsKind(k){igsKind=k;renderIgCharts();}
 
 function buildIgsFilters(){
   const tabs=document.getElementById('igs-mode-tabs');
   if(!tabs)return;
   const modeCfg=[['year','年'],['quarter','季'],['month','月']];
   tabs.innerHTML=modeCfg.map(([m,l])=>`<button onclick="setIgsMode('${m}')" style="padding:5px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:.12s;${m===igsMode?'background:var(--accent);color:#000;':'background:transparent;color:var(--txt3);'}">${l}</button>`).join('');
+  // 內容類型 Tabs
+  const kindTabs=document.getElementById('igs-kind-tabs');
+  if(kindTabs){
+    const kindCfg=[['post','貼文 + 測驗'],['reel','影片 Reels']];
+    kindTabs.innerHTML=kindCfg.map(([k,l])=>`<button onclick="setIgsKind('${k}')" style="padding:5px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:.12s;${k===igsKind?'background:var(--ig);color:#fff;':'background:transparent;color:var(--txt3);'}">${l}</button>`).join('');
+  }
   // 年份下拉（依資料中存在的年份 + 當年）
   const ySet=new Set(IG_DATA.map(d=>(d.date||'').substring(0,4)).filter(Boolean));
   ySet.add(String(new Date().getFullYear()));
@@ -1725,49 +1739,105 @@ function buildIgsFilters(){
   }
 }
 
+// 內容類型過濾：post = 貼文(1)+測驗(2)，reel = 影片(3)
+function matchKind(d){
+  const t=String(d.type);
+  if(igsKind==='reel')return t==='3';
+  return t==='1'||t==='2';
+}
 function getIgFilteredData(){
   igsYear=parseInt(document.getElementById('igs-year')?.value||igsYear);
   if(igsMode==='month')igsMonth=parseInt(document.getElementById('igs-month')?.value||igsMonth);
+  const kindLabel=igsKind==='reel'?'影片 Reels':'貼文+測驗';
+  let base,rangeLabel;
   if(igsMode==='year'){
-    return{data:IG_DATA.filter(d=>(d.date||'').startsWith(String(igsYear))),label:`${igsYear} 年度`};
+    base=IG_DATA.filter(d=>(d.date||'').startsWith(String(igsYear)));
+    rangeLabel=`${igsYear} 年度`;
   }else if(igsMode==='quarter'){
     const qms=[1,2,3].map(i=>String((igsQuarter-1)*3+i).padStart(2,'0'));
-    return{data:IG_DATA.filter(d=>(d.date||'').startsWith(String(igsYear))&&qms.includes((d.date||'').substring(5,7))),label:`${igsYear} Q${igsQuarter}`};
+    base=IG_DATA.filter(d=>(d.date||'').startsWith(String(igsYear))&&qms.includes((d.date||'').substring(5,7)));
+    rangeLabel=`${igsYear} Q${igsQuarter}`;
   }else{
     const ym=`${igsYear}-${String(igsMonth).padStart(2,'0')}`;
-    return{data:IG_DATA.filter(d=>(d.date||'').startsWith(ym)),label:`${igsYear} 年 ${igsMonth} 月`};
+    base=IG_DATA.filter(d=>(d.date||'').startsWith(ym));
+    rangeLabel=`${igsYear} 年 ${igsMonth} 月`;
   }
+  return{data:base.filter(matchKind),label:`${rangeLabel} · ${kindLabel}`};
 }
 
 function renderIgCharts(){
   buildIgsFilters();
   const{data:filtered,label}=getIgFilteredData();
   const labelEl=document.getElementById('igs-label');if(labelEl)labelEl.textContent=`${label} · 共 ${filtered.length} 則`;
+  const kpiTitle=document.getElementById('igs-kpi-title');
+  if(kpiTitle){
+    const t=igsKind==='reel'?'影片 Reels 成效摘要':'貼文 + 測驗成效摘要';
+    kpiTitle.innerHTML=`<span class="icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span>${t}`;
+  }
 
-  // 月度趨勢：年模式顯示 12 個月、季模式顯示季內 3 個月、月模式顯示該月按週
-  let months,mv,xLabels;
+  // 月度趨勢：年模式顯示 12 個月、季模式顯示季內 3 個月、月模式顯示該月每則貼文
+  let xLabels,mv;
+  const inKind=arr=>arr.filter(matchKind);
   if(igsMode==='year'){
-    months=[];for(let i=1;i<=12;i++)months.push(`${igsYear}-${String(i).padStart(2,'0')}`);
-    mv=months.map(m=>IG_DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.views)||0),0));
+    const months=[];for(let i=1;i<=12;i++)months.push(`${igsYear}-${String(i).padStart(2,'0')}`);
+    mv=months.map(m=>inKind(IG_DATA.filter(d=>(d.date||'').startsWith(m))).reduce((s,d)=>s+(Number(d.views)||0),0));
     xLabels=months.map(m=>m.substring(5)+'月');
   }else if(igsMode==='quarter'){
     const qms=[1,2,3].map(i=>(igsQuarter-1)*3+i);
-    months=qms.map(m=>`${igsYear}-${String(m).padStart(2,'0')}`);
-    mv=months.map(m=>IG_DATA.filter(d=>(d.date||'').startsWith(m)).reduce((s,d)=>s+(Number(d.views)||0),0));
+    const months=qms.map(m=>`${igsYear}-${String(m).padStart(2,'0')}`);
+    mv=months.map(m=>inKind(IG_DATA.filter(d=>(d.date||'').startsWith(m))).reduce((s,d)=>s+(Number(d.views)||0),0));
     xLabels=qms.map(m=>m+'月');
   }else{
-    // 月模式：顯示該月內每則貼文（依日期排序）
     const sorted=[...filtered].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
     xLabels=sorted.map(d=>(d.date||'').substring(8,10)+'日');
     mv=sorted.map(d=>Number(d.views)||0);
   }
   if(igChartMonthly)igChartMonthly.destroy();
-  igChartMonthly=new Chart(document.getElementById('ig-chart-monthly'),{type:'bar',data:{labels:xLabels,datasets:[{label:'觀看數',data:mv,backgroundColor:'rgba(225,48,108,0.7)',borderRadius:4}]},options:{responsive:true,scales:{x:{grid:{display:false}},y:{beginAtZero:true}},plugins:{legend:{display:false}}}});
+  const trendColor=igsKind==='reel'?'rgba(96,165,250,0.7)':'rgba(225,48,108,0.7)';
+  igChartMonthly=new Chart(document.getElementById('ig-chart-monthly'),{type:'bar',data:{labels:xLabels,datasets:[{label:'觀看數',data:mv,backgroundColor:trendColor,borderRadius:4}]},options:{responsive:true,scales:{x:{grid:{display:false}},y:{beginAtZero:true}},plugins:{legend:{display:false}}}});
 
-  const types=['1','2','3'];const tLabels=['貼文','測驗','影片'];
-  const tCounts=types.map(t=>filtered.filter(d=>String(d.type)===t).length);
+  // 第二格：依內容類型顯示不同 KPI summary
   if(igChartType)igChartType.destroy();
-  igChartType=new Chart(document.getElementById('ig-chart-type'),{type:'doughnut',data:{labels:tLabels,datasets:[{data:tCounts,backgroundColor:['rgba(225,48,108,0.7)','rgba(251,191,36,0.7)','rgba(96,165,250,0.7)'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12}}}}});
+  const sumViews=filtered.reduce((s,d)=>s+(Number(d.views)||0),0);
+  const sumInter=filtered.reduce((s,d)=>s+(Number(d.interactions)||0),0);
+  const sumLikes=filtered.reduce((s,d)=>s+(Number(d.likes)||0),0);
+  const sumShares=filtered.reduce((s,d)=>s+(Number(d.shares)||0),0);
+  const sumSaves=filtered.reduce((s,d)=>s+(Number(d.saves)||0),0);
+  const sumReach=filtered.reduce((s,d)=>s+(Number(d.reach)||0),0);
+  const sumComments=filtered.reduce((s,d)=>s+(Number(d.comments)||0),0);
+  const cntF=filtered.length;
+  const avg=v=>cntF>0?Math.round(v/cntF):0;
+  const engageRate=sumReach>0?(sumInter/sumReach*100).toFixed(1):'0.0';
+  const typeBox=document.getElementById('ig-chart-type');
+  if(typeBox){
+    const parent=typeBox.parentElement;
+    let kpiBox=parent.querySelector('.ig-kind-kpi');
+    if(!kpiBox){
+      typeBox.style.display='none';
+      kpiBox=document.createElement('div');
+      kpiBox.className='ig-kind-kpi';
+      parent.appendChild(kpiBox);
+    }
+    if(igsKind==='reel'){
+      kpiBox.innerHTML=`
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;font-size:12px;">
+          <div style="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">觀看總數</div><div style="font-size:20px;font-weight:800;color:#60A5FA;margin-top:4px;">${sumViews.toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">平均 ${avg(sumViews).toLocaleString()} / 則</div></div>
+          <div style="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">觸及帳號</div><div style="font-size:20px;font-weight:800;color:#60A5FA;margin-top:4px;">${sumReach.toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">平均 ${avg(sumReach).toLocaleString()} / 則</div></div>
+          <div style="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">互動次數</div><div style="font-size:20px;font-weight:800;color:#60A5FA;margin-top:4px;">${sumInter.toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">互動率 ${engageRate}%</div></div>
+          <div style="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">分享 / 儲存</div><div style="font-size:20px;font-weight:800;color:#60A5FA;margin-top:4px;">${sumShares.toLocaleString()} / ${sumSaves.toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">${cntF} 則 Reels</div></div>
+        </div>`;
+    }else{
+      const post1=filtered.filter(d=>String(d.type)==='1').length;
+      const quiz2=filtered.filter(d=>String(d.type)==='2').length;
+      kpiBox.innerHTML=`
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;font-size:12px;">
+          <div style="background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">總互動</div><div style="font-size:20px;font-weight:800;color:#E1306C;margin-top:4px;">${sumInter.toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">平均 ${avg(sumInter).toLocaleString()} / 則</div></div>
+          <div style="background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">按讚 + 留言</div><div style="font-size:20px;font-weight:800;color:#E1306C;margin-top:4px;">${(sumLikes+sumComments).toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">讚 ${sumLikes.toLocaleString()} · 留言 ${sumComments.toLocaleString()}</div></div>
+          <div style="background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">儲存數</div><div style="font-size:20px;font-weight:800;color:#E1306C;margin-top:4px;">${sumSaves.toLocaleString()}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">平均 ${avg(sumSaves).toLocaleString()} / 則</div></div>
+          <div style="background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.25);border-radius:8px;padding:12px;"><div style="color:var(--txt3);font-size:11px;">貼文 / 測驗</div><div style="font-size:20px;font-weight:800;color:#E1306C;margin-top:4px;">${post1} / ${quiz2}</div><div style="color:var(--txt3);font-size:11px;margin-top:2px;">共 ${cntF} 則</div></div>
+        </div>`;
+    }
+  }
 
   // TOP 5 IG 貼文（依觀看數）
   const top5=[...filtered].sort((a,b)=>(Number(b.views)||0)-(Number(a.views)||0)).slice(0,5);
@@ -1775,7 +1845,7 @@ function renderIgCharts(){
   const t5Data=top5.map(d=>Number(d.views)||0);
   if(igChartTop5)igChartTop5.destroy();
   const t5El=document.getElementById('ig-chart-top5');
-  if(t5El)igChartTop5=new Chart(t5El,{type:'bar',data:{labels:t5Labels,datasets:[{label:'觀看數',data:t5Data,backgroundColor:'rgba(225,48,108,0.75)',borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{beginAtZero:true,grid:{display:false}},y:{grid:{display:false}}},plugins:{legend:{display:false}}}});
+  if(t5El)igChartTop5=new Chart(t5El,{type:'bar',data:{labels:t5Labels,datasets:[{label:'觀看數',data:t5Data,backgroundColor:trendColor,borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{beginAtZero:true,grid:{display:false}},y:{grid:{display:false}}},plugins:{legend:{display:false}}}});
 
   // 類別分布
   const igCats=[...new Set(filtered.map(d=>d.cat).filter(Boolean))];
