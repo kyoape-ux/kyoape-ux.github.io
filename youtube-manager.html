@@ -535,6 +535,16 @@ tr:hover td{background:rgba(52,211,153,.03);}
         <div class="form-group"><label>觸及人數</label><input type="number" id="f-ig_reach" placeholder="0" min="0"></div>
       </div>
 
+      <div class="section-header" style="color:#34D399;border-color:rgba(52,211,153,.3);">
+        <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+        官網曝光（內部歸因，不計入 KPI 加總）
+      </div>
+      <div class="form-grid cols3">
+        <div class="form-group full"><label>官網頁面連結</label><input type="url" id="f-web_url" placeholder="https://www.ktgh.com.tw/..."></div>
+        <div class="form-group"><label>YT 外部嵌入觀看（YT Studio · 流量來源 · 外部）</label><input type="number" id="f-embed_views" placeholder="0" min="0"></div>
+        <div class="form-group"><label>官網頁面瀏覽量（GA4 Pageviews）</label><input type="number" id="f-web_pageviews" placeholder="0" min="0"></div>
+      </div>
+
       <div class="form-group full" style="margin-top:14px;"><label>備註</label><textarea id="f-note" placeholder="備註內容..."></textarea></div>
       <div class="form-actions">
         <button class="btn btn-primary write-only" onclick="saveEntry()">儲存影片</button>
@@ -1090,6 +1100,14 @@ tr:hover td{background:rgba(52,211,153,.03);}
       <div class="form-group"><label>分享數</label><input type="number" id="e-ig_shares" min="0"></div>
       <div class="form-group"><label>觸及人數</label><input type="number" id="e-ig_reach" min="0"></div>
     </div>
+    <div class="section-header" style="color:#34D399;border-color:rgba(52,211,153,.3);margin-top:14px;">
+      <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>官網曝光
+    </div>
+    <div class="form-grid cols3">
+      <div class="form-group full"><label>官網頁面連結</label><input type="url" id="e-web_url" placeholder="https://www.ktgh.com.tw/..."></div>
+      <div class="form-group"><label>YT 外部嵌入觀看</label><input type="number" id="e-embed_views" min="0"></div>
+      <div class="form-group"><label>官網 Pageviews</label><input type="number" id="e-web_pageviews" min="0"></div>
+    </div>
     <div class="form-group full" style="margin-top:12px;"><label>備註</label><textarea id="e-note"></textarea></div>
     <div class="form-actions">
       <button class="btn btn-primary write-only" onclick="updateEntry()">儲存修改</button>
@@ -1106,8 +1124,9 @@ const BASIC_FIELDS = ['title','date','dur','type','cat','planner','producer','no
 const YT_FIELDS = ['yt_url','yt_views','yt_likes','yt_comments','yt_imp','yt_ctr','yt_ratio','yt_avgdur'];
 const FB_FIELDS = ['fb_url','fb_views','fb_likes','fb_comments','fb_shares','fb_reach'];
 const IG_FIELDS = ['ig_url','ig_views','ig_likes','ig_comments','ig_shares','ig_reach'];
-const NUM_FIELDS = ['yt_views','yt_likes','yt_comments','yt_imp','yt_ctr','yt_ratio','fb_views','fb_likes','fb_comments','fb_shares','fb_reach','ig_views','ig_likes','ig_comments','ig_shares','ig_reach'];
-const ALL_FORM_FIELDS = [...BASIC_FIELDS, ...YT_FIELDS, ...FB_FIELDS, ...IG_FIELDS];
+const WEB_FIELDS = ['web_url','embed_views','web_pageviews'];
+const NUM_FIELDS = ['yt_views','yt_likes','yt_comments','yt_imp','yt_ctr','yt_ratio','fb_views','fb_likes','fb_comments','fb_shares','fb_reach','ig_views','ig_likes','ig_comments','ig_shares','ig_reach','embed_views','web_pageviews'];
+const ALL_FORM_FIELDS = [...BASIC_FIELDS, ...YT_FIELDS, ...FB_FIELDS, ...IG_FIELDS, ...WEB_FIELDS];
 function totalViews(d){return(Number(d.yt_views)||0)+(Number(d.fb_views)||0)+(Number(d.ig_views)||0);}
 
 // ── 統計規則：發布後 1 個月內的數據為 KPI ──
@@ -1219,6 +1238,8 @@ function renderDashboard(){
   document.getElementById('dash-label').textContent=label;
 
   const tv=vd.reduce((s,d)=>s+totalViews(d),0),ytv=vd.reduce((s,d)=>s+(Number(d.yt_views)||0),0),fbv=vd.reduce((s,d)=>s+(Number(d.fb_views)||0),0),igv=vd.reduce((s,d)=>s+(Number(d.ig_views)||0),0);
+  const embedV=vd.reduce((s,d)=>s+(Number(d.embed_views)||0),0),webPV=vd.reduce((s,d)=>s+(Number(d.web_pageviews)||0),0);
+  const embedRate=ytv>0?Math.round(embedV/ytv*100):0;
   const cnt=vd.length,avgCtr=cnt?(vd.reduce((s,d)=>s+(Number(d.yt_ctr)||0),0)/cnt):0;
   const star=vd.filter(d=>(Number(d.yt_views)||0)>=CFG.personalGoal).length;
   const gView=CFG.viewGoal*mult,gCnt=CFG.countGoal*mult;
@@ -1234,7 +1255,8 @@ function renderDashboard(){
     <div class="kpi-card"><div class="kpi-label">${pLabel}度全平台觀看</div><div class="kpi-val">${tv.toLocaleString()}</div><div class="kpi-sub">${pLabel}目標 ${gView.toLocaleString()}（${vp}%）</div><div class="kpi-bar"><div class="kpi-bar-fill ${vp>=100?'kpi-ok':vp>=60?'kpi-warn':'kpi-bad'}" style="width:${vp}%"></div></div><div class="platform-breakdown"><span class="plat-tag plat-yt">YT ${ytv.toLocaleString()}</span><span class="plat-tag plat-fb">FB ${fbv.toLocaleString()}</span><span class="plat-tag plat-ig">IG ${igv.toLocaleString()}</span></div></div>
     <div class="kpi-card"><div class="kpi-label">${pLabel}度上傳數</div><div class="kpi-val">${cnt}</div><div class="kpi-sub">${pLabel}目標 ${gCnt} 部（${cp}%）</div><div class="kpi-bar"><div class="kpi-bar-fill ${cp>=100?'kpi-ok':cp>=60?'kpi-warn':'kpi-bad'}" style="width:${cp}%"></div></div></div>
     <div class="kpi-card"><div class="kpi-label">YT 平均 CTR</div><div class="kpi-val">${(avgCtr*100).toFixed(1)}%</div><div class="kpi-sub">YouTube 點閱率</div></div>
-    <div class="kpi-card"><div class="kpi-label">達標影片</div><div class="kpi-val">${star}</div><div class="kpi-sub">單片 YT ≥${CFG.personalGoal.toLocaleString()}</div></div>`;
+    <div class="kpi-card"><div class="kpi-label">達標影片</div><div class="kpi-val">${star}</div><div class="kpi-sub">單片 YT ≥${CFG.personalGoal.toLocaleString()}</div></div>
+    <div class="kpi-card" style="border-color:rgba(52,211,153,.25);"><div class="kpi-label" style="color:#34D399;">官網曝光（內部歸因）</div><div class="kpi-val">${embedV.toLocaleString()}</div><div class="kpi-sub">YT 外部嵌入觀看 · 佔 YT ${embedRate}%</div><div class="platform-breakdown"><span class="plat-tag" style="background:rgba(52,211,153,.1);color:#34D399;">官網 PV ${webPV.toLocaleString()}</span></div></div>`;
   renderCharts(vd);
 }
 function renderCharts(viewData){
@@ -1783,6 +1805,8 @@ function openMonthlyReport(){
   const ytv=mData.reduce((s,d)=>s+(Number(d.yt_views)||0),0);
   const fbv=mData.reduce((s,d)=>s+(Number(d.fb_views)||0),0);
   const igv=mData.reduce((s,d)=>s+(Number(d.ig_views)||0),0);
+  const embedV=mData.reduce((s,d)=>s+(Number(d.embed_views)||0),0);
+  const webPV=mData.reduce((s,d)=>s+(Number(d.web_pageviews)||0),0);
   const cnt=mData.length;
   const vGoal=CFG.viewGoal||5000,cGoal=CFG.countGoal||6;
   const vRate=Math.min(Math.round(tv/vGoal*100),999),cRate=Math.min(Math.round(cnt/cGoal*100),999);
@@ -1889,6 +1913,12 @@ tr:nth-child(even) td{background:#FAFAFA;}
     <div class="plat plat-fb"><div class="val">${fbv.toLocaleString()}</div><div class="lbl">Facebook</div></div>
     <div class="plat plat-ig"><div class="val">${igv.toLocaleString()}</div><div class="lbl">Instagram</div></div>
   </div>
+  ${showVideo&&(embedV>0||webPV>0)?`<div class="sec-title" style="border-color:#0F6E56;color:#0F6E56;">🌐 官網曝光（內部歸因 · 不計入 KPI 加總）</div>
+  <div class="plat-row" style="grid-template-columns:repeat(3,1fr);">
+    <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${embedV.toLocaleString()}</div><div class="lbl">YT 外部嵌入觀看</div></div>
+    <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${webPV.toLocaleString()}</div><div class="lbl">官網頁面瀏覽量（PV）</div></div>
+    <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${ytv>0?Math.round(embedV/ytv*100):0}%</div><div class="lbl">官網嵌入佔 YT 比例</div></div>
+  </div>`:''}
   <div class="prog-row">
     <div class="prog"><div class="prog-lbl"><span>觀看目標（${vGoal.toLocaleString()} 次）</span><span>${tv.toLocaleString()} / ${vGoal.toLocaleString()}</span></div><div class="prog-bg"><div class="prog-fill" style="width:${Math.min(100,vRate)}%"></div></div></div>
     <div class="prog"><div class="prog-lbl"><span>上架目標（${cGoal} 部）</span><span>${cnt} / ${cGoal}</span></div><div class="prog-bg"><div class="prog-fill" style="width:${Math.min(100,cRate)}%"></div></div></div>
@@ -1926,6 +1956,8 @@ function openAnnualReport(){
   const ytv=yrData.reduce((s,d)=>s+(Number(d.yt_views)||0),0);
   const fbv=yrData.reduce((s,d)=>s+(Number(d.fb_views)||0),0);
   const igv=yrData.reduce((s,d)=>s+(Number(d.ig_views)||0),0);
+  const embedV=yrData.reduce((s,d)=>s+(Number(d.embed_views)||0),0);
+  const webPV=yrData.reduce((s,d)=>s+(Number(d.web_pageviews)||0),0);
   const cnt=yrData.length;
   const now=new Date().toLocaleDateString('zh-TW');
   const qLabels=['Q1（1～3月）','Q2（4～6月）','Q3（7～9月）','Q4（10～12月）'];
@@ -2008,6 +2040,12 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
     <div class="plat plat-fb"><div class="val">${fbv.toLocaleString()}</div><div class="lbl">Facebook</div></div>
     <div class="plat plat-ig"><div class="val">${igv.toLocaleString()}</div><div class="lbl">Instagram</div></div>
   </div>
+  ${(embedV>0||webPV>0)?`<div class="sec-title" style="border-color:#0F6E56;">🌐 官網曝光（內部歸因 · 不計入 KPI 加總）</div>
+  <div class="plat-row" style="grid-template-columns:repeat(3,1fr);">
+    <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${embedV.toLocaleString()}</div><div class="lbl">YT 外部嵌入觀看</div></div>
+    <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${webPV.toLocaleString()}</div><div class="lbl">官網頁面瀏覽量（PV）</div></div>
+    <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${ytv>0?Math.round(embedV/ytv*100):0}%</div><div class="lbl">官網嵌入佔 YT 比例</div></div>
+  </div>`:''}
   <div class="sec-title">季度摘要</div>
   <table><thead><tr><th>季度</th><th>上架數</th><th>YT 觀看</th><th>FB 觀看</th><th>IG 觀看</th><th>全平台合計</th></tr></thead>
   <tbody>${qRows}</tbody></table>
