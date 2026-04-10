@@ -865,6 +865,9 @@ tr:hover td{background:rgba(52,211,153,.03);}
           <h3>✨ 新增標籤</h3>
           <div class="form-grid" style="margin-top:12px;">
             <div class="form-group"><label>標籤名稱 *</label><input type="text" id="new-tag-name" placeholder="例：肺癌、LDCT、疫苗宣導"></div>
+            <div class="form-group"><label>分類</label>
+              <select id="new-tag-group"><option value="未分類">未分類</option></select>
+            </div>
             <div class="form-group full"><label>說明（選填）</label><input type="text" id="new-tag-desc" placeholder="此標籤的用途說明"></div>
           </div>
           <div class="form-actions" style="margin-top:12px;">
@@ -1495,19 +1498,24 @@ function renderSnapshotList(){
 // 標籤系統
 // ============================================================
 const TAGS_KEY='kt_yt_tags';
-let TAGS=[]; // [{id, name, color, desc}]
+let TAGS=[]; // [{id, name, color, desc, group}]
 const TAG_COLORS=['#34D399','#60A5FA','#FBBF24','#F87171','#A78BFA','#2DD4BF','#F472B6','#F59E0B','#818CF8','#14B8A6'];
+const TAG_GROUPS=['主題','衛教與生活','疾病｜心臟與血管','疾病｜神經系統','疾病｜胸腔與呼吸','疾病｜肝膽腸胃','疾病｜腎臟與泌尿','疾病｜內分泌與代謝','疾病｜癌症','疾病｜骨科與復健','疾病｜眼科','疾病｜耳鼻喉','疾病｜皮膚科','疾病｜婦產科','疾病｜兒科','疾病｜風濕免疫','疾病｜身心科','疾病｜感染科','疾病｜牙科','疾病｜其他','推廣活動','品牌','族群','科別','特色中心','未分類'];
+const TAG_GROUP_ICONS={'主題':'🏥','衛教與生活':'💡','推廣活動':'📣','品牌':'🏢','族群':'👥','科別':'🩺','特色中心':'⭐','未分類':'🏷️'};
+function getGroupIcon(g){if(TAG_GROUP_ICONS[g])return TAG_GROUP_ICONS[g];if(g&&g.startsWith('疾病'))return'🔬';return'🏷️';}
 function loadTags(){
   try{TAGS=JSON.parse(localStorage.getItem(TAGS_KEY)||'[]');}catch(e){TAGS=[];}
   if(!Array.isArray(TAGS))TAGS=[];
+  // migrate: ensure group field
+  TAGS.forEach(t=>{if(!t.group)t.group='未分類';});
 }
 function saveTags(){localStorage.setItem(TAGS_KEY,JSON.stringify(TAGS));}
-function addTag(name,desc){
+function addTag(name,desc,group){
   if(!canWrite()){alert('您的權限不足');return false;}
   name=(name||'').trim();if(!name)return false;
   if(TAGS.find(t=>t.name===name)){alert('此標籤已存在');return false;}
   const color=TAG_COLORS[TAGS.length%TAG_COLORS.length];
-  TAGS.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),name,color,desc:(desc||'').trim()});
+  TAGS.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),name,color,desc:(desc||'').trim(),group:group||'未分類'});
   saveTags();renderTagsPage();refreshAllTagInputs();
   return true;
 }
@@ -1526,13 +1534,13 @@ function deleteTag(id){
   renderTagsPage();renderAll();renderIgAll();refreshAllTagInputs();
   showSyncBadge('標籤已刪除');
 }
-function updateTag(id,name,desc){
+function updateTag(id,name,desc,group){
   if(!canWrite()){alert('您的權限不足');return;}
   const t=TAGS.find(x=>x.id===id);if(!t)return;
   name=(name||'').trim();if(!name)return;
   const oldName=t.name;
   if(name!==oldName&&TAGS.find(x=>x.name===name)){alert('此名稱已存在');return;}
-  t.name=name;t.desc=(desc||'').trim();
+  t.name=name;t.desc=(desc||'').trim();if(group!==undefined)t.group=group;
   // 同步更新所有引用
   if(name!==oldName){
     DATA.forEach(d=>{if(Array.isArray(d.tags)){d.tags=d.tags.map(n=>n===oldName?name:n);}});
@@ -1555,7 +1563,10 @@ function initTagInput(containerId,initialTags){
   const render=()=>{
     const cur=JSON.parse(box.dataset.tags||'[]');
     const chips=cur.map(n=>{const c=getTagColor(n);return `<span class="tag-chip tag-chip-rm" style="background:${c}22;color:${c};border:1px solid ${c}44;" onclick="removeTagFromInput('${containerId}','${esc(n).replace(/'/g,'\\\'')}')">${esc(n)} ✕</span>`;}).join(' ');
-    const options=TAGS.filter(t=>!cur.includes(t.name)).map(t=>`<option value="${esc(t.name)}">${esc(t.name)}</option>`).join('');
+    const avail=TAGS.filter(t=>!cur.includes(t.name));
+    const groups=[...new Set(avail.map(t=>t.group||'未分類'))];
+    groups.sort((a,b)=>{const ai=TAG_GROUPS.indexOf(a),bi=TAG_GROUPS.indexOf(b);return(ai<0?99:ai)-(bi<0?99:bi);});
+    const options=groups.map(g=>{const items=avail.filter(t=>(t.group||'未分類')===g);return `<optgroup label="${esc(g)}">${items.map(t=>`<option value="${esc(t.name)}">${esc(t.name)}</option>`).join('')}</optgroup>`;}).join('');
     box.innerHTML=`<div class="tag-chips-row">${chips||'<span style="color:var(--txt3);font-size:11px;">尚未選擇標籤</span>'}</div>
       <div style="display:flex;gap:6px;margin-top:6px;">
         <select onchange="addTagToInput('${containerId}',this.value);this.value=''" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-2);color:var(--txt);"><option value="">＋ 從現有標籤選擇</option>${options}</select>
@@ -1598,100 +1609,224 @@ function refreshAllTagInputs(){
 // 預設標籤種子
 // ============================================================
 const DEFAULT_TAGS=[
-  // ─── 疾病與醫療主題 ───
-  {name:'肺癌',desc:'肺癌篩檢、LDCT、肺部腫瘤相關'},
-  {name:'LDCT',desc:'低劑量電腦斷層掃描推廣'},
-  {name:'大腸癌',desc:'大腸癌篩檢、大腸鏡相關'},
-  {name:'乳癌',desc:'乳癌防治、乳房攝影'},
-  {name:'糖尿病',desc:'血糖管理、胰島素、糖尿病預防'},
-  {name:'心血管',desc:'心臟病、高血壓、中風相關'},
-  {name:'骨科',desc:'骨折、關節置換、脊椎相關'},
-  {name:'復健',desc:'物理治療、職能治療、運動傷害復健'},
-  {name:'眼科',desc:'白內障、近視雷射、視網膜手術'},
-  {name:'腸胃',desc:'胃食道逆流、便秘、腸胃鏡'},
+  // ─── 主題 ───
+  {name:'肺癌',desc:'肺癌篩檢、LDCT、肺部腫瘤相關',group:'主題'},
+  {name:'LDCT',desc:'低劑量電腦斷層掃描推廣',group:'主題'},
+  {name:'大腸癌',desc:'大腸癌篩檢、大腸鏡相關',group:'主題'},
+  {name:'乳癌',desc:'乳癌防治、乳房攝影',group:'主題'},
+  {name:'糖尿病',desc:'血糖管理、胰島素、糖尿病預防',group:'主題'},
+  {name:'心血管',desc:'心臟病、高血壓、中風相關',group:'主題'},
+  {name:'腸胃',desc:'胃食道逆流、便秘、腸胃鏡',group:'主題'},
   // ─── 衛教與生活 ───
-  {name:'營養',desc:'飲食建議、營養素、食材選擇'},
-  {name:'運動',desc:'運動處方、健身教學、復健運動'},
-  {name:'睡眠',desc:'睡眠品質、失眠、睡眠呼吸中止'},
-  {name:'減重',desc:'減重門診、體重管理'},
-  {name:'養生',desc:'中醫養生、保健觀念'},
-  {name:'壓力管理',desc:'心理健康、壓力紓解、情緒調適'},
-  {name:'日常保健',desc:'生活小常識、預防保健資訊'},
+  {name:'營養',desc:'飲食建議、營養素、食材選擇',group:'衛教與生活'},
+  {name:'運動',desc:'運動處方、健身教學、復健運動',group:'衛教與生活'},
+  {name:'睡眠',desc:'睡眠品質、失眠、睡眠呼吸中止',group:'衛教與生活'},
+  {name:'減重',desc:'減重門診、體重管理',group:'衛教與生活'},
+  {name:'養生',desc:'中醫養生、保健觀念',group:'衛教與生活'},
+  {name:'壓力管理',desc:'心理健康、壓力紓解、情緒調適',group:'衛教與生活'},
+  {name:'日常保健',desc:'生活小常識、預防保健資訊',group:'衛教與生活'},
+  // ─── 疾病｜心臟與血管 ───
+  {name:'冠心病',desc:'冠狀動脈心臟病、心絞痛',group:'疾病｜心臟與血管'},
+  {name:'心肌梗塞',desc:'急性心肌梗塞',group:'疾病｜心臟與血管'},
+  {name:'心房顫動',desc:'心律不整、心房顫動',group:'疾病｜心臟與血管'},
+  {name:'心臟衰竭',desc:'充血性心臟衰竭',group:'疾病｜心臟與血管'},
+  {name:'高血壓',desc:'高血壓防治',group:'疾病｜心臟與血管'},
+  {name:'瓣膜疾病',desc:'心臟瓣膜修補/置換',group:'疾病｜心臟與血管'},
+  {name:'主動脈剝離',desc:'急性主動脈剝離',group:'疾病｜心臟與血管'},
+  {name:'靜脈曲張',desc:'下肢靜脈曲張',group:'疾病｜心臟與血管'},
+  {name:'周邊動脈疾病',desc:'周邊血管阻塞',group:'疾病｜心臟與血管'},
+  // ─── 疾病｜神經系統 ───
+  {name:'腦中風',desc:'缺血性/出血性腦中風',group:'疾病｜神經系統'},
+  {name:'帕金森氏症',desc:'巴金森氏症',group:'疾病｜神經系統'},
+  {name:'失智症',desc:'阿茲海默症、血管型失智',group:'疾病｜神經系統'},
+  {name:'癲癇',desc:'癲癇發作、抗癲癇治療',group:'疾病｜神經系統'},
+  {name:'頭痛',desc:'偏頭痛、緊張型頭痛',group:'疾病｜神經系統'},
+  {name:'三叉神經痛',desc:'三叉神經痛治療',group:'疾病｜神經系統'},
+  {name:'坐骨神經痛',desc:'坐骨神經壓迫',group:'疾病｜神經系統'},
+  // ─── 疾病｜胸腔與呼吸 ───
+  {name:'氣喘',desc:'支氣管氣喘',group:'疾病｜胸腔與呼吸'},
+  {name:'COPD',desc:'慢性阻塞性肺病',group:'疾病｜胸腔與呼吸'},
+  {name:'肺炎',desc:'社區型/院內型肺炎',group:'疾病｜胸腔與呼吸'},
+  {name:'肺結核',desc:'結核病防治',group:'疾病｜胸腔與呼吸'},
+  {name:'睡眠呼吸中止症',desc:'阻塞型睡眠呼吸中止',group:'疾病｜胸腔與呼吸'},
+  // ─── 疾病｜肝膽腸胃 ───
+  {name:'肝炎',desc:'B肝/C肝、病毒性肝炎',group:'疾病｜肝膽腸胃'},
+  {name:'肝硬化',desc:'肝硬化及併發症',group:'疾病｜肝膽腸胃'},
+  {name:'肝癌',desc:'肝細胞癌',group:'疾病｜肝膽腸胃'},
+  {name:'膽結石',desc:'膽囊結石、膽管結石',group:'疾病｜肝膽腸胃'},
+  {name:'胃潰瘍',desc:'消化性潰瘍',group:'疾病｜肝膽腸胃'},
+  {name:'胃食道逆流',desc:'GERD',group:'疾病｜肝膽腸胃'},
+  {name:'大腸息肉',desc:'大腸息肉切除',group:'疾病｜肝膽腸胃'},
+  {name:'腸躁症',desc:'大腸激躁症',group:'疾病｜肝膽腸胃'},
+  {name:'便秘',desc:'慢性便秘',group:'疾病｜肝膽腸胃'},
+  {name:'胰臟炎',desc:'急性/慢性胰臟炎',group:'疾病｜肝膽腸胃'},
+  // ─── 疾病｜腎臟與泌尿 ───
+  {name:'慢性腎病',desc:'CKD、腎功能衰退',group:'疾病｜腎臟與泌尿'},
+  {name:'腎結石',desc:'泌尿道結石',group:'疾病｜腎臟與泌尿'},
+  {name:'洗腎',desc:'血液透析、腹膜透析',group:'疾病｜腎臟與泌尿'},
+  {name:'攝護腺肥大',desc:'良性攝護腺增生',group:'疾病｜腎臟與泌尿'},
+  {name:'尿路感染',desc:'泌尿道感染',group:'疾病｜腎臟與泌尿'},
+  {name:'尿失禁',desc:'壓力性/急迫性尿失禁',group:'疾病｜腎臟與泌尿'},
+  // ─── 疾病｜內分泌與代謝 ───
+  {name:'甲狀腺疾病',desc:'甲亢、甲低、甲狀腺結節',group:'疾病｜內分泌與代謝'},
+  {name:'骨質疏鬆',desc:'骨密度檢測、骨鬆防治',group:'疾病｜內分泌與代謝'},
+  {name:'高血脂',desc:'高膽固醇、高三酸甘油酯',group:'疾病｜內分泌與代謝'},
+  {name:'痛風',desc:'高尿酸血症、痛風性關節炎',group:'疾病｜內分泌與代謝'},
+  // ─── 疾病｜癌症 ───
+  {name:'胃癌',desc:'胃癌治療',group:'疾病｜癌症'},
+  {name:'食道癌',desc:'食道癌治療',group:'疾病｜癌症'},
+  {name:'口腔癌',desc:'口腔癌篩檢與治療',group:'疾病｜癌症'},
+  {name:'攝護腺癌',desc:'攝護腺癌篩檢與治療',group:'疾病｜癌症'},
+  {name:'甲狀腺癌',desc:'甲狀腺癌手術',group:'疾病｜癌症'},
+  {name:'子宮頸癌',desc:'子宮頸癌篩檢、HPV',group:'疾病｜癌症'},
+  {name:'卵巢癌',desc:'卵巢癌治療',group:'疾病｜癌症'},
+  {name:'胰臟癌',desc:'胰臟癌治療',group:'疾病｜癌症'},
+  {name:'腎臟癌',desc:'腎細胞癌',group:'疾病｜癌症'},
+  {name:'膀胱癌',desc:'膀胱癌治療',group:'疾病｜癌症'},
+  {name:'淋巴癌',desc:'淋巴瘤',group:'疾病｜癌症'},
+  {name:'白血病',desc:'血癌、急性/慢性白血病',group:'疾病｜癌症'},
+  // ─── 疾病｜骨科與復健 ───
+  {name:'退化性關節炎',desc:'膝關節、髖關節退化',group:'疾病｜骨科與復健'},
+  {name:'椎間盤突出',desc:'腰椎/頸椎椎間盤突出',group:'疾病｜骨科與復健'},
+  {name:'骨折',desc:'各部位骨折處理',group:'疾病｜骨科與復健'},
+  {name:'十字韌帶',desc:'ACL 前十字韌帶損傷',group:'疾病｜骨科與復健'},
+  {name:'肩旋轉肌',desc:'旋轉肌袖撕裂',group:'疾病｜骨科與復健'},
+  {name:'脊椎側彎',desc:'脊椎側彎矯正',group:'疾病｜骨科與復健'},
+  {name:'五十肩',desc:'沾黏性肩關節囊炎',group:'疾病｜骨科與復健'},
+  {name:'足底筋膜炎',desc:'足底疼痛、足底筋膜炎',group:'疾病｜骨科與復健'},
+  // ─── 疾病｜眼科 ───
+  {name:'白內障',desc:'白內障手術',group:'疾病｜眼科'},
+  {name:'青光眼',desc:'青光眼治療',group:'疾病｜眼科'},
+  {name:'黃斑部病變',desc:'老年性黃斑部病變',group:'疾病｜眼科'},
+  {name:'乾眼症',desc:'乾眼症治療',group:'疾病｜眼科'},
+  {name:'近視',desc:'近視雷射、學童近視防治',group:'疾病｜眼科'},
+  {name:'視網膜剝離',desc:'視網膜剝離手術',group:'疾病｜眼科'},
+  // ─── 疾病｜耳鼻喉 ───
+  {name:'鼻竇炎',desc:'急性/慢性鼻竇炎',group:'疾病｜耳鼻喉'},
+  {name:'中耳炎',desc:'中耳炎治療',group:'疾病｜耳鼻喉'},
+  {name:'扁桃腺炎',desc:'扁桃腺肥大/發炎',group:'疾病｜耳鼻喉'},
+  {name:'聲帶疾病',desc:'聲帶息肉、聲帶麻痺',group:'疾病｜耳鼻喉'},
+  {name:'打鼾',desc:'打鼾治療、睡眠手術',group:'疾病｜耳鼻喉'},
+  {name:'聽力障礙',desc:'聽損評估、助聽器',group:'疾病｜耳鼻喉'},
+  // ─── 疾病｜皮膚科 ───
+  {name:'異位性皮膚炎',desc:'過敏性皮膚炎',group:'疾病｜皮膚科'},
+  {name:'蕁麻疹',desc:'急性/慢性蕁麻疹',group:'疾病｜皮膚科'},
+  {name:'帶狀疱疹',desc:'帶狀疱疹（皮蛇）',group:'疾病｜皮膚科'},
+  {name:'乾癬',desc:'乾癬（牛皮癬）',group:'疾病｜皮膚科'},
+  {name:'痤瘡',desc:'青春痘、粉刺治療',group:'疾病｜皮膚科'},
+  // ─── 疾病｜婦產科 ───
+  {name:'子宮肌瘤',desc:'子宮肌瘤治療',group:'疾病｜婦產科'},
+  {name:'子宮內膜異位',desc:'子宮內膜異位症、巧克力囊腫',group:'疾病｜婦產科'},
+  {name:'多囊性卵巢',desc:'PCOS',group:'疾病｜婦產科'},
+  {name:'更年期',desc:'更年期症狀與荷爾蒙治療',group:'疾病｜婦產科'},
+  {name:'產前檢查',desc:'產檢、高層次超音波',group:'疾病｜婦產科'},
+  {name:'不孕症',desc:'不孕症評估與治療',group:'疾病｜婦產科'},
+  // ─── 疾病｜兒科 ───
+  {name:'兒童過敏',desc:'小兒過敏、氣喘',group:'疾病｜兒科'},
+  {name:'腸病毒',desc:'腸病毒防治',group:'疾病｜兒科'},
+  {name:'發展遲緩',desc:'兒童發展評估',group:'疾病｜兒科'},
+  {name:'兒童肥胖',desc:'學童肥胖防治',group:'疾病｜兒科'},
+  {name:'新生兒黃疸',desc:'新生兒黃疸照護',group:'疾病｜兒科'},
+  // ─── 疾病｜風濕免疫 ───
+  {name:'類風濕性關節炎',desc:'RA',group:'疾病｜風濕免疫'},
+  {name:'紅斑性狼瘡',desc:'SLE',group:'疾病｜風濕免疫'},
+  {name:'僵直性脊椎炎',desc:'AS',group:'疾病｜風濕免疫'},
+  {name:'乾燥症',desc:'修格連氏症候群',group:'疾病｜風濕免疫'},
+  // ─── 疾病｜身心科 ───
+  {name:'憂鬱症',desc:'重度憂鬱症、產後憂鬱',group:'疾病｜身心科'},
+  {name:'焦慮症',desc:'廣泛性焦慮症、恐慌症',group:'疾病｜身心科'},
+  {name:'失眠',desc:'睡眠障礙、慢性失眠',group:'疾病｜身心科'},
+  {name:'自律神經失調',desc:'自律神經功能異常',group:'疾病｜身心科'},
+  // ─── 疾病｜感染科 ───
+  {name:'COVID-19',desc:'新冠病毒感染',group:'疾病｜感染科'},
+  {name:'流感',desc:'季節性流感防治',group:'疾病｜感染科'},
+  {name:'登革熱',desc:'登革熱防治',group:'疾病｜感染科'},
+  {name:'蜂窩性組織炎',desc:'皮膚軟組織感染',group:'疾病｜感染科'},
+  // ─── 疾病｜牙科 ───
+  {name:'牙周病',desc:'牙周病治療',group:'疾病｜牙科'},
+  {name:'植牙',desc:'人工植牙',group:'疾病｜牙科'},
+  {name:'齲齒',desc:'蛀牙預防與治療',group:'疾病｜牙科'},
+  // ─── 疾病｜其他 ───
+  {name:'疝氣',desc:'腹股溝疝氣、臍疝氣',group:'疾病｜其他'},
+  {name:'痔瘡',desc:'痔瘡手術、肛門疾患',group:'疾病｜其他'},
+  {name:'甲溝炎',desc:'指甲內生、甲溝炎',group:'疾病｜其他'},
   // ─── 推廣活動 ───
-  {name:'疫苗宣導',desc:'流感/COVID/HPV 疫苗推廣'},
-  {name:'健檢推廣',desc:'健康檢查套組、企業健檢'},
-  {name:'社區講座',desc:'社區衛教講座、義診活動'},
-  {name:'節慶活動',desc:'院內節慶活動、公益活動'},
+  {name:'疫苗宣導',desc:'流感/COVID/HPV 疫苗推廣',group:'推廣活動'},
+  {name:'健檢推廣',desc:'健康檢查套組、企業健檢',group:'推廣活動'},
+  {name:'社區講座',desc:'社區衛教講座、義診活動',group:'推廣活動'},
+  {name:'節慶活動',desc:'院內節慶活動、公益活動',group:'推廣活動'},
   // ─── 品牌 ───
-  {name:'醫師介紹',desc:'主治醫師專訪、專長介紹'},
-  {name:'院區導覽',desc:'環境介紹、新設備、新空間'},
-  {name:'品牌形象',desc:'醫院理念、ESG、員工故事'},
-  {name:'KOL合作',desc:'網紅體驗、部落客合作'},
-  // ─── 特定族群 ───
-  {name:'銀髮族',desc:'長者照護、樂齡活動'},
-  {name:'婦幼',desc:'孕期保健、兒童衛教、產後護理'},
-  {name:'上班族',desc:'職場健康、久坐族、外食族'},
+  {name:'醫師介紹',desc:'主治醫師專訪、專長介紹',group:'品牌'},
+  {name:'院區導覽',desc:'環境介紹、新設備、新空間',group:'品牌'},
+  {name:'品牌形象',desc:'醫院理念、ESG、員工故事',group:'品牌'},
+  {name:'KOL合作',desc:'網紅體驗、部落客合作',group:'品牌'},
+  // ─── 族群 ───
+  {name:'銀髮族',desc:'長者照護、樂齡活動',group:'族群'},
+  {name:'婦幼',desc:'孕期保健、兒童衛教、產後護理',group:'族群'},
+  {name:'上班族',desc:'職場健康、久坐族、外食族',group:'族群'},
   // ─── 科別 ───
-  {name:'一般內科',desc:'科別'},
-  {name:'神經內科',desc:'科別'},
-  {name:'肝膽腸胃科',desc:'科別'},
-  {name:'內分泌及新陳代謝科',desc:'科別'},
-  {name:'腎臟內科',desc:'科別'},
-  {name:'胸腔暨呼吸治療內科',desc:'科別'},
-  {name:'風濕免疫科',desc:'科別'},
-  {name:'心臟內科',desc:'科別'},
-  {name:'腫瘤內科',desc:'科別'},
-  {name:'感染科',desc:'科別'},
-  {name:'血液腫瘤科',desc:'科別'},
-  {name:'高壓氧診',desc:'科別'},
-  {name:'一般外科',desc:'科別'},
-  {name:'大腸直腸外科',desc:'科別'},
-  {name:'神經外科',desc:'科別'},
-  {name:'整形外科',desc:'科別'},
-  {name:'心臟血管外科',desc:'科別'},
-  {name:'胸腔外科',desc:'科別'},
-  {name:'泌尿科',desc:'科別'},
-  {name:'乳房外科',desc:'科別'},
-  {name:'中醫部',desc:'科別'},
-  {name:'耳鼻喉頭頸部',desc:'科別'},
-  {name:'牙科',desc:'科別'},
-  {name:'婦產科',desc:'科別'},
-  {name:'兒科',desc:'科別'},
-  {name:'皮膚科',desc:'科別'},
-  {name:'家庭醫學科',desc:'科別'},
-  {name:'老年醫學科',desc:'科別'},
-  {name:'緩和醫學科',desc:'科別'},
-  {name:'職業醫學科',desc:'科別'},
-  {name:'復健科',desc:'科別'},
-  {name:'身心科',desc:'科別'},
-  {name:'放射腫瘤科',desc:'科別'},
-  {name:'急診醫學部',desc:'科別'},
-  {name:'麻醉科',desc:'科別'},
-  {name:'核子醫學科',desc:'科別'},
-  {name:'影像醫學科',desc:'科別'},
-  {name:'重症醫學部',desc:'科別'},
-  {name:'病理科',desc:'科別'},
+  {name:'一般內科',desc:'',group:'科別'},
+  {name:'神經內科',desc:'',group:'科別'},
+  {name:'肝膽腸胃科',desc:'',group:'科別'},
+  {name:'內分泌及新陳代謝科',desc:'',group:'科別'},
+  {name:'腎臟內科',desc:'',group:'科別'},
+  {name:'胸腔暨呼吸治療內科',desc:'',group:'科別'},
+  {name:'風濕免疫科',desc:'',group:'科別'},
+  {name:'心臟內科',desc:'',group:'科別'},
+  {name:'腫瘤內科',desc:'',group:'科別'},
+  {name:'感染科（科別）',desc:'',group:'科別'},
+  {name:'血液腫瘤科',desc:'',group:'科別'},
+  {name:'高壓氧診',desc:'',group:'科別'},
+  {name:'一般外科',desc:'',group:'科別'},
+  {name:'大腸直腸外科',desc:'',group:'科別'},
+  {name:'神經外科',desc:'',group:'科別'},
+  {name:'整形外科',desc:'',group:'科別'},
+  {name:'心臟血管外科',desc:'',group:'科別'},
+  {name:'胸腔外科',desc:'',group:'科別'},
+  {name:'骨科',desc:'',group:'科別'},
+  {name:'泌尿科',desc:'',group:'科別'},
+  {name:'乳房外科',desc:'',group:'科別'},
+  {name:'中醫部',desc:'',group:'科別'},
+  {name:'耳鼻喉頭頸部',desc:'',group:'科別'},
+  {name:'牙科（科別）',desc:'',group:'科別'},
+  {name:'眼科',desc:'',group:'科別'},
+  {name:'婦產科',desc:'',group:'科別'},
+  {name:'兒科（科別）',desc:'',group:'科別'},
+  {name:'皮膚科（科別）',desc:'',group:'科別'},
+  {name:'家庭醫學科',desc:'',group:'科別'},
+  {name:'老年醫學科',desc:'',group:'科別'},
+  {name:'緩和醫學科',desc:'',group:'科別'},
+  {name:'職業醫學科',desc:'',group:'科別'},
+  {name:'復健科',desc:'',group:'科別'},
+  {name:'身心科（科別）',desc:'',group:'科別'},
+  {name:'放射腫瘤科',desc:'',group:'科別'},
+  {name:'急診醫學部',desc:'',group:'科別'},
+  {name:'麻醉科',desc:'',group:'科別'},
+  {name:'核子醫學科',desc:'',group:'科別'},
+  {name:'影像醫學科',desc:'',group:'科別'},
+  {name:'重症醫學部',desc:'',group:'科別'},
+  {name:'病理科',desc:'',group:'科別'},
   // ─── 特色中心 ───
-  {name:'肺癌篩檢暨防治中心',desc:'特色中心'},
-  {name:'媽媽寶寶天地',desc:'特色中心'},
-  {name:'國際醫療服務中心',desc:'特色中心'},
-  {name:'運動醫學中心',desc:'特色中心'},
-  {name:'長照中心',desc:'特色中心'},
-  {name:'失智共照中心',desc:'特色中心'},
-  {name:'營養點滴中心',desc:'特色中心'},
-  {name:'傷造口照護中心',desc:'特色中心'},
-  {name:'達文西微創手術中心',desc:'特色中心'},
-  {name:'瑪佐脊椎機械手臂',desc:'特色中心'},
-  {name:'健康管理中心',desc:'特色中心'},
-  {name:'醫學美容中心',desc:'特色中心'},
-  {name:'細胞治療專區',desc:'特色中心'},
-  {name:'腦中風中心',desc:'特色中心'},
-  {name:'癌症中心',desc:'特色中心'},
-  {name:'骨質疏鬆照護中心',desc:'特色中心'},
-  {name:'睡眠醫學中心',desc:'特色中心'},
-  {name:'兒童發展聯合評估中心',desc:'特色中心'},
-  {name:'兒少保護親善醫療中心',desc:'特色中心'},
-  {name:'社區健康中心',desc:'特色中心'},
+  {name:'肺癌篩檢暨防治中心',desc:'',group:'特色中心'},
+  {name:'媽媽寶寶天地',desc:'',group:'特色中心'},
+  {name:'國際醫療服務中心',desc:'',group:'特色中心'},
+  {name:'運動醫學中心',desc:'',group:'特色中心'},
+  {name:'長照中心',desc:'',group:'特色中心'},
+  {name:'失智共照中心',desc:'',group:'特色中心'},
+  {name:'營養點滴中心',desc:'',group:'特色中心'},
+  {name:'傷造口照護中心',desc:'',group:'特色中心'},
+  {name:'達文西微創手術中心',desc:'',group:'特色中心'},
+  {name:'瑪佐脊椎機械手臂',desc:'',group:'特色中心'},
+  {name:'健康管理中心',desc:'',group:'特色中心'},
+  {name:'醫學美容中心',desc:'',group:'特色中心'},
+  {name:'細胞治療專區',desc:'',group:'特色中心'},
+  {name:'腦中風中心',desc:'',group:'特色中心'},
+  {name:'癌症中心',desc:'',group:'特色中心'},
+  {name:'骨質疏鬆照護中心',desc:'',group:'特色中心'},
+  {name:'睡眠醫學中心',desc:'',group:'特色中心'},
+  {name:'兒童發展聯合評估中心',desc:'',group:'特色中心'},
+  {name:'兒少保護親善醫療中心',desc:'',group:'特色中心'},
+  {name:'社區健康中心',desc:'',group:'特色中心'},
 ];
 function seedDefaultTags(){
   if(!canWrite()){alert('請以組員或組長身份登入');return;}
@@ -1702,7 +1837,7 @@ function seedDefaultTags(){
   toAdd.forEach(t=>{
     const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
     const colorIdx=(TAGS.length)%TAG_COLORS.length;
-    TAGS.push({id,name:t.name,color:TAG_COLORS[colorIdx],desc:t.desc});
+    TAGS.push({id,name:t.name,color:TAG_COLORS[colorIdx],desc:t.desc,group:t.group||'未分類'});
   });
   saveTags();renderTagsPage();refreshAllTagInputs();
   alert(`✅ 已建立 ${toAdd.length} 個預設標籤！\n可到標籤管理頁自行新增、修改或刪除。`);
@@ -1711,39 +1846,98 @@ function seedDefaultTags(){
 // ============================================================
 // 標籤管理頁面
 // ============================================================
+let tagGroupCollapsed={};
+function toggleTagGroup(g){tagGroupCollapsed[g]=!tagGroupCollapsed[g];renderTagsPage();}
 function renderTagsPage(){
   const box=document.getElementById('tags-list');if(!box)return;
   if(TAGS.length===0){box.innerHTML='<p style="color:var(--txt3);font-size:12px;padding:20px 0;text-align:center;">尚未建立任何標籤</p>';return;}
-  box.innerHTML=`<div style="display:flex;flex-direction:column;gap:8px;">${TAGS.map(t=>{
-    const vc=DATA.filter(d=>!d.deleted_at&&(d.tags||[]).includes(t.name)).length;
-    const ic=IG_DATA.filter(d=>!d.deleted_at&&(d.tags||[]).includes(t.name)).length;
-    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;gap:12px;">
-      <div style="flex:1;min-width:0;display:flex;align-items:center;gap:10px;">
-        <span class="tag-chip" style="background:${t.color}22;color:${t.color};border:1px solid ${t.color}44;font-weight:700;">${esc(t.name)}</span>
-        <span style="font-size:11px;color:var(--txt3);">${esc(t.desc||'')}</span>
-      </div>
-      <div style="font-size:11px;color:var(--txt3);white-space:nowrap;">影片 ${vc} · IG ${ic}</div>
-      <div style="display:flex;gap:6px;">
-        <button class="btn btn-secondary btn-sm write-only" onclick="promptEditTag('${t.id}')">編輯</button>
-        <button class="btn btn-secondary btn-sm" onclick="runPromotionReport('${esc(t.name).replace(/'/g,'\\\'')}')">產出報告</button>
-        <button class="btn btn-danger btn-sm leader-only" onclick="deleteTag('${t.id}')">刪除</button>
-      </div>
-    </div>`;
-  }).join('')}</div>`;
+  // Group tags
+  const grouped={};
+  TAGS.forEach(t=>{const g=t.group||'未分類';if(!grouped[g])grouped[g]=[];grouped[g].push(t);});
+  // Sort groups by TAG_GROUPS order
+  const sortedGroups=Object.keys(grouped).sort((a,b)=>{const ai=TAG_GROUPS.indexOf(a),bi=TAG_GROUPS.indexOf(b);return(ai<0?99:ai)-(bi<0?99:bi);});
+  // Stats cache
+  const vMap={},iMap={};
+  TAGS.forEach(t=>{vMap[t.name]=DATA.filter(d=>!d.deleted_at&&(d.tags||[]).includes(t.name)).length;iMap[t.name]=IG_DATA.filter(d=>!d.deleted_at&&(d.tags||[]).includes(t.name)).length;});
+  // Filter
+  const fv=document.getElementById('tag-group-filter');
+  const filterG=fv?fv.value:'';
+  const displayGroups=filterG?sortedGroups.filter(g=>g===filterG):sortedGroups;
+  // Build filter dropdown
+  const filterHtml=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <span style="font-size:12px;color:var(--txt3);">篩選分類：</span>
+    <select id="tag-group-filter" onchange="renderTagsPage()" style="padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-2);color:var(--txt);">
+      <option value="">全部分類（${TAGS.length} 個標籤）</option>
+      ${sortedGroups.map(g=>`<option value="${esc(g)}"${g===filterG?' selected':''}>${getGroupIcon(g)} ${esc(g)}（${grouped[g].length}）</option>`).join('')}
+    </select>
+    <span style="font-size:11px;color:var(--txt3);">共 ${sortedGroups.length} 個分類</span>
+  </div>`;
+  // Render groups
+  let html=filterHtml;
+  displayGroups.forEach(g=>{
+    const tags=grouped[g];
+    const collapsed=!!tagGroupCollapsed[g];
+    const gTotal=tags.length;
+    const gUsedV=tags.reduce((s,t)=>s+vMap[t.name],0);
+    const gUsedI=tags.reduce((s,t)=>s+iMap[t.name],0);
+    html+=`<div style="margin-bottom:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+      <div onclick="toggleTagGroup('${esc(g).replace(/'/g,"\\'")}')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg-2);cursor:pointer;user-select:none;border-bottom:${collapsed?'none':'1px solid var(--border)'};">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:16px;">${getGroupIcon(g)}</span>
+          <span style="font-size:13px;font-weight:700;color:var(--txt);">${esc(g)}</span>
+          <span style="font-size:11px;color:var(--txt3);background:var(--bg-1);padding:2px 8px;border-radius:10px;">${gTotal}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:11px;color:var(--txt3);">影片 ${gUsedV} · IG ${gUsedI}</span>
+          <span style="color:var(--txt3);font-size:12px;transition:transform .2s;transform:rotate(${collapsed?'-90':'0'}deg);">▼</span>
+        </div>
+      </div>`;
+    if(!collapsed){
+      html+=`<div style="display:flex;flex-direction:column;gap:1px;background:var(--border);">`;
+      tags.forEach(t=>{
+        const vc=vMap[t.name],ic=iMap[t.name];
+        html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--bg-1);gap:10px;">
+          <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;">
+            <span class="tag-chip" style="background:${t.color}22;color:${t.color};border:1px solid ${t.color}44;font-weight:600;font-size:11px;">${esc(t.name)}</span>
+            <span style="font-size:11px;color:var(--txt3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(t.desc||'')}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+            <span style="font-size:10px;color:var(--txt3);white-space:nowrap;">${vc||ic?`影${vc} · IG${ic}`:''}</span>
+            <button class="btn btn-secondary btn-sm write-only" onclick="promptEditTag('${t.id}')" style="padding:3px 8px;font-size:10px;">編輯</button>
+            <button class="btn btn-secondary btn-sm" onclick="runPromotionReport('${esc(t.name).replace(/'/g,'\\\'')}')">報告</button>
+            <button class="btn btn-danger btn-sm leader-only" onclick="deleteTag('${t.id}')" style="padding:3px 8px;font-size:10px;">刪除</button>
+          </div>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+  });
+  box.innerHTML=html;
 }
 function promptEditTag(id){
   const t=TAGS.find(x=>x.id===id);if(!t)return;
+  // Use a small modal-like prompt sequence
   const name=prompt('標籤名稱：',t.name);if(name===null)return;
   const desc=prompt('說明（選填）：',t.desc||'');if(desc===null)return;
-  updateTag(id,name,desc);
+  const gIdx=TAG_GROUPS.indexOf(t.group||'未分類');
+  const gPrompt='分類編號：\n'+TAG_GROUPS.map((g,i)=>`${i}. ${g}`).join('\n')+'\n\n請輸入編號（目前：'+gIdx+'）：';
+  const gInput=prompt(gPrompt,String(gIdx>=0?gIdx:TAG_GROUPS.length-1));if(gInput===null)return;
+  const group=TAG_GROUPS[parseInt(gInput)]||t.group||'未分類';
+  updateTag(id,name,desc,group);
 }
 function submitNewTag(){
   const n=document.getElementById('new-tag-name').value;
   const d=document.getElementById('new-tag-desc').value;
-  if(addTag(n,d)){
+  const g=document.getElementById('new-tag-group').value||'未分類';
+  if(addTag(n,d,g)){
     document.getElementById('new-tag-name').value='';
     document.getElementById('new-tag-desc').value='';
   }
+}
+function populateGroupDropdown(){
+  const sel=document.getElementById('new-tag-group');if(!sel)return;
+  sel.innerHTML=TAG_GROUPS.map(g=>`<option value="${esc(g)}">${getGroupIcon(g)} ${esc(g)}</option>`).join('');
 }
 
 // ============================================================
@@ -1752,7 +1946,9 @@ function submitNewTag(){
 function openPromotionReport(){
   const sel=document.getElementById('promo-tag-select');
   if(!sel)return;
-  sel.innerHTML='<option value="">— 選擇標籤 —</option>'+TAGS.map(t=>`<option value="${esc(t.name)}">${esc(t.name)}${t.desc?' · '+esc(t.desc):''}</option>`).join('');
+  const grps={};TAGS.forEach(t=>{const g=t.group||'未分類';if(!grps[g])grps[g]=[];grps[g].push(t);});
+  const gKeys=Object.keys(grps).sort((a,b)=>{const ai=TAG_GROUPS.indexOf(a),bi=TAG_GROUPS.indexOf(b);return(ai<0?99:ai)-(bi<0?99:bi);});
+  sel.innerHTML='<option value="">— 選擇標籤 —</option>'+gKeys.map(g=>`<optgroup label="${getGroupIcon(g)} ${esc(g)}">${grps[g].map(t=>`<option value="${esc(t.name)}">${esc(t.name)}${t.desc?' · '+esc(t.desc):''}</option>`).join('')}</optgroup>`).join('');
 }
 function runPromotionReport(tagName){
   if(!tagName){tagName=document.getElementById('promo-tag-select')?.value;}
@@ -1913,7 +2109,7 @@ function renderTrashList(){
 // ============================================================
 // 導覽
 // ============================================================
-function showPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>{const t=n.getAttribute('onclick')||'';n.classList.toggle('active',t.includes("'"+name+"'"));});if(name==='dashboard')renderDashboard();if(name==='list')renderList();if(name==='config')renderCfgForm();if(name==='backup')renderBackupPage();if(name==='tags')renderTagsPage();if(name==='promotion')openPromotionReport();if(name==='ig'){renderIgAll();if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgAll();showSyncBadge('IG 已同步 Sheets');}});}}if(name==='igstats'){renderIgCharts();if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgCharts();showSyncBadge('IG 已同步 Sheets');}});}}if(name==='report'){const now=new Date();document.getElementById('rpt-year').value=now.getFullYear();document.getElementById('rpt-month').value=String(now.getMonth()+1).padStart(2,'0');}}
+function showPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>{const t=n.getAttribute('onclick')||'';n.classList.toggle('active',t.includes("'"+name+"'"));});if(name==='dashboard')renderDashboard();if(name==='list')renderList();if(name==='config')renderCfgForm();if(name==='backup')renderBackupPage();if(name==='tags'){populateGroupDropdown();renderTagsPage();}if(name==='promotion')openPromotionReport();if(name==='ig'){renderIgAll();if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgAll();showSyncBadge('IG 已同步 Sheets');}});}}if(name==='igstats'){renderIgCharts();if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgCharts();showSyncBadge('IG 已同步 Sheets');}});}}if(name==='report'){const now=new Date();document.getElementById('rpt-year').value=now.getFullYear();document.getElementById('rpt-month').value=String(now.getMonth()+1).padStart(2,'0');}}
 function renderAll(){renderDashboard();renderList();renderCfgForm();buildMonthFilter();}
 
 // ============================================================
