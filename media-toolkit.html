@@ -142,10 +142,26 @@ main{max-width:980px;margin:24px auto 0;padding:0 16px}
 .tips-text{font-size:12px;color:var(--text2);line-height:1.6}
 
 .res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:32px}
-.res-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;text-decoration:none;transition:.2s;display:flex;flex-direction:column;gap:5px}
+.res-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;text-decoration:none;transition:.2s;display:flex;flex-direction:column;gap:7px}
 .res-card:hover{transform:translateY(-2px);border-color:var(--border2);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.res-tag{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:6px;align-self:flex-start;border:1px solid transparent}
+.res-tag.music{background:rgba(168,85,247,.12);color:#c084fc;border-color:rgba(168,85,247,.25)}
+.res-tag.video{background:rgba(14,165,233,.1);color:var(--sky2);border-color:rgba(14,165,233,.2)}
+.res-tag.image{background:rgba(16,185,129,.1);color:var(--emerald2);border-color:rgba(16,185,129,.2)}
+.res-tag.sfx{background:rgba(245,158,11,.1);color:var(--amber2);border-color:rgba(245,158,11,.2)}
+.res-tag.mixed{background:rgba(99,102,241,.12);color:var(--indigo2);border-color:rgba(99,102,241,.2)}
+.res-tag.ai{background:rgba(236,72,153,.12);color:#f472b6;border-color:rgba(236,72,153,.25)}
+.res-tag.tmpl{background:rgba(20,184,166,.1);color:#2dd4bf;border-color:rgba(20,184,166,.2)}
+.res-tag.paid{background:rgba(245,158,11,.1);color:var(--amber2);border-color:rgba(245,158,11,.2)}
+.price-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;align-self:flex-start;margin-top:2px}
+.price-badge.free{background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
+.price-badge.freemium{background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
+.price-badge.paid-only{background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
 .res-name{font-size:14px;font-weight:700;color:var(--text)}
-.res-desc{font-size:12px;color:var(--text2);line-height:1.55}
+.res-desc{font-size:12px;color:var(--text2);line-height:1.55;flex:1}
+.res-card-bot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:8px}
+.res-arrow{color:var(--text3);flex-shrink:0;opacity:.5;transition:.18s}
+.res-card:hover .res-arrow{color:var(--indigo2);opacity:1}
 
 .sw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
 .sw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;gap:14px;align-items:stretch;transition:.2s;text-decoration:none}
@@ -193,12 +209,6 @@ footer a{color:var(--indigo2);text-decoration:none}
 /* ── c-teal ── */
 .c-teal::before{background:linear-gradient(90deg,#0d9488,#2dd4bf)}.c-teal:hover{box-shadow:0 0 24px rgba(20,184,166,.15)}.c-teal .tool-icon{background:rgba(20,184,166,.15)}.c-teal .tool-btn{background:rgba(20,184,166,.12);color:#2dd4bf}.c-teal .progress-bar{background:linear-gradient(90deg,#0d9488,#2dd4bf)}.c-teal .dl-btn{background:linear-gradient(135deg,#0d9488,#14b8a6)}.c-teal .fmt{background:rgba(20,184,166,.1);color:#2dd4bf;border-color:rgba(20,184,166,.2)}
 
-/* ── c-cyan ── */
-.c-cyan::before{background:linear-gradient(90deg,#0891b2,#22d3ee)}.c-cyan:hover{box-shadow:0 0 24px rgba(6,182,212,.15)}.c-cyan .tool-icon{background:rgba(6,182,212,.15)}.c-cyan .tool-btn{background:rgba(6,182,212,.12);color:#22d3ee}.c-cyan .drop-area{border-color:rgba(6,182,212,.35)}.c-cyan .drop-area:hover,.c-cyan .drop-area.drag-over{border-color:#22d3ee;background:rgba(6,182,212,.07)}.c-cyan .progress-bar{background:linear-gradient(90deg,#0891b2,#22d3ee)}.c-cyan .dl-btn{background:linear-gradient(135deg,#0891b2,#06b6d4)}
-
-/* ── c-pink ── */
-.c-pink::before{background:linear-gradient(90deg,#db2777,#f472b6)}.c-pink:hover{box-shadow:0 0 24px rgba(236,72,153,.15)}.c-pink .tool-icon{background:rgba(236,72,153,.15)}.c-pink .tool-btn{background:rgba(236,72,153,.12);color:#f472b6}.c-pink .drop-area{border-color:rgba(236,72,153,.35)}.c-pink .drop-area:hover,.c-pink .drop-area.drag-over{border-color:#f472b6;background:rgba(236,72,153,.07)}.c-pink .progress-bar{background:linear-gradient(90deg,#db2777,#f472b6)}.c-pink .dl-btn{background:linear-gradient(135deg,#db2777,#ec4899)}
-
 /* ── trim card additions ── */
 .trim-open-btn{display:none!important;background:rgba(14,165,233,.15);color:var(--sky2);margin-bottom:10px}
 .tool-card.has-file .trim-open-btn{display:flex!important}
@@ -216,13 +226,6 @@ footer a{color:var(--indigo2);text-decoration:none}
 .trim-bit-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap;min-width:60px;flex-shrink:0}
 .trim-bit-row .fmt-select{margin-bottom:0;font-size:12px}
 .trim-out-divider{height:1px;background:var(--border);margin:1px 0}
-
-/* ── audio trim opts ── */
-.audio-trim-opts{display:none;margin-bottom:10px;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:11px 13px;flex-direction:column;gap:6px}
-.tool-card.has-file .audio-trim-opts{display:flex}
-.tool-card.done .audio-trim-opts,.tool-card.processing .audio-trim-opts{display:none}
-.audio-time-inp{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:13px;color:var(--text);outline:none;font-variant-numeric:tabular-nums}
-.audio-time-inp:focus{border-color:var(--border2)}
 
 /* ── trim modal ── */
 .trim-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:900;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:.22s}
@@ -296,6 +299,24 @@ footer a{color:var(--indigo2);text-decoration:none}
   .nav-btn{padding:8px 12px;font-size:12px}
   .tools-grid,.sw-grid{grid-template-columns:1fr}
 }
+
+/* ── Face Blur ── */
+.fb-limits{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:12px}
+.fb-limit{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 9px}
+.fb-limit-label{font-size:10px;color:var(--text3);line-height:1.35}
+.fb-limit-label strong{color:var(--text2);font-size:10.5px;display:block;margin-bottom:1px}
+.fb-limit-ico-ok{color:var(--emerald2);flex-shrink:0}
+.fb-limit-ico-warn{color:var(--amber2);flex-shrink:0}
+.fb-setup{display:none;margin-bottom:12px}
+.tool-card.has-file .fb-setup{display:block}
+.tool-card.processing .fb-setup,.tool-card.done .fb-setup{display:none}
+.fb-canvas-wrap{position:relative;background:#000;border-radius:10px;overflow:hidden;margin-bottom:8px;cursor:crosshair;border:1px solid var(--border2);line-height:0}
+.fb-canvas{width:100%;display:block}
+.fb-hint{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(0,0,0,.72),transparent);color:rgba(255,255,255,.82);font-size:10px;text-align:center;padding:10px 6px 5px;pointer-events:none;line-height:1.4}
+.fb-detect-btn{width:100%;padding:7px;border-radius:9px;border:none;background:rgba(244,63,94,.1);color:var(--rose2);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s;margin-bottom:8px}
+.fb-detect-btn:hover{background:rgba(244,63,94,.2)}
+.fb-detect-btn:disabled{opacity:.4;pointer-events:none}
+.tool-card[data-tool="faceBlur"] .start-btn:disabled{opacity:.32;pointer-events:none}
 </style>
 </head>
 <body>
@@ -422,7 +443,7 @@ if ('serviceWorker' in navigator) {
     <div class="tool-card c-amber" data-tool="convert">
       <input type="file" hidden accept="video/*,.mkv,.avi,.webm,.flv,.ts">
       <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-convert"/></svg></div>
-      <div class="tool-name">影片格式轉檔</div>
+      <div class="tool-name">格式轉換</div>
       <div class="tool-desc">影片格式互轉，解決播放器相容性問題。</div>
       <select class="fmt-select" name="outfmt">
         <option value="mp4">轉成 MP4（最相容）</option>
@@ -548,6 +569,31 @@ if ('serviceWorker' in navigator) {
     </div>
 
     <!-- 移除聲音 -->
+    <div class="tool-card c-rose" data-tool="mute">
+      <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
+      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-mute"/></svg></div>
+      <div class="tool-name">移除影片聲音</div>
+      <div class="tool-desc">將影片音軌完全移除，輸出無聲影片，適合重新配音或配樂。</div>
+      <div class="tool-formats"><span class="fmt">去除音軌</span><span class="fmt">保留畫面</span><span class="fmt">快速處理</span></div>
+      <div class="drop-area">
+        <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
+        <div class="drop-area-text">拖曳影片到這裡，或點擊選取</div>
+        <div class="drop-area-sub">支援 MP4、MOV、AVI、MKV</div>
+      </div>
+      <div class="file-info">
+        <span class="file-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg></span>
+        <span class="file-info-name"></span><span class="file-info-size"></span>
+        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
+      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">移除音軌中...</div></div>
+      <div class="error-msg"></div>
+      <button class="tool-btn start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>移除聲音</button>
+      <div class="download-wrap">
+        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載無聲影片</button>
+        <button class="reset-btn">再次處理</button>
+      </div>
+    </div>
+
     <div class="tool-card c-orange" data-tool="watermark">
       <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
       <input type="file" hidden accept="image/*" class="wm-logo-input">
@@ -597,13 +643,41 @@ if ('serviceWorker' in navigator) {
       </div>
     </div>
 
-    <!-- 移除聲音 -->
-    <div class="tool-card c-rose" data-tool="mute">
+    <!-- 人臉模糊處理 -->
+    <div class="tool-card c-rose" data-tool="faceBlur">
       <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
-      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-mute"/></svg></div>
-      <div class="tool-name">移除影片聲音</div>
-      <div class="tool-desc">將影片音軌完全移除，輸出無聲影片，適合重新配音或配樂。</div>
-      <div class="tool-formats"><span class="fmt">去除音軌</span><span class="fmt">保留畫面</span><span class="fmt">快速處理</span></div>
+      <div class="tool-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      </div>
+      <div class="tool-name">人臉模糊處理</div>
+      <div class="tool-desc">自動追蹤人臉位置，全片套用高斯模糊或馬賽克，適用於復健記錄、臨床研究影片的隱私保護。</div>
+
+      <!-- 使用限制 -->
+      <div class="fb-limits">
+        <div class="fb-limit">
+          <svg class="fb-limit-ico-ok" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="fb-limit-label"><strong>解析度</strong>1080p 以下</div>
+        </div>
+        <div class="fb-limit">
+          <svg class="fb-limit-ico-ok" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="fb-limit-label"><strong>長度</strong>5 分鐘以內</div>
+        </div>
+        <div class="fb-limit">
+          <svg class="fb-limit-ico-ok" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="fb-limit-label"><strong>檔案大小</strong>300 MB 以下</div>
+        </div>
+        <div class="fb-limit">
+          <svg class="fb-limit-ico-warn" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <div class="fb-limit-label"><strong>處理時間</strong>影片時長 5～10 倍</div>
+        </div>
+      </div>
+
       <div class="drop-area">
         <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
         <div class="drop-area-text">拖曳影片到這裡，或點擊選取</div>
@@ -614,12 +688,31 @@ if ('serviceWorker' in navigator) {
         <span class="file-info-name"></span><span class="file-info-size"></span>
         <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
       </div>
-      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">移除音軌中...</div></div>
+
+      <!-- Canvas 框選區 -->
+      <div class="fb-setup">
+        <div class="fb-canvas-wrap">
+          <canvas class="fb-canvas"></canvas>
+          <div class="fb-hint">手動拖曳框選臉部，或點「自動偵測人臉」</div>
+        </div>
+        <button class="fb-detect-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          自動偵測人臉
+        </button>
+        <select class="fmt-select fb-blur-type">
+          <option value="gaussian">高斯模糊（柔和自然，學術推薦）</option>
+          <option value="mosaic">馬賽克（明顯方塊遮蔽）</option>
+        </select>
+      </div>
+
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">處理中，請稍候...</div></div>
       <div class="error-msg"></div>
-      <button class="tool-btn start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>移除聲音</button>
+      <button class="tool-btn start-btn" disabled>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始模糊處理
+      </button>
       <div class="download-wrap">
-        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載無聲影片</button>
-        <button class="reset-btn">再次處理</button>
+        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載處理後影片</button>
+        <button class="reset-btn">重新處理</button>
       </div>
     </div>
 
@@ -690,64 +783,6 @@ if ('serviceWorker' in navigator) {
       </div>
     </div>
 
-    <!-- 音樂裁剪片段 -->
-    <div class="tool-card c-cyan" data-tool="audioTrim">
-      <input type="file" hidden accept="audio/*,.mp3,.wav,.aac,.flac,.ogg,.m4a,.opus">
-      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-cut"/></svg></div>
-      <div class="tool-name">音樂裁剪片段</div>
-      <div class="tool-desc">設定起始與結束時間，擷取音樂中指定的片段，輸出 MP3。</div>
-      <div class="drop-area">
-        <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
-        <div class="drop-area-text">拖曳音訊到這裡，或點擊選取</div>
-        <div class="drop-area-sub">支援 MP3、WAV、AAC、FLAC、OGG、M4A</div>
-      </div>
-      <div class="file-info">
-        <span class="file-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg></span>
-        <span class="file-info-name"></span><span class="file-info-size"></span>
-        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
-      </div>
-      <div class="audio-trim-opts">
-        <div class="trim-bit-row">
-          <span class="trim-bit-lbl">開始</span>
-          <input class="audio-time-inp" placeholder="0:00（秒 或 分:秒）" value="0">
-        </div>
-        <div class="trim-bit-row">
-          <span class="trim-bit-lbl">結束</span>
-          <input class="audio-time-inp" placeholder="留空 = 到結尾" value="">
-        </div>
-      </div>
-      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">裁剪中...</div></div>
-      <div class="error-msg"></div>
-      <button class="tool-btn start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始裁剪</button>
-      <div class="download-wrap">
-        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載裁剪後音訊</button>
-        <button class="reset-btn">再次裁剪</button>
-      </div>
-    </div>
-
-    <!-- 音樂合併 -->
-    <div class="tool-card c-pink" data-tool="audioMerge">
-      <input type="file" hidden accept="audio/*,.mp3,.wav,.aac,.flac,.ogg,.m4a" multiple>
-      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-layers"/></svg></div>
-      <div class="tool-name">音樂合併</div>
-      <div class="tool-desc">上傳多個音訊片段，拖曳調整順序，一鍵合併輸出 MP3 音檔。</div>
-      <div class="merge-dropzone">
-        <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
-        <div class="drop-area-text">拖曳多個音訊到這裡，或點擊選取</div>
-        <div class="drop-area-sub">支援 MP3、WAV、AAC、FLAC・可同時選多個</div>
-      </div>
-      <div class="merge-list"></div>
-      <button class="merge-add-more"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>加入更多片段</button>
-      <div class="merge-hint">請至少加入 2 個片段才能合併</div>
-      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">合併中...</div></div>
-      <div class="error-msg"></div>
-      <button class="tool-btn start-btn" style="opacity:.45;cursor:not-allowed"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始合併（需 ≥ 2 個片段）</button>
-      <div class="download-wrap">
-        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載合併後音訊</button>
-        <button class="reset-btn">重新選取</button>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -755,60 +790,60 @@ if ('serviceWorker' in navigator) {
 <div class="panel" id="panel-res">
   <div class="tips" style="margin-top:24px">
     <div class="tips-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-film"/></svg></div>
-    <div><div class="tips-title">精選素材網站 · AI 工具 · 模板庫</div><div class="tips-text">包含免費、Freemium 及付費訂閱網站，使用前請確認各站授權條款。</div></div>
+    <div><div class="tips-title">精選素材網站 · AI 工具 · 模板庫</div><div class="tips-text">包含免費（CC0）、免費帳號（Freemium）及付費訂閱網站，各卡片標示收費方式，使用前請確認各站授權條款。</div></div>
   </div>
 
   <div class="section-title">AI 應用工具</div>
   <div class="res-grid">
-    <a href="https://podcast.adobe.com/" target="_blank" class="res-card"><div class="res-name">Adobe Podcast</div><div class="res-desc">AI 一鍵消除背景噪音、提升人聲清晰度，錄音品質瞬間升級。</div></a>
-    <a href="https://fomofly.com/" target="_blank" class="res-card"><div class="res-name">Fomofly</div><div class="res-desc">AI 驅動的影片生成與行銷素材製作工具，快速產出短影音。</div></a>
-    <a href="https://www.deevid.ai/" target="_blank" class="res-card"><div class="res-name">Deevid AI</div><div class="res-desc">AI 影片生成平台，輸入文字或圖片即可產出影片內容。</div></a>
-    <a href="https://runwayml.com/" target="_blank" class="res-card"><div class="res-name">Runway ML</div><div class="res-desc">業界頂尖 AI 影片生成，支援文字轉影片、影片編輯、去背景。</div></a>
-    <a href="https://pika.art/" target="_blank" class="res-card"><div class="res-name">Pika Labs</div><div class="res-desc">AI 文字/圖片轉影片，動態效果自然，免費方案每月有額度。</div></a>
-    <a href="https://suno.com/" target="_blank" class="res-card"><div class="res-name">Suno AI</div><div class="res-desc">輸入歌詞或提示詞，AI 自動生成完整歌曲含人聲，免費方案每日有額度。</div></a>
-    <a href="https://www.udio.com/" target="_blank" class="res-card"><div class="res-name">Udio</div><div class="res-desc">高品質 AI 音樂生成，風格多元，免費帳號每月可生成數百首。</div></a>
-    <a href="https://elevenlabs.io/" target="_blank" class="res-card"><div class="res-name">ElevenLabs</div><div class="res-desc">最擬真 AI 語音合成與聲音複製，旁白、配音首選，支援中文。</div></a>
-    <a href="https://www.heygen.com/" target="_blank" class="res-card"><div class="res-name">HeyGen</div><div class="res-desc">AI 數位人分身影片製作，自動對嘴、多語言配音，企業宣傳常用。</div></a>
-    <a href="https://www.capcut.com/" target="_blank" class="res-card"><div class="res-name">CapCut AI</div><div class="res-desc">AI 自動剪輯、字幕生成、去背、特效，短影音製作首選工具。</div></a>
-    <a href="https://www.descript.com/" target="_blank" class="res-card"><div class="res-name">Descript</div><div class="res-desc">用文字編輯影片與 Podcast，AI 去口頭禪、過場音效、聲音修復。</div></a>
+    <a href="https://podcast.adobe.com/" target="_blank" class="res-card"><span class="res-tag ai">AI 降噪</span><div class="res-name">Adobe Podcast</div><div class="res-desc">AI 一鍵消除背景噪音、提升人聲清晰度，錄音品質瞬間升級。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://fomofly.com/" target="_blank" class="res-card"><span class="res-tag ai">AI 影片</span><div class="res-name">Fomofly</div><div class="res-desc">AI 驅動的影片生成與行銷素材製作工具，快速產出短影音。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://www.deevid.ai/" target="_blank" class="res-card"><span class="res-tag ai">AI 影片</span><div class="res-name">Deevid AI</div><div class="res-desc">AI 影片生成平台，輸入文字或圖片即可產出影片內容。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://runwayml.com/" target="_blank" class="res-card"><span class="res-tag ai">AI 影片</span><div class="res-name">Runway ML</div><div class="res-desc">業界頂尖 AI 影片生成，支援文字轉影片、影片編輯、去背景。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://pika.art/" target="_blank" class="res-card"><span class="res-tag ai">AI 影片</span><div class="res-name">Pika Labs</div><div class="res-desc">AI 文字/圖片轉影片，動態效果自然，免費方案每月有額度。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://suno.com/" target="_blank" class="res-card"><span class="res-tag ai">AI 音樂</span><div class="res-name">Suno AI</div><div class="res-desc">輸入歌詞或提示詞，AI 自動生成完整歌曲含人聲，免費方案每日有額度。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://www.udio.com/" target="_blank" class="res-card"><span class="res-tag ai">AI 音樂</span><div class="res-name">Udio</div><div class="res-desc">高品質 AI 音樂生成，風格多元，免費帳號每月可生成數百首。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://elevenlabs.io/" target="_blank" class="res-card"><span class="res-tag ai">AI 語音</span><div class="res-name">ElevenLabs</div><div class="res-desc">最擬真 AI 語音合成與聲音複製，旁白、配音首選，支援中文。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://www.heygen.com/" target="_blank" class="res-card"><span class="res-tag ai">AI 影片</span><div class="res-name">HeyGen</div><div class="res-desc">AI 數位人分身影片製作，自動對嘴、多語言配音，企業宣傳常用。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://www.capcut.com/" target="_blank" class="res-card"><span class="res-tag ai">AI 剪輯</span><div class="res-name">CapCut AI</div><div class="res-desc">AI 自動剪輯、字幕生成、去背、特效，短影音製作首選工具。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://www.descript.com/" target="_blank" class="res-card"><span class="res-tag ai">AI 編輯</span><div class="res-name">Descript</div><div class="res-desc">用文字編輯影片與 Podcast，AI 去口頭禪、過場音效、聲音修復。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
   </div>
 
   <div class="section-title">音樂 · 音效</div>
   <div class="res-grid">
-    <a href="https://studio.youtube.com/channel/audio" target="_blank" class="res-card"><div class="res-name">YouTube 音訊庫</div><div class="res-desc">YouTube 官方，免費商業授權音樂與音效，品質穩定。</div></a>
-    <a href="https://pixabay.com/music/" target="_blank" class="res-card"><div class="res-name">Pixabay Music</div><div class="res-desc">大量 CC0 授權背景音樂，可商用，無需署名。</div></a>
-    <a href="https://freemusicarchive.org/" target="_blank" class="res-card"><div class="res-name">Free Music Archive</div><div class="res-desc">多樣風格音樂，獨立音樂人授權，分類清楚。</div></a>
-    <a href="https://freesound.org/" target="_blank" class="res-card"><div class="res-name">Freesound</div><div class="res-desc">50 萬+ 環境音效、特效音，社群共同上傳。</div></a>
-    <a href="https://www.zapsplat.com/" target="_blank" class="res-card"><div class="res-name">Zapsplat</div><div class="res-desc">專業音效庫，免費帳號可下載，分類細緻。</div></a>
-    <a href="https://incompetech.com/" target="_blank" class="res-card"><div class="res-name">Incompetech</div><div class="res-desc">Kevin MacLeod 知名免費配樂庫，影片常用。</div></a>
-    <a href="https://www.500audio.com/" target="_blank" class="res-card"><div class="res-name">500 Audio</div><div class="res-desc">高品質授權音樂，可按單首購買或訂閱，影片配樂常用。</div></a>
+    <a href="https://studio.youtube.com/channel/audio" target="_blank" class="res-card"><span class="res-tag music">音樂</span><div class="res-name">YouTube 音訊庫</div><div class="res-desc">YouTube 官方，免費商業授權音樂與音效，品質穩定。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://pixabay.com/music/" target="_blank" class="res-card"><span class="res-tag music">音樂</span><div class="res-name">Pixabay Music</div><div class="res-desc">大量 CC0 授權背景音樂，可商用，無需署名。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://freemusicarchive.org/" target="_blank" class="res-card"><span class="res-tag music">音樂</span><div class="res-name">Free Music Archive</div><div class="res-desc">多樣風格音樂，獨立音樂人授權，分類清楚。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://freesound.org/" target="_blank" class="res-card"><span class="res-tag sfx">音效</span><div class="res-name">Freesound</div><div class="res-desc">50 萬+ 環境音效、特效音，社群共同上傳。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://www.zapsplat.com/" target="_blank" class="res-card"><span class="res-tag sfx">音效</span><div class="res-name">Zapsplat</div><div class="res-desc">專業音效庫，免費帳號可下載，分類細緻。</div><div class="res-card-bot"><span class="price-badge freemium">免費帳號</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://incompetech.com/" target="_blank" class="res-card"><span class="res-tag music">音樂</span><div class="res-name">Incompetech</div><div class="res-desc">Kevin MacLeod 知名免費配樂庫，影片常用。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://www.500audio.com/" target="_blank" class="res-card"><span class="res-tag music">音樂</span><div class="res-name">500 Audio</div><div class="res-desc">高品質授權音樂，可按單首購買或訂閱，影片配樂常用。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
   </div>
 
   <div class="section-title">影片素材</div>
   <div class="res-grid">
-    <a href="https://www.pexels.com/videos/" target="_blank" class="res-card"><div class="res-name">Pexels Videos</div><div class="res-desc">高品質 4K 免費影片，完全可商用，無需署名。</div></a>
-    <a href="https://pixabay.com/videos/" target="_blank" class="res-card"><div class="res-name">Pixabay Video</div><div class="res-desc">CC0 免費影片庫，各種場景與風格都有。</div></a>
-    <a href="https://coverr.co/" target="_blank" class="res-card"><div class="res-name">Coverr</div><div class="res-desc">精選生活感影片，適合網站背景或宣傳影片。</div></a>
-    <a href="https://mixkit.co/free-stock-video/" target="_blank" class="res-card"><div class="res-name">Mixkit</div><div class="res-desc">影片、音樂、音效一站搞定，品質優良。</div></a>
+    <a href="https://www.pexels.com/videos/" target="_blank" class="res-card"><span class="res-tag video">影片</span><div class="res-name">Pexels Videos</div><div class="res-desc">高品質 4K 免費影片，完全可商用，無需署名。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://pixabay.com/videos/" target="_blank" class="res-card"><span class="res-tag video">影片</span><div class="res-name">Pixabay Video</div><div class="res-desc">CC0 免費影片庫，各種場景與風格都有。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://coverr.co/" target="_blank" class="res-card"><span class="res-tag video">影片</span><div class="res-name">Coverr</div><div class="res-desc">精選生活感影片，適合網站背景或宣傳影片。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://mixkit.co/free-stock-video/" target="_blank" class="res-card"><span class="res-tag mixed">影/音/樂</span><div class="res-name">Mixkit</div><div class="res-desc">影片、音樂、音效一站搞定，品質優良。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
   </div>
 
   <div class="section-title">圖片素材</div>
   <div class="res-grid">
-    <a href="https://unsplash.com/" target="_blank" class="res-card"><div class="res-name">Unsplash</div><div class="res-desc">頂級攝影師作品，免費商用授權，畫質極佳。</div></a>
-    <a href="https://www.pexels.com/" target="_blank" class="res-card"><div class="res-name">Pexels</div><div class="res-desc">免費圖片與影片，CC0 授權，搜尋功能強。</div></a>
-    <a href="https://pixabay.com/" target="_blank" class="res-card"><div class="res-name">Pixabay</div><div class="res-desc">圖片、插畫、影片、音樂全都有，CC0 免費商用。</div></a>
-    <a href="https://www.freepik.com/" target="_blank" class="res-card"><div class="res-name">Freepik</div><div class="res-desc">圖片、插圖、向量圖、模板，免費帳號可用，須署名。</div></a>
+    <a href="https://unsplash.com/" target="_blank" class="res-card"><span class="res-tag image">圖片</span><div class="res-name">Unsplash</div><div class="res-desc">頂級攝影師作品，免費商用授權，畫質極佳。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://www.pexels.com/" target="_blank" class="res-card"><span class="res-tag image">圖片</span><div class="res-name">Pexels</div><div class="res-desc">免費圖片與影片，CC0 授權，搜尋功能強。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://pixabay.com/" target="_blank" class="res-card"><span class="res-tag mixed">圖/影/音</span><div class="res-name">Pixabay</div><div class="res-desc">圖片、插畫、影片、音樂全都有，CC0 免費商用。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://www.freepik.com/" target="_blank" class="res-card"><span class="res-tag image">圖片</span><div class="res-name">Freepik</div><div class="res-desc">圖片、插圖、向量圖、模板，免費帳號可用，須署名。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
   </div>
 
   <div class="section-title">模板素材庫（音樂 · 影片 · 動畫）</div>
   <div class="res-grid">
-    <a href="https://elements.envato.com/" target="_blank" class="res-card"><div class="res-name">Envato Elements</div><div class="res-desc">最大創意素材平台，AE/PR 模板、音樂、字型一站訂閱，月費制。</div></a>
-    <a href="https://motionarray.com/" target="_blank" class="res-card"><div class="res-name">Motion Array</div><div class="res-desc">Premiere Pro、After Effects 模板及授權音樂，有免費項目可用。</div></a>
-    <a href="https://www.motionelements.com/" target="_blank" class="res-card"><div class="res-name">Motion Elements</div><div class="res-desc">亞洲最大動態素材平台，動畫模板、背景音樂、影片，有免費下載。</div></a>
-    <a href="https://artlist.io/" target="_blank" class="res-card"><div class="res-name">Artlist</div><div class="res-desc">專業影片配樂授權平台，一次訂閱無限使用，業界常用。</div></a>
-    <a href="https://www.storyblocks.com/" target="_blank" class="res-card"><div class="res-name">Storyblocks</div><div class="res-desc">股票影片、背景音樂、音效全包，訂閱後無限下載。</div></a>
-    <a href="https://www.videvo.net/" target="_blank" class="res-card"><div class="res-name">Videvo</div><div class="res-desc">免費及高級影片素材、動畫片段，部分 CC0 授權可直接商用。</div></a>
-    <a href="https://stock.adobe.com/" target="_blank" class="res-card"><div class="res-name">Adobe Stock</div><div class="res-desc">頂級圖片、影片、音樂、3D 素材平台，Creative Cloud 訂閱可整合使用。</div></a>
+    <a href="https://elements.envato.com/" target="_blank" class="res-card"><span class="res-tag tmpl">模板</span><div class="res-name">Envato Elements</div><div class="res-desc">最大創意素材平台，AE/PR 模板、音樂、字型一站訂閱，月費制。</div><div class="res-card-bot"><span class="price-badge paid-only">付費訂閱</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://motionarray.com/" target="_blank" class="res-card"><span class="res-tag tmpl">模板</span><div class="res-name">Motion Array</div><div class="res-desc">Premiere Pro、After Effects 模板及授權音樂，有免費項目可用。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://www.motionelements.com/" target="_blank" class="res-card"><span class="res-tag tmpl">模板</span><div class="res-name">Motion Elements</div><div class="res-desc">亞洲最大動態素材平台，動畫模板、背景音樂、影片，有免費下載。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://artlist.io/" target="_blank" class="res-card"><span class="res-tag music">音樂</span><div class="res-name">Artlist</div><div class="res-desc">專業影片配樂授權平台，一次訂閱無限使用，業界常用。</div><div class="res-card-bot"><span class="price-badge paid-only">付費訂閱</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://www.storyblocks.com/" target="_blank" class="res-card"><span class="res-tag mixed">影/音/樂</span><div class="res-name">Storyblocks</div><div class="res-desc">股票影片、背景音樂、音效全包，訂閱後無限下載。</div><div class="res-card-bot"><span class="price-badge paid-only">付費訂閱</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://www.videvo.net/" target="_blank" class="res-card"><span class="res-tag video">影片</span><div class="res-name">Videvo</div><div class="res-desc">免費及高級影片素材、動畫片段，部分 CC0 授權可直接商用。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://stock.adobe.com/" target="_blank" class="res-card"><span class="res-tag mixed">圖/影/音</span><div class="res-name">Adobe Stock</div><div class="res-desc">頂級圖片、影片、音樂、3D 素材平台，Creative Cloud 訂閱可整合使用。</div><div class="res-card-bot"><span class="price-badge paid-only">付費訂閱</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
   </div>
 </div>
 
@@ -1114,39 +1149,6 @@ if ('serviceWorker' in navigator) {
       var data = ff.FS('readFile', outN);
       fsClean.apply(null, inNames.concat(['mlist.txt', outN]));
       return { data: data, ext: ofmt, filename: 'merged.' + ofmt };
-    },
-    audioTrim: async function(file, card) {
-      var inps = card.querySelectorAll('.audio-time-inp');
-      var start = parseTime(inps[0] ? inps[0].value : '0') || 0;
-      var end = parseTime(inps[1] ? inps[1].value : '');
-      var dur = (end !== null && end > start) ? (end - start) : null;
-      var inExt = getExt(file.name), inN = 'ain.' + inExt, outN = 'aout.mp3';
-      try { ff.FS('unlink', inN); } catch(e) {}
-      try { ff.FS('unlink', outN); } catch(e) {}
-      ff.FS('writeFile', inN, await fetchFile(file));
-      var args = ['-ss', String(start), '-i', inN];
-      if (dur !== null) args.push('-t', String(dur));
-      args.push('-acodec', 'libmp3lame', '-b:a', '192k', '-q:a', '0', outN);
-      await ff.run.apply(ff, args);
-      var data = ff.FS('readFile', outN);
-      fsClean(inN, outN);
-      return { data: data, ext: 'mp3', filename: basename(file.name) + '_trim.mp3' };
-    },
-    audioMerge: async function(files, card) {
-      if (!files || files.length < 2) throw new Error('請至少選取 2 個音訊');
-      var outN = 'amerged.mp3';
-      var inNames = [];
-      for (var i = 0; i < files.length; i++) {
-        var inN = 'am' + i + '.' + getExt(files[i].name);
-        ff.FS('writeFile', inN, await fetchFile(files[i]));
-        inNames.push(inN);
-      }
-      var listTxt = inNames.map(function(n){ return "file '" + n + "'"; }).join('\n');
-      ff.FS('writeFile', 'amlist.txt', listTxt);
-      await ff.run('-f','concat','-safe','0','-i','amlist.txt','-acodec','libmp3lame','-b:a','192k', outN);
-      var data = ff.FS('readFile', outN);
-      fsClean.apply(null, inNames.concat(['amlist.txt', outN]));
-      return { data: data, ext: 'mp3', filename: 'merged_audio.mp3' };
     }
   };
 
@@ -1417,8 +1419,7 @@ if ('serviceWorker' in navigator) {
     });
   }
 
-  function setupMergeCard(card, procKey) {
-    procKey = procKey || 'merge';
+  function setupMergeCard(card) {
     var input = card.querySelector('input[type=file][multiple]');
     var dropzone = card.querySelector('.merge-dropzone');
     var list = card.querySelector('.merge-list');
@@ -1524,11 +1525,10 @@ if ('serviceWorker' in navigator) {
       ffRunning = true;
       try {
         await ensureFF(); bar.style.width = '10%';
-        var result = await PROC[procKey](files, card);
+        var result = await PROC.merge(files, card);
         bar.style.width = '100%'; await sleep(350);
         card.classList.remove('processing'); card.classList.add('done');
-        var mimeType = (procKey === 'audioMerge') ? ('audio/' + result.ext) : ('video/' + result.ext);
-        var blob = new Blob([result.data.buffer], { type: mimeType });
+        var blob = new Blob([result.data.buffer], { type: 'video/' + result.ext });
         var url = URL.createObjectURL(blob);
         dlBtn.onclick = function(){ var a = document.createElement('a'); a.href=url; a.download=result.filename; a.click(); };
       } catch(err) {
@@ -1556,6 +1556,340 @@ if ('serviceWorker' in navigator) {
     updateState();
   }
 
+  // ── Face Blur helpers ──────────────────────────────────────
+  function applyBlurEffect(ctx, srcCanvas, bbox, blurType) {
+    var x = Math.max(0, bbox.x), y = Math.max(0, bbox.y);
+    var w = Math.min(bbox.w, srcCanvas.width - x);
+    var h = Math.min(bbox.h, srcCanvas.height - y);
+    if (w <= 0 || h <= 0) return;
+    var tmp = document.createElement('canvas');
+    tmp.width = w; tmp.height = h;
+    tmp.getContext('2d').drawImage(srcCanvas, x, y, w, h, 0, 0, w, h);
+    if (blurType === 'gaussian') {
+      var blurPx = Math.round(Math.max(10, Math.min(Math.min(w, h) * 0.14, 40)));
+      ctx.save();
+      ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+      ctx.filter = 'blur(' + blurPx + 'px)';
+      ctx.drawImage(tmp, x, y, w, h);
+      ctx.restore();
+    } else {
+      var ps = Math.max(4, Math.min(Math.round(Math.min(w, h) / 9), 20));
+      var tw = Math.max(1, Math.ceil(w / ps)), th = Math.max(1, Math.ceil(h / ps));
+      var m = document.createElement('canvas'); m.width = tw; m.height = th;
+      m.getContext('2d').drawImage(srcCanvas, x, y, w, h, 0, 0, tw, th);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(m, 0, 0, tw, th, x, y, w, h);
+      ctx.imageSmoothingEnabled = true;
+    }
+  }
+
+  function setupFaceBlurCard(card) {
+    var input    = card.querySelector('input[type=file]');
+    var dropArea = card.querySelector('.drop-area');
+    var nameEl   = card.querySelector('.file-info-name');
+    var sizeEl   = card.querySelector('.file-info-size');
+    var clearBtn = card.querySelector('.file-clear');
+    var bar      = card.querySelector('.progress-bar');
+    var progText = card.querySelector('.progress-text');
+    var startBtn = card.querySelector('.start-btn');
+    var dlBtn    = card.querySelector('.dl-btn');
+    var resetBtn = card.querySelector('.reset-btn');
+    var errEl    = card.querySelector('.error-msg');
+    var canvasEl = card.querySelector('.fb-canvas');
+    var canvasWrap = card.querySelector('.fb-canvas-wrap');
+    var hintEl   = card.querySelector('.fb-hint');
+    var detectBtn= card.querySelector('.fb-detect-btn');
+    var blurSel  = card.querySelector('.fb-blur-type');
+    var ctx      = canvasEl.getContext('2d');
+
+    var videoEl  = document.createElement('video');
+    videoEl.muted = true; videoEl.playsInline = true;
+    var bbox = null; // video pixel coords
+    var mpReady = false, faceDet = null, _mpResolve = null;
+
+    // ── MediaPipe ──
+    function loadMP() {
+      return new Promise(function(res, rej) {
+        if (mpReady) { res(); return; }
+        var doInit = function() {
+          faceDet = new FaceDetection({
+            locateFile: function(f) {
+              return 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4.1646425229/' + f;
+            }
+          });
+          faceDet.setOptions({ model: 'short', minDetectionConfidence: 0.45 });
+          faceDet.onResults(function(r) {
+            if (_mpResolve) { var fn = _mpResolve; _mpResolve = null; fn(r.detections && r.detections.length ? r.detections[0] : null); }
+          });
+          // warm-up
+          faceDet.send({ image: canvasEl }).then(function() { mpReady = true; res(); }).catch(res);
+        };
+        if (window.FaceDetection) { doInit(); return; }
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4.1646425229/face_detection.js';
+        s.crossOrigin = 'anonymous';
+        s.onload = doInit; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+
+    function detectFace(imgEl) {
+      return new Promise(function(resolve) {
+        var tid = setTimeout(function() { if (_mpResolve) { _mpResolve = null; resolve(null); } }, 4000);
+        _mpResolve = function(d) { clearTimeout(tid); resolve(d); };
+        faceDet.send({ image: imgEl });
+      });
+    }
+
+    function detToBbox(det, vw, vh) {
+      var bb = det.boundingBox;
+      var fw = bb.width * vw, fh = bb.height * vh;
+      var px = fw * 0.22, py = fh * 0.28;
+      return {
+        x: Math.round(Math.max(0, (bb.xCenter - bb.width/2) * vw - px)),
+        y: Math.round(Math.max(0, (bb.yCenter - bb.height/2) * vh - py)),
+        w: Math.round(Math.min(fw + 2*px, vw)),
+        h: Math.round(Math.min(fh + 2*py, vh))
+      };
+    }
+
+    function drawBbox(b) {
+      var vw = canvasEl.width, vh = canvasEl.height;
+      ctx.drawImage(videoEl, 0, 0, vw, vh);
+      ctx.save();
+      ctx.strokeStyle = '#fb7185'; ctx.lineWidth = Math.max(2, vw/220);
+      ctx.setLineDash([Math.round(vw/60), Math.round(vw/90)]);
+      ctx.strokeRect(b.x, b.y, b.w, b.h);
+      ctx.fillStyle = 'rgba(251,113,133,.13)';
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      ctx.restore();
+    }
+
+    function setReady() { startBtn.disabled = false; }
+
+    // ── File handling ──
+    function setFile(f) {
+      if (f.size > 314572800) { // 300 MB
+        errEl.textContent = '檔案超過 300 MB 限制，請先壓縮再試';
+        card.classList.add('has-error'); return;
+      }
+      fileMap.set(card, f);
+      card.classList.remove('done','has-error','processing','fb-bbox-set');
+      card.classList.add('has-file');
+      nameEl.textContent = f.name; sizeEl.textContent = fmtBytes(f.size);
+      bar.style.width = '0%'; errEl.textContent = '';
+      bbox = null; startBtn.disabled = true;
+      hintEl.textContent = '手動拖曳框選臉部，或點「自動偵測人臉」';
+
+      if (videoEl.src.startsWith('blob:')) URL.revokeObjectURL(videoEl.src);
+      videoEl.src = URL.createObjectURL(f);
+      videoEl.addEventListener('loadedmetadata', function onMeta() {
+        videoEl.removeEventListener('loadedmetadata', onMeta);
+        var vw = videoEl.videoWidth, vh = videoEl.videoHeight;
+        if (vw > 1920 || vh > 1920) {
+          errEl.textContent = '解析度超過 1080p 建議上限，處理可能不穩定';
+          card.classList.add('has-error');
+        }
+        canvasEl.width = vw; canvasEl.height = vh;
+        videoEl.currentTime = 0.05;
+        videoEl.addEventListener('seeked', function onS() {
+          videoEl.removeEventListener('seeked', onS);
+          ctx.drawImage(videoEl, 0, 0, vw, vh);
+        });
+      });
+    }
+
+    function reset() {
+      fileMap.delete(card);
+      var pu = blobMap.get(card); if (pu) URL.revokeObjectURL(pu); blobMap.delete(card);
+      if (videoEl.src.startsWith('blob:')) URL.revokeObjectURL(videoEl.src);
+      videoEl.src = ''; videoEl.load();
+      card.classList.remove('has-file','done','has-error','processing');
+      if (input) input.value = '';
+      bar.style.width = '0%'; errEl.textContent = '';
+      bbox = null; startBtn.disabled = true;
+      ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+    }
+
+    // ── Canvas draw ──
+    var drawing = false, ds = {};
+    canvasWrap.addEventListener('mousedown', function(e) {
+      var r = canvasEl.getBoundingClientRect();
+      ds = { x: e.clientX - r.left, y: e.clientY - r.top };
+      drawing = true; e.preventDefault();
+    });
+    document.addEventListener('mousemove', function(e) {
+      if (!drawing) return;
+      var r = canvasEl.getBoundingClientRect();
+      var cx = e.clientX - r.left, cy = e.clientY - r.top;
+      var sx = canvasEl.width/r.width, sy = canvasEl.height/r.height;
+      ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+      ctx.save();
+      ctx.strokeStyle='#fb7185'; ctx.lineWidth=Math.max(2,canvasEl.width/220);
+      ctx.setLineDash([8,5]);
+      ctx.strokeRect(ds.x*sx, ds.y*sy, (cx-ds.x)*sx, (cy-ds.y)*sy);
+      ctx.fillStyle='rgba(251,113,133,.1)';
+      ctx.fillRect(ds.x*sx, ds.y*sy, (cx-ds.x)*sx, (cy-ds.y)*sy);
+      ctx.restore();
+    });
+    document.addEventListener('mouseup', function(e) {
+      if (!drawing) return; drawing = false;
+      var r = canvasEl.getBoundingClientRect();
+      var sx = canvasEl.width/r.width, sy = canvasEl.height/r.height;
+      var dx = (e.clientX - r.left - ds.x)*sx, dy = (e.clientY - r.top - ds.y)*sy;
+      if (Math.abs(dx) < 15 || Math.abs(dy) < 15) return;
+      var bx = ds.x*sx, by = ds.y*sy;
+      if (dx < 0) { bx += dx; dx = -dx; } if (dy < 0) { by += dy; dy = -dy; }
+      bbox = { x:Math.round(bx), y:Math.round(by), w:Math.round(dx), h:Math.round(dy) };
+      hintEl.textContent = '已框選臉部區域 ✓ — 拖曳可重新選取';
+      setReady();
+    });
+
+    // ── Auto-detect ──
+    detectBtn.addEventListener('click', async function() {
+      if (!fileMap.get(card)) return;
+      detectBtn.disabled = true;
+      var orig = detectBtn.innerHTML;
+      detectBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg> 載入偵測引擎...';
+      try {
+        await loadMP();
+        detectBtn.innerHTML = orig.replace('自動偵測人臉','偵測中...');
+        var det = await detectFace(canvasEl);
+        if (!det) {
+          hintEl.textContent = '⚠ 未偵測到人臉 — 請手動拖曳框選';
+        } else {
+          bbox = detToBbox(det, canvasEl.width, canvasEl.height);
+          drawBbox(bbox);
+          hintEl.textContent = '已自動偵測人臉 ✓ — 可重新拖曳調整範圍';
+          setReady();
+        }
+      } catch(e) { hintEl.textContent = '⚠ 偵測載入失敗，請手動框選'; }
+      detectBtn.disabled = false;
+      detectBtn.innerHTML = orig;
+    });
+
+    // ── Start ──
+    startBtn.addEventListener('click', async function() {
+      var file = fileMap.get(card);
+      if (!file || !bbox) return;
+      if (card.classList.contains('processing')) return;
+      if (ffRunning) { errEl.textContent = '另一個工具正在處理中，請稍候再試'; card.classList.add('has-error'); return; }
+
+      card.classList.remove('has-error','done'); card.classList.add('processing');
+      bar.style.width = '5%';
+      currentBar = bar; currentProgressEl = progText; currentProgressBase = '處理中...'; ffRunning = true;
+
+      try {
+        await ensureFF(); bar.style.width = '8%';
+
+        var vw = videoEl.videoWidth, vh = videoEl.videoHeight;
+        var duration = videoEl.duration;
+        if (duration > 300) throw new Error('影片超過 5 分鐘限制（' + Math.round(duration/60) + ' 分鐘）');
+
+        progText.textContent = '載入臉部偵測引擎...';
+        await loadMP(); bar.style.width = '10%';
+
+        var blurType = blurSel.value;
+        var fps = 24;
+        var inExt = getExt(file.name), inN = 'fb_in.' + inExt;
+
+        progText.textContent = '載入影片...';
+        try { ff.FS('unlink', inN); } catch(e) {}
+        ff.FS('writeFile', inN, await fetchFile(file));
+        bar.style.width = '14%';
+
+        progText.textContent = '提取音軌...';
+        try { ff.FS('unlink', 'fb_aud.aac'); } catch(e) {}
+        var hasAudio = false;
+        try { await ff.run('-i', inN, '-vn', '-acodec', 'aac', '-b:a', '128k', 'fb_aud.aac'); hasAudio = true; } catch(e) {}
+        bar.style.width = '16%';
+
+        // Process frames
+        var offC = document.createElement('canvas'); offC.width = vw; offC.height = vh;
+        var offCtx = offC.getContext('2d');
+        var totalFrames = Math.ceil(duration * fps);
+        var lastBbox = bbox;
+        var written = 0;
+
+        for (var i = 0; i < totalFrames; i++) {
+          // Seek
+          var t = i / fps;
+          await new Promise(function(res) {
+            if (Math.abs(videoEl.currentTime - t) < 0.004) { res(); return; }
+            function h() { videoEl.removeEventListener('seeked', h); res(); }
+            videoEl.addEventListener('seeked', h);
+            videoEl.currentTime = t;
+          });
+
+          offCtx.drawImage(videoEl, 0, 0, vw, vh);
+
+          // Detect & track
+          var det = await detectFace(offC);
+          if (det) lastBbox = detToBbox(det, vw, vh);
+
+          // Apply blur
+          applyBlurEffect(offCtx, offC, lastBbox, blurType);
+
+          // Write JPEG frame
+          var fName = 'fb_' + String(i).padStart(6,'0') + '.jpg';
+          var jBlob = await new Promise(function(r) { offC.toBlob(r, 'image/jpeg', 0.88); });
+          ff.FS('writeFile', fName, new Uint8Array(await jBlob.arrayBuffer()));
+          written++;
+
+          var pct = 16 + Math.round((i / totalFrames) * 68);
+          bar.style.width = pct + '%';
+          progText.textContent = '處理第 ' + (i+1) + ' / ' + totalFrames + ' 幀...';
+          if (i % 5 === 0) await sleep(0);
+        }
+
+        // Encode
+        progText.textContent = '編碼輸出影片...'; bar.style.width = '85%';
+        try { ff.FS('unlink', 'fb_out.mp4'); } catch(e) {}
+        var args = ['-r', String(fps), '-i', 'fb_%06d.jpg'];
+        if (hasAudio) args.push('-i', 'fb_aud.aac');
+        args.push('-c:v','libx264','-preset','ultrafast','-crf','20','-pix_fmt','yuv420p');
+        if (hasAudio) args.push('-c:a','aac','-b:a','128k','-shortest');
+        args.push('-max_muxing_queue_size','1024','fb_out.mp4');
+        await ff.run.apply(ff, args);
+
+        var outData = ff.FS('readFile', 'fb_out.mp4');
+
+        // Cleanup FS
+        try { ff.FS('unlink', inN); } catch(e) {}
+        try { ff.FS('unlink', 'fb_aud.aac'); } catch(e) {}
+        try { ff.FS('unlink', 'fb_out.mp4'); } catch(e) {}
+        for (var j = 0; j < written; j++) { try { ff.FS('unlink','fb_'+String(j).padStart(6,'0')+'.jpg'); } catch(e) {} }
+
+        bar.style.width = '100%'; await sleep(350);
+        card.classList.remove('processing'); card.classList.add('done');
+        var blob = new Blob([outData.buffer], { type:'video/mp4' });
+        var url = URL.createObjectURL(blob);
+        blobMap.set(card, url);
+        dlBtn.onclick = function() { var a=document.createElement('a'); a.href=url; a.download=basename(file.name)+'_blurred.mp4'; a.click(); };
+
+      } catch(err) {
+        console.error(err);
+        card.classList.remove('processing'); card.classList.add('has-file','has-error');
+        bar.style.width = '0%';
+        errEl.textContent = '處理失敗：' + (err.message || '格式不支援或記憶體不足');
+        if (err.message && err.message.indexOf('one command at a time') >= 0) ffReady = false;
+      } finally {
+        currentBar = null;
+        if (currentProgressEl) currentProgressEl.textContent = currentProgressBase;
+        currentProgressEl = null; currentProgressBase = ''; ffRunning = false;
+      }
+    });
+
+    // ── Drop / input / clear / reset ──
+    dropArea.addEventListener('click', function() { input.click(); });
+    dropArea.addEventListener('dragover', function(e) { e.preventDefault(); dropArea.classList.add('drag-over'); });
+    dropArea.addEventListener('dragleave', function() { dropArea.classList.remove('drag-over'); });
+    dropArea.addEventListener('drop', function(e) { e.preventDefault(); dropArea.classList.remove('drag-over'); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
+    input.addEventListener('change', function() { if (input.files[0]) setFile(input.files[0]); });
+    clearBtn.addEventListener('click', reset);
+    resetBtn.addEventListener('click', reset);
+  }
+
   window.showPanel = function(id, btn) {
     document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
     document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
@@ -1567,10 +1901,10 @@ if ('serviceWorker' in navigator) {
     }
   };
 
-  document.querySelectorAll('.tool-card[data-tool]:not([data-tool="merge"]):not([data-tool="watermark"]):not([data-tool="audioMerge"])').forEach(setupCard);
+  document.querySelectorAll('.tool-card[data-tool]:not([data-tool="merge"]):not([data-tool="watermark"]):not([data-tool="faceBlur"])').forEach(setupCard);
   document.querySelectorAll('.tool-card[data-tool="watermark"]').forEach(setupWatermarkCard);
-  document.querySelectorAll('.tool-card[data-tool="merge"]').forEach(function(c){ setupMergeCard(c, 'merge'); });
-  document.querySelectorAll('.tool-card[data-tool="audioMerge"]').forEach(function(c){ setupMergeCard(c, 'audioMerge'); });
+  document.querySelectorAll('.tool-card[data-tool="merge"]').forEach(setupMergeCard);
+  document.querySelectorAll('.tool-card[data-tool="faceBlur"]').forEach(setupFaceBlurCard);
 })();
 </script>
 
