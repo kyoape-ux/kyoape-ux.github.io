@@ -244,6 +244,27 @@ tr:hover td{background:rgba(52,211,153,.03);}
 .tag-chip-rm{cursor:pointer;}
 .tag-chip-rm:hover{opacity:.7;}
 .tag-chips-row{display:flex;flex-wrap:wrap;gap:4px;min-height:28px;align-items:center;padding:6px 8px;background:var(--bg-2);border:1px dashed var(--border);border-radius:6px;}
+/* 標籤管理頁 — 分組卡片 */
+.tg-card{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:14px;}
+.tg-card-hd{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.tg-card-hd b{font-size:14px;font-weight:700;color:var(--txt);}
+.tg-card-hd span.tg-cnt{font-size:12px;color:var(--txt3);font-weight:400;}
+.tg-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.tg-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid;cursor:default;transition:box-shadow .15s;}
+.tg-pill:hover{box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.tg-pill .tg-uses{font-weight:400;font-size:11px;opacity:.7;}
+.tg-pill .tg-x{cursor:pointer;font-size:13px;opacity:.5;margin-left:2px;line-height:1;}
+.tg-pill .tg-x:hover{opacity:1;}
+.tg-pill .tg-edit{cursor:pointer;font-size:11px;opacity:.4;margin-left:1px;}
+.tg-pill .tg-edit:hover{opacity:1;}
+/* 新增列 */
+.tg-add-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:16px 0;}
+.tg-add-row input,.tg-add-row select{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg-1);color:var(--txt);outline:none;}
+.tg-add-row input:focus,.tg-add-row select:focus{border-color:var(--accent);}
+.tg-add-row input{flex:1;min-width:160px;max-width:280px;}
+.tg-add-row select{min-width:140px;}
+.tg-add-btn{padding:8px 20px;border:none;border-radius:8px;font-size:13px;font-weight:700;background:var(--accent);color:#000;cursor:pointer;white-space:nowrap;}
+.tg-add-btn:hover{filter:brightness(1.1);}
 .role-member-chip{background:rgba(96,165,250,.12);color:var(--blue);}
 .role-leader-chip{background:rgba(52,211,153,.12);color:var(--accent);}
 /* Permission-based UI */
@@ -856,30 +877,27 @@ tr:hover td{background:rgba(52,211,153,.03);}
     <div class="page" id="page-tags">
       <div class="page-header">
         <div class="page-header-left">
-          <h1>標籤管理</h1>
-          <p>建立與維護內容屬性標籤，可套用於影片與 IG 貼文（例如：肺癌、LDCT、疫苗宣導...）</p>
+          <h1>共用標籤建立</h1>
+          <p>此處建立的標籤，可在影片 / IG 貼文中套用，用於跨傳達管道統計。</p>
+        </div>
+        <div class="page-header-right" style="display:flex;gap:8px;">
+          <button class="btn btn-secondary write-only" onclick="seedDefaultTags()" title="載入預設科別、中心、疾病等標籤">⚡ 載入預設標籤組</button>
         </div>
       </div>
       <div class="page-body">
-        <div class="cfg-card">
-          <h3>✨ 新增標籤</h3>
-          <div class="form-grid" style="margin-top:12px;">
-            <div class="form-group"><label>標籤名稱 *</label><input type="text" id="new-tag-name" placeholder="例：肺癌、LDCT、疫苗宣導"></div>
-            <div class="form-group"><label>分類</label>
-              <select id="new-tag-group"><option value="未分類">未分類</option></select>
-            </div>
-            <div class="form-group full"><label>說明（選填）</label><input type="text" id="new-tag-desc" placeholder="此標籤的用途說明"></div>
-          </div>
-          <div class="form-actions" style="margin-top:12px;">
-            <button class="btn btn-primary write-only" onclick="submitNewTag()">新增標籤</button>
-            <button class="btn btn-secondary write-only" onclick="seedDefaultTags()" title="建立一組依醫院內容彙整出的常用標籤，不會覆蓋既有標籤">⚡ 載入預設標籤組</button>
+        <!-- 新增標籤列 -->
+        <div class="tg-card" style="margin-bottom:20px;">
+          <div style="font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:10px;">＋ 新增共用標籤</div>
+          <p style="font-size:11px;color:var(--txt3);margin-bottom:12px;">此處建立的標籤，可在影片 / IG 貼文任一列表中套用，用於跨傳達管道統計。</p>
+          <div class="tg-add-row">
+            <input type="text" id="new-tag-name" placeholder="e.g. LDCT、達文西、健">
+            <select id="new-tag-group"><option value="未分類">未分類</option></select>
+            <input type="text" id="new-tag-desc" placeholder="說明（選填）" style="max-width:220px;">
+            <button class="tg-add-btn write-only" onclick="submitNewTag()">＋ 新增</button>
           </div>
         </div>
-        <div class="cfg-card" style="margin-top:20px;">
-          <h3>📋 所有標籤</h3>
-          <p style="font-size:12px;color:var(--txt3);margin-top:6px;">點「產出報告」可立即依此標籤產生推廣數據報告。</p>
-          <div id="tags-list" style="margin-top:16px;"></div>
-        </div>
+        <!-- 標籤列表 -->
+        <div id="tags-list"></div>
       </div>
     </div>
 
@@ -1846,72 +1864,57 @@ function seedDefaultTags(){
 // ============================================================
 // 標籤管理頁面
 // ============================================================
-let tagGroupCollapsed={};
-function toggleTagGroup(g){tagGroupCollapsed[g]=!tagGroupCollapsed[g];renderTagsPage();}
+// 分組顏色對應
+const TAG_GROUP_COLORS={
+  '主題':'#2563EB','衛教與生活':'#0891B2',
+  '疾病｜心臟與血管':'#DC2626','疾病｜神經系統':'#7C3AED','疾病｜胸腔與呼吸':'#0D9488',
+  '疾病｜肝膽腸胃':'#B45309','疾病｜腎臟與泌尿':'#4338CA','疾病｜內分泌與代謝':'#C026D3',
+  '疾病｜癌症':'#BE123C','疾病｜骨科與復健':'#15803D','疾病｜眼科':'#1D4ED8',
+  '疾病｜耳鼻喉':'#9333EA','疾病｜皮膚科':'#EA580C','疾病｜婦產科':'#DB2777',
+  '疾病｜兒科':'#059669','疾病｜風濕免疫':'#6D28D9','疾病｜身心科':'#7C3AED',
+  '疾病｜感染科':'#B91C1C','疾病｜牙科':'#0369A1','疾病｜其他':'#64748B',
+  '推廣活動':'#D97706','品牌':'#4F46E5','族群':'#0891B2',
+  '科別':'#15803D','特色中心':'#0E7490','未分類':'#64748B'
+};
+function getGroupColor(g){return TAG_GROUP_COLORS[g]||'#64748B';}
 function renderTagsPage(){
   const box=document.getElementById('tags-list');if(!box)return;
-  if(TAGS.length===0){box.innerHTML='<p style="color:var(--txt3);font-size:12px;padding:20px 0;text-align:center;">尚未建立任何標籤</p>';return;}
+  if(TAGS.length===0){box.innerHTML='<p style="color:var(--txt3);font-size:13px;padding:40px 0;text-align:center;">尚未建立任何標籤<br><span style="font-size:11px;">點擊上方「⚡ 載入預設標籤組」快速建立</span></p>';return;}
   // Group tags
   const grouped={};
   TAGS.forEach(t=>{const g=t.group||'未分類';if(!grouped[g])grouped[g]=[];grouped[g].push(t);});
-  // Sort groups by TAG_GROUPS order
   const sortedGroups=Object.keys(grouped).sort((a,b)=>{const ai=TAG_GROUPS.indexOf(a),bi=TAG_GROUPS.indexOf(b);return(ai<0?99:ai)-(bi<0?99:bi);});
   // Stats cache
-  const vMap={},iMap={};
-  TAGS.forEach(t=>{vMap[t.name]=DATA.filter(d=>!d.deleted_at&&(d.tags||[]).includes(t.name)).length;iMap[t.name]=IG_DATA.filter(d=>!d.deleted_at&&(d.tags||[]).includes(t.name)).length;});
-  // Filter
-  const fv=document.getElementById('tag-group-filter');
-  const filterG=fv?fv.value:'';
-  const displayGroups=filterG?sortedGroups.filter(g=>g===filterG):sortedGroups;
-  // Build filter dropdown
-  const filterHtml=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-    <span style="font-size:12px;color:var(--txt3);">篩選分類：</span>
-    <select id="tag-group-filter" onchange="renderTagsPage()" style="padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-2);color:var(--txt);">
-      <option value="">全部分類（${TAGS.length} 個標籤）</option>
-      ${sortedGroups.map(g=>`<option value="${esc(g)}"${g===filterG?' selected':''}>${getGroupIcon(g)} ${esc(g)}（${grouped[g].length}）</option>`).join('')}
-    </select>
-    <span style="font-size:11px;color:var(--txt3);">共 ${sortedGroups.length} 個分類</span>
-  </div>`;
-  // Render groups
-  let html=filterHtml;
-  displayGroups.forEach(g=>{
+  const useMap={};
+  TAGS.forEach(t=>{
+    const vc=DATA.filter(d=>!d.deleted_at&&(d.tags||[]).includes(t.name)).length;
+    const ic=IG_DATA.filter(d=>!d.deleted_at&&(d.tags||[]).includes(t.name)).length;
+    useMap[t.name]=vc+ic;
+  });
+  let html='';
+  sortedGroups.forEach(g=>{
     const tags=grouped[g];
-    const collapsed=!!tagGroupCollapsed[g];
-    const gTotal=tags.length;
-    const gUsedV=tags.reduce((s,t)=>s+vMap[t.name],0);
-    const gUsedI=tags.reduce((s,t)=>s+iMap[t.name],0);
-    html+=`<div style="margin-bottom:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
-      <div onclick="toggleTagGroup('${esc(g).replace(/'/g,"\\'")}')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg-2);cursor:pointer;user-select:none;border-bottom:${collapsed?'none':'1px solid var(--border)'};">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:16px;">${getGroupIcon(g)}</span>
-          <span style="font-size:13px;font-weight:700;color:var(--txt);">${esc(g)}</span>
-          <span style="font-size:11px;color:var(--txt3);background:var(--bg-1);padding:2px 8px;border-radius:10px;">${gTotal}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <span style="font-size:11px;color:var(--txt3);">影片 ${gUsedV} · IG ${gUsedI}</span>
-          <span style="color:var(--txt3);font-size:12px;transition:transform .2s;transform:rotate(${collapsed?'-90':'0'}deg);">▼</span>
-        </div>
-      </div>`;
-    if(!collapsed){
-      html+=`<div style="display:flex;flex-direction:column;gap:1px;background:var(--border);">`;
-      tags.forEach(t=>{
-        const vc=vMap[t.name],ic=iMap[t.name];
-        html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--bg-1);gap:10px;">
-          <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;">
-            <span class="tag-chip" style="background:${t.color}22;color:${t.color};border:1px solid ${t.color}44;font-weight:600;font-size:11px;">${esc(t.name)}</span>
-            <span style="font-size:11px;color:var(--txt3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(t.desc||'')}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-            <span style="font-size:10px;color:var(--txt3);white-space:nowrap;">${vc||ic?`影${vc} · IG${ic}`:''}</span>
-            <button class="btn btn-secondary btn-sm write-only" onclick="promptEditTag('${t.id}')" style="padding:3px 8px;font-size:10px;">編輯</button>
-            <button class="btn btn-secondary btn-sm" onclick="runPromotionReport('${esc(t.name).replace(/'/g,'\\\'')}')">報告</button>
-            <button class="btn btn-danger btn-sm leader-only" onclick="deleteTag('${t.id}')" style="padding:3px 8px;font-size:10px;">刪除</button>
-          </div>
-        </div>`;
-      });
-      html+=`</div>`;
-    }
-    html+=`</div>`;
+    const gc=getGroupColor(g);
+    const displayName=g.replace('疾病｜','');
+    const isDisease=g.startsWith('疾病');
+    const groupLabel=isDisease?displayName:g;
+    html+=`<div class="tg-card">
+      <div class="tg-card-hd">
+        <b style="color:${gc};">${esc(groupLabel)}</b>
+        <span class="tg-cnt">（${tags.length}）</span>
+      </div>
+      <div class="tg-grid">`;
+    tags.forEach(t=>{
+      const uses=useMap[t.name]||0;
+      const safeName=esc(t.name).replace(/'/g,"\\'");
+      html+=`<span class="tg-pill" style="color:${gc};border-color:${gc}40;background:${gc}0D;" title="${esc(t.desc||t.name)}">
+        <span class="tg-edit write-only" onclick="promptEditTag('${t.id}')" title="編輯">✎</span>
+        <span>${esc(t.name)}</span>
+        <span class="tg-uses">${uses}次</span>
+        <span class="tg-x write-only" onclick="deleteTag('${t.id}')" title="刪除">✕</span>
+      </span>`;
+    });
+    html+=`</div></div>`;
   });
   box.innerHTML=html;
 }
