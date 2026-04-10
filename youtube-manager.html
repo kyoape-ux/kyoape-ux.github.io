@@ -438,6 +438,13 @@ tr:hover td{background:rgba(52,211,153,.03);}
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             使用指南
           </button>
+          <span style="width:1px;height:20px;background:var(--border);margin:0 2px;"></span>
+          <a href="https://www.youtube.com/@KuangTienGenHosp" target="_blank" class="hdr-btn" style="color:var(--yt);border-color:rgba(255,68,68,.25);text-decoration:none;" title="光田綜合醫院 YouTube 頻道">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/ktgh_health/" target="_blank" class="hdr-btn" style="color:var(--ig);border-color:rgba(244,114,182,.25);text-decoration:none;" title="光田綜合醫院 Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+          </a>
         </div>
       </div>
 
@@ -576,7 +583,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
         <div class="form-group"><label>官網頁面瀏覽量（GA4 Pageviews）</label><input type="number" id="f-web_pageviews" placeholder="0" min="0"></div>
       </div>
 
-      <div class="form-group full" style="margin-top:14px;"><label>🏷️ 屬性標籤（可多選，例如：肺癌、LDCT、疫苗宣導）</label>
+      <div class="form-group full" style="margin-top:14px;"><label><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>屬性標籤（可多選，例如：肺癌、LDCT、疫苗宣導）</label>
         <div id="f-tags"></div>
       </div>
       <div class="form-group full" style="margin-top:14px;"><label>備註</label><textarea id="f-note" placeholder="備註內容..."></textarea></div>
@@ -652,7 +659,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
           <div class="form-group full"><label>對應影片（可選，連動後此貼文觀看數將自動寫回該影片的 IG 觀看欄）</label>
             <select id="ig-videoId"><option value="">— 不對應 —</option></select>
           </div>
-          <div class="form-group full"><label>🏷️ 屬性標籤（可多選）</label>
+          <div class="form-group full"><label><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>屬性標籤（可多選）</label>
             <div id="ig-tags"></div>
           </div>
         </div>
@@ -670,7 +677,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
             <select id="ig-filter-month" onchange="renderIgList()" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-2);color:var(--txt);"><option value="">全部月份</option></select>
             <select id="ig-filter-type" onchange="renderIgList()" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-2);color:var(--txt);"><option value="">全部類型</option><option value="1">貼文</option><option value="2">測驗</option><option value="3">影片</option></select>
             <button class="btn btn-secondary btn-sm" onclick="exportIgCSV()">匯出 CSV</button>
-            <button id="ig-upload-btn" class="btn btn-sm write-only" onclick="bulkUploadIgToSheets()" style="background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25);" title="將本機所有 IG 貼文上傳到 Google Sheets">⬆ 上傳本機→Sheets</button>
+            <button id="ig-upload-btn" class="btn btn-sm write-only" onclick="bulkUploadIgToSheets()" style="background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25);" title="將本機所有 IG 貼文上傳到 Google Sheets"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><polyline points="17,11 12,6 7,11"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M5 21h14"/></svg>上傳本機→Sheets</button>
           </div>
         </div>
         <div class="tbl-wrap">
@@ -842,7 +849,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
       </div>
       <div class="page-body">
         <div class="cfg-card">
-          <h3>📥 下載 JSON 備份</h3>
+          <h3><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>下載 JSON 備份</h3>
           <p style="font-size:12px;color:var(--txt3);margin-top:6px;">將目前所有影片、IG 貼文、設定與全部快照匯出為一個 JSON 檔案，存到本機作為離線備份。</p>
           <div class="form-actions" style="margin-top:12px;">
             <button class="btn btn-primary" onclick="downloadBackupJson()">下載備份檔（JSON）</button>
@@ -853,16 +860,16 @@ tr:hover td{background:rgba(52,211,153,.03);}
         </div>
 
         <div class="cfg-card" style="margin-top:20px;">
-          <h3>📸 本機快照（最多 5 份）</h3>
+          <h3><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>本機快照（最多 5 份）</h3>
           <p style="font-size:12px;color:var(--txt3);margin-top:6px;">每次同步、推送、匯入、刪除前系統會自動建立快照。也可以手動建立。</p>
           <div class="form-actions" style="margin-top:12px;">
-            <button class="btn btn-secondary" onclick="createSnapshot('手動建立')">📸 建立快照（現況）</button>
+            <button class="btn btn-secondary" onclick="createSnapshot('手動建立')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>建立快照（現況）</button>
           </div>
           <div id="snapshot-list" style="margin-top:16px;"></div>
         </div>
 
         <div class="cfg-card" style="margin-top:20px;" id="trash-section-anchor">
-          <h3>🗑️ 回收筒</h3>
+          <h3><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>回收筒</h3>
           <p style="font-size:12px;color:var(--txt3);margin-top:6px;">被「刪除」的影片與 IG 貼文會先進入回收筒（軟刪除），可以還原，或由組長永久刪除。</p>
           <div id="trash-tabs" style="display:flex;gap:2px;background:var(--bg-2);border-radius:8px;padding:3px;border:1px solid var(--border);margin-top:12px;width:fit-content;">
             <button onclick="setTrashTab('video')" id="trash-tab-video" class="trash-tab-btn">影片</button>
@@ -881,19 +888,19 @@ tr:hover td{background:rgba(52,211,153,.03);}
           <p>此處建立的標籤，可在影片 / IG 貼文中套用，用於跨傳達管道統計。</p>
         </div>
         <div class="page-header-right" style="display:flex;gap:8px;">
-          <button class="btn btn-secondary write-only" onclick="seedDefaultTags()" title="載入預設科別、中心、疾病等標籤">⚡ 載入預設標籤組</button>
+          <button class="btn btn-secondary write-only" onclick="seedDefaultTags()" title="載入預設科別、中心、疾病等標籤"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>載入預設標籤組</button>
         </div>
       </div>
       <div class="page-body">
         <!-- 新增標籤列 -->
         <div class="tg-card" style="margin-bottom:20px;">
-          <div style="font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:10px;">＋ 新增共用標籤</div>
+          <div style="font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:10px;display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>新增共用標籤</div>
           <p style="font-size:11px;color:var(--txt3);margin-bottom:12px;">此處建立的標籤，可在影片 / IG 貼文任一列表中套用，用於跨傳達管道統計。</p>
           <div class="tg-add-row">
             <input type="text" id="new-tag-name" placeholder="e.g. LDCT、達文西、健">
             <select id="new-tag-group"><option value="未分類">未分類</option></select>
             <input type="text" id="new-tag-desc" placeholder="說明（選填）" style="max-width:220px;">
-            <button class="tg-add-btn write-only" onclick="submitNewTag()">＋ 新增</button>
+            <button class="tg-add-btn write-only" onclick="submitNewTag()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="vertical-align:middle;margin-right:2px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>新增</button>
           </div>
         </div>
         <!-- 標籤列表 -->
@@ -911,7 +918,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
       </div>
       <div class="page-body">
         <div class="cfg-card">
-          <h3>🎯 選擇要彙整的標籤</h3>
+          <h3><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>選擇要彙整的標籤</h3>
           <p style="font-size:12px;color:var(--txt3);margin-top:6px;">系統會自動撈出所有被標記此標籤的影片與 IG 貼文，計算 YT / FB / IG / 官網等各管道的總曝光。</p>
           <div class="form-grid" style="margin-top:14px;">
             <div class="form-group full"><label>標籤</label>
@@ -924,7 +931,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
           </div>
         </div>
         <div class="cfg-card" style="margin-top:20px;">
-          <h3>📊 快速預覽</h3>
+          <h3><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>快速預覽</h3>
           <div id="promo-preview" style="margin-top:12px;color:var(--txt3);font-size:12px;">選擇標籤後，此處會顯示該標籤目前已累積的成效。</div>
         </div>
       </div>
@@ -1194,7 +1201,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
       <div class="form-group full"><label>對應影片（可選）</label>
         <select id="ie-videoId"><option value="">— 不對應 —</option></select>
       </div>
-      <div class="form-group full"><label>🏷️ 屬性標籤（可多選）</label>
+      <div class="form-group full"><label><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>屬性標籤（可多選）</label>
         <div id="ie-tags"></div>
       </div>
     </div>
@@ -1264,7 +1271,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
       <div class="form-group"><label>YT 外部嵌入觀看</label><input type="number" id="e-embed_views" min="0"></div>
       <div class="form-group"><label>官網 Pageviews</label><input type="number" id="e-web_pageviews" min="0"></div>
     </div>
-    <div class="form-group full" style="margin-top:14px;"><label>🏷️ 屬性標籤（可多選）</label>
+    <div class="form-group full" style="margin-top:14px;"><label><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>屬性標籤（可多選）</label>
       <div id="e-tags"></div>
     </div>
     <div class="form-group full" style="margin-top:12px;"><label>備註</label><textarea id="e-note"></textarea></div>
@@ -1298,9 +1305,9 @@ function getVideoStatus(d){
   return'locked';
 }
 const STATUS_CFG={
-  collecting:{label:'統計中',color:'var(--amber)',bg:'rgba(251,191,36,.12)',icon:'◐'},
-  pending:{label:'待抓取',color:'var(--red)',bg:'rgba(248,113,113,.12)',icon:'◉'},
-  locked:{label:'已定案',color:'var(--accent)',bg:'rgba(52,211,153,.12)',icon:'◎'},
+  collecting:{label:'統計中',color:'var(--amber)',bg:'rgba(251,191,36,.12)',icon:'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20" fill="currentColor" stroke="none"/></svg>'},
+  pending:{label:'待抓取',color:'var(--red)',bg:'rgba(248,113,113,.12)',icon:'<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4" fill="var(--bg-1)"/></svg>'},
+  locked:{label:'已定案',color:'var(--accent)',bg:'rgba(52,211,153,.12)',icon:'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>'},
   unknown:{label:'—',color:'var(--txt3)',bg:'transparent',icon:''}
 };
 function getQuarter(date){return Math.floor(new Date(date).getMonth()/3)+1;}
@@ -1375,7 +1382,7 @@ function createSnapshot(reason,silent){
   arr.unshift(snap);
   while(arr.length>SNAPSHOT_MAX)arr.pop();
   saveSnapshots(arr);
-  if(!silent){showSyncBadge('📸 已建立快照');renderBackupPage();}
+  if(!silent){showSyncBadge('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg> 已建立快照');renderBackupPage();}
 }
 function restoreSnapshot(id){
   if(!canDelete()){alert('僅組長可還原快照');return;}
@@ -1519,8 +1526,18 @@ const TAGS_KEY='kt_yt_tags';
 let TAGS=[]; // [{id, name, color, desc, group}]
 const TAG_COLORS=['#34D399','#60A5FA','#FBBF24','#F87171','#A78BFA','#2DD4BF','#F472B6','#F59E0B','#818CF8','#14B8A6'];
 const TAG_GROUPS=['主題','衛教與生活','疾病｜心臟與血管','疾病｜神經系統','疾病｜胸腔與呼吸','疾病｜肝膽腸胃','疾病｜腎臟與泌尿','疾病｜內分泌與代謝','疾病｜癌症','疾病｜骨科與復健','疾病｜眼科','疾病｜耳鼻喉','疾病｜皮膚科','疾病｜婦產科','疾病｜兒科','疾病｜風濕免疫','疾病｜身心科','疾病｜感染科','疾病｜牙科','疾病｜其他','推廣活動','品牌','族群','科別','特色中心','未分類'];
-const TAG_GROUP_ICONS={'主題':'🏥','衛教與生活':'💡','推廣活動':'📣','品牌':'🏢','族群':'👥','科別':'🩺','特色中心':'⭐','未分類':'🏷️'};
-function getGroupIcon(g){if(TAG_GROUP_ICONS[g])return TAG_GROUP_ICONS[g];if(g&&g.startsWith('疾病'))return'🔬';return'🏷️';}
+const _si=(d,c)=>`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${c||'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;">${d}</svg>`;
+const TAG_GROUP_ICONS={
+  '主題':_si('<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/>'),
+  '衛教與生活':_si('<line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>'),
+  '推廣活動':_si('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'),
+  '品牌':_si('<rect x="1" y="3" width="15" height="13"/><polygon points="16,8 20,5 20,16 16,13 16,8"/>'),
+  '族群':_si('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
+  '科別':_si('<path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/>'),
+  '特色中心':_si('<polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>'),
+  '未分類':_si('<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>')
+};
+function getGroupIcon(g){if(TAG_GROUP_ICONS[g])return TAG_GROUP_ICONS[g];if(g&&g.startsWith('疾病'))return _si('<circle cx="12" cy="12" r="10"/><line x1="14.31" y1="8" x2="20.05" y2="17.94"/><line x1="9.69" y1="8" x2="21.17" y2="8"/><line x1="7.38" y1="12" x2="13.12" y2="2.06"/><line x1="9.69" y1="16" x2="3.95" y2="6.06"/><line x1="14.31" y1="16" x2="2.83" y2="16"/><line x1="16.62" y1="12" x2="10.88" y2="21.94"/>');return TAG_GROUP_ICONS['未分類'];}
 function loadTags(){
   try{TAGS=JSON.parse(localStorage.getItem(TAGS_KEY)||'[]');}catch(e){TAGS=[];}
   if(!Array.isArray(TAGS))TAGS=[];
@@ -1580,14 +1597,14 @@ function initTagInput(containerId,initialTags){
   box.dataset.tags=JSON.stringify(selected);
   const render=()=>{
     const cur=JSON.parse(box.dataset.tags||'[]');
-    const chips=cur.map(n=>{const c=getTagColor(n);return `<span class="tag-chip tag-chip-rm" style="background:${c}22;color:${c};border:1px solid ${c}44;" onclick="removeTagFromInput('${containerId}','${esc(n).replace(/'/g,'\\\'')}')">${esc(n)} ✕</span>`;}).join(' ');
+    const chips=cur.map(n=>{const c=getTagColor(n);return `<span class="tag-chip tag-chip-rm" style="background:${c}22;color:${c};border:1px solid ${c}44;" onclick="removeTagFromInput('${containerId}','${esc(n).replace(/'/g,'\\\'')}')">${esc(n)} <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="vertical-align:middle;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>`;}).join(' ');
     const avail=TAGS.filter(t=>!cur.includes(t.name));
     const groups=[...new Set(avail.map(t=>t.group||'未分類'))];
     groups.sort((a,b)=>{const ai=TAG_GROUPS.indexOf(a),bi=TAG_GROUPS.indexOf(b);return(ai<0?99:ai)-(bi<0?99:bi);});
     const options=groups.map(g=>{const items=avail.filter(t=>(t.group||'未分類')===g);return `<optgroup label="${esc(g)}">${items.map(t=>`<option value="${esc(t.name)}">${esc(t.name)}</option>`).join('')}</optgroup>`;}).join('');
     box.innerHTML=`<div class="tag-chips-row">${chips||'<span style="color:var(--txt3);font-size:11px;">尚未選擇標籤</span>'}</div>
       <div style="display:flex;gap:6px;margin-top:6px;">
-        <select onchange="addTagToInput('${containerId}',this.value);this.value=''" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-2);color:var(--txt);"><option value="">＋ 從現有標籤選擇</option>${options}</select>
+        <select onchange="addTagToInput('${containerId}',this.value);this.value=''" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-2);color:var(--txt);"><option value="">+ 從現有標籤選擇</option>${options}</select>
         <input type="text" placeholder="或輸入新標籤 Enter 新增" onkeydown="if(event.key==='Enter'){event.preventDefault();addNewTagToInput('${containerId}',this.value);this.value='';}" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-2);color:var(--txt);">
       </div>`;
   };
@@ -1879,7 +1896,7 @@ const TAG_GROUP_COLORS={
 function getGroupColor(g){return TAG_GROUP_COLORS[g]||'#64748B';}
 function renderTagsPage(){
   const box=document.getElementById('tags-list');if(!box)return;
-  if(TAGS.length===0){box.innerHTML='<p style="color:var(--txt3);font-size:13px;padding:40px 0;text-align:center;">尚未建立任何標籤<br><span style="font-size:11px;">點擊上方「⚡ 載入預設標籤組」快速建立</span></p>';return;}
+  if(TAGS.length===0){box.innerHTML='<p style="color:var(--txt3);font-size:13px;padding:40px 0;text-align:center;">尚未建立任何標籤<br><span style="font-size:11px;">點擊上方「<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>載入預設標籤組」快速建立</span></p>';return;}
   // Group tags
   const grouped={};
   TAGS.forEach(t=>{const g=t.group||'未分類';if(!grouped[g])grouped[g]=[];grouped[g].push(t);});
@@ -1908,10 +1925,10 @@ function renderTagsPage(){
       const uses=useMap[t.name]||0;
       const safeName=esc(t.name).replace(/'/g,"\\'");
       html+=`<span class="tg-pill" style="color:${gc};border-color:${gc}40;background:${gc}0D;" title="${esc(t.desc||t.name)}">
-        <span class="tg-edit write-only" onclick="promptEditTag('${t.id}')" title="編輯">✎</span>
+        <span class="tg-edit write-only" onclick="promptEditTag('${t.id}')" title="編輯"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>
         <span>${esc(t.name)}</span>
         <span class="tg-uses">${uses}次</span>
-        <span class="tg-x write-only" onclick="deleteTag('${t.id}')" title="刪除">✕</span>
+        <span class="tg-x write-only" onclick="deleteTag('${t.id}')" title="刪除"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
       </span>`;
     });
     html+=`</div></div>`;
@@ -2037,7 +2054,7 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
 .print-btn{position:fixed;bottom:24px;right:24px;background:${color};color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px ${color}4D;}
 @media print{.print-btn{display:none;}@page{size:A4;margin:15mm;}}
 </style></head><body>
-<button class="print-btn" onclick="window.print()">🖨️ 列印 / 存成 PDF</button>
+<button class="print-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>列印 / 存成 PDF</button>
 <div class="report">
   <div class="hd">
     <div class="hd-l">
@@ -2051,14 +2068,14 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
   <div class="summary">
     <b>內容彙整：</b>共 ${videos.length} 部影片、${igPq.length} 則 IG 貼文/測驗、${igRl.length} 則 Reels，透過多平台觸及累計 <b style="color:${color};">${grandTotal.toLocaleString()}</b> 次曝光。
   </div>
-  <div class="sec-title">📊 整體成效</div>
+  <div class="sec-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>整體成效</div>
   <div class="kpi-row">
     <div class="kpi"><div class="val">${videos.length}</div><div class="lbl">影片數量</div></div>
     <div class="kpi"><div class="val">${(igPq.length+igRl.length)}</div><div class="lbl">IG 貼文數</div></div>
     <div class="kpi"><div class="val">${vTotal.toLocaleString()}</div><div class="lbl">影片全平台觀看</div></div>
     <div class="kpi"><div class="val">${grandTotal.toLocaleString()}</div><div class="lbl">綜合曝光</div></div>
   </div>
-  <div class="sec-title">📡 各傳達管道</div>
+  <div class="sec-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>各傳達管道</div>
   <div class="plat-row">
     <div class="plat plat-yt"><div class="val">${vYt.toLocaleString()}</div><div class="lbl">YouTube 觀看</div></div>
     <div class="plat plat-fb"><div class="val">${vFb.toLocaleString()}</div><div class="lbl">Facebook 觀看</div></div>
@@ -2068,15 +2085,15 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
     <div class="plat" style="border-color:rgba(52,211,153,.35);"><div class="val" style="color:#0F6E56;">${vEmbed.toLocaleString()}</div><div class="lbl">官網嵌入觀看</div></div>
     <div class="plat" style="border-color:rgba(52,211,153,.35);"><div class="val" style="color:#0F6E56;">${vWebPV.toLocaleString()}</div><div class="lbl">官網頁面瀏覽</div></div>
   </div>`:''}
-  <div class="sec-title">🎬 符合標籤的影片（${videos.length} 部）</div>
+  <div class="sec-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/><line x1="17" y1="17" x2="22" y2="17"/></svg>符合標籤的影片（${videos.length} 部）</div>
   <table><thead><tr><th>#</th><th>標題</th><th>日期</th><th>類別</th><th>YT</th><th>FB</th><th>IG</th><th>合計</th></tr></thead>
   <tbody>${vRows}</tbody></table>
 
-  <div class="sec-title">📸 IG 貼文 / 測驗（${igPq.length} 則）</div>
+  <div class="sec-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg> IG 貼文 / 測驗（${igPq.length} 則）</div>
   <table><thead><tr><th>#</th><th>標題</th><th>日期</th><th>觀看</th><th>互動</th><th>分享</th><th>儲存</th></tr></thead>
   <tbody>${igPqRows}</tbody></table>
 
-  <div class="sec-title">🎥 IG 影片 Reels（${igRl.length} 則）</div>
+  <div class="sec-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><polygon points="23,7 16,12 23,17 23,7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> IG 影片 Reels（${igRl.length} 則）</div>
   <table><thead><tr><th>#</th><th>標題</th><th>日期</th><th>觀看</th><th>觸及</th><th>互動</th><th>儲存</th></tr></thead>
   <tbody>${igRlRows}</tbody></table>
 
@@ -2178,7 +2195,7 @@ function renderDashboard(){
   // Pending alert
   const pendingList=_AV.filter(d=>getVideoStatus(d)==='pending');
   const pa=document.getElementById('pending-alert');
-  if(pendingList.length>0){pa.style.display='block';pa.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span style="font-size:18px;color:var(--red);">◉</span><div><b style="color:var(--red);">${pendingList.length} 部影片已滿 1 個月，請更新數據</b><div style="font-size:11px;color:var(--txt3);margin-top:2px;">點擊影片名稱可直接編輯並一鍵取得最新 YT 數據</div></div></div>`+pendingList.map(d=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(248,113,113,.1);font-size:12px;"><span style="color:var(--txt3);">${(d.date||'').substring(0,10)}</span><a href="#" onclick="openEdit('${d.id}');return false;" style="color:var(--red);font-weight:500;">${esc(d.title)}</a></div>`).join('');}else{pa.style.display='none';}
+  if(pendingList.length>0){pa.style.display='block';pa.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span style="color:var(--red);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4" fill="var(--bg-1)"/></svg></span><div><b style="color:var(--red);">${pendingList.length} 部影片已滿 1 個月，請更新數據</b><div style="font-size:11px;color:var(--txt3);margin-top:2px;">點擊影片名稱可直接編輯並一鍵取得最新 YT 數據</div></div></div>`+pendingList.map(d=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(248,113,113,.1);font-size:12px;"><span style="color:var(--txt3);">${(d.date||'').substring(0,10)}</span><a href="#" onclick="openEdit('${d.id}');return false;" style="color:var(--red);font-weight:500;">${esc(d.title)}</a></div>`).join('');}else{pa.style.display='none';}
 
   document.getElementById('kpi-cards').innerHTML=`
     <div class="kpi-card"><div class="kpi-label">${pLabel}度全平台觀看</div><div class="kpi-val">${tv.toLocaleString()}</div><div class="kpi-sub">${pLabel}目標 ${gView.toLocaleString()}（${vp}%）</div><div class="kpi-bar"><div class="kpi-bar-fill ${vp>=100?'kpi-ok':vp>=60?'kpi-warn':'kpi-bad'}" style="width:${vp}%"></div></div><div class="platform-breakdown"><span class="plat-tag plat-yt">YT ${ytv.toLocaleString()}</span><span class="plat-tag plat-fb">FB ${fbv.toLocaleString()}</span><span class="plat-tag plat-ig">IG ${igv.toLocaleString()}</span></div></div>
@@ -2583,7 +2600,7 @@ async function bulkUploadIgToSheets(){
     if(r&&r.success)ok++;else fail++;
     btn.textContent=`上傳中 ${ok+fail}/${IG_DATA.length}`;
   }
-  btn.disabled=false;btn.textContent='⬆ 上傳本機→Sheets';
+  btn.disabled=false;btn.textContent='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><polyline points="17,11 12,6 7,11"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M5 21h14"/></svg>上傳本機→Sheets';
   showSyncBadge(`✅ IG 上傳完成：${ok} 筆成功${fail?'，'+fail+' 筆失敗':''}`);
   if(ok>0){setTimeout(()=>syncIgFromSheets().then(ok2=>{if(ok2)renderIgAll();else renderIgAll();}),1500);}else{renderIgAll();}
 }
@@ -3009,7 +3026,7 @@ tr:nth-child(even) td{background:#FAFAFA;}
 .print-btn{position:fixed;bottom:24px;right:24px;background:#0F6E56;color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(15,110,86,.3);}
 @media print{.print-btn{display:none;}@page{size:A4;margin:15mm;}}
 </style></head><body>
-<button class="print-btn" onclick="window.print()">🖨️ 列印 / 存成 PDF</button>
+<button class="print-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>列印 / 存成 PDF</button>
 <div class="report">
   <div class="hd">
     <div class="hd-l"><h1>${moLabel} 影片發布成效報告</h1><p>光田綜合醫院 視覺多媒體設計組</p></div>
@@ -3026,7 +3043,7 @@ tr:nth-child(even) td{background:#FAFAFA;}
     <div class="plat plat-fb"><div class="val">${fbv.toLocaleString()}</div><div class="lbl">Facebook</div></div>
     <div class="plat plat-ig"><div class="val">${igv.toLocaleString()}</div><div class="lbl">Instagram</div></div>
   </div>
-  ${showVideo&&(embedV>0||webPV>0)?`<div class="sec-title" style="border-color:#0F6E56;color:#0F6E56;">🌐 官網曝光（內部歸因 · 不計入 KPI 加總）</div>
+  ${showVideo&&(embedV>0||webPV>0)?`<div class="sec-title" style="border-color:#0F6E56;color:#0F6E56;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> 官網曝光（內部歸因 · 不計入 KPI 加總）</div>
   <div class="plat-row" style="grid-template-columns:repeat(3,1fr);">
     <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${embedV.toLocaleString()}</div><div class="lbl">YT 外部嵌入觀看</div></div>
     <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${webPV.toLocaleString()}</div><div class="lbl">官網頁面瀏覽量（PV）</div></div>
@@ -3036,7 +3053,7 @@ tr:nth-child(even) td{background:#FAFAFA;}
     <div class="prog"><div class="prog-lbl"><span>觀看目標（${vGoal.toLocaleString()} 次）</span><span>${tv.toLocaleString()} / ${vGoal.toLocaleString()}</span></div><div class="prog-bg"><div class="prog-fill" style="width:${Math.min(100,vRate)}%"></div></div></div>
     <div class="prog"><div class="prog-lbl"><span>上架目標（${cGoal} 部）</span><span>${cnt} / ${cGoal}</span></div><div class="prog-bg"><div class="prog-fill" style="width:${Math.min(100,cRate)}%"></div></div></div>
   </div>
-  ${showVideo?`<div class="sec-title">🏆 本月觀看次數 TOP 5</div>
+  ${showVideo?`<div class="sec-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> 本月觀看次數 TOP 5</div>
   <table><thead><tr><th style="width:40px;">排名</th><th>影片標題</th><th>類型</th><th>類別</th><th>YT 觀看</th><th>FB 觀看</th><th>IG 觀看</th><th>全平台合計</th></tr></thead>
   <tbody>${top5rows}</tbody></table>`:''}
   ${showVideo?`<div class="sec-title">本月影片清單（共 ${cnt} 部）</div>
@@ -3073,14 +3090,14 @@ tr:nth-child(even) td{background:#FAFAFA;}
     // 貼文 + 測驗
     if(postQuiz.length>0){
       const pV=sumOf(postQuiz,'views'),pI=sumOf(postQuiz,'interactions'),pS=sumOf(postQuiz,'shares'),pSv=sumOf(postQuiz,'saves'),pL=sumOf(postQuiz,'likes'),pC=sumOf(postQuiz,'comments');
-      html+=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;">📸 Instagram 貼文 + 測驗（共 ${postQuiz.length} 則）</div>
+      html+=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg> Instagram 貼文 + 測驗（共 ${postQuiz.length} 則）</div>
       <div class="ig-kpi-row">
         <div class="ig-kpi"><div class="val">${pI.toLocaleString()}</div><div class="lbl">總互動</div></div>
         <div class="ig-kpi"><div class="val">${(pL+pC).toLocaleString()}</div><div class="lbl">按讚 + 留言</div></div>
         <div class="ig-kpi"><div class="val">${pS.toLocaleString()}</div><div class="lbl">分享</div></div>
         <div class="ig-kpi"><div class="val">${pSv.toLocaleString()}</div><div class="lbl">儲存</div></div>
       </div>
-      <div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:14px;font-size:12px;">🏆 貼文 + 測驗 TOP 5（依觀看）</div>
+      <div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:14px;font-size:12px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> 貼文 + 測驗 TOP 5（依觀看）</div>
       <table><thead><tr><th style="width:40px;">排名</th><th>標題</th><th>類別</th><th>觀看</th><th>互動</th><th>分享</th><th>儲存</th></tr></thead>
       <tbody>${renderTopRows(postQuiz)}</tbody></table>
       <div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:14px;font-size:12px;">本月清單</div>
@@ -3091,21 +3108,21 @@ tr:nth-child(even) td{background:#FAFAFA;}
     if(reels.length>0){
       const rV=sumOf(reels,'views'),rI=sumOf(reels,'interactions'),rR=sumOf(reels,'reach'),rS=sumOf(reels,'shares'),rSv=sumOf(reels,'saves');
       const eRate=rR>0?(rI/rR*100).toFixed(1):'0.0';
-      html+=`<div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:28px;">🎬 Instagram 影片 Reels（共 ${reels.length} 則）</div>
+      html+=`<div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:28px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/><line x1="17" y1="17" x2="22" y2="17"/></svg>Instagram 影片 Reels（共 ${reels.length} 則）</div>
       <div class="ig-kpi-row" style="background:rgba(96,165,250,.05);">
         <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rV.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">觀看總數</div></div>
         <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rR.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">觸及帳號</div></div>
         <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rI.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">互動率 ${eRate}%</div></div>
         <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rS.toLocaleString()} / ${rSv.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">分享 / 儲存</div></div>
       </div>
-      <div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:14px;font-size:12px;">🏆 Reels TOP 5（依觀看）</div>
+      <div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:14px;font-size:12px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> Reels TOP 5（依觀看）</div>
       <table><thead><tr><th style="width:40px;">排名</th><th>標題</th><th>類別</th><th>觀看</th><th>互動</th><th>分享</th><th>儲存</th></tr></thead>
       <tbody>${renderTopRows(reels)}</tbody></table>
       <div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:14px;font-size:12px;">本月清單</div>
       <table><thead><tr><th>發布日期</th><th>標題</th><th>類別</th><th>觀看</th><th>互動</th><th>分享</th><th>儲存</th></tr></thead>
       <tbody>${renderRows(reels)}</tbody></table>`;
     }
-    if(!html)html=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;">📸 Instagram 統計</div><p style="text-align:center;color:#aaa;padding:24px;">本月無 IG 資料</p>`;
+    if(!html)html=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg> Instagram 統計</div><p style="text-align:center;color:#aaa;padding:24px;">本月無 IG 資料</p>`;
     return html;
   })():''}
   <div class="footer"><span>光田綜合醫院 視覺多媒體設計組 · 僅供內部使用</span><span>影片發布資訊管理系統 · 產製於 ${now}</span></div>
@@ -3216,7 +3233,7 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
     <div class="plat plat-fb"><div class="val">${fbv.toLocaleString()}</div><div class="lbl">Facebook</div></div>
     <div class="plat plat-ig"><div class="val">${igv.toLocaleString()}</div><div class="lbl">Instagram</div></div>
   </div>`:''}
-  ${showVideo&&(embedV>0||webPV>0)?`<div class="sec-title" style="border-color:#0F6E56;">🌐 官網曝光（內部歸因 · 不計入 KPI 加總）</div>
+  ${showVideo&&(embedV>0||webPV>0)?`<div class="sec-title" style="border-color:#0F6E56;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> 官網曝光（內部歸因 · 不計入 KPI 加總）</div>
   <div class="plat-row" style="grid-template-columns:repeat(3,1fr);">
     <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${embedV.toLocaleString()}</div><div class="lbl">YT 外部嵌入觀看</div></div>
     <div class="plat" style="border:1px solid #B8DFC9;background:#F2FAF6;"><div class="val" style="color:#0F6E56;">${webPV.toLocaleString()}</div><div class="lbl">官網頁面瀏覽量（PV）</div></div>
@@ -3268,20 +3285,20 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
         <td>${sumOf(qRl,'interactions').toLocaleString()}</td>
       </tr>`;
     }).join('');
-    let html=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;">📸 Instagram 年度成效（依貼文類型）</div>
+    let html=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg> Instagram 年度成效（依貼文類型）</div>
     <table><thead><tr><th>季度</th><th>貼文+測驗 數</th><th>觀看</th><th>互動</th><th>Reels 數</th><th>觀看</th><th>互動</th></tr></thead>
     <tbody>${igQRows}</tbody></table>`;
     // 貼文+測驗
     if(postQuiz.length>0){
       const pV=sumOf(postQuiz,'views'),pI=sumOf(postQuiz,'interactions'),pS=sumOf(postQuiz,'shares'),pSv=sumOf(postQuiz,'saves'),pL=sumOf(postQuiz,'likes'),pC=sumOf(postQuiz,'comments');
-      html+=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:24px;">📸 貼文 + 測驗 年度總覽（共 ${postQuiz.length} 則）</div>
+      html+=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:24px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg> 貼文 + 測驗 年度總覽（共 ${postQuiz.length} 則）</div>
       <div class="ig-kpi-row">
         <div class="ig-kpi"><div class="val">${pI.toLocaleString()}</div><div class="lbl">總互動</div></div>
         <div class="ig-kpi"><div class="val">${(pL+pC).toLocaleString()}</div><div class="lbl">按讚 + 留言</div></div>
         <div class="ig-kpi"><div class="val">${pS.toLocaleString()}</div><div class="lbl">分享</div></div>
         <div class="ig-kpi"><div class="val">${pSv.toLocaleString()}</div><div class="lbl">儲存</div></div>
       </div>
-      <div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:14px;font-size:12px;">🏆 貼文 + 測驗 年度 TOP 5</div>
+      <div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:14px;font-size:12px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> 貼文 + 測驗 年度 TOP 5</div>
       <table><thead><tr><th style="width:40px;">排名</th><th>標題</th><th>日期</th><th>類別</th><th>觀看</th><th>互動</th><th>儲存</th></tr></thead>
       <tbody>${renderTopRows(postQuiz)}</tbody></table>`;
     }
@@ -3289,14 +3306,14 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
     if(reels.length>0){
       const rV=sumOf(reels,'views'),rI=sumOf(reels,'interactions'),rR=sumOf(reels,'reach'),rS=sumOf(reels,'shares'),rSv=sumOf(reels,'saves');
       const eRate=rR>0?(rI/rR*100).toFixed(1):'0.0';
-      html+=`<div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:24px;">🎬 影片 Reels 年度總覽（共 ${reels.length} 則）</div>
+      html+=`<div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:24px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/><line x1="17" y1="17" x2="22" y2="17"/></svg>影片 Reels 年度總覽（共 ${reels.length} 則）</div>
       <div class="ig-kpi-row">
         <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rV.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">觀看總數</div></div>
         <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rR.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">觸及帳號</div></div>
         <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rI.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">互動率 ${eRate}%</div></div>
         <div class="ig-kpi" style="background:#EFF6FF;border-color:#93C5FD;"><div class="val" style="color:#1D4ED8;">${rS.toLocaleString()} / ${rSv.toLocaleString()}</div><div class="lbl" style="color:#1E40AF;">分享 / 儲存</div></div>
       </div>
-      <div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:14px;font-size:12px;">🏆 Reels 年度 TOP 5</div>
+      <div class="sec-title" style="border-color:#60A5FA;color:#1D4ED8;margin-top:14px;font-size:12px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> Reels 年度 TOP 5</div>
       <table><thead><tr><th style="width:40px;">排名</th><th>標題</th><th>日期</th><th>類別</th><th>觀看</th><th>互動</th><th>儲存</th></tr></thead>
       <tbody>${renderTopRows(reels)}</tbody></table>`;
     }
