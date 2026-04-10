@@ -238,15 +238,15 @@ tr:hover td{background:rgba(52,211,153,.03);}
 .login-err{display:none;background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2);padding:8px 12px;border-radius:7px;font-size:12px;}
 .login-submit{width:100%;padding:11px;background:var(--accent2);color:#000;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;}
 .login-submit:hover{background:var(--accent);}
-.login-readonly-btn{background:none;border:none;cursor:pointer;font-size:12px;color:var(--txt3);text-decoration:underline;text-underline-offset:3px;margin-top:18px;font-family:inherit;transition:.15s;display:block;width:100%;}
-.login-readonly-btn:hover{color:var(--txt2);}
 /* Role badge */
 .role-badge-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-.role-readonly-chip{background:rgba(90,107,128,.15);color:var(--txt3);}
+.tag-chip{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;line-height:1.6;white-space:nowrap;margin:1px 2px;}
+.tag-chip-rm{cursor:pointer;}
+.tag-chip-rm:hover{opacity:.7;}
+.tag-chips-row{display:flex;flex-wrap:wrap;gap:4px;min-height:28px;align-items:center;padding:6px 8px;background:var(--bg-2);border:1px dashed var(--border);border-radius:6px;}
 .role-member-chip{background:rgba(96,165,250,.12);color:var(--blue);}
 .role-leader-chip{background:rgba(52,211,153,.12);color:var(--accent);}
 /* Permission-based UI */
-.role-readonly .write-only{display:none!important;}
 .role-member .leader-only{display:none!important;}
 </style>
 </head>
@@ -294,7 +294,6 @@ tr:hover td{background:rgba(52,211,153,.03);}
         <button class="login-submit" onclick="doLogin()">確認登入</button>
       </div>
 
-      <button class="login-readonly-btn" onclick="setRole('readonly')">以訪客身份瀏覽（唯讀）</button>
     </div>
   </div>
 </div>
@@ -328,6 +327,14 @@ tr:hover td{background:rgba(52,211,153,.03);}
     </div>
     <div class="nav-item" onclick="showPage('igstats')">
       <span class="icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>IG 貼文成效
+    </div>
+
+    <div class="nav-section">標籤與推廣</div>
+    <div class="nav-item" onclick="showPage('tags')">
+      <span class="icon"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>標籤管理
+    </div>
+    <div class="nav-item" onclick="showPage('promotion')">
+      <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg></span>推廣數據報告
     </div>
 
     <div class="nav-section">報表</div>
@@ -548,6 +555,9 @@ tr:hover td{background:rgba(52,211,153,.03);}
         <div class="form-group"><label>官網頁面瀏覽量（GA4 Pageviews）</label><input type="number" id="f-web_pageviews" placeholder="0" min="0"></div>
       </div>
 
+      <div class="form-group full" style="margin-top:14px;"><label>🏷️ 屬性標籤（可多選，例如：肺癌、LDCT、疫苗宣導）</label>
+        <div id="f-tags"></div>
+      </div>
       <div class="form-group full" style="margin-top:14px;"><label>備註</label><textarea id="f-note" placeholder="備註內容..."></textarea></div>
       <div class="form-actions">
         <button class="btn btn-primary write-only" onclick="saveEntry()">儲存影片</button>
@@ -620,6 +630,9 @@ tr:hover td{background:rgba(52,211,153,.03);}
           <div class="form-group full"><label>IG 連結</label><input type="url" id="ig-link" placeholder="https://www.instagram.com/p/..."></div>
           <div class="form-group full"><label>對應影片（可選，連動後此貼文觀看數將自動寫回該影片的 IG 觀看欄）</label>
             <select id="ig-videoId"><option value="">— 不對應 —</option></select>
+          </div>
+          <div class="form-group full"><label>🏷️ 屬性標籤（可多選）</label>
+            <div id="ig-tags"></div>
           </div>
         </div>
         <div class="form-actions" style="margin-top:12px;">
@@ -827,7 +840,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
           <div id="snapshot-list" style="margin-top:16px;"></div>
         </div>
 
-        <div class="cfg-card" style="margin-top:20px;">
+        <div class="cfg-card" style="margin-top:20px;" id="trash-section-anchor">
           <h3>🗑️ 回收筒</h3>
           <p style="font-size:12px;color:var(--txt3);margin-top:6px;">被「刪除」的影片與 IG 貼文會先進入回收筒（軟刪除），可以還原，或由組長永久刪除。</p>
           <div id="trash-tabs" style="display:flex;gap:2px;background:var(--bg-2);border-radius:8px;padding:3px;border:1px solid var(--border);margin-top:12px;width:fit-content;">
@@ -835,6 +848,62 @@ tr:hover td{background:rgba(52,211,153,.03);}
             <button onclick="setTrashTab('ig')" id="trash-tab-ig" class="trash-tab-btn">IG 貼文</button>
           </div>
           <div id="trash-list" style="margin-top:16px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Page: 標籤管理 ═══ -->
+    <div class="page" id="page-tags">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>標籤管理</h1>
+          <p>建立與維護內容屬性標籤，可套用於影片與 IG 貼文（例如：肺癌、LDCT、疫苗宣導...）</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="cfg-card">
+          <h3>✨ 新增標籤</h3>
+          <div class="form-grid" style="margin-top:12px;">
+            <div class="form-group"><label>標籤名稱 *</label><input type="text" id="new-tag-name" placeholder="例：肺癌、LDCT、疫苗宣導"></div>
+            <div class="form-group full"><label>說明（選填）</label><input type="text" id="new-tag-desc" placeholder="此標籤的用途說明"></div>
+          </div>
+          <div class="form-actions" style="margin-top:12px;">
+            <button class="btn btn-primary write-only" onclick="submitNewTag()">新增標籤</button>
+          </div>
+        </div>
+        <div class="cfg-card" style="margin-top:20px;">
+          <h3>📋 所有標籤</h3>
+          <p style="font-size:12px;color:var(--txt3);margin-top:6px;">點「產出報告」可立即依此標籤產生推廣數據報告。</p>
+          <div id="tags-list" style="margin-top:16px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Page: 推廣數據報告 ═══ -->
+    <div class="page" id="page-promotion">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>推廣數據報告</h1>
+          <p>依標籤一鍵彙整影片 + IG 貼文的跨平台推廣成效</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="cfg-card">
+          <h3>🎯 選擇要彙整的標籤</h3>
+          <p style="font-size:12px;color:var(--txt3);margin-top:6px;">系統會自動撈出所有被標記此標籤的影片與 IG 貼文，計算 YT / FB / IG / 官網等各管道的總曝光。</p>
+          <div class="form-grid" style="margin-top:14px;">
+            <div class="form-group full"><label>標籤</label>
+              <select id="promo-tag-select"><option value="">— 選擇標籤 —</option></select>
+            </div>
+          </div>
+          <div class="form-actions" style="margin-top:12px;">
+            <button class="btn btn-primary" onclick="runPromotionReport()">產出報告</button>
+            <button class="btn btn-secondary" onclick="showPage('tags')">前往標籤管理</button>
+          </div>
+        </div>
+        <div class="cfg-card" style="margin-top:20px;">
+          <h3>📊 快速預覽</h3>
+          <div id="promo-preview" style="margin-top:12px;color:var(--txt3);font-size:12px;">選擇標籤後，此處會顯示該標籤目前已累積的成效。</div>
         </div>
       </div>
     </div>
@@ -1103,6 +1172,9 @@ tr:hover td{background:rgba(52,211,153,.03);}
       <div class="form-group full"><label>對應影片（可選）</label>
         <select id="ie-videoId"><option value="">— 不對應 —</option></select>
       </div>
+      <div class="form-group full"><label>🏷️ 屬性標籤（可多選）</label>
+        <div id="ie-tags"></div>
+      </div>
     </div>
     <div class="form-actions">
       <button class="btn btn-primary write-only" onclick="submitIgEdit()">儲存修改</button>
@@ -1169,6 +1241,9 @@ tr:hover td{background:rgba(52,211,153,.03);}
       <div class="form-group full"><label>官網頁面連結</label><input type="url" id="e-web_url" placeholder="https://www.ktgh.com.tw/..."></div>
       <div class="form-group"><label>YT 外部嵌入觀看</label><input type="number" id="e-embed_views" min="0"></div>
       <div class="form-group"><label>官網 Pageviews</label><input type="number" id="e-web_pageviews" min="0"></div>
+    </div>
+    <div class="form-group full" style="margin-top:14px;"><label>🏷️ 屬性標籤（可多選）</label>
+      <div id="e-tags"></div>
     </div>
     <div class="form-group full" style="margin-top:12px;"><label>備註</label><textarea id="e-note"></textarea></div>
     <div class="form-actions">
@@ -1415,6 +1490,287 @@ function renderSnapshotList(){
       </div>
     </div>`).join('')}</div>`;
 }
+// ============================================================
+// 標籤系統
+// ============================================================
+const TAGS_KEY='kt_yt_tags';
+let TAGS=[]; // [{id, name, color, desc}]
+const TAG_COLORS=['#34D399','#60A5FA','#FBBF24','#F87171','#A78BFA','#2DD4BF','#F472B6','#F59E0B','#818CF8','#14B8A6'];
+function loadTags(){
+  try{TAGS=JSON.parse(localStorage.getItem(TAGS_KEY)||'[]');}catch(e){TAGS=[];}
+  if(!Array.isArray(TAGS))TAGS=[];
+}
+function saveTags(){localStorage.setItem(TAGS_KEY,JSON.stringify(TAGS));}
+function addTag(name,desc){
+  if(!canWrite()){alert('您的權限不足');return false;}
+  name=(name||'').trim();if(!name)return false;
+  if(TAGS.find(t=>t.name===name)){alert('此標籤已存在');return false;}
+  const color=TAG_COLORS[TAGS.length%TAG_COLORS.length];
+  TAGS.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),name,color,desc:(desc||'').trim()});
+  saveTags();renderTagsPage();refreshAllTagInputs();
+  return true;
+}
+function deleteTag(id){
+  if(!canDelete()){alert('您的權限不足');return;}
+  const t=TAGS.find(x=>x.id===id);if(!t)return;
+  const usedV=DATA.filter(d=>(d.tags||[]).includes(t.name)).length;
+  const usedI=IG_DATA.filter(d=>(d.tags||[]).includes(t.name)).length;
+  if(!confirm(`確定刪除標籤「${t.name}」？\n目前有 ${usedV} 部影片 / ${usedI} 則 IG 貼文使用此標籤，刪除後這些內容的該標籤也會被移除。`))return;
+  createSnapshot('刪除標籤前（自動）',true);
+  TAGS=TAGS.filter(x=>x.id!==id);saveTags();
+  // 從影片與 IG 貼文中移除
+  DATA.forEach(d=>{if(Array.isArray(d.tags))d.tags=d.tags.filter(n=>n!==t.name);});
+  IG_DATA.forEach(d=>{if(Array.isArray(d.tags))d.tags=d.tags.filter(n=>n!==t.name);});
+  saveData();saveIgData();
+  renderTagsPage();renderAll();renderIgAll();refreshAllTagInputs();
+  showSyncBadge('標籤已刪除');
+}
+function updateTag(id,name,desc){
+  if(!canWrite()){alert('您的權限不足');return;}
+  const t=TAGS.find(x=>x.id===id);if(!t)return;
+  name=(name||'').trim();if(!name)return;
+  const oldName=t.name;
+  if(name!==oldName&&TAGS.find(x=>x.name===name)){alert('此名稱已存在');return;}
+  t.name=name;t.desc=(desc||'').trim();
+  // 同步更新所有引用
+  if(name!==oldName){
+    DATA.forEach(d=>{if(Array.isArray(d.tags)){d.tags=d.tags.map(n=>n===oldName?name:n);}});
+    IG_DATA.forEach(d=>{if(Array.isArray(d.tags)){d.tags=d.tags.map(n=>n===oldName?name:n);}});
+    saveData();saveIgData();
+  }
+  saveTags();renderTagsPage();renderAll();renderIgAll();refreshAllTagInputs();
+}
+function getTagColor(name){const t=TAGS.find(x=>x.name===name);return t?t.color:'#64748B';}
+function renderTagChips(tagArr){
+  if(!Array.isArray(tagArr)||tagArr.length===0)return '';
+  return tagArr.map(n=>{const c=getTagColor(n);return `<span class="tag-chip" style="background:${c}22;color:${c};border:1px solid ${c}44;">${esc(n)}</span>`;}).join(' ');
+}
+
+// 標籤輸入控件 - 可多選、可新建
+function initTagInput(containerId,initialTags){
+  const box=document.getElementById(containerId);if(!box)return;
+  const selected=Array.isArray(initialTags)?[...initialTags]:[];
+  box.dataset.tags=JSON.stringify(selected);
+  const render=()=>{
+    const cur=JSON.parse(box.dataset.tags||'[]');
+    const chips=cur.map(n=>{const c=getTagColor(n);return `<span class="tag-chip tag-chip-rm" style="background:${c}22;color:${c};border:1px solid ${c}44;" onclick="removeTagFromInput('${containerId}','${esc(n).replace(/'/g,'\\\'')}')">${esc(n)} ✕</span>`;}).join(' ');
+    const options=TAGS.filter(t=>!cur.includes(t.name)).map(t=>`<option value="${esc(t.name)}">${esc(t.name)}</option>`).join('');
+    box.innerHTML=`<div class="tag-chips-row">${chips||'<span style="color:var(--txt3);font-size:11px;">尚未選擇標籤</span>'}</div>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <select onchange="addTagToInput('${containerId}',this.value);this.value=''" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-2);color:var(--txt);"><option value="">＋ 從現有標籤選擇</option>${options}</select>
+        <input type="text" placeholder="或輸入新標籤 Enter 新增" onkeydown="if(event.key==='Enter'){event.preventDefault();addNewTagToInput('${containerId}',this.value);this.value='';}" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-2);color:var(--txt);">
+      </div>`;
+  };
+  box._render=render;
+  render();
+}
+function addTagToInput(containerId,name){
+  if(!name)return;
+  const box=document.getElementById(containerId);if(!box)return;
+  const cur=JSON.parse(box.dataset.tags||'[]');
+  if(!cur.includes(name))cur.push(name);
+  box.dataset.tags=JSON.stringify(cur);
+  box._render&&box._render();
+}
+function addNewTagToInput(containerId,name){
+  name=(name||'').trim();if(!name)return;
+  if(!TAGS.find(t=>t.name===name)){
+    if(!addTag(name,''))return;
+  }
+  addTagToInput(containerId,name);
+}
+function removeTagFromInput(containerId,name){
+  const box=document.getElementById(containerId);if(!box)return;
+  const cur=JSON.parse(box.dataset.tags||'[]').filter(n=>n!==name);
+  box.dataset.tags=JSON.stringify(cur);
+  box._render&&box._render();
+}
+function getTagsFromInput(containerId){
+  const box=document.getElementById(containerId);if(!box)return[];
+  try{return JSON.parse(box.dataset.tags||'[]');}catch(e){return[];}
+}
+function refreshAllTagInputs(){
+  ['f-tags','e-tags','ig-tags','ie-tags'].forEach(id=>{const box=document.getElementById(id);if(box&&box._render)box._render();});
+}
+
+// ============================================================
+// 標籤管理頁面
+// ============================================================
+function renderTagsPage(){
+  const box=document.getElementById('tags-list');if(!box)return;
+  if(TAGS.length===0){box.innerHTML='<p style="color:var(--txt3);font-size:12px;padding:20px 0;text-align:center;">尚未建立任何標籤</p>';return;}
+  box.innerHTML=`<div style="display:flex;flex-direction:column;gap:8px;">${TAGS.map(t=>{
+    const vc=DATA.filter(d=>!d.deleted_at&&(d.tags||[]).includes(t.name)).length;
+    const ic=IG_DATA.filter(d=>!d.deleted_at&&(d.tags||[]).includes(t.name)).length;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;gap:12px;">
+      <div style="flex:1;min-width:0;display:flex;align-items:center;gap:10px;">
+        <span class="tag-chip" style="background:${t.color}22;color:${t.color};border:1px solid ${t.color}44;font-weight:700;">${esc(t.name)}</span>
+        <span style="font-size:11px;color:var(--txt3);">${esc(t.desc||'')}</span>
+      </div>
+      <div style="font-size:11px;color:var(--txt3);white-space:nowrap;">影片 ${vc} · IG ${ic}</div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-secondary btn-sm write-only" onclick="promptEditTag('${t.id}')">編輯</button>
+        <button class="btn btn-secondary btn-sm" onclick="runPromotionReport('${esc(t.name).replace(/'/g,'\\\'')}')">產出報告</button>
+        <button class="btn btn-danger btn-sm leader-only" onclick="deleteTag('${t.id}')">刪除</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+function promptEditTag(id){
+  const t=TAGS.find(x=>x.id===id);if(!t)return;
+  const name=prompt('標籤名稱：',t.name);if(name===null)return;
+  const desc=prompt('說明（選填）：',t.desc||'');if(desc===null)return;
+  updateTag(id,name,desc);
+}
+function submitNewTag(){
+  const n=document.getElementById('new-tag-name').value;
+  const d=document.getElementById('new-tag-desc').value;
+  if(addTag(n,d)){
+    document.getElementById('new-tag-name').value='';
+    document.getElementById('new-tag-desc').value='';
+  }
+}
+
+// ============================================================
+// 推廣數據報告
+// ============================================================
+function openPromotionReport(){
+  const sel=document.getElementById('promo-tag-select');
+  if(!sel)return;
+  sel.innerHTML='<option value="">— 選擇標籤 —</option>'+TAGS.map(t=>`<option value="${esc(t.name)}">${esc(t.name)}${t.desc?' · '+esc(t.desc):''}</option>`).join('');
+}
+function runPromotionReport(tagName){
+  if(!tagName){tagName=document.getElementById('promo-tag-select')?.value;}
+  if(!tagName){alert('請選擇標籤');return;}
+  const videos=activeVideos().filter(d=>(d.tags||[]).includes(tagName));
+  const igPosts=activeIgPosts().filter(d=>(d.tags||[]).includes(tagName));
+  const now=new Date().toLocaleDateString('zh-TW');
+  const tag=TAGS.find(t=>t.name===tagName);
+  const color=tag?tag.color:'#0F6E56';
+
+  // 影片統計
+  const vTotal=videos.reduce((s,d)=>s+totalViews(d),0);
+  const vYt=videos.reduce((s,d)=>s+(Number(d.yt_views)||0),0);
+  const vFb=videos.reduce((s,d)=>s+(Number(d.fb_views)||0),0);
+  const vIg=videos.reduce((s,d)=>s+(Number(d.ig_views)||0),0);
+  const vEmbed=videos.reduce((s,d)=>s+(Number(d.embed_views)||0),0);
+  const vWebPV=videos.reduce((s,d)=>s+(Number(d.web_pageviews)||0),0);
+
+  // IG 統計（分貼文+測驗 vs Reels）
+  const igPq=igPosts.filter(d=>String(d.type)==='1'||String(d.type)==='2');
+  const igRl=igPosts.filter(d=>String(d.type)==='3');
+  const sumIg=(arr,k)=>arr.reduce((s,d)=>s+(Number(d[k])||0),0);
+
+  // 全平台合計（影片 + IG Reels 觀看 + 貼文互動）
+  const grandTotal=vTotal+sumIg(igRl,'views')+sumIg(igPq,'views');
+
+  const vRows=videos.length>0?videos.sort((a,b)=>totalViews(b)-totalViews(a)).map((d,i)=>`<tr>
+    <td>${i+1}</td>
+    <td style="text-align:left;max-width:260px;">${esc(d.title||'')}</td>
+    <td>${(d.date||'').substring(0,10)}</td>
+    <td>${esc(d.cat||'')}</td>
+    <td>${(Number(d.yt_views)||0).toLocaleString()}</td>
+    <td>${(Number(d.fb_views)||0).toLocaleString()}</td>
+    <td>${(Number(d.ig_views)||0).toLocaleString()}</td>
+    <td style="font-weight:700;">${totalViews(d).toLocaleString()}</td>
+  </tr>`).join(''):`<tr><td colspan="8" style="text-align:center;color:#aaa;padding:24px;">無符合的影片</td></tr>`;
+
+  const igPqRows=igPq.length>0?igPq.sort((a,b)=>(Number(b.views)||0)-(Number(a.views)||0)).map((d,i)=>`<tr>
+    <td>${i+1}</td>
+    <td style="text-align:left;max-width:240px;">${esc(d.title||'')}</td>
+    <td>${(d.date||'').substring(0,10)}</td>
+    <td>${(Number(d.views)||0).toLocaleString()}</td>
+    <td>${(Number(d.interactions)||0).toLocaleString()}</td>
+    <td>${(Number(d.shares)||0).toLocaleString()}</td>
+    <td>${(Number(d.saves)||0).toLocaleString()}</td>
+  </tr>`).join(''):`<tr><td colspan="7" style="text-align:center;color:#aaa;padding:18px;">無符合的 IG 貼文 / 測驗</td></tr>`;
+
+  const igRlRows=igRl.length>0?igRl.sort((a,b)=>(Number(b.views)||0)-(Number(a.views)||0)).map((d,i)=>`<tr>
+    <td>${i+1}</td>
+    <td style="text-align:left;max-width:240px;">${esc(d.title||'')}</td>
+    <td>${(d.date||'').substring(0,10)}</td>
+    <td>${(Number(d.views)||0).toLocaleString()}</td>
+    <td>${(Number(d.reach)||0).toLocaleString()}</td>
+    <td>${(Number(d.interactions)||0).toLocaleString()}</td>
+    <td>${(Number(d.saves)||0).toLocaleString()}</td>
+  </tr>`).join(''):`<tr><td colspan="7" style="text-align:center;color:#aaa;padding:18px;">無符合的 Reels</td></tr>`;
+
+  const html=`<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"><title>推廣數據報告 · ${esc(tagName)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;color:#1A1A1A;background:#fff;font-size:13px;line-height:1.6;}
+.report{max-width:980px;margin:0 auto;padding:36px 44px;}
+.hd{border-bottom:3px solid ${color};padding-bottom:16px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-end;}
+.hd-l h1{font-size:22px;color:${color};font-weight:900;}.hd-l p{font-size:12px;color:#999;margin-top:4px;}
+.hd-r{font-size:11px;color:#999;text-align:right;line-height:1.8;}
+.tag-big{display:inline-block;padding:6px 18px;border-radius:20px;background:${color}22;color:${color};border:2px solid ${color}66;font-weight:900;font-size:16px;margin-top:8px;}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.kpi{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px 16px;text-align:center;}
+.kpi .val{font-size:24px;font-weight:900;color:${color};}.kpi .lbl{font-size:11px;color:#64748B;margin-top:3px;}
+.plat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.plat{background:#fff;border-radius:10px;padding:14px;text-align:center;border:1px solid #E2E8F0;}
+.plat-yt{border-color:rgba(255,68,68,.35);}.plat-fb{border-color:rgba(76,139,245,.35);}.plat-ig{border-color:rgba(244,114,182,.35);}
+.plat .val{font-size:22px;font-weight:800;}.plat-yt .val{color:#FF4444;}.plat-fb .val{color:#4C8BF5;}.plat-ig .val{color:#F472B6;}
+.plat .lbl{font-size:11px;color:#999;margin-top:3px;}
+.sec-title{font-size:14px;font-weight:700;color:${color};border-left:3px solid ${color};padding-left:10px;margin:22px 0 12px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:${color};color:#fff;padding:9px 10px;font-weight:600;font-size:11px;text-align:center;}
+td{padding:8px 10px;border-bottom:1px solid #ECECEC;text-align:center;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
+.summary{background:${color}0d;border-left:4px solid ${color};padding:14px 18px;border-radius:6px;margin-bottom:20px;font-size:13px;line-height:1.8;color:#334155;}
+.footer{margin-top:32px;padding-top:12px;border-top:1px solid #E0E0E0;font-size:11px;color:#BBB;display:flex;justify-content:space-between;}
+.print-btn{position:fixed;bottom:24px;right:24px;background:${color};color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px ${color}4D;}
+@media print{.print-btn{display:none;}@page{size:A4;margin:15mm;}}
+</style></head><body>
+<button class="print-btn" onclick="window.print()">🖨️ 列印 / 存成 PDF</button>
+<div class="report">
+  <div class="hd">
+    <div class="hd-l">
+      <h1>推廣數據報告</h1>
+      <p>光田綜合醫院 視覺多媒體設計組</p>
+      <div class="tag-big">#${esc(tagName)}</div>
+    </div>
+    <div class="hd-r">產製日期：${now}<br>資料範圍：全歷程累計<br>資料來源：YT / FB / IG / 官網</div>
+  </div>
+  ${tag&&tag.desc?`<div class="summary"><b>標籤說明：</b>${esc(tag.desc)}</div>`:''}
+  <div class="summary">
+    <b>內容彙整：</b>共 ${videos.length} 部影片、${igPq.length} 則 IG 貼文/測驗、${igRl.length} 則 Reels，透過多平台觸及累計 <b style="color:${color};">${grandTotal.toLocaleString()}</b> 次曝光。
+  </div>
+  <div class="sec-title">📊 整體成效</div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="val">${videos.length}</div><div class="lbl">影片數量</div></div>
+    <div class="kpi"><div class="val">${(igPq.length+igRl.length)}</div><div class="lbl">IG 貼文數</div></div>
+    <div class="kpi"><div class="val">${vTotal.toLocaleString()}</div><div class="lbl">影片全平台觀看</div></div>
+    <div class="kpi"><div class="val">${grandTotal.toLocaleString()}</div><div class="lbl">綜合曝光</div></div>
+  </div>
+  <div class="sec-title">📡 各傳達管道</div>
+  <div class="plat-row">
+    <div class="plat plat-yt"><div class="val">${vYt.toLocaleString()}</div><div class="lbl">YouTube 觀看</div></div>
+    <div class="plat plat-fb"><div class="val">${vFb.toLocaleString()}</div><div class="lbl">Facebook 觀看</div></div>
+    <div class="plat plat-ig"><div class="val">${(vIg+sumIg(igPq,'views')+sumIg(igRl,'views')).toLocaleString()}</div><div class="lbl">Instagram 觀看</div></div>
+  </div>
+  ${(vEmbed>0||vWebPV>0)?`<div class="plat-row" style="grid-template-columns:repeat(2,1fr);">
+    <div class="plat" style="border-color:rgba(52,211,153,.35);"><div class="val" style="color:#0F6E56;">${vEmbed.toLocaleString()}</div><div class="lbl">官網嵌入觀看</div></div>
+    <div class="plat" style="border-color:rgba(52,211,153,.35);"><div class="val" style="color:#0F6E56;">${vWebPV.toLocaleString()}</div><div class="lbl">官網頁面瀏覽</div></div>
+  </div>`:''}
+  <div class="sec-title">🎬 符合標籤的影片（${videos.length} 部）</div>
+  <table><thead><tr><th>#</th><th>標題</th><th>日期</th><th>類別</th><th>YT</th><th>FB</th><th>IG</th><th>合計</th></tr></thead>
+  <tbody>${vRows}</tbody></table>
+
+  <div class="sec-title">📸 IG 貼文 / 測驗（${igPq.length} 則）</div>
+  <table><thead><tr><th>#</th><th>標題</th><th>日期</th><th>觀看</th><th>互動</th><th>分享</th><th>儲存</th></tr></thead>
+  <tbody>${igPqRows}</tbody></table>
+
+  <div class="sec-title">🎥 IG 影片 Reels（${igRl.length} 則）</div>
+  <table><thead><tr><th>#</th><th>標題</th><th>日期</th><th>觀看</th><th>觸及</th><th>互動</th><th>儲存</th></tr></thead>
+  <tbody>${igRlRows}</tbody></table>
+
+  <div class="footer"><span>光田綜合醫院 視覺多媒體設計組 · 僅供內部使用</span><span>影片發布資訊管理系統 · 產製於 ${now}</span></div>
+</div></body></html>`;
+  const w=window.open('','_blank');w.document.write(html);w.document.close();
+}
+
 function renderTrashList(){
   const box=document.getElementById('trash-list');if(!box)return;
   const vb=document.getElementById('trash-tab-video'),ib=document.getElementById('trash-tab-ig');
@@ -1442,7 +1798,7 @@ function renderTrashList(){
 // ============================================================
 // 導覽
 // ============================================================
-function showPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>{const t=n.getAttribute('onclick')||'';n.classList.toggle('active',t.includes("'"+name+"'"));});if(name==='dashboard')renderDashboard();if(name==='list')renderList();if(name==='config')renderCfgForm();if(name==='backup')renderBackupPage();if(name==='ig'){renderIgAll();if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgAll();showSyncBadge('IG 已同步 Sheets');}});}}if(name==='igstats'){renderIgCharts();if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgCharts();showSyncBadge('IG 已同步 Sheets');}});}}if(name==='report'){const now=new Date();document.getElementById('rpt-year').value=now.getFullYear();document.getElementById('rpt-month').value=String(now.getMonth()+1).padStart(2,'0');}}
+function showPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>{const t=n.getAttribute('onclick')||'';n.classList.toggle('active',t.includes("'"+name+"'"));});if(name==='dashboard')renderDashboard();if(name==='list')renderList();if(name==='config')renderCfgForm();if(name==='backup')renderBackupPage();if(name==='tags')renderTagsPage();if(name==='promotion')openPromotionReport();if(name==='ig'){renderIgAll();if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgAll();showSyncBadge('IG 已同步 Sheets');}});}}if(name==='igstats'){renderIgCharts();if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgCharts();showSyncBadge('IG 已同步 Sheets');}});}}if(name==='report'){const now=new Date();document.getElementById('rpt-year').value=now.getFullYear();document.getElementById('rpt-month').value=String(now.getMonth()+1).padStart(2,'0');}}
 function renderAll(){renderDashboard();renderList();renderCfgForm();buildMonthFilter();}
 
 // ============================================================
@@ -1560,8 +1916,8 @@ function renderCharts(viewData){
 // 新增影片
 // ============================================================
 function buildEntryFromForm(p){const g=id=>document.getElementById(p+id);const e={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};ALL_FORM_FIELDS.forEach(f=>{const el=g(f);if(!el)return;if(NUM_FIELDS.includes(f))e[f]=Number(el.value)||0;else e[f]=el.value.trim?el.value.trim():el.value;});if(window._lastStatsFetchDate){e.statsDate=window._lastStatsFetchDate;window._lastStatsFetchDate=null;}return e;}
-async function saveEntry(){if(!canWrite()){showAlert('entry-alert','您的權限不足，請以組員或組長身份登入','err');return;}const t=document.getElementById('f-title').value.trim(),d=document.getElementById('f-date').value;if(!t){showAlert('entry-alert','請填寫影片標題','err');return;}if(!d){showAlert('entry-alert','請選擇發布日期','err');return;}const e=buildEntryFromForm('f-');DATA.push(e);saveData();showAlert('entry-alert','已儲存','ok');clearForm();renderAll();const ok=await pushToSheets('saveVideo',{data:e});showSyncBadge(ok?'已同步 Sheets':USE_API()?'本機已儲存，同步失敗':'已儲存至本機');}
-function clearForm(){ALL_FORM_FIELDS.forEach(id=>{const el=document.getElementById('f-'+id);if(el)el.value='';});document.getElementById('f-type').value='long';document.getElementById('f-cat').value='疾病衛教';document.getElementById('f-date').value=new Date().toISOString().slice(0,10);}
+async function saveEntry(){if(!canWrite()){showAlert('entry-alert','您的權限不足，請以組員或組長身份登入','err');return;}const t=document.getElementById('f-title').value.trim(),d=document.getElementById('f-date').value;if(!t){showAlert('entry-alert','請填寫影片標題','err');return;}if(!d){showAlert('entry-alert','請選擇發布日期','err');return;}const e=buildEntryFromForm('f-');e.tags=getTagsFromInput('f-tags');DATA.push(e);saveData();showAlert('entry-alert','已儲存','ok');clearForm();renderAll();const ok=await pushToSheets('saveVideo',{data:e});showSyncBadge(ok?'已同步 Sheets':USE_API()?'本機已儲存，同步失敗':'已儲存至本機');}
+function clearForm(){ALL_FORM_FIELDS.forEach(id=>{const el=document.getElementById('f-'+id);if(el)el.value='';});document.getElementById('f-type').value='long';document.getElementById('f-cat').value='疾病衛教';document.getElementById('f-date').value=new Date().toISOString().slice(0,10);initTagInput('f-tags',[]);}
 
 // ============================================================
 // 影片列表
@@ -1576,7 +1932,8 @@ function renderList(){
   if(f.length===0){tb.innerHTML='';em.style.display='block';return;}em.style.display='none';
   tb.innerHTML=f.map(d=>{const tv=totalViews(d),ytv=Number(d.yt_views)||0,fbv=Number(d.fb_views)||0,igv=Number(d.ig_views)||0,lk=d.yt_url||d.fb_url||d.ig_url||'';
     const st=getVideoStatus(d),sc=STATUS_CFG[st];
-    return`<tr><td><span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${sc.bg};color:${sc.color};">${sc.icon} ${sc.label}</span></td><td style="white-space:nowrap;">${(d.date||'').substring(0,10)||'—'}</td><td style="max-width:200px;color:#fff;">${lk?`<a href="${esc(lk)}" target="_blank" style="color:#fff;">${esc(d.title)}</a>`:esc(d.title)}</td><td><span class="type-badge type-${d.type}">${d.type==='short'?'Short':'Long'}</span></td><td>${esc(d.cat||'')}</td><td><div class="views-cell"><span class="total">${tv.toLocaleString()}</span><span class="plats">${ytv?`<span style="color:var(--yt)">YT ${ytv.toLocaleString()}</span>`:''}${fbv?`<span style="color:var(--fb)">FB ${fbv.toLocaleString()}</span>`:''}${igv?`<span style="color:var(--ig)">IG ${igv.toLocaleString()}</span>`:''}</span></div></td><td style="white-space:nowrap;font-size:11px;color:var(--txt3);">${d.statsDate||'—'}</td><td>${esc(d.planner||'')}</td><td><div class="act-btns"><button class="act-btn write-only" onclick="openEdit('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span></button><button class="act-btn del write-only" onclick="deleteEntry('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></div></td></tr>`;}).join('');
+    const tagHtml=Array.isArray(d.tags)&&d.tags.length?`<div style="margin-top:3px;">${renderTagChips(d.tags)}</div>`:'';
+    return`<tr><td><span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${sc.bg};color:${sc.color};">${sc.icon} ${sc.label}</span></td><td style="white-space:nowrap;">${(d.date||'').substring(0,10)||'—'}</td><td style="max-width:200px;color:#fff;">${lk?`<a href="${esc(lk)}" target="_blank" style="color:#fff;">${esc(d.title)}</a>`:esc(d.title)}${tagHtml}</td><td><span class="type-badge type-${d.type}">${d.type==='short'?'Short':'Long'}</span></td><td>${esc(d.cat||'')}</td><td><div class="views-cell"><span class="total">${tv.toLocaleString()}</span><span class="plats">${ytv?`<span style="color:var(--yt)">YT ${ytv.toLocaleString()}</span>`:''}${fbv?`<span style="color:var(--fb)">FB ${fbv.toLocaleString()}</span>`:''}${igv?`<span style="color:var(--ig)">IG ${igv.toLocaleString()}</span>`:''}</span></div></td><td style="white-space:nowrap;font-size:11px;color:var(--txt3);">${d.statsDate||'—'}</td><td>${esc(d.planner||'')}</td><td><div class="act-btns"><button class="act-btn write-only" onclick="openEdit('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span></button><button class="act-btn del write-only" onclick="deleteEntry('${d.id}')"><span class="icon"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></div></td></tr>`;}).join('');
 }
 function buildMonthFilter(){const ms=[...new Set(activeVideos().map(d=>(d.date||'').substring(0,7)).filter(Boolean))].sort().reverse();document.getElementById('filter-month').innerHTML='<option value="">全部月份</option>'+ms.map(m=>`<option value="${m}">${m}</option>`).join('');}
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
@@ -1584,9 +1941,9 @@ function esc(s){const d=document.createElement('div');d.textContent=s||'';return
 // ============================================================
 // 編輯 / 刪除
 // ============================================================
-function openEdit(id){const d=DATA.find(v=>v.id===id);if(!d)return;document.getElementById('e-id').value=d.id;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(!el)return;const v=d[f]??'';el.value=(f==='dur'||f==='yt_avgdur')?normalizeDur(v):v;});document.getElementById('edit-modal').classList.add('show');}
+function openEdit(id){const d=DATA.find(v=>v.id===id);if(!d)return;document.getElementById('e-id').value=d.id;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(!el)return;const v=d[f]??'';el.value=(f==='dur'||f==='yt_avgdur')?normalizeDur(v):v;});initTagInput('e-tags',Array.isArray(d.tags)?d.tags:[]);document.getElementById('edit-modal').classList.add('show');}
 function closeModal(){document.getElementById('edit-modal').classList.remove('show');}
-async function updateEntry(){if(!canWrite()){showAlert('edit-alert','您的權限不足','err');return;}const id=document.getElementById('e-id').value,idx=DATA.findIndex(d=>d.id===id);if(idx===-1)return;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(!el)return;if(NUM_FIELDS.includes(f))DATA[idx][f]=Number(el.value)||0;else DATA[idx][f]=el.value;});DATA[idx].updatedAt=new Date().toISOString();if(window._lastStatsFetchDate){DATA[idx].statsDate=window._lastStatsFetchDate;window._lastStatsFetchDate=null;}saveData();closeModal();renderAll();const ok=await pushToSheets('updateVideo',{data:DATA[idx]});showSyncBadge(ok?'已同步修改':USE_API()?'本機已更新，同步失敗':'已更新');}
+async function updateEntry(){if(!canWrite()){showAlert('edit-alert','您的權限不足','err');return;}const id=document.getElementById('e-id').value,idx=DATA.findIndex(d=>d.id===id);if(idx===-1)return;ALL_FORM_FIELDS.forEach(f=>{const el=document.getElementById('e-'+f);if(!el)return;if(NUM_FIELDS.includes(f))DATA[idx][f]=Number(el.value)||0;else DATA[idx][f]=el.value;});DATA[idx].tags=getTagsFromInput('e-tags');DATA[idx].updatedAt=new Date().toISOString();if(window._lastStatsFetchDate){DATA[idx].statsDate=window._lastStatsFetchDate;window._lastStatsFetchDate=null;}saveData();closeModal();renderAll();const ok=await pushToSheets('updateVideo',{data:DATA[idx]});showSyncBadge(ok?'已同步修改':USE_API()?'本機已更新，同步失敗':'已更新');}
 async function deleteEntry(id){
   if(!canDelete()){alert('僅組員或組長可刪除影片');return;}
   if(!confirm('確定要刪除此影片紀錄？\n（將移至回收筒，可於「資料備份還原」頁還原）'))return;
@@ -1843,6 +2200,7 @@ function saveIgPost(){
     reach:Number(document.getElementById('ig-reach').value)||0,
     link:document.getElementById('ig-link').value.trim(),
     videoId:document.getElementById('ig-videoId').value||'',
+    tags:getTagsFromInput('ig-tags'),
     createdAt:new Date().toISOString()
   };
   if(!canWrite()){showAlert('ig-entry-alert','您的權限不足，請以組員或組長身份登入','err');return;}
@@ -1880,6 +2238,7 @@ function clearIgForm(){
   document.getElementById('ig-date').value=new Date().toISOString().slice(0,10);
   const v=document.getElementById('ig-videoId');if(v)v.value='';
   rebuildVideoSelect('ig-videoId','');
+  initTagInput('ig-tags',[]);
 }
 
 function deleteIgPost(id){
@@ -1921,6 +2280,7 @@ function openEditIg(id){
   ['title','date','type','cat','link'].forEach(f=>{const el=document.getElementById('ie-'+f);if(el)el.value=d[f]??'';});
   ['views','likes','comments','interactions','shares','saves','reach'].forEach(f=>{const el=document.getElementById('ie-'+f);if(el)el.value=Number(d[f])||0;});
   rebuildVideoSelect('ie-videoId',d.videoId||'');
+  initTagInput('ie-tags',Array.isArray(d.tags)?d.tags:[]);
   document.getElementById('ig-edit-alert').className='alert';
   document.getElementById('ig-edit-modal').classList.add('show');
 }
@@ -1934,6 +2294,7 @@ async function submitIgEdit(){
   ['views','likes','comments','interactions','shares','saves','reach'].forEach(f=>{const el=document.getElementById('ie-'+f);if(el)IG_DATA[idx][f]=Number(el.value)||0;});
   const newVid=document.getElementById('ie-videoId').value||'';
   IG_DATA[idx].videoId=newVid;
+  IG_DATA[idx].tags=getTagsFromInput('ie-tags');
   IG_DATA[idx].updatedAt=new Date().toISOString();
   saveIgData();
   // 同步新舊兩個對應影片的 ig_views
@@ -1974,7 +2335,7 @@ function renderIgList(){
   em.style.display='none';
   tb.innerHTML=f.map(d=>`<tr>
     <td style="white-space:nowrap;">${(d.date||'').substring(0,10)||'—'}</td>
-    <td style="max-width:220px;">${d.link?`<a href="${esc(d.link)}" target="_blank">${esc(d.title)}</a>`:esc(d.title)}</td>
+    <td style="max-width:220px;">${d.link?`<a href="${esc(d.link)}" target="_blank">${esc(d.title)}</a>`:esc(d.title)}${Array.isArray(d.tags)&&d.tags.length?`<div style="margin-top:3px;">${renderTagChips(d.tags)}</div>`:''}</td>
     <td><span class="type-badge" style="${String(d.type)==='1'?'background:rgba(244,114,182,.15);color:#F472B6;':String(d.type)==='2'?'background:rgba(251,191,36,.15);color:#D97706;':'background:rgba(96,165,250,.15);color:#3B82F6;'}">${IG_TYPE_MAP[d.type]||d.type}</span></td>
     <td>${esc(d.cat||'')}</td>
     <td style="text-align:right;">${(Number(d.views)||0).toLocaleString()}</td>
@@ -2171,8 +2532,8 @@ function exportIgCSV(){
 // 三階權限系統
 // ============================================================
 const ROLE_PASSWORDS={member:'ktgh20662088',leader:'ktghadmin2026'};
-const ROLE_LABELS={readonly:'唯讀',member:'組員',leader:'組長'};
-const ROLE_CLASSES={readonly:'role-readonly-chip',member:'role-member-chip',leader:'role-leader-chip'};
+const ROLE_LABELS={member:'組員',leader:'組長'};
+const ROLE_CLASSES={member:'role-member-chip',leader:'role-leader-chip'};
 let CURRENT_ROLE=sessionStorage.getItem('kt_role')||null;
 let _pendingRole=null;
 
@@ -2638,7 +2999,8 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
 // ============================================================
 document.addEventListener('DOMContentLoaded',()=>{
   checkAuth();
-  checkSetup();loadData();loadIgData();renderIgAll();
+  checkSetup();loadTags();loadData();loadIgData();renderIgAll();
+  initTagInput('f-tags',[]);initTagInput('ig-tags',[]);
   if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgAll();showSyncBadge('IG 已同步 Sheets');}});}
   document.getElementById('f-date').value=new Date().toISOString().slice(0,10);
   document.getElementById('ig-date').value=new Date().toISOString().slice(0,10);
