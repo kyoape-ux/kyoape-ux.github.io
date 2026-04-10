@@ -1525,24 +1525,24 @@ function renderSnapshotList(){
 const TAGS_KEY='kt_yt_tags';
 let TAGS=[]; // [{id, name, color, desc, group}]
 const TAG_COLORS=['#34D399','#60A5FA','#FBBF24','#F87171','#A78BFA','#2DD4BF','#F472B6','#F59E0B','#818CF8','#14B8A6'];
-const TAG_GROUPS=['主題','衛教與生活','疾病｜心臟與血管','疾病｜神經系統','疾病｜胸腔與呼吸','疾病｜肝膽腸胃','疾病｜腎臟與泌尿','疾病｜內分泌與代謝','疾病｜癌症','疾病｜骨科與復健','疾病｜眼科','疾病｜耳鼻喉','疾病｜皮膚科','疾病｜婦產科','疾病｜兒科','疾病｜風濕免疫','疾病｜身心科','疾病｜感染科','疾病｜牙科','疾病｜其他','推廣活動','品牌','族群','科別','特色中心','未分類'];
+const TAG_GROUPS=['科別','中心','疾病','儀器','技術','高級健檢','性質','健康人文藝術活動','族群','未分類'];
 const _si=(d,c)=>`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${c||'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;">${d}</svg>`;
-const TAG_GROUP_ICONS={
-  '主題':_si('<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/>'),
-  '衛教與生活':_si('<line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>'),
-  '推廣活動':_si('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'),
-  '品牌':_si('<rect x="1" y="3" width="15" height="13"/><polygon points="16,8 20,5 20,16 16,13 16,8"/>'),
-  '族群':_si('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
-  '科別':_si('<path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/>'),
-  '特色中心':_si('<polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>'),
-  '未分類':_si('<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>')
-};
-function getGroupIcon(g){if(TAG_GROUP_ICONS[g])return TAG_GROUP_ICONS[g];if(g&&g.startsWith('疾病'))return _si('<circle cx="12" cy="12" r="10"/><line x1="14.31" y1="8" x2="20.05" y2="17.94"/><line x1="9.69" y1="8" x2="21.17" y2="8"/><line x1="7.38" y1="12" x2="13.12" y2="2.06"/><line x1="9.69" y1="16" x2="3.95" y2="6.06"/><line x1="14.31" y1="16" x2="2.83" y2="16"/><line x1="16.62" y1="12" x2="10.88" y2="21.94"/>');return TAG_GROUP_ICONS['未分類'];}
+const TAG_GROUP_ICONS={};
+function getGroupIcon(g){return '';}
 function loadTags(){
   try{TAGS=JSON.parse(localStorage.getItem(TAGS_KEY)||'[]');}catch(e){TAGS=[];}
   if(!Array.isArray(TAGS))TAGS=[];
   // migrate: ensure group field
   TAGS.forEach(t=>{if(!t.group)t.group='未分類';});
+  // auto-seed: 首次使用時自動建立預設標籤
+  if(TAGS.length===0&&DEFAULT_TAGS.length>0){
+    DEFAULT_TAGS.forEach(t=>{
+      const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+      const colorIdx=(TAGS.length)%TAG_COLORS.length;
+      TAGS.push({id,name:t.name,color:TAG_COLORS[colorIdx],desc:t.desc||'',group:t.group||'未分類'});
+    });
+    saveTags();
+  }
 }
 function saveTags(){localStorage.setItem(TAGS_KEY,JSON.stringify(TAGS));}
 function addTag(name,desc,group){
@@ -1644,224 +1644,82 @@ function refreshAllTagInputs(){
 // 預設標籤種子
 // ============================================================
 const DEFAULT_TAGS=[
-  // ─── 主題 ───
-  {name:'肺癌',desc:'肺癌篩檢、LDCT、肺部腫瘤相關',group:'主題'},
-  {name:'LDCT',desc:'低劑量電腦斷層掃描推廣',group:'主題'},
-  {name:'大腸癌',desc:'大腸癌篩檢、大腸鏡相關',group:'主題'},
-  {name:'乳癌',desc:'乳癌防治、乳房攝影',group:'主題'},
-  {name:'糖尿病',desc:'血糖管理、胰島素、糖尿病預防',group:'主題'},
-  {name:'心血管',desc:'心臟病、高血壓、中風相關',group:'主題'},
-  {name:'腸胃',desc:'胃食道逆流、便秘、腸胃鏡',group:'主題'},
-  // ─── 衛教與生活 ───
-  {name:'營養',desc:'飲食建議、營養素、食材選擇',group:'衛教與生活'},
-  {name:'運動',desc:'運動處方、健身教學、復健運動',group:'衛教與生活'},
-  {name:'睡眠',desc:'睡眠品質、失眠、睡眠呼吸中止',group:'衛教與生活'},
-  {name:'減重',desc:'減重門診、體重管理',group:'衛教與生活'},
-  {name:'養生',desc:'中醫養生、保健觀念',group:'衛教與生活'},
-  {name:'壓力管理',desc:'心理健康、壓力紓解、情緒調適',group:'衛教與生活'},
-  {name:'日常保健',desc:'生活小常識、預防保健資訊',group:'衛教與生活'},
-  // ─── 疾病｜心臟與血管 ───
-  {name:'冠心病',desc:'冠狀動脈心臟病、心絞痛',group:'疾病｜心臟與血管'},
-  {name:'心肌梗塞',desc:'急性心肌梗塞',group:'疾病｜心臟與血管'},
-  {name:'心房顫動',desc:'心律不整、心房顫動',group:'疾病｜心臟與血管'},
-  {name:'心臟衰竭',desc:'充血性心臟衰竭',group:'疾病｜心臟與血管'},
-  {name:'高血壓',desc:'高血壓防治',group:'疾病｜心臟與血管'},
-  {name:'瓣膜疾病',desc:'心臟瓣膜修補/置換',group:'疾病｜心臟與血管'},
-  {name:'主動脈剝離',desc:'急性主動脈剝離',group:'疾病｜心臟與血管'},
-  {name:'靜脈曲張',desc:'下肢靜脈曲張',group:'疾病｜心臟與血管'},
-  {name:'周邊動脈疾病',desc:'周邊血管阻塞',group:'疾病｜心臟與血管'},
-  // ─── 疾病｜神經系統 ───
-  {name:'腦中風',desc:'缺血性/出血性腦中風',group:'疾病｜神經系統'},
-  {name:'帕金森氏症',desc:'巴金森氏症',group:'疾病｜神經系統'},
-  {name:'失智症',desc:'阿茲海默症、血管型失智',group:'疾病｜神經系統'},
-  {name:'癲癇',desc:'癲癇發作、抗癲癇治療',group:'疾病｜神經系統'},
-  {name:'頭痛',desc:'偏頭痛、緊張型頭痛',group:'疾病｜神經系統'},
-  {name:'三叉神經痛',desc:'三叉神經痛治療',group:'疾病｜神經系統'},
-  {name:'坐骨神經痛',desc:'坐骨神經壓迫',group:'疾病｜神經系統'},
-  // ─── 疾病｜胸腔與呼吸 ───
-  {name:'氣喘',desc:'支氣管氣喘',group:'疾病｜胸腔與呼吸'},
-  {name:'COPD',desc:'慢性阻塞性肺病',group:'疾病｜胸腔與呼吸'},
-  {name:'肺炎',desc:'社區型/院內型肺炎',group:'疾病｜胸腔與呼吸'},
-  {name:'肺結核',desc:'結核病防治',group:'疾病｜胸腔與呼吸'},
-  {name:'睡眠呼吸中止症',desc:'阻塞型睡眠呼吸中止',group:'疾病｜胸腔與呼吸'},
-  // ─── 疾病｜肝膽腸胃 ───
-  {name:'肝炎',desc:'B肝/C肝、病毒性肝炎',group:'疾病｜肝膽腸胃'},
-  {name:'肝硬化',desc:'肝硬化及併發症',group:'疾病｜肝膽腸胃'},
-  {name:'肝癌',desc:'肝細胞癌',group:'疾病｜肝膽腸胃'},
-  {name:'膽結石',desc:'膽囊結石、膽管結石',group:'疾病｜肝膽腸胃'},
-  {name:'胃潰瘍',desc:'消化性潰瘍',group:'疾病｜肝膽腸胃'},
-  {name:'胃食道逆流',desc:'GERD',group:'疾病｜肝膽腸胃'},
-  {name:'大腸息肉',desc:'大腸息肉切除',group:'疾病｜肝膽腸胃'},
-  {name:'腸躁症',desc:'大腸激躁症',group:'疾病｜肝膽腸胃'},
-  {name:'便秘',desc:'慢性便秘',group:'疾病｜肝膽腸胃'},
-  {name:'胰臟炎',desc:'急性/慢性胰臟炎',group:'疾病｜肝膽腸胃'},
-  // ─── 疾病｜腎臟與泌尿 ───
-  {name:'慢性腎病',desc:'CKD、腎功能衰退',group:'疾病｜腎臟與泌尿'},
-  {name:'腎結石',desc:'泌尿道結石',group:'疾病｜腎臟與泌尿'},
-  {name:'洗腎',desc:'血液透析、腹膜透析',group:'疾病｜腎臟與泌尿'},
-  {name:'攝護腺肥大',desc:'良性攝護腺增生',group:'疾病｜腎臟與泌尿'},
-  {name:'尿路感染',desc:'泌尿道感染',group:'疾病｜腎臟與泌尿'},
-  {name:'尿失禁',desc:'壓力性/急迫性尿失禁',group:'疾病｜腎臟與泌尿'},
-  // ─── 疾病｜內分泌與代謝 ───
-  {name:'甲狀腺疾病',desc:'甲亢、甲低、甲狀腺結節',group:'疾病｜內分泌與代謝'},
-  {name:'骨質疏鬆',desc:'骨密度檢測、骨鬆防治',group:'疾病｜內分泌與代謝'},
-  {name:'高血脂',desc:'高膽固醇、高三酸甘油酯',group:'疾病｜內分泌與代謝'},
-  {name:'痛風',desc:'高尿酸血症、痛風性關節炎',group:'疾病｜內分泌與代謝'},
-  // ─── 疾病｜癌症 ───
-  {name:'胃癌',desc:'胃癌治療',group:'疾病｜癌症'},
-  {name:'食道癌',desc:'食道癌治療',group:'疾病｜癌症'},
-  {name:'口腔癌',desc:'口腔癌篩檢與治療',group:'疾病｜癌症'},
-  {name:'攝護腺癌',desc:'攝護腺癌篩檢與治療',group:'疾病｜癌症'},
-  {name:'甲狀腺癌',desc:'甲狀腺癌手術',group:'疾病｜癌症'},
-  {name:'子宮頸癌',desc:'子宮頸癌篩檢、HPV',group:'疾病｜癌症'},
-  {name:'卵巢癌',desc:'卵巢癌治療',group:'疾病｜癌症'},
-  {name:'胰臟癌',desc:'胰臟癌治療',group:'疾病｜癌症'},
-  {name:'腎臟癌',desc:'腎細胞癌',group:'疾病｜癌症'},
-  {name:'膀胱癌',desc:'膀胱癌治療',group:'疾病｜癌症'},
-  {name:'淋巴癌',desc:'淋巴瘤',group:'疾病｜癌症'},
-  {name:'白血病',desc:'血癌、急性/慢性白血病',group:'疾病｜癌症'},
-  // ─── 疾病｜骨科與復健 ───
-  {name:'退化性關節炎',desc:'膝關節、髖關節退化',group:'疾病｜骨科與復健'},
-  {name:'椎間盤突出',desc:'腰椎/頸椎椎間盤突出',group:'疾病｜骨科與復健'},
-  {name:'骨折',desc:'各部位骨折處理',group:'疾病｜骨科與復健'},
-  {name:'十字韌帶',desc:'ACL 前十字韌帶損傷',group:'疾病｜骨科與復健'},
-  {name:'肩旋轉肌',desc:'旋轉肌袖撕裂',group:'疾病｜骨科與復健'},
-  {name:'脊椎側彎',desc:'脊椎側彎矯正',group:'疾病｜骨科與復健'},
-  {name:'五十肩',desc:'沾黏性肩關節囊炎',group:'疾病｜骨科與復健'},
-  {name:'足底筋膜炎',desc:'足底疼痛、足底筋膜炎',group:'疾病｜骨科與復健'},
-  // ─── 疾病｜眼科 ───
-  {name:'白內障',desc:'白內障手術',group:'疾病｜眼科'},
-  {name:'青光眼',desc:'青光眼治療',group:'疾病｜眼科'},
-  {name:'黃斑部病變',desc:'老年性黃斑部病變',group:'疾病｜眼科'},
-  {name:'乾眼症',desc:'乾眼症治療',group:'疾病｜眼科'},
-  {name:'近視',desc:'近視雷射、學童近視防治',group:'疾病｜眼科'},
-  {name:'視網膜剝離',desc:'視網膜剝離手術',group:'疾病｜眼科'},
-  // ─── 疾病｜耳鼻喉 ───
-  {name:'鼻竇炎',desc:'急性/慢性鼻竇炎',group:'疾病｜耳鼻喉'},
-  {name:'中耳炎',desc:'中耳炎治療',group:'疾病｜耳鼻喉'},
-  {name:'扁桃腺炎',desc:'扁桃腺肥大/發炎',group:'疾病｜耳鼻喉'},
-  {name:'聲帶疾病',desc:'聲帶息肉、聲帶麻痺',group:'疾病｜耳鼻喉'},
-  {name:'打鼾',desc:'打鼾治療、睡眠手術',group:'疾病｜耳鼻喉'},
-  {name:'聽力障礙',desc:'聽損評估、助聽器',group:'疾病｜耳鼻喉'},
-  // ─── 疾病｜皮膚科 ───
-  {name:'異位性皮膚炎',desc:'過敏性皮膚炎',group:'疾病｜皮膚科'},
-  {name:'蕁麻疹',desc:'急性/慢性蕁麻疹',group:'疾病｜皮膚科'},
-  {name:'帶狀疱疹',desc:'帶狀疱疹（皮蛇）',group:'疾病｜皮膚科'},
-  {name:'乾癬',desc:'乾癬（牛皮癬）',group:'疾病｜皮膚科'},
-  {name:'痤瘡',desc:'青春痘、粉刺治療',group:'疾病｜皮膚科'},
-  // ─── 疾病｜婦產科 ───
-  {name:'子宮肌瘤',desc:'子宮肌瘤治療',group:'疾病｜婦產科'},
-  {name:'子宮內膜異位',desc:'子宮內膜異位症、巧克力囊腫',group:'疾病｜婦產科'},
-  {name:'多囊性卵巢',desc:'PCOS',group:'疾病｜婦產科'},
-  {name:'更年期',desc:'更年期症狀與荷爾蒙治療',group:'疾病｜婦產科'},
-  {name:'產前檢查',desc:'產檢、高層次超音波',group:'疾病｜婦產科'},
-  {name:'不孕症',desc:'不孕症評估與治療',group:'疾病｜婦產科'},
-  // ─── 疾病｜兒科 ───
-  {name:'兒童過敏',desc:'小兒過敏、氣喘',group:'疾病｜兒科'},
-  {name:'腸病毒',desc:'腸病毒防治',group:'疾病｜兒科'},
-  {name:'發展遲緩',desc:'兒童發展評估',group:'疾病｜兒科'},
-  {name:'兒童肥胖',desc:'學童肥胖防治',group:'疾病｜兒科'},
-  {name:'新生兒黃疸',desc:'新生兒黃疸照護',group:'疾病｜兒科'},
-  // ─── 疾病｜風濕免疫 ───
-  {name:'類風濕性關節炎',desc:'RA',group:'疾病｜風濕免疫'},
-  {name:'紅斑性狼瘡',desc:'SLE',group:'疾病｜風濕免疫'},
-  {name:'僵直性脊椎炎',desc:'AS',group:'疾病｜風濕免疫'},
-  {name:'乾燥症',desc:'修格連氏症候群',group:'疾病｜風濕免疫'},
-  // ─── 疾病｜身心科 ───
-  {name:'憂鬱症',desc:'重度憂鬱症、產後憂鬱',group:'疾病｜身心科'},
-  {name:'焦慮症',desc:'廣泛性焦慮症、恐慌症',group:'疾病｜身心科'},
-  {name:'失眠',desc:'睡眠障礙、慢性失眠',group:'疾病｜身心科'},
-  {name:'自律神經失調',desc:'自律神經功能異常',group:'疾病｜身心科'},
-  // ─── 疾病｜感染科 ───
-  {name:'COVID-19',desc:'新冠病毒感染',group:'疾病｜感染科'},
-  {name:'流感',desc:'季節性流感防治',group:'疾病｜感染科'},
-  {name:'登革熱',desc:'登革熱防治',group:'疾病｜感染科'},
-  {name:'蜂窩性組織炎',desc:'皮膚軟組織感染',group:'疾病｜感染科'},
-  // ─── 疾病｜牙科 ───
-  {name:'牙周病',desc:'牙周病治療',group:'疾病｜牙科'},
-  {name:'植牙',desc:'人工植牙',group:'疾病｜牙科'},
-  {name:'齲齒',desc:'蛀牙預防與治療',group:'疾病｜牙科'},
-  // ─── 疾病｜其他 ───
-  {name:'疝氣',desc:'腹股溝疝氣、臍疝氣',group:'疾病｜其他'},
-  {name:'痔瘡',desc:'痔瘡手術、肛門疾患',group:'疾病｜其他'},
-  {name:'甲溝炎',desc:'指甲內生、甲溝炎',group:'疾病｜其他'},
-  // ─── 推廣活動 ───
-  {name:'疫苗宣導',desc:'流感/COVID/HPV 疫苗推廣',group:'推廣活動'},
-  {name:'健檢推廣',desc:'健康檢查套組、企業健檢',group:'推廣活動'},
-  {name:'社區講座',desc:'社區衛教講座、義診活動',group:'推廣活動'},
-  {name:'節慶活動',desc:'院內節慶活動、公益活動',group:'推廣活動'},
-  // ─── 品牌 ───
-  {name:'醫師介紹',desc:'主治醫師專訪、專長介紹',group:'品牌'},
-  {name:'院區導覽',desc:'環境介紹、新設備、新空間',group:'品牌'},
-  {name:'品牌形象',desc:'醫院理念、ESG、員工故事',group:'品牌'},
-  {name:'KOL合作',desc:'網紅體驗、部落客合作',group:'品牌'},
-  // ─── 族群 ───
-  {name:'銀髮族',desc:'長者照護、樂齡活動',group:'族群'},
-  {name:'婦幼',desc:'孕期保健、兒童衛教、產後護理',group:'族群'},
-  {name:'上班族',desc:'職場健康、久坐族、外食族',group:'族群'},
-  // ─── 科別 ───
-  {name:'一般內科',desc:'',group:'科別'},
-  {name:'神經內科',desc:'',group:'科別'},
-  {name:'肝膽腸胃科',desc:'',group:'科別'},
-  {name:'內分泌及新陳代謝科',desc:'',group:'科別'},
-  {name:'腎臟內科',desc:'',group:'科別'},
-  {name:'胸腔暨呼吸治療內科',desc:'',group:'科別'},
-  {name:'風濕免疫科',desc:'',group:'科別'},
-  {name:'心臟內科',desc:'',group:'科別'},
-  {name:'腫瘤內科',desc:'',group:'科別'},
-  {name:'感染科（科別）',desc:'',group:'科別'},
-  {name:'血液腫瘤科',desc:'',group:'科別'},
-  {name:'高壓氧診',desc:'',group:'科別'},
-  {name:'一般外科',desc:'',group:'科別'},
-  {name:'大腸直腸外科',desc:'',group:'科別'},
-  {name:'神經外科',desc:'',group:'科別'},
-  {name:'整形外科',desc:'',group:'科別'},
-  {name:'心臟血管外科',desc:'',group:'科別'},
-  {name:'胸腔外科',desc:'',group:'科別'},
-  {name:'骨科',desc:'',group:'科別'},
-  {name:'泌尿科',desc:'',group:'科別'},
-  {name:'乳房外科',desc:'',group:'科別'},
-  {name:'中醫部',desc:'',group:'科別'},
-  {name:'耳鼻喉頭頸部',desc:'',group:'科別'},
-  {name:'牙科（科別）',desc:'',group:'科別'},
-  {name:'眼科',desc:'',group:'科別'},
-  {name:'婦產科',desc:'',group:'科別'},
-  {name:'兒科（科別）',desc:'',group:'科別'},
-  {name:'皮膚科（科別）',desc:'',group:'科別'},
-  {name:'家庭醫學科',desc:'',group:'科別'},
-  {name:'老年醫學科',desc:'',group:'科別'},
-  {name:'緩和醫學科',desc:'',group:'科別'},
-  {name:'職業醫學科',desc:'',group:'科別'},
-  {name:'復健科',desc:'',group:'科別'},
-  {name:'身心科（科別）',desc:'',group:'科別'},
-  {name:'放射腫瘤科',desc:'',group:'科別'},
-  {name:'急診醫學部',desc:'',group:'科別'},
-  {name:'麻醉科',desc:'',group:'科別'},
-  {name:'核子醫學科',desc:'',group:'科別'},
-  {name:'影像醫學科',desc:'',group:'科別'},
-  {name:'重症醫學部',desc:'',group:'科別'},
-  {name:'病理科',desc:'',group:'科別'},
-  // ─── 特色中心 ───
-  {name:'肺癌篩檢暨防治中心',desc:'',group:'特色中心'},
-  {name:'媽媽寶寶天地',desc:'',group:'特色中心'},
-  {name:'國際醫療服務中心',desc:'',group:'特色中心'},
-  {name:'運動醫學中心',desc:'',group:'特色中心'},
-  {name:'長照中心',desc:'',group:'特色中心'},
-  {name:'失智共照中心',desc:'',group:'特色中心'},
-  {name:'營養點滴中心',desc:'',group:'特色中心'},
-  {name:'傷造口照護中心',desc:'',group:'特色中心'},
-  {name:'達文西微創手術中心',desc:'',group:'特色中心'},
-  {name:'瑪佐脊椎機械手臂',desc:'',group:'特色中心'},
-  {name:'健康管理中心',desc:'',group:'特色中心'},
-  {name:'醫學美容中心',desc:'',group:'特色中心'},
-  {name:'細胞治療專區',desc:'',group:'特色中心'},
-  {name:'腦中風中心',desc:'',group:'特色中心'},
-  {name:'癌症中心',desc:'',group:'特色中心'},
-  {name:'骨質疏鬆照護中心',desc:'',group:'特色中心'},
-  {name:'睡眠醫學中心',desc:'',group:'特色中心'},
-  {name:'兒童發展聯合評估中心',desc:'',group:'特色中心'},
-  {name:'兒少保護親善醫療中心',desc:'',group:'特色中心'},
-  {name:'社區健康中心',desc:'',group:'特色中心'},
+  // ═══ 科別 ═══
+  {name:'心臟內科',group:'科別'},{name:'神經內科',group:'科別'},{name:'神經外科',group:'科別'},
+  {name:'骨科',group:'科別'},{name:'婦產科',group:'科別'},{name:'兒科',group:'科別'},
+  {name:'耳鼻喉科',group:'科別'},{name:'眼科',group:'科別'},{name:'皮膚科',group:'科別'},
+  {name:'泌尿科',group:'科別'},{name:'腸胃肝膽',group:'科別'},{name:'身心科',group:'科別'},
+  {name:'中醫部',group:'科別'},{name:'放射腫瘤',group:'科別'},{name:'核子醫學',group:'科別'},
+  {name:'家醫科',group:'科別'},{name:'急診',group:'科別'},{name:'麻醉科',group:'科別'},
+  {name:'復健科',group:'科別'},{name:'胸腔內科',group:'科別'},{name:'腎臟內科',group:'科別'},
+  {name:'一般外科',group:'科別'},{name:'大腸直腸外科',group:'科別'},{name:'整形外科',group:'科別'},
+  {name:'心臟血管外科',group:'科別'},{name:'胸腔外科',group:'科別'},{name:'乳房外科',group:'科別'},
+  {name:'內分泌科',group:'科別'},{name:'風濕免疫科',group:'科別'},{name:'腫瘤內科',group:'科別'},
+  {name:'感染科',group:'科別'},{name:'血液腫瘤科',group:'科別'},{name:'老年醫學科',group:'科別'},
+  {name:'牙科',group:'科別'},{name:'病理科',group:'科別'},
+  // ═══ 中心 ═══
+  {name:'健康管理中心',group:'中心'},{name:'醫美中心',group:'中心'},{name:'運動醫學中心',group:'中心'},
+  {name:'癌症中心',group:'中心'},{name:'失智症中心',group:'中心'},{name:'睡眠中心',group:'中心'},
+  {name:'腦中風中心',group:'中心'},{name:'肺癌篩檢中心',group:'中心'},{name:'長照中心',group:'中心'},
+  {name:'營養點滴中心',group:'中心'},{name:'骨鬆照護中心',group:'中心'},{name:'細胞治療專區',group:'中心'},
+  {name:'兒童發展中心',group:'中心'},{name:'社區健康中心',group:'中心'},{name:'國際醫療中心',group:'中心'},
+  {name:'傷造口照護中心',group:'中心'},
+  // ═══ 疾病 ═══
+  {name:'肺癌',group:'疾病'},{name:'大腸癌',group:'疾病'},{name:'乳癌',group:'疾病'},
+  {name:'肝癌',group:'疾病'},{name:'胃癌',group:'疾病'},{name:'口腔癌',group:'疾病'},
+  {name:'攝護腺癌',group:'疾病'},{name:'甲狀腺癌',group:'疾病'},{name:'子宮頸癌',group:'疾病'},
+  {name:'腦中風',group:'疾病'},{name:'心肌梗塞',group:'疾病'},{name:'心房顫動',group:'疾病'},
+  {name:'高血壓',group:'疾病'},{name:'糖尿病',group:'疾病'},{name:'高血脂',group:'疾病'},
+  {name:'失智症',group:'疾病'},{name:'帕金森氏症',group:'疾病'},{name:'癲癇',group:'疾病'},
+  {name:'氣喘',group:'疾病'},{name:'COPD',group:'疾病'},{name:'睡眠呼吸中止症',group:'疾病'},
+  {name:'胃食道逆流',group:'疾病'},{name:'肝炎',group:'疾病'},{name:'膽結石',group:'疾病'},
+  {name:'大腸息肉',group:'疾病'},{name:'慢性腎病',group:'疾病'},{name:'腎結石',group:'疾病'},
+  {name:'攝護腺肥大',group:'疾病'},{name:'甲狀腺疾病',group:'疾病'},{name:'骨質疏鬆',group:'疾病'},
+  {name:'痛風',group:'疾病'},{name:'退化性關節炎',group:'疾病'},{name:'椎間盤突出',group:'疾病'},
+  {name:'五十肩',group:'疾病'},{name:'足底筋膜炎',group:'疾病'},{name:'脊椎側彎',group:'疾病'},
+  {name:'白內障',group:'疾病'},{name:'青光眼',group:'疾病'},{name:'黃斑部病變',group:'疾病'},
+  {name:'鼻竇炎',group:'疾病'},{name:'打鼾',group:'疾病'},{name:'聽力障礙',group:'疾病'},
+  {name:'異位性皮膚炎',group:'疾病'},{name:'帶狀疱疹',group:'疾病'},{name:'乾癬',group:'疾病'},
+  {name:'子宮肌瘤',group:'疾病'},{name:'子宮內膜異位',group:'疾病'},{name:'不孕症',group:'疾病'},
+  {name:'兒童過敏',group:'疾病'},{name:'腸病毒',group:'疾病'},{name:'發展遲緩',group:'疾病'},
+  {name:'類風濕性關節炎',group:'疾病'},{name:'僵直性脊椎炎',group:'疾病'},
+  {name:'憂鬱症',group:'疾病'},{name:'焦慮症',group:'疾病'},{name:'失眠',group:'疾病'},
+  {name:'疝氣',group:'疾病'},{name:'痔瘡',group:'疾病'},{name:'靜脈曲張',group:'疾病'},
+  {name:'COVID-19',group:'疾病'},{name:'流感',group:'疾病'},
+  // ═══ 儀器 ═══
+  {name:'達文西',group:'儀器'},{name:'MAKO機器手臂',group:'儀器'},{name:'Elekta Versa HD',group:'儀器'},
+  {name:'PET-CT',group:'儀器'},{name:'3T MRI',group:'儀器'},{name:'256切CT',group:'儀器'},
+  {name:'骨密度儀(DXA)',group:'儀器'},{name:'超音波',group:'儀器'},{name:'心導管',group:'儀器'},
+  {name:'內視鏡',group:'儀器'},{name:'高壓氧艙',group:'儀器'},{name:'體外震波',group:'儀器'},
+  {name:'瑪佐脊椎機械手臂',group:'儀器'},{name:'睡眠檢測儀',group:'儀器'},
+  // ═══ 技術 ═══
+  {name:'微創手術',group:'技術'},{name:'達文西手術',group:'技術'},{name:'機器手臂手術',group:'技術'},
+  {name:'標靶治療',group:'技術'},{name:'免疫治療',group:'技術'},{name:'細胞治療',group:'技術'},
+  {name:'放射治療',group:'技術'},{name:'質子治療',group:'技術'},{name:'精準醫療',group:'技術'},
+  {name:'腹腔鏡手術',group:'技術'},{name:'關節鏡手術',group:'技術'},{name:'脊椎微創手術',group:'技術'},
+  {name:'心導管手術',group:'技術'},{name:'TAVI',group:'技術'},{name:'LDCT篩檢',group:'技術'},
+  {name:'3D列印',group:'技術'},{name:'AI輔助診斷',group:'技術'},{name:'基因檢測',group:'技術'},
+  {name:'幹細胞治療',group:'技術'},{name:'冷凍治療',group:'技術'},
+  // ═══ 高級健檢 ═══
+  {name:'全身健檢',group:'高級健檢'},{name:'癌症篩檢',group:'高級健檢'},{name:'心血管健檢',group:'高級健檢'},
+  {name:'腦血管健檢',group:'高級健檢'},{name:'婦女健檢',group:'高級健檢'},{name:'企業健檢',group:'高級健檢'},
+  {name:'高階影像健檢',group:'高級健檢'},{name:'基因檢測健檢',group:'高級健檢'},{name:'樂齡健檢',group:'高級健檢'},
+  {name:'VIP尊榮健檢',group:'高級健檢'},{name:'消化道內視鏡健檢',group:'高級健檢'},
+  // ═══ 性質 ═══
+  {name:'新醫師',group:'性質'},{name:'新儀器',group:'性質'},{name:'新技術',group:'性質'},
+  {name:'專案活動',group:'性質'},{name:'健檢方案',group:'性質'},{name:'媒體露出',group:'性質'},
+  {name:'行政公告',group:'性質'},{name:'衛教文章',group:'性質'},{name:'院慶活動',group:'性質'},
+  {name:'KOL合作',group:'性質'},{name:'醫師介紹',group:'性質'},
+  // ═══ 健康人文藝術活動 ═══
+  {name:'音樂會',group:'健康人文藝術活動'},{name:'畫展',group:'健康人文藝術活動'},
+  {name:'志工活動',group:'健康人文藝術活動'},{name:'社區講座',group:'健康人文藝術活動'},
+  {name:'健走活動',group:'健康人文藝術活動'},{name:'公益義診',group:'健康人文藝術活動'},
+  {name:'節慶活動',group:'健康人文藝術活動'},{name:'親子活動',group:'健康人文藝術活動'},
+  {name:'員工運動會',group:'健康人文藝術活動'},{name:'園藝治療',group:'健康人文藝術活動'},
+  {name:'病友會',group:'健康人文藝術活動'},{name:'ESG永續',group:'健康人文藝術活動'},
+  // ═══ 族群 ═══
+  {name:'女性',group:'族群'},{name:'親子',group:'族群'},{name:'男性',group:'族群'},
+  {name:'中高齡',group:'族群'},{name:'兒童',group:'族群'},{name:'青少年',group:'族群'},
 ];
 function seedDefaultTags(){
   if(!canWrite()){alert('請以組員或組長身份登入');return;}
@@ -1883,15 +1741,9 @@ function seedDefaultTags(){
 // ============================================================
 // 分組顏色對應
 const TAG_GROUP_COLORS={
-  '主題':'#2563EB','衛教與生活':'#0891B2',
-  '疾病｜心臟與血管':'#DC2626','疾病｜神經系統':'#7C3AED','疾病｜胸腔與呼吸':'#0D9488',
-  '疾病｜肝膽腸胃':'#B45309','疾病｜腎臟與泌尿':'#4338CA','疾病｜內分泌與代謝':'#C026D3',
-  '疾病｜癌症':'#BE123C','疾病｜骨科與復健':'#15803D','疾病｜眼科':'#1D4ED8',
-  '疾病｜耳鼻喉':'#9333EA','疾病｜皮膚科':'#EA580C','疾病｜婦產科':'#DB2777',
-  '疾病｜兒科':'#059669','疾病｜風濕免疫':'#6D28D9','疾病｜身心科':'#7C3AED',
-  '疾病｜感染科':'#B91C1C','疾病｜牙科':'#0369A1','疾病｜其他':'#64748B',
-  '推廣活動':'#D97706','品牌':'#4F46E5','族群':'#0891B2',
-  '科別':'#15803D','特色中心':'#0E7490','未分類':'#64748B'
+  '科別':'#15803D','中心':'#0E7490','疾病':'#DC2626',
+  '儀器':'#B45309','技術':'#7C3AED','高級健檢':'#0369A1',
+  '性質':'#6D28D9','健康人文藝術活動':'#D97706','族群':'#BE123C','未分類':'#64748B'
 };
 function getGroupColor(g){return TAG_GROUP_COLORS[g]||'#64748B';}
 function renderTagsPage(){
