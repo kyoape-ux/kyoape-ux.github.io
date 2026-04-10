@@ -299,6 +299,24 @@ footer a{color:var(--indigo2);text-decoration:none}
   .nav-btn{padding:8px 12px;font-size:12px}
   .tools-grid,.sw-grid{grid-template-columns:1fr}
 }
+
+/* ── Face Blur ── */
+.fb-limits{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:12px}
+.fb-limit{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 9px}
+.fb-limit-label{font-size:10px;color:var(--text3);line-height:1.35}
+.fb-limit-label strong{color:var(--text2);font-size:10.5px;display:block;margin-bottom:1px}
+.fb-limit-ico-ok{color:var(--emerald2);flex-shrink:0}
+.fb-limit-ico-warn{color:var(--amber2);flex-shrink:0}
+.fb-setup{display:none;margin-bottom:12px}
+.tool-card.has-file .fb-setup{display:block}
+.tool-card.processing .fb-setup,.tool-card.done .fb-setup{display:none}
+.fb-canvas-wrap{position:relative;background:#000;border-radius:10px;overflow:hidden;margin-bottom:8px;cursor:crosshair;border:1px solid var(--border2);line-height:0}
+.fb-canvas{width:100%;display:block}
+.fb-hint{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(0,0,0,.72),transparent);color:rgba(255,255,255,.82);font-size:10px;text-align:center;padding:10px 6px 5px;pointer-events:none;line-height:1.4}
+.fb-detect-btn{width:100%;padding:7px;border-radius:9px;border:none;background:rgba(244,63,94,.1);color:var(--rose2);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s;margin-bottom:8px}
+.fb-detect-btn:hover{background:rgba(244,63,94,.2)}
+.fb-detect-btn:disabled{opacity:.4;pointer-events:none}
+.tool-card[data-tool="faceBlur"] .start-btn:disabled{opacity:.32;pointer-events:none}
 </style>
 </head>
 <body>
@@ -621,6 +639,79 @@ if ('serviceWorker' in navigator) {
       <button class="tool-btn start-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始壓製</button>
       <div class="download-wrap">
         <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載加浮水印影片</button>
+        <button class="reset-btn">重新處理</button>
+      </div>
+    </div>
+
+    <!-- 人臉模糊處理 -->
+    <div class="tool-card c-rose" data-tool="faceBlur">
+      <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
+      <div class="tool-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      </div>
+      <div class="tool-name">人臉模糊處理</div>
+      <div class="tool-desc">自動追蹤人臉位置，全片套用高斯模糊或馬賽克，適用於復健記錄、臨床研究影片的隱私保護。</div>
+
+      <!-- 使用限制 -->
+      <div class="fb-limits">
+        <div class="fb-limit">
+          <svg class="fb-limit-ico-ok" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="fb-limit-label"><strong>解析度</strong>1080p 以下</div>
+        </div>
+        <div class="fb-limit">
+          <svg class="fb-limit-ico-ok" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="fb-limit-label"><strong>長度</strong>5 分鐘以內</div>
+        </div>
+        <div class="fb-limit">
+          <svg class="fb-limit-ico-ok" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="fb-limit-label"><strong>檔案大小</strong>300 MB 以下</div>
+        </div>
+        <div class="fb-limit">
+          <svg class="fb-limit-ico-warn" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <div class="fb-limit-label"><strong>處理時間</strong>影片時長 5～10 倍</div>
+        </div>
+      </div>
+
+      <div class="drop-area">
+        <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
+        <div class="drop-area-text">拖曳影片到這裡，或點擊選取</div>
+        <div class="drop-area-sub">支援 MP4、MOV、AVI、MKV</div>
+      </div>
+      <div class="file-info">
+        <span class="file-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg></span>
+        <span class="file-info-name"></span><span class="file-info-size"></span>
+        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
+      </div>
+
+      <!-- Canvas 框選區 -->
+      <div class="fb-setup">
+        <div class="fb-canvas-wrap">
+          <canvas class="fb-canvas"></canvas>
+          <div class="fb-hint">手動拖曳框選臉部，或點「自動偵測人臉」</div>
+        </div>
+        <button class="fb-detect-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          自動偵測人臉
+        </button>
+        <select class="fmt-select fb-blur-type">
+          <option value="gaussian">高斯模糊（柔和自然，學術推薦）</option>
+          <option value="mosaic">馬賽克（明顯方塊遮蔽）</option>
+        </select>
+      </div>
+
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">處理中，請稍候...</div></div>
+      <div class="error-msg"></div>
+      <button class="tool-btn start-btn" disabled>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始模糊處理
+      </button>
+      <div class="download-wrap">
+        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載處理後影片</button>
         <button class="reset-btn">重新處理</button>
       </div>
     </div>
@@ -1465,6 +1556,340 @@ if ('serviceWorker' in navigator) {
     updateState();
   }
 
+  // ── Face Blur helpers ──────────────────────────────────────
+  function applyBlurEffect(ctx, srcCanvas, bbox, blurType) {
+    var x = Math.max(0, bbox.x), y = Math.max(0, bbox.y);
+    var w = Math.min(bbox.w, srcCanvas.width - x);
+    var h = Math.min(bbox.h, srcCanvas.height - y);
+    if (w <= 0 || h <= 0) return;
+    var tmp = document.createElement('canvas');
+    tmp.width = w; tmp.height = h;
+    tmp.getContext('2d').drawImage(srcCanvas, x, y, w, h, 0, 0, w, h);
+    if (blurType === 'gaussian') {
+      var blurPx = Math.round(Math.max(10, Math.min(Math.min(w, h) * 0.14, 40)));
+      ctx.save();
+      ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+      ctx.filter = 'blur(' + blurPx + 'px)';
+      ctx.drawImage(tmp, x, y, w, h);
+      ctx.restore();
+    } else {
+      var ps = Math.max(4, Math.min(Math.round(Math.min(w, h) / 9), 20));
+      var tw = Math.max(1, Math.ceil(w / ps)), th = Math.max(1, Math.ceil(h / ps));
+      var m = document.createElement('canvas'); m.width = tw; m.height = th;
+      m.getContext('2d').drawImage(srcCanvas, x, y, w, h, 0, 0, tw, th);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(m, 0, 0, tw, th, x, y, w, h);
+      ctx.imageSmoothingEnabled = true;
+    }
+  }
+
+  function setupFaceBlurCard(card) {
+    var input    = card.querySelector('input[type=file]');
+    var dropArea = card.querySelector('.drop-area');
+    var nameEl   = card.querySelector('.file-info-name');
+    var sizeEl   = card.querySelector('.file-info-size');
+    var clearBtn = card.querySelector('.file-clear');
+    var bar      = card.querySelector('.progress-bar');
+    var progText = card.querySelector('.progress-text');
+    var startBtn = card.querySelector('.start-btn');
+    var dlBtn    = card.querySelector('.dl-btn');
+    var resetBtn = card.querySelector('.reset-btn');
+    var errEl    = card.querySelector('.error-msg');
+    var canvasEl = card.querySelector('.fb-canvas');
+    var canvasWrap = card.querySelector('.fb-canvas-wrap');
+    var hintEl   = card.querySelector('.fb-hint');
+    var detectBtn= card.querySelector('.fb-detect-btn');
+    var blurSel  = card.querySelector('.fb-blur-type');
+    var ctx      = canvasEl.getContext('2d');
+
+    var videoEl  = document.createElement('video');
+    videoEl.muted = true; videoEl.playsInline = true;
+    var bbox = null; // video pixel coords
+    var mpReady = false, faceDet = null, _mpResolve = null;
+
+    // ── MediaPipe ──
+    function loadMP() {
+      return new Promise(function(res, rej) {
+        if (mpReady) { res(); return; }
+        var doInit = function() {
+          faceDet = new FaceDetection({
+            locateFile: function(f) {
+              return 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4.1646425229/' + f;
+            }
+          });
+          faceDet.setOptions({ model: 'short', minDetectionConfidence: 0.45 });
+          faceDet.onResults(function(r) {
+            if (_mpResolve) { var fn = _mpResolve; _mpResolve = null; fn(r.detections && r.detections.length ? r.detections[0] : null); }
+          });
+          // warm-up
+          faceDet.send({ image: canvasEl }).then(function() { mpReady = true; res(); }).catch(res);
+        };
+        if (window.FaceDetection) { doInit(); return; }
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4.1646425229/face_detection.js';
+        s.crossOrigin = 'anonymous';
+        s.onload = doInit; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+
+    function detectFace(imgEl) {
+      return new Promise(function(resolve) {
+        var tid = setTimeout(function() { if (_mpResolve) { _mpResolve = null; resolve(null); } }, 4000);
+        _mpResolve = function(d) { clearTimeout(tid); resolve(d); };
+        faceDet.send({ image: imgEl });
+      });
+    }
+
+    function detToBbox(det, vw, vh) {
+      var bb = det.boundingBox;
+      var fw = bb.width * vw, fh = bb.height * vh;
+      var px = fw * 0.22, py = fh * 0.28;
+      return {
+        x: Math.round(Math.max(0, (bb.xCenter - bb.width/2) * vw - px)),
+        y: Math.round(Math.max(0, (bb.yCenter - bb.height/2) * vh - py)),
+        w: Math.round(Math.min(fw + 2*px, vw)),
+        h: Math.round(Math.min(fh + 2*py, vh))
+      };
+    }
+
+    function drawBbox(b) {
+      var vw = canvasEl.width, vh = canvasEl.height;
+      ctx.drawImage(videoEl, 0, 0, vw, vh);
+      ctx.save();
+      ctx.strokeStyle = '#fb7185'; ctx.lineWidth = Math.max(2, vw/220);
+      ctx.setLineDash([Math.round(vw/60), Math.round(vw/90)]);
+      ctx.strokeRect(b.x, b.y, b.w, b.h);
+      ctx.fillStyle = 'rgba(251,113,133,.13)';
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      ctx.restore();
+    }
+
+    function setReady() { startBtn.disabled = false; }
+
+    // ── File handling ──
+    function setFile(f) {
+      if (f.size > 314572800) { // 300 MB
+        errEl.textContent = '檔案超過 300 MB 限制，請先壓縮再試';
+        card.classList.add('has-error'); return;
+      }
+      fileMap.set(card, f);
+      card.classList.remove('done','has-error','processing','fb-bbox-set');
+      card.classList.add('has-file');
+      nameEl.textContent = f.name; sizeEl.textContent = fmtBytes(f.size);
+      bar.style.width = '0%'; errEl.textContent = '';
+      bbox = null; startBtn.disabled = true;
+      hintEl.textContent = '手動拖曳框選臉部，或點「自動偵測人臉」';
+
+      if (videoEl.src.startsWith('blob:')) URL.revokeObjectURL(videoEl.src);
+      videoEl.src = URL.createObjectURL(f);
+      videoEl.addEventListener('loadedmetadata', function onMeta() {
+        videoEl.removeEventListener('loadedmetadata', onMeta);
+        var vw = videoEl.videoWidth, vh = videoEl.videoHeight;
+        if (vw > 1920 || vh > 1920) {
+          errEl.textContent = '解析度超過 1080p 建議上限，處理可能不穩定';
+          card.classList.add('has-error');
+        }
+        canvasEl.width = vw; canvasEl.height = vh;
+        videoEl.currentTime = 0.05;
+        videoEl.addEventListener('seeked', function onS() {
+          videoEl.removeEventListener('seeked', onS);
+          ctx.drawImage(videoEl, 0, 0, vw, vh);
+        });
+      });
+    }
+
+    function reset() {
+      fileMap.delete(card);
+      var pu = blobMap.get(card); if (pu) URL.revokeObjectURL(pu); blobMap.delete(card);
+      if (videoEl.src.startsWith('blob:')) URL.revokeObjectURL(videoEl.src);
+      videoEl.src = ''; videoEl.load();
+      card.classList.remove('has-file','done','has-error','processing');
+      if (input) input.value = '';
+      bar.style.width = '0%'; errEl.textContent = '';
+      bbox = null; startBtn.disabled = true;
+      ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+    }
+
+    // ── Canvas draw ──
+    var drawing = false, ds = {};
+    canvasWrap.addEventListener('mousedown', function(e) {
+      var r = canvasEl.getBoundingClientRect();
+      ds = { x: e.clientX - r.left, y: e.clientY - r.top };
+      drawing = true; e.preventDefault();
+    });
+    document.addEventListener('mousemove', function(e) {
+      if (!drawing) return;
+      var r = canvasEl.getBoundingClientRect();
+      var cx = e.clientX - r.left, cy = e.clientY - r.top;
+      var sx = canvasEl.width/r.width, sy = canvasEl.height/r.height;
+      ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+      ctx.save();
+      ctx.strokeStyle='#fb7185'; ctx.lineWidth=Math.max(2,canvasEl.width/220);
+      ctx.setLineDash([8,5]);
+      ctx.strokeRect(ds.x*sx, ds.y*sy, (cx-ds.x)*sx, (cy-ds.y)*sy);
+      ctx.fillStyle='rgba(251,113,133,.1)';
+      ctx.fillRect(ds.x*sx, ds.y*sy, (cx-ds.x)*sx, (cy-ds.y)*sy);
+      ctx.restore();
+    });
+    document.addEventListener('mouseup', function(e) {
+      if (!drawing) return; drawing = false;
+      var r = canvasEl.getBoundingClientRect();
+      var sx = canvasEl.width/r.width, sy = canvasEl.height/r.height;
+      var dx = (e.clientX - r.left - ds.x)*sx, dy = (e.clientY - r.top - ds.y)*sy;
+      if (Math.abs(dx) < 15 || Math.abs(dy) < 15) return;
+      var bx = ds.x*sx, by = ds.y*sy;
+      if (dx < 0) { bx += dx; dx = -dx; } if (dy < 0) { by += dy; dy = -dy; }
+      bbox = { x:Math.round(bx), y:Math.round(by), w:Math.round(dx), h:Math.round(dy) };
+      hintEl.textContent = '已框選臉部區域 ✓ — 拖曳可重新選取';
+      setReady();
+    });
+
+    // ── Auto-detect ──
+    detectBtn.addEventListener('click', async function() {
+      if (!fileMap.get(card)) return;
+      detectBtn.disabled = true;
+      var orig = detectBtn.innerHTML;
+      detectBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg> 載入偵測引擎...';
+      try {
+        await loadMP();
+        detectBtn.innerHTML = orig.replace('自動偵測人臉','偵測中...');
+        var det = await detectFace(canvasEl);
+        if (!det) {
+          hintEl.textContent = '⚠ 未偵測到人臉 — 請手動拖曳框選';
+        } else {
+          bbox = detToBbox(det, canvasEl.width, canvasEl.height);
+          drawBbox(bbox);
+          hintEl.textContent = '已自動偵測人臉 ✓ — 可重新拖曳調整範圍';
+          setReady();
+        }
+      } catch(e) { hintEl.textContent = '⚠ 偵測載入失敗，請手動框選'; }
+      detectBtn.disabled = false;
+      detectBtn.innerHTML = orig;
+    });
+
+    // ── Start ──
+    startBtn.addEventListener('click', async function() {
+      var file = fileMap.get(card);
+      if (!file || !bbox) return;
+      if (card.classList.contains('processing')) return;
+      if (ffRunning) { errEl.textContent = '另一個工具正在處理中，請稍候再試'; card.classList.add('has-error'); return; }
+
+      card.classList.remove('has-error','done'); card.classList.add('processing');
+      bar.style.width = '5%';
+      currentBar = bar; currentProgressEl = progText; currentProgressBase = '處理中...'; ffRunning = true;
+
+      try {
+        await ensureFF(); bar.style.width = '8%';
+
+        var vw = videoEl.videoWidth, vh = videoEl.videoHeight;
+        var duration = videoEl.duration;
+        if (duration > 300) throw new Error('影片超過 5 分鐘限制（' + Math.round(duration/60) + ' 分鐘）');
+
+        progText.textContent = '載入臉部偵測引擎...';
+        await loadMP(); bar.style.width = '10%';
+
+        var blurType = blurSel.value;
+        var fps = 24;
+        var inExt = getExt(file.name), inN = 'fb_in.' + inExt;
+
+        progText.textContent = '載入影片...';
+        try { ff.FS('unlink', inN); } catch(e) {}
+        ff.FS('writeFile', inN, await fetchFile(file));
+        bar.style.width = '14%';
+
+        progText.textContent = '提取音軌...';
+        try { ff.FS('unlink', 'fb_aud.aac'); } catch(e) {}
+        var hasAudio = false;
+        try { await ff.run('-i', inN, '-vn', '-acodec', 'aac', '-b:a', '128k', 'fb_aud.aac'); hasAudio = true; } catch(e) {}
+        bar.style.width = '16%';
+
+        // Process frames
+        var offC = document.createElement('canvas'); offC.width = vw; offC.height = vh;
+        var offCtx = offC.getContext('2d');
+        var totalFrames = Math.ceil(duration * fps);
+        var lastBbox = bbox;
+        var written = 0;
+
+        for (var i = 0; i < totalFrames; i++) {
+          // Seek
+          var t = i / fps;
+          await new Promise(function(res) {
+            if (Math.abs(videoEl.currentTime - t) < 0.004) { res(); return; }
+            function h() { videoEl.removeEventListener('seeked', h); res(); }
+            videoEl.addEventListener('seeked', h);
+            videoEl.currentTime = t;
+          });
+
+          offCtx.drawImage(videoEl, 0, 0, vw, vh);
+
+          // Detect & track
+          var det = await detectFace(offC);
+          if (det) lastBbox = detToBbox(det, vw, vh);
+
+          // Apply blur
+          applyBlurEffect(offCtx, offC, lastBbox, blurType);
+
+          // Write JPEG frame
+          var fName = 'fb_' + String(i).padStart(6,'0') + '.jpg';
+          var jBlob = await new Promise(function(r) { offC.toBlob(r, 'image/jpeg', 0.88); });
+          ff.FS('writeFile', fName, new Uint8Array(await jBlob.arrayBuffer()));
+          written++;
+
+          var pct = 16 + Math.round((i / totalFrames) * 68);
+          bar.style.width = pct + '%';
+          progText.textContent = '處理第 ' + (i+1) + ' / ' + totalFrames + ' 幀...';
+          if (i % 5 === 0) await sleep(0);
+        }
+
+        // Encode
+        progText.textContent = '編碼輸出影片...'; bar.style.width = '85%';
+        try { ff.FS('unlink', 'fb_out.mp4'); } catch(e) {}
+        var args = ['-r', String(fps), '-i', 'fb_%06d.jpg'];
+        if (hasAudio) args.push('-i', 'fb_aud.aac');
+        args.push('-c:v','libx264','-preset','ultrafast','-crf','20','-pix_fmt','yuv420p');
+        if (hasAudio) args.push('-c:a','aac','-b:a','128k','-shortest');
+        args.push('-max_muxing_queue_size','1024','fb_out.mp4');
+        await ff.run.apply(ff, args);
+
+        var outData = ff.FS('readFile', 'fb_out.mp4');
+
+        // Cleanup FS
+        try { ff.FS('unlink', inN); } catch(e) {}
+        try { ff.FS('unlink', 'fb_aud.aac'); } catch(e) {}
+        try { ff.FS('unlink', 'fb_out.mp4'); } catch(e) {}
+        for (var j = 0; j < written; j++) { try { ff.FS('unlink','fb_'+String(j).padStart(6,'0')+'.jpg'); } catch(e) {} }
+
+        bar.style.width = '100%'; await sleep(350);
+        card.classList.remove('processing'); card.classList.add('done');
+        var blob = new Blob([outData.buffer], { type:'video/mp4' });
+        var url = URL.createObjectURL(blob);
+        blobMap.set(card, url);
+        dlBtn.onclick = function() { var a=document.createElement('a'); a.href=url; a.download=basename(file.name)+'_blurred.mp4'; a.click(); };
+
+      } catch(err) {
+        console.error(err);
+        card.classList.remove('processing'); card.classList.add('has-file','has-error');
+        bar.style.width = '0%';
+        errEl.textContent = '處理失敗：' + (err.message || '格式不支援或記憶體不足');
+        if (err.message && err.message.indexOf('one command at a time') >= 0) ffReady = false;
+      } finally {
+        currentBar = null;
+        if (currentProgressEl) currentProgressEl.textContent = currentProgressBase;
+        currentProgressEl = null; currentProgressBase = ''; ffRunning = false;
+      }
+    });
+
+    // ── Drop / input / clear / reset ──
+    dropArea.addEventListener('click', function() { input.click(); });
+    dropArea.addEventListener('dragover', function(e) { e.preventDefault(); dropArea.classList.add('drag-over'); });
+    dropArea.addEventListener('dragleave', function() { dropArea.classList.remove('drag-over'); });
+    dropArea.addEventListener('drop', function(e) { e.preventDefault(); dropArea.classList.remove('drag-over'); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
+    input.addEventListener('change', function() { if (input.files[0]) setFile(input.files[0]); });
+    clearBtn.addEventListener('click', reset);
+    resetBtn.addEventListener('click', reset);
+  }
+
   window.showPanel = function(id, btn) {
     document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
     document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
@@ -1476,9 +1901,10 @@ if ('serviceWorker' in navigator) {
     }
   };
 
-  document.querySelectorAll('.tool-card[data-tool]:not([data-tool="merge"]):not([data-tool="watermark"])').forEach(setupCard);
+  document.querySelectorAll('.tool-card[data-tool]:not([data-tool="merge"]):not([data-tool="watermark"]):not([data-tool="faceBlur"])').forEach(setupCard);
   document.querySelectorAll('.tool-card[data-tool="watermark"]').forEach(setupWatermarkCard);
   document.querySelectorAll('.tool-card[data-tool="merge"]').forEach(setupMergeCard);
+  document.querySelectorAll('.tool-card[data-tool="faceBlur"]').forEach(setupFaceBlurCard);
 })();
 </script>
 
