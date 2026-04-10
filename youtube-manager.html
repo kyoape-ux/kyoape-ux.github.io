@@ -869,6 +869,7 @@ tr:hover td{background:rgba(52,211,153,.03);}
           </div>
           <div class="form-actions" style="margin-top:12px;">
             <button class="btn btn-primary write-only" onclick="submitNewTag()">新增標籤</button>
+            <button class="btn btn-secondary write-only" onclick="seedDefaultTags()" title="建立一組依醫院內容彙整出的常用標籤，不會覆蓋既有標籤">⚡ 載入預設標籤組</button>
           </div>
         </div>
         <div class="cfg-card" style="margin-top:20px;">
@@ -1591,6 +1592,59 @@ function getTagsFromInput(containerId){
 }
 function refreshAllTagInputs(){
   ['f-tags','e-tags','ig-tags','ie-tags'].forEach(id=>{const box=document.getElementById(id);if(box&&box._render)box._render();});
+}
+
+// ============================================================
+// 預設標籤種子
+// ============================================================
+const DEFAULT_TAGS=[
+  // ─── 疾病與醫療主題 ───
+  {name:'肺癌',desc:'肺癌篩檢、LDCT、肺部腫瘤相關'},
+  {name:'LDCT',desc:'低劑量電腦斷層掃描推廣'},
+  {name:'大腸癌',desc:'大腸癌篩檢、大腸鏡相關'},
+  {name:'乳癌',desc:'乳癌防治、乳房攝影'},
+  {name:'糖尿病',desc:'血糖管理、胰島素、糖尿病預防'},
+  {name:'心血管',desc:'心臟病、高血壓、中風相關'},
+  {name:'骨科',desc:'骨折、關節置換、脊椎相關'},
+  {name:'復健',desc:'物理治療、職能治療、運動傷害復健'},
+  {name:'眼科',desc:'白內障、近視雷射、視網膜手術'},
+  {name:'腸胃',desc:'胃食道逆流、便秘、腸胃鏡'},
+  // ─── 衛教與生活 ───
+  {name:'營養',desc:'飲食建議、營養素、食材選擇'},
+  {name:'運動',desc:'運動處方、健身教學、復健運動'},
+  {name:'睡眠',desc:'睡眠品質、失眠、睡眠呼吸中止'},
+  {name:'減重',desc:'減重門診、體重管理'},
+  {name:'養生',desc:'中醫養生、保健觀念'},
+  {name:'壓力管理',desc:'心理健康、壓力紓解、情緒調適'},
+  {name:'日常保健',desc:'生活小常識、預防保健資訊'},
+  // ─── 推廣活動 ───
+  {name:'疫苗宣導',desc:'流感/COVID/HPV 疫苗推廣'},
+  {name:'健檢推廣',desc:'健康檢查套組、企業健檢'},
+  {name:'社區講座',desc:'社區衛教講座、義診活動'},
+  {name:'節慶活動',desc:'院內節慶活動、公益活動'},
+  // ─── 品牌 ───
+  {name:'醫師介紹',desc:'主治醫師專訪、專長介紹'},
+  {name:'院區導覽',desc:'環境介紹、新設備、新空間'},
+  {name:'品牌形象',desc:'醫院理念、ESG、員工故事'},
+  {name:'KOL合作',desc:'網紅體驗、部落客合作'},
+  // ─── 特定族群 ───
+  {name:'銀髮族',desc:'長者照護、樂齡活動'},
+  {name:'婦幼',desc:'孕期保健、兒童衛教、產後護理'},
+  {name:'上班族',desc:'職場健康、久坐族、外食族'},
+];
+function seedDefaultTags(){
+  if(!canWrite()){alert('請以組員或組長身份登入');return;}
+  const existing=TAGS.map(t=>t.name);
+  const toAdd=DEFAULT_TAGS.filter(t=>!existing.includes(t.name));
+  if(toAdd.length===0){alert('所有預設標籤皆已存在，無需重複建立。');return;}
+  if(!confirm(`即將建立 ${toAdd.length} 個預設標籤（不影響已存在的標籤）。\n\n包含：${toAdd.map(t=>t.name).join('、')}\n\n確定建立？`))return;
+  toAdd.forEach(t=>{
+    const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    const colorIdx=(TAGS.length)%TAG_COLORS.length;
+    TAGS.push({id,name:t.name,color:TAG_COLORS[colorIdx],desc:t.desc});
+  });
+  saveTags();renderTagsPage();refreshAllTagInputs();
+  alert(`✅ 已建立 ${toAdd.length} 個預設標籤！\n可到標籤管理頁自行新增、修改或刪除。`);
 }
 
 // ============================================================
