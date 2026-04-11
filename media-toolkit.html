@@ -668,7 +668,7 @@ if (!self.crossOriginIsolated) {
         </svg>
       </div>
       <div class="tool-name">人臉模糊處理</div>
-      <div class="tool-desc">自動追蹤人臉位置，全片套用高斯模糊或馬賽克，適用於復健記錄、臨床研究影片的隱私保護。</div>
+      <div class="tool-desc">自動追蹤人臉位置，全片套用高斯模糊或馬賽克，保護影片中的個人隱私。</div>
 
       <!-- 使用限制 -->
       <div class="fb-limits">
@@ -1579,10 +1579,11 @@ if (!self.crossOriginIsolated) {
     var tmp = document.createElement('canvas');
     tmp.width = w; tmp.height = h;
     tmp.getContext('2d').drawImage(srcCanvas, x, y, w, h, 0, 0, w, h);
+    var cx = x + w/2, cy = y + h/2, rx = w/2, ry = h/2;
     if (blurType === 'gaussian') {
       var blurPx = Math.round(Math.max(10, Math.min(Math.min(w, h) * 0.14, 40)));
       ctx.save();
-      ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2); ctx.clip();
       ctx.filter = 'blur(' + blurPx + 'px)';
       ctx.drawImage(tmp, x, y, w, h);
       ctx.restore();
@@ -1591,9 +1592,12 @@ if (!self.crossOriginIsolated) {
       var tw = Math.max(1, Math.ceil(w / ps)), th = Math.max(1, Math.ceil(h / ps));
       var m = document.createElement('canvas'); m.width = tw; m.height = th;
       m.getContext('2d').drawImage(srcCanvas, x, y, w, h, 0, 0, tw, th);
+      ctx.save();
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2); ctx.clip();
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(m, 0, 0, tw, th, x, y, w, h);
       ctx.imageSmoothingEnabled = true;
+      ctx.restore();
     }
   }
 
@@ -1658,7 +1662,7 @@ if (!self.crossOriginIsolated) {
     function detToBbox(det, vw, vh) {
       var bb = det.boundingBox;
       var fw = bb.width * vw, fh = bb.height * vh;
-      var px = fw * 0.22, py = fh * 0.28;
+      var px = fw * 0.08, py = fh * 0.10;
       return {
         x: Math.round(Math.max(0, (bb.xCenter - bb.width/2) * vw - px)),
         y: Math.round(Math.max(0, (bb.yCenter - bb.height/2) * vh - py)),
@@ -1671,11 +1675,13 @@ if (!self.crossOriginIsolated) {
       var vw = canvasEl.width, vh = canvasEl.height;
       ctx.drawImage(videoEl, 0, 0, vw, vh);
       ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(b.x + b.w/2, b.y + b.h/2, b.w/2, b.h/2, 0, 0, Math.PI*2);
       ctx.strokeStyle = '#fb7185'; ctx.lineWidth = Math.max(2, vw/220);
       ctx.setLineDash([Math.round(vw/60), Math.round(vw/90)]);
-      ctx.strokeRect(b.x, b.y, b.w, b.h);
+      ctx.stroke();
       ctx.fillStyle = 'rgba(251,113,133,.13)';
-      ctx.fillRect(b.x, b.y, b.w, b.h);
+      ctx.fill();
       ctx.restore();
     }
 
@@ -1737,13 +1743,16 @@ if (!self.crossOriginIsolated) {
       var r = canvasEl.getBoundingClientRect();
       var cx = e.clientX - r.left, cy = e.clientY - r.top;
       var sx = canvasEl.width/r.width, sy = canvasEl.height/r.height;
+      var bw = (cx - ds.x)*sx, bh = (cy - ds.y)*sy;
       ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
       ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(ds.x*sx + bw/2, ds.y*sy + bh/2, Math.abs(bw/2), Math.abs(bh/2), 0, 0, Math.PI*2);
       ctx.strokeStyle='#fb7185'; ctx.lineWidth=Math.max(2,canvasEl.width/220);
       ctx.setLineDash([8,5]);
-      ctx.strokeRect(ds.x*sx, ds.y*sy, (cx-ds.x)*sx, (cy-ds.y)*sy);
+      ctx.stroke();
       ctx.fillStyle='rgba(251,113,133,.1)';
-      ctx.fillRect(ds.x*sx, ds.y*sy, (cx-ds.x)*sx, (cy-ds.y)*sy);
+      ctx.fill();
       ctx.restore();
     });
     document.addEventListener('mouseup', function(e) {
