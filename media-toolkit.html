@@ -582,81 +582,6 @@ if (!self.crossOriginIsolated) {
       </div>
     </div>
 
-    <!-- 移除聲音 -->
-    <div class="tool-card c-rose" data-tool="mute">
-      <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
-      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-mute"/></svg></div>
-      <div class="tool-name">移除影片聲音</div>
-      <div class="tool-desc">將影片音軌完全移除，輸出無聲影片，適合重新配音或配樂。</div>
-      <div class="tool-formats"><span class="fmt">去除音軌</span><span class="fmt">保留畫面</span><span class="fmt">快速處理</span></div>
-      <div class="drop-area">
-        <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
-        <div class="drop-area-text">拖曳影片到這裡，或點擊選取</div>
-        <div class="drop-area-sub">支援 MP4、MOV、AVI、MKV</div>
-      </div>
-      <div class="file-info">
-        <span class="file-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg></span>
-        <span class="file-info-name"></span><span class="file-info-size"></span>
-        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
-      </div>
-      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">移除音軌中...</div></div>
-      <div class="error-msg"></div>
-      <button class="tool-btn start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>移除聲音</button>
-      <div class="download-wrap">
-        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載無聲影片</button>
-        <button class="reset-btn">再次處理</button>
-      </div>
-    </div>
-
-    <div class="tool-card c-orange" data-tool="watermark">
-      <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
-      <input type="file" hidden accept="image/*" class="wm-logo-input">
-      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-wm"/></svg></div>
-      <div class="tool-name">壓製浮水印</div>
-      <div class="tool-desc">將 LOGO 疊加在影片指定角落，支援 PNG 透明背景，適合加上頻道或品牌標誌。</div>
-      <div class="drop-area">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg>
-        <div class="drop-text">拖曳影片到這裡，或點擊選取</div>
-        <div class="drop-sub">支援 MP4、MOV、MKV、WebM</div>
-      </div>
-      <div class="file-info">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg>
-        <div class="file-meta"><div class="file-name"></div><div class="file-info-size"></div></div>
-        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
-      </div>
-      <div class="wm-logo-pick">
-        <button class="tool-btn wm-logo-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg>選擇 LOGO 圖片</button>
-        <span class="wm-logo-name">尚未選擇（PNG 透明背景建議）</span>
-      </div>
-      <div class="wm-opts">
-        <div class="trim-bit-row">
-          <span class="trim-bit-lbl">位置</span>
-          <div class="wm-pos-grid">
-            <button class="wm-pos-btn" data-pos="tl">↖ 左上</button>
-            <button class="wm-pos-btn active" data-pos="tr">↗ 右上</button>
-            <button class="wm-pos-btn" data-pos="bl">↙ 左下</button>
-            <button class="wm-pos-btn" data-pos="br">↘ 右下</button>
-          </div>
-        </div>
-        <div class="trim-bit-row">
-          <span class="trim-bit-lbl">大小</span>
-          <select class="fmt-select wm-size-sel" style="margin-bottom:0">
-            <option value="80">小（80px）</option>
-            <option value="120" selected>中（120px）</option>
-            <option value="180">大（180px）</option>
-            <option value="250">特大（250px）</option>
-          </select>
-        </div>
-      </div>
-      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">壓製浮水印中...</div></div>
-      <div class="error-msg"></div>
-      <button class="tool-btn start-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始壓製</button>
-      <div class="download-wrap">
-        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載加浮水印影片</button>
-        <button class="reset-btn">重新處理</button>
-      </div>
-    </div>
-
     <!-- 人臉模糊處理 -->
     <div class="tool-card c-rose" data-tool="faceBlur">
       <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
@@ -727,6 +652,81 @@ if (!self.crossOriginIsolated) {
       <div class="download-wrap">
         <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載處理後影片</button>
         <button class="reset-btn">重新處理</button>
+      </div>
+    </div>
+
+    <div class="tool-card c-orange" data-tool="watermark">
+      <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
+      <input type="file" hidden accept="image/*" class="wm-logo-input">
+      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-wm"/></svg></div>
+      <div class="tool-name">壓製浮水印</div>
+      <div class="tool-desc">將 LOGO 疊加在影片指定角落，支援 PNG 透明背景，適合加上頻道或品牌標誌。</div>
+      <div class="drop-area">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg>
+        <div class="drop-text">拖曳影片到這裡，或點擊選取</div>
+        <div class="drop-sub">支援 MP4、MOV、MKV、WebM</div>
+      </div>
+      <div class="file-info">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg>
+        <div class="file-meta"><div class="file-name"></div><div class="file-info-size"></div></div>
+        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
+      </div>
+      <div class="wm-logo-pick">
+        <button class="tool-btn wm-logo-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg>選擇 LOGO 圖片</button>
+        <span class="wm-logo-name">尚未選擇（PNG 透明背景建議）</span>
+      </div>
+      <div class="wm-opts">
+        <div class="trim-bit-row">
+          <span class="trim-bit-lbl">位置</span>
+          <div class="wm-pos-grid">
+            <button class="wm-pos-btn" data-pos="tl">↖ 左上</button>
+            <button class="wm-pos-btn active" data-pos="tr">↗ 右上</button>
+            <button class="wm-pos-btn" data-pos="bl">↙ 左下</button>
+            <button class="wm-pos-btn" data-pos="br">↘ 右下</button>
+          </div>
+        </div>
+        <div class="trim-bit-row">
+          <span class="trim-bit-lbl">大小</span>
+          <select class="fmt-select wm-size-sel" style="margin-bottom:0">
+            <option value="80">小（80px）</option>
+            <option value="120" selected>中（120px）</option>
+            <option value="180">大（180px）</option>
+            <option value="250">特大（250px）</option>
+          </select>
+        </div>
+      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">壓製浮水印中...</div></div>
+      <div class="error-msg"></div>
+      <button class="tool-btn start-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始壓製</button>
+      <div class="download-wrap">
+        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載加浮水印影片</button>
+        <button class="reset-btn">重新處理</button>
+      </div>
+    </div>
+
+    <!-- 移除聲音 -->
+    <div class="tool-card c-rose" data-tool="mute">
+      <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
+      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-mute"/></svg></div>
+      <div class="tool-name">移除影片聲音</div>
+      <div class="tool-desc">將影片音軌完全移除，輸出無聲影片，適合重新配音或配樂。</div>
+      <div class="tool-formats"><span class="fmt">去除音軌</span><span class="fmt">保留畫面</span><span class="fmt">快速處理</span></div>
+      <div class="drop-area">
+        <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
+        <div class="drop-area-text">拖曳影片到這裡，或點擊選取</div>
+        <div class="drop-area-sub">支援 MP4、MOV、AVI、MKV</div>
+      </div>
+      <div class="file-info">
+        <span class="file-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg></span>
+        <span class="file-info-name"></span><span class="file-info-size"></span>
+        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
+      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">移除音軌中...</div></div>
+      <div class="error-msg"></div>
+      <button class="tool-btn start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>移除聲音</button>
+      <div class="download-wrap">
+        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載無聲影片</button>
+        <button class="reset-btn">再次處理</button>
       </div>
     </div>
 
