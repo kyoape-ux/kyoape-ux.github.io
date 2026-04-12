@@ -358,6 +358,24 @@ footer a{color:var(--indigo2);text-decoration:none}
 .sub-opts{display:flex;gap:8px;margin-bottom:8px}
 .sub-opts select{flex:1}
 .tool-card[data-tool="subtitle"] .start-btn:disabled{opacity:.32;pointer-events:none}
+
+/* guide bar */
+.guide-bar{margin-bottom:20px}
+.guide-bar-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;letter-spacing:.3px}
+.guide-bar-title svg{opacity:.55}
+.guide-scroll{display:flex;flex-wrap:wrap;gap:6px}
+.guide-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 12px;border-radius:8px;border:1px solid var(--border2);
+  background:var(--card);color:var(--text2);font-size:11px;font-weight:600;
+  cursor:pointer;transition:.18s;white-space:nowrap;text-decoration:none;
+}
+.guide-pill:hover{border-color:var(--border);color:var(--text);transform:translateY(-1px)}
+.guide-pill .gp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.gp-emerald{background:#10b981}.gp-amber{background:#f59e0b}.gp-sky{background:#0ea5e9}
+.gp-teal{background:#14b8a6}.gp-rose{background:#f43f5e}.gp-orange{background:#ea580c}
+.gp-pink{background:#ec4899}.gp-lime{background:#84cc16}.gp-cyan{background:#22d3ee}
+.gp-fuchsia{background:#d946ef}.gp-indigo{background:#818cf8}.gp-violet{background:#8b5cf6}
 </style>
 </head>
 <body>
@@ -462,6 +480,28 @@ if (!self.crossOriginIsolated) {
     <div>
       <div class="tips-title">完全在瀏覽器內處理，檔案不會離開你的電腦</div>
       <div class="tips-text">所有轉檔由 FFmpeg 在本機執行，無需帳號、無需上傳，完全保護隱私。首次使用需下載引擎（約 25 MB），之後即時處理。</div>
+    </div>
+  </div>
+
+  <div class="guide-bar">
+    <div class="guide-bar-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      使用指南 — 點擊快速跳轉至該工具
+    </div>
+    <div class="guide-scroll">
+      <a class="guide-pill" data-guide="compress"><span class="gp-dot gp-emerald"></span>影片壓縮</a>
+      <a class="guide-pill" data-guide="convert"><span class="gp-dot gp-amber"></span>格式轉換</a>
+      <a class="guide-pill" data-guide="trim"><span class="gp-dot gp-sky"></span>影片裁剪</a>
+      <a class="guide-pill" data-guide="merge"><span class="gp-dot gp-teal"></span>影片合併</a>
+      <a class="guide-pill" data-guide="faceBlur"><span class="gp-dot gp-rose"></span>人臉模糊</a>
+      <a class="guide-pill" data-guide="watermark"><span class="gp-dot gp-orange"></span>壓製浮水印</a>
+      <a class="guide-pill" data-guide="mute"><span class="gp-dot gp-rose"></span>移除聲音</a>
+      <a class="guide-pill" data-guide="bgm"><span class="gp-dot gp-pink"></span>背景音樂</a>
+      <a class="guide-pill" data-guide="speed"><span class="gp-dot gp-lime"></span>調整速度</a>
+      <a class="guide-pill" data-guide="subtitle"><span class="gp-dot gp-cyan"></span>加入字幕</a>
+      <a class="guide-pill" data-guide="snapshot"><span class="gp-dot gp-fuchsia"></span>截取影格</a>
+      <a class="guide-pill" data-guide="toAudio"><span class="gp-dot gp-indigo"></span>影片轉音樂</a>
+      <a class="guide-pill" data-guide="audioConvert"><span class="gp-dot gp-violet"></span>音訊轉換</a>
     </div>
   </div>
 
@@ -2603,6 +2643,19 @@ if (!self.crossOriginIsolated) {
   document.querySelectorAll('.tool-card[data-tool="bgm"]').forEach(setupBgmCard);
   document.querySelectorAll('.tool-card[data-tool="subtitle"]').forEach(setupSubtitleCard);
   document.querySelectorAll('.tool-card[data-tool="snapshot"]').forEach(setupSnapshotCard);
+
+  // Guide pills → scroll to card
+  document.querySelectorAll('.guide-pill[data-guide]').forEach(function(pill) {
+    pill.addEventListener('click', function() {
+      var toolId = pill.dataset.guide;
+      var card = document.querySelector('.tool-card[data-tool="' + toolId + '"]');
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.style.boxShadow = '0 0 0 2px rgba(255,255,255,.25), 0 0 32px rgba(255,255,255,.08)';
+        setTimeout(function() { card.style.boxShadow = ''; }, 1500);
+      }
+    });
+  });
 })();
 </script>
 
