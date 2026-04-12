@@ -23,7 +23,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans
 header{background:linear-gradient(160deg,#1a1040 0%,#0f1628 40%,#0d0e14 100%);padding:36px 24px 40px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
 header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 15% 60%,rgba(99,102,241,.22) 0%,transparent 55%),radial-gradient(ellipse at 85% 30%,rgba(139,92,246,.16) 0%,transparent 50%),radial-gradient(ellipse at 50% 100%,rgba(16,185,129,.08) 0%,transparent 40%)}
 header::after{content:'';position:absolute;inset:0;opacity:.04;background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);background-size:40px 40px}
-.header-inner{position:relative;z-index:1;max-width:720px;margin:0 auto;padding-right:110px}
+.header-inner{position:relative;z-index:1;max-width:720px;margin:0 auto}
 .logo-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px}
 .logo-icon{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f46e5,#7c3aed);box-shadow:0 4px 20px rgba(99,102,241,.5),0 0 0 1px rgba(255,255,255,.1)}
 .logo-title{font-size:28px;font-weight:800;color:#fff;letter-spacing:.5px;text-shadow:0 2px 12px rgba(99,102,241,.4)}
@@ -359,29 +359,10 @@ footer a{color:var(--indigo2);text-decoration:none}
 .sub-opts select{flex:1}
 .tool-card[data-tool="subtitle"] .start-btn:disabled{opacity:.32;pointer-events:none}
 
-/* guide bar (inline quick-jump) */
-.guide-bar{margin-bottom:20px}
-.guide-bar-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;letter-spacing:.3px}
-.guide-bar-title svg{opacity:.55}
-.guide-scroll{display:flex;flex-wrap:wrap;gap:6px}
-.guide-pill{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:5px 12px;border-radius:8px;border:1px solid var(--border2);
-  background:var(--card);color:var(--text2);font-size:11px;font-weight:600;
-  cursor:pointer;transition:.18s;white-space:nowrap;text-decoration:none;
-}
-.guide-pill:hover{border-color:var(--border);color:var(--text);transform:translateY(-1px)}
-.guide-pill .gp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-
-/* guide button (header) */
-.guide-btn{
-  position:absolute;right:0;top:50%;transform:translateY(-50%);
-  display:inline-flex;align-items:center;gap:6px;
-  padding:7px 14px;border-radius:10px;border:1px solid rgba(165,180,252,.2);
-  background:rgba(99,102,241,.08);color:#a5b4fc;font-size:12px;font-weight:700;
-  cursor:pointer;transition:.18s;letter-spacing:.3px;
-}
-.guide-btn:hover{background:rgba(99,102,241,.15);border-color:rgba(165,180,252,.35);color:#c7d2fe}
+/* nav guide button + separator */
+.nav-sep{width:1px;height:18px;background:var(--border2);margin:0 2px;flex-shrink:0}
+.nav-btn-guide{opacity:.7;transition:.18s}
+.nav-btn-guide:hover{opacity:1}
 
 /* guide modal */
 .guide-overlay{
@@ -494,10 +475,6 @@ if (!self.crossOriginIsolated) {
         <div class="logo-sub">Media Toolkit</div>
       </div>
     </div>
-    <button class="guide-btn" id="guideOpenBtn">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      使用指南
-    </button>
     <div class="header-tags">
       <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-tool"/></svg>影音轉檔工具</span>
       <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-film"/></svg>影音資源庫</span>
@@ -517,6 +494,10 @@ if (!self.crossOriginIsolated) {
     <button class="nav-btn" onclick="showPanel('sw',this)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-monitor"/></svg>剪輯軟體
     </button>
+    <span class="nav-sep"></span>
+    <button class="nav-btn nav-btn-guide" id="guideOpenBtn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>使用指南
+    </button>
   </div>
 </div>
 
@@ -528,28 +509,6 @@ if (!self.crossOriginIsolated) {
     <div>
       <div class="tips-title">完全在瀏覽器內處理，檔案不會離開你的電腦</div>
       <div class="tips-text">所有轉檔由 FFmpeg 在本機執行，無需帳號、無需上傳，完全保護隱私。首次使用需下載引擎（約 25 MB），之後即時處理。</div>
-    </div>
-  </div>
-
-  <div class="guide-bar">
-    <div class="guide-bar-title">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      使用指南 — 點擊快速跳轉至該工具
-    </div>
-    <div class="guide-scroll">
-      <a class="guide-pill" data-guide="compress"><span class="gp-dot gp-emerald"></span>影片壓縮</a>
-      <a class="guide-pill" data-guide="convert"><span class="gp-dot gp-amber"></span>格式轉換</a>
-      <a class="guide-pill" data-guide="trim"><span class="gp-dot gp-sky"></span>影片裁剪</a>
-      <a class="guide-pill" data-guide="merge"><span class="gp-dot gp-teal"></span>影片合併</a>
-      <a class="guide-pill" data-guide="faceBlur"><span class="gp-dot gp-rose"></span>人臉模糊</a>
-      <a class="guide-pill" data-guide="watermark"><span class="gp-dot gp-orange"></span>壓製浮水印</a>
-      <a class="guide-pill" data-guide="mute"><span class="gp-dot gp-rose"></span>移除聲音</a>
-      <a class="guide-pill" data-guide="bgm"><span class="gp-dot gp-pink"></span>背景音樂</a>
-      <a class="guide-pill" data-guide="speed"><span class="gp-dot gp-lime"></span>調整速度</a>
-      <a class="guide-pill" data-guide="subtitle"><span class="gp-dot gp-cyan"></span>加入字幕</a>
-      <a class="guide-pill" data-guide="snapshot"><span class="gp-dot gp-fuchsia"></span>截取影格</a>
-      <a class="guide-pill" data-guide="toAudio"><span class="gp-dot gp-indigo"></span>影片轉音樂</a>
-      <a class="guide-pill" data-guide="audioConvert"><span class="gp-dot gp-violet"></span>音訊轉換</a>
     </div>
   </div>
 
@@ -2692,18 +2651,6 @@ if (!self.crossOriginIsolated) {
   document.querySelectorAll('.tool-card[data-tool="subtitle"]').forEach(setupSubtitleCard);
   document.querySelectorAll('.tool-card[data-tool="snapshot"]').forEach(setupSnapshotCard);
 
-  // Guide pills → scroll to card
-  document.querySelectorAll('.guide-pill[data-guide]').forEach(function(pill) {
-    pill.addEventListener('click', function() {
-      var toolId = pill.dataset.guide;
-      var card = document.querySelector('.tool-card[data-tool="' + toolId + '"]');
-      if (card) {
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        card.style.boxShadow = '0 0 0 2px rgba(255,255,255,.25), 0 0 32px rgba(255,255,255,.08)';
-        setTimeout(function() { card.style.boxShadow = ''; }, 1500);
-      }
-    });
-  });
 })();
 </script>
 
