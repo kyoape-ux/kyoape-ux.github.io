@@ -23,7 +23,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans
 header{background:linear-gradient(160deg,#1a1040 0%,#0f1628 40%,#0d0e14 100%);padding:36px 24px 40px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
 header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 15% 60%,rgba(99,102,241,.22) 0%,transparent 55%),radial-gradient(ellipse at 85% 30%,rgba(139,92,246,.16) 0%,transparent 50%),radial-gradient(ellipse at 50% 100%,rgba(16,185,129,.08) 0%,transparent 40%)}
 header::after{content:'';position:absolute;inset:0;opacity:.04;background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);background-size:40px 40px}
-.header-inner{position:relative;z-index:1;max-width:720px;margin:0 auto}
+.header-inner{position:relative;z-index:1;max-width:720px;margin:0 auto;padding-right:110px}
 .logo-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px}
 .logo-icon{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f46e5,#7c3aed);box-shadow:0 4px 20px rgba(99,102,241,.5),0 0 0 1px rgba(255,255,255,.1)}
 .logo-title{font-size:28px;font-weight:800;color:#fff;letter-spacing:.5px;text-shadow:0 2px 12px rgba(99,102,241,.4)}
@@ -359,7 +359,7 @@ footer a{color:var(--indigo2);text-decoration:none}
 .sub-opts select{flex:1}
 .tool-card[data-tool="subtitle"] .start-btn:disabled{opacity:.32;pointer-events:none}
 
-/* guide bar */
+/* guide bar (inline quick-jump) */
 .guide-bar{margin-bottom:20px}
 .guide-bar-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;letter-spacing:.3px}
 .guide-bar-title svg{opacity:.55}
@@ -372,6 +372,50 @@ footer a{color:var(--indigo2);text-decoration:none}
 }
 .guide-pill:hover{border-color:var(--border);color:var(--text);transform:translateY(-1px)}
 .guide-pill .gp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* guide button (header) */
+.guide-btn{
+  position:absolute;right:0;top:50%;transform:translateY(-50%);
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:10px;border:1px solid rgba(165,180,252,.2);
+  background:rgba(99,102,241,.08);color:#a5b4fc;font-size:12px;font-weight:700;
+  cursor:pointer;transition:.18s;letter-spacing:.3px;
+}
+.guide-btn:hover{background:rgba(99,102,241,.15);border-color:rgba(165,180,252,.35);color:#c7d2fe}
+
+/* guide modal */
+.guide-overlay{
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.guide-overlay.open{display:flex}
+.guide-modal{
+  width:100%;max-width:540px;max-height:85vh;overflow-y:auto;
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:28px 24px 20px;position:relative;
+  box-shadow:0 24px 64px rgba(0,0,0,.5);
+}
+.guide-modal-close{
+  position:absolute;right:14px;top:14px;width:30px;height:30px;border-radius:8px;
+  border:none;background:rgba(255,255,255,.06);color:var(--text3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:.15s;
+}
+.guide-modal-close:hover{background:rgba(255,255,255,.12);color:var(--text)}
+.guide-modal h2{font-size:17px;font-weight:800;color:var(--text);margin-bottom:4px}
+.guide-modal .gm-sub{font-size:12px;color:var(--text3);margin-bottom:20px;line-height:1.5}
+.gm-section{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;margin:16px 0 8px;text-transform:uppercase}
+.gm-section:first-of-type{margin-top:0}
+.gm-list{display:flex;flex-direction:column;gap:6px}
+.gm-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 12px;border-radius:10px;border:1px solid var(--border2);
+  background:rgba(255,255,255,.015);transition:.15s;cursor:pointer;
+}
+.gm-item:hover{border-color:var(--border);background:rgba(255,255,255,.035)}
+.gm-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.gm-item-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.gm-item-desc{font-size:11px;color:var(--text3);line-height:1.5}
 .gp-emerald{background:#10b981}.gp-amber{background:#f59e0b}.gp-sky{background:#0ea5e9}
 .gp-teal{background:#14b8a6}.gp-rose{background:#f43f5e}.gp-orange{background:#ea580c}
 .gp-pink{background:#ec4899}.gp-lime{background:#84cc16}.gp-cyan{background:#22d3ee}
@@ -450,6 +494,10 @@ if (!self.crossOriginIsolated) {
         <div class="logo-sub">Media Toolkit</div>
       </div>
     </div>
+    <button class="guide-btn" id="guideOpenBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      使用指南
+    </button>
     <div class="header-tags">
       <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-tool"/></svg>影音轉檔工具</span>
       <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-film"/></svg>影音資源庫</span>
@@ -2896,6 +2944,103 @@ window.addEventListener('resize', function() {
   clearTimeout(_eqTimer);
   _eqTimer = setTimeout(window.eqSwCards, 120);
 });
+</script>
+
+<!-- 使用指南 Modal -->
+<div class="guide-overlay" id="guideOverlay">
+  <div class="guide-modal">
+    <button class="guide-modal-close" id="guideCloseBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg>
+    </button>
+    <h2>使用指南</h2>
+    <p class="gm-sub">所有工具皆在瀏覽器本機執行，檔案不會上傳。點擊任一項目可跳轉至該工具。</p>
+
+    <div class="gm-section">影片工��</div>
+    <div class="gm-list">
+      <div class="gm-item" data-guide="compress">
+        <span class="gm-dot gp-emerald"></span>
+        <div><div class="gm-item-name">影片壓縮</div><div class="gm-item-desc">選擇壓縮品質（高／標準／小檔案），上傳影片即可縮小檔案大小，方便 LINE 或 Email 傳送。</div></div>
+      </div>
+      <div class="gm-item" data-guide="convert">
+        <span class="gm-dot gp-amber"></span>
+        <div><div class="gm-item-name">影片格式轉換</div><div class="gm-item-desc">將影片轉為 MP4、WebM、MOV、AVI 等格式，解決播放器不支援的問題。</div></div>
+      </div>
+      <div class="gm-item" data-guide="trim">
+        <span class="gm-dot gp-sky"></span>
+        <div><div class="gm-item-name">影片裁剪</div><div class="gm-item-desc">設定起始與結束時間，精準擷取需要的片段。可選擇輸出為影片或 MP3 音訊。</div></div>
+      </div>
+      <div class="gm-item" data-guide="merge">
+        <span class="gm-dot gp-teal"></span>
+        <div><div class="gm-item-name">影片合併</div><div class="gm-item-desc">將多個影片檔案依序合併為一支完整影片，支援拖曳排序。</div></div>
+      </div>
+      <div class="gm-item" data-guide="faceBlur">
+        <span class="gm-dot gp-rose"></span>
+        <div><div class="gm-item-name">人臉模糊處理</div><div class="gm-item-desc">自動偵測人臉或手動框選，全片套用高斯模糊或馬賽克。限 1080p、5 分鐘、300MB 以內。</div></div>
+      </div>
+      <div class="gm-item" data-guide="watermark">
+        <span class="gm-dot gp-orange"></span>
+        <div><div class="gm-item-name">壓製浮水印</div><div class="gm-item-desc">上傳影片與 LOGO 圖片（PNG 透明背景），選擇位置與大小即可疊加浮水印。</div></div>
+      </div>
+      <div class="gm-item" data-guide="mute">
+        <span class="gm-dot gp-rose"></span>
+        <div><div class="gm-item-name">移除影片聲音</div><div class="gm-item-desc">完全移除影片音軌，輸出無聲影片，適合重新配音或配樂使用。</div></div>
+      </div>
+      <div class="gm-item" data-guide="bgm">
+        <span class="gm-dot gp-pink"></span>
+        <div><div class="gm-item-name">加入背景音樂</div><div class="gm-item-desc">上傳影片與音樂檔案，分別調整原始音量與音樂音量比例，自動淡入混音。</div></div>
+      </div>
+      <div class="gm-item" data-guide="speed">
+        <span class="gm-dot gp-lime"></span>
+        <div><div class="gm-item-name">調整播放速度</div><div class="gm-item-desc">支援 0.25x 至 4x 變速，慢動作適合步態分析，加速適合縮時呈現。音訊同步調整。</div></div>
+      </div>
+      <div class="gm-item" data-guide="subtitle">
+        <span class="gm-dot gp-cyan"></span>
+        <div><div class="gm-item-name">加入字幕</div><div class="gm-item-desc">輸入文字後燒錄於影片上，可選擇位置（頂部／底部／置中）與字體大小，支援中文。</div></div>
+      </div>
+      <div class="gm-item" data-guide="snapshot">
+        <span class="gm-dot gp-fuchsia"></span>
+        <div><div class="gm-item-name">截取影格</div><div class="gm-item-desc">拖曳時間軸選擇任意時間點，一鍵擷取畫面輸出 PNG 高畫質圖片，免轉檔。</div></div>
+      </div>
+    </div>
+
+    <div class="gm-section">音訊工具</div>
+    <div class="gm-list">
+      <div class="gm-item" data-guide="toAudio">
+        <span class="gm-dot gp-indigo"></span>
+        <div><div class="gm-item-name">影片轉音樂</div><div class="gm-item-desc">從影片中提取音軌，輸出為 MP3、AAC 或 WAV 格式的音訊檔案。</div></div>
+      </div>
+      <div class="gm-item" data-guide="audioConvert">
+        <span class="gm-dot gp-violet"></span>
+        <div><div class="gm-item-name">音訊格式轉換</div><div class="gm-item-desc">MP3、WAV、AAC、FLAC、OGG 音訊格式互轉，滿足不同裝置與平台需求。</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var overlay = document.getElementById('guideOverlay');
+  var openBtn = document.getElementById('guideOpenBtn');
+  var closeBtn = document.getElementById('guideCloseBtn');
+  openBtn.addEventListener('click', function() { overlay.classList.add('open'); });
+  closeBtn.addEventListener('click', function() { overlay.classList.remove('open'); });
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.classList.remove('open'); });
+  // Click item → close modal + scroll to card
+  overlay.querySelectorAll('.gm-item[data-guide]').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var toolId = item.dataset.guide;
+      var card = document.querySelector('.tool-card[data-tool="' + toolId + '"]');
+      overlay.classList.remove('open');
+      if (card) {
+        setTimeout(function() {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.boxShadow = '0 0 0 2px rgba(255,255,255,.25), 0 0 32px rgba(255,255,255,.08)';
+          setTimeout(function() { card.style.boxShadow = ''; }, 1500);
+        }, 250);
+      }
+    });
+  });
+})();
 </script>
 </body>
 </html>
