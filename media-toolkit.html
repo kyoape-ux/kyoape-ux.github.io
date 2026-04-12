@@ -1576,29 +1576,45 @@ if (!self.crossOriginIsolated) {
     var w = Math.min(bbox.w, srcCanvas.width - x);
     var h = Math.min(bbox.h, srcCanvas.height - y);
     if (w <= 0 || h <= 0) return;
-    var tmp = document.createElement('canvas');
-    tmp.width = w; tmp.height = h;
-    tmp.getContext('2d').drawImage(srcCanvas, x, y, w, h, 0, 0, w, h);
-    var cx = x + w/2, cy = y + h/2, rx = w/2, ry = h/2;
+    var rx = w / 2, ry = h / 2;
+    var feather = Math.round(Math.max(5, Math.min(10, Math.min(w, h) * 0.08)));
+
+    // Step 1: render blur/pixelate effect to face-sized canvas
+    var fc = document.createElement('canvas'); fc.width = w; fc.height = h;
+    var fCtx = fc.getContext('2d');
     if (blurType === 'gaussian') {
-      var blurPx = Math.round(Math.max(10, Math.min(Math.min(w, h) * 0.14, 40)));
-      ctx.save();
-      ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2); ctx.clip();
-      ctx.filter = 'blur(' + blurPx + 'px)';
-      ctx.drawImage(tmp, x, y, w, h);
-      ctx.restore();
+      var blurPx = Math.round(Math.max(12, Math.min(Math.min(w, h) * 0.14, 40)));
+      fCtx.filter = 'blur(' + blurPx + 'px)';
+      fCtx.drawImage(srcCanvas, -x, -y);
+      fCtx.filter = 'none';
     } else {
       var ps = Math.max(4, Math.min(Math.round(Math.min(w, h) / 9), 20));
       var tw = Math.max(1, Math.ceil(w / ps)), th = Math.max(1, Math.ceil(h / ps));
       var m = document.createElement('canvas'); m.width = tw; m.height = th;
       m.getContext('2d').drawImage(srcCanvas, x, y, w, h, 0, 0, tw, th);
-      ctx.save();
-      ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2); ctx.clip();
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(m, 0, 0, tw, th, x, y, w, h);
-      ctx.imageSmoothingEnabled = true;
-      ctx.restore();
+      fCtx.imageSmoothingEnabled = false;
+      fCtx.drawImage(m, 0, 0, tw, th, 0, 0, w, h);
+      fCtx.imageSmoothingEnabled = true;
     }
+
+    // Step 2: sharp inner ellipse → blur it to create a soft feathered mask
+    var sharpEl = document.createElement('canvas'); sharpEl.width = w; sharpEl.height = h;
+    var seCtx = sharpEl.getContext('2d');
+    seCtx.beginPath();
+    seCtx.ellipse(rx, ry, Math.max(1, rx - feather), Math.max(1, ry - feather), 0, 0, Math.PI * 2);
+    seCtx.fillStyle = '#fff'; seCtx.fill();
+
+    var softMask = document.createElement('canvas'); softMask.width = w; softMask.height = h;
+    var smCtx = softMask.getContext('2d');
+    smCtx.filter = 'blur(' + feather + 'px)';
+    smCtx.drawImage(sharpEl, 0, 0);
+
+    // Step 3: apply feathered mask to effect canvas (keeps only the soft-edged ellipse)
+    fCtx.globalCompositeOperation = 'destination-in';
+    fCtx.drawImage(softMask, 0, 0);
+
+    // Step 4: composite feathered result onto main canvas
+    ctx.drawImage(fc, x, y);
   }
 
   function setupFaceBlurCard(card) {
@@ -1846,9 +1862,31 @@ if (!self.crossOriginIsolated) {
 
           offCtx.drawImage(videoEl, 0, 0, vw, vh);
 
-          // Detect & track
+          // Detect & track (EMA smoothing + outlier rejection)
           var det = await detectFace(offC);
-          if (det) lastBbox = detToBbox(det, vw, vh);
+          if (det) {
+            var raw = detToBbox(det, vw, vh);
+            if (lastBbox) {
+              var wRatio = raw.w / lastBbox.w;
+              var hRatio = raw.h / lastBbox.h;
+              var dx = (raw.x + raw.w/2) - (lastBbox.x + lastBbox.w/2);
+              var dy = (raw.y + raw.h/2) - (lastBbox.y + lastBbox.h/2);
+              var moveDist = Math.sqrt(dx*dx + dy*dy);
+              var maxMove = Math.max(lastBbox.w, lastBbox.h) * 0.4;
+              if (wRatio < 1.4 && wRatio > 0.72 && hRatio < 1.4 && hRatio > 0.72 && moveDist < maxMove) {
+                var a = 0.35;
+                lastBbox = {
+                  x: Math.round(lastBbox.x + a*(raw.x - lastBbox.x)),
+                  y: Math.round(lastBbox.y + a*(raw.y - lastBbox.y)),
+                  w: Math.round(lastBbox.w + a*(raw.w - lastBbox.w)),
+                  h: Math.round(lastBbox.h + a*(raw.h - lastBbox.h))
+                };
+              }
+              // else: outlier (likely hand/body), keep lastBbox unchanged
+            } else {
+              lastBbox = raw;
+            }
+          }
 
           // Apply blur
           applyBlurEffect(offCtx, offC, lastBbox, blurType);
