@@ -353,11 +353,23 @@ footer a{color:var(--indigo2);text-decoration:none}
 .sub-setup{display:none;margin-bottom:10px}
 .tool-card.has-file .sub-setup{display:block}
 .tool-card.processing .sub-setup,.tool-card.done .sub-setup{display:none}
-.sub-text{width:100%;min-height:60px;padding:8px 10px;border-radius:9px;border:1px solid var(--border2);background:var(--card);color:var(--text);font-size:12px;font-family:inherit;resize:vertical;margin-bottom:8px}
-.sub-text::placeholder{color:var(--text3)}
-.sub-opts{display:flex;gap:8px;margin-bottom:8px}
-.sub-opts select{flex:1}
-.tool-card[data-tool="subtitle"] .start-btn:disabled{opacity:.32;pointer-events:none}
+.sub-srt-pick{margin-bottom:8px}
+.sub-srt-btn{width:100%;padding:8px;border-radius:9px;border:1px dashed rgba(34,211,238,.35);background:transparent;color:#67e8f9;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s}
+.sub-srt-btn:hover{background:rgba(34,211,238,.08);border-color:#22d3ee}
+.sub-srt-name{font-size:10.5px;color:var(--text3);text-align:center;margin:4px 0 8px}
+.sub-srt-count{font-size:10.5px;color:#67e8f9;text-align:center;margin-bottom:8px;display:none}
+.sub-style-title{font-size:10.5px;font-weight:700;color:var(--text3);margin-bottom:6px;letter-spacing:.3px}
+.sub-style-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.sub-style-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}
+.sub-style-row label{min-width:48px;font-weight:600;font-size:10.5px}
+.sub-style-row select,.sub-style-row input{flex:1}
+.sub-style-row input[type=color]{width:28px;height:24px;padding:0 1px;border:1px solid var(--border2);border-radius:6px;background:var(--card);cursor:pointer}
+.sub-style-row input[type=range]{accent-color:#22d3ee;height:4px}
+.sub-style-row .sub-val{min-width:28px;text-align:right;color:var(--text3);font-size:10px}
+.sub-preview-box{background:#000;border-radius:8px;padding:12px;margin-bottom:8px;text-align:center;min-height:36px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border2)}
+.sub-preview-text{line-height:1.5;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.tool-card[data-tool="subtitle"] .start-btn{display:none}
+.tool-card[data-tool="subtitle"].sub-ready .start-btn{display:flex}
 
 /* guide bar (inline quick-jump) */
 .guide-bar{margin-bottom:20px}
@@ -896,13 +908,14 @@ if (!self.crossOriginIsolated) {
       </div>
     </div>
 
-    <!-- 加入字幕 -->
+    <!-- 加入字幕（SRT 匯入） -->
     <div class="tool-card c-cyan" data-tool="subtitle">
       <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
+      <input type="file" hidden accept=".srt,.vtt,.txt" class="sub-srt-input">
       <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-subtitle"/></svg></div>
-      <div class="tool-name">加入字幕</div>
-      <div class="tool-desc">在影片底部或頂部燒錄文字字幕，適合衛教影片、學術發表配字說明。</div>
-      <div class="tool-formats"><span class="fmt">全片字幕</span><span class="fmt">自訂位置</span><span class="fmt">中文支援</span></div>
+      <div class="tool-name">SRT 字幕燒錄</div>
+      <div class="tool-desc">匯入 SRT 字幕檔，逐句依時間軸燒錄於影片上。可用剪映或 Whisper 產生 SRT。</div>
+      <div class="tool-formats"><span class="fmt">SRT 匯入</span><span class="fmt">逐句時間軸</span><span class="fmt">中文支援</span></div>
       <div class="drop-area">
         <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
         <div class="drop-area-text">拖曳影片到這裡，或點擊選取</div>
@@ -914,23 +927,72 @@ if (!self.crossOriginIsolated) {
         <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
       </div>
       <div class="sub-setup">
-        <textarea class="sub-text" placeholder="輸入要顯示的字幕文字，例如：&#10;光田綜合醫院 — 復健科衛教影片&#10;（多行文字會自動換行顯示）"></textarea>
-        <div class="sub-opts">
-          <select class="fmt-select" name="subpos">
-            <option value="bottom" selected>底部（推薦）</option>
-            <option value="top">頂部</option>
-            <option value="center">置中</option>
-          </select>
-          <select class="fmt-select" name="subfontsize">
-            <option value="small">小字（適合長文）</option>
-            <option value="medium" selected>中字（推薦）</option>
-            <option value="large">大字（醒目標題）</option>
-          </select>
+        <div class="sub-srt-pick">
+          <button class="sub-srt-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg>
+            選擇 SRT 字幕檔
+          </button>
+          <div class="sub-srt-name">尚未選擇（支援 .srt 格式）</div>
+          <div class="sub-srt-count"></div>
+        </div>
+        <div class="sub-style-title">字幕樣式</div>
+        <div class="sub-style-grid">
+          <div class="sub-style-row">
+            <label>字體</label>
+            <select class="fmt-select" name="subfont" style="font-size:11px">
+              <option value="Microsoft JhengHei" selected>微軟正黑體</option>
+              <option value="Noto Sans TC">Noto Sans TC</option>
+              <option value="PingFang TC">蘋方</option>
+              <option value="system-ui">系統預設</option>
+            </select>
+          </div>
+          <div class="sub-style-row">
+            <label>位置</label>
+            <select class="fmt-select" name="subpos" style="font-size:11px">
+              <option value="bottom" selected>底部</option>
+              <option value="top">頂部</option>
+              <option value="center">置中</option>
+            </select>
+          </div>
+          <div class="sub-style-row">
+            <label>粗體</label>
+            <select class="fmt-select" name="subbold" style="font-size:11px">
+              <option value="700" selected>粗體</option>
+              <option value="400">正常</option>
+              <option value="900">特粗</option>
+            </select>
+          </div>
+          <div class="sub-style-row">
+            <label>字級</label>
+            <input type="range" class="sub-fontsize-range" min="16" max="72" value="36">
+            <span class="sub-val sub-fontsize-val">36</span>
+          </div>
+          <div class="sub-style-row">
+            <label>文字色</label>
+            <input type="color" name="subcolor" value="#ffffff">
+          </div>
+          <div class="sub-style-row">
+            <label>底色</label>
+            <input type="color" name="subbgcolor" value="#000000">
+          </div>
+          <div class="sub-style-row">
+            <label>邊距</label>
+            <input type="range" class="sub-margin-range" min="8" max="80" value="24">
+            <span class="sub-val sub-margin-val">24px</span>
+          </div>
+          <div class="sub-style-row">
+            <label>底色透明</label>
+            <input type="range" class="sub-bgalpha-range" min="0" max="100" value="60">
+            <span class="sub-val sub-bgalpha-val">60%</span>
+          </div>
+        </div>
+        <div class="sub-preview-box">
+          <span class="sub-preview-text" style="font-family:'Microsoft JhengHei',sans-serif;font-weight:700;font-size:16px;color:#fff">字幕預覽效果</span>
         </div>
       </div>
       <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">燒錄字幕中...</div></div>
       <div class="error-msg"></div>
-      <button class="tool-btn start-btn" disabled>
+      <button class="tool-btn start-btn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始燒錄字幕
       </button>
       <div class="download-wrap">
@@ -1064,6 +1126,7 @@ if (!self.crossOriginIsolated) {
     <a href="https://www.heygen.com/" target="_blank" class="res-card"><span class="res-tag ai">AI 影片</span><div class="res-name">HeyGen</div><div class="res-desc">AI 數位人分身影片製作，自動對嘴、多語言配音，企業宣傳常用。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
     <a href="https://www.capcut.com/" target="_blank" class="res-card"><span class="res-tag ai">AI 剪輯</span><div class="res-name">CapCut AI</div><div class="res-desc">AI 自動剪輯、字幕生成、去背、特效，短影音製作首選工具。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
     <a href="https://www.descript.com/" target="_blank" class="res-card"><span class="res-tag ai">AI 編輯</span><div class="res-name">Descript</div><div class="res-desc">用文字編輯影片與 Podcast，AI 去口頭禪、過場音效、聲音修復。</div><div class="res-card-bot"><span class="price-badge freemium">免費/付費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
+    <a href="https://github.com/Const-me/Whisper" target="_blank" class="res-card"><span class="res-tag ai">AI 字幕</span><div class="res-name">Whisper 桌面版</div><div class="res-desc">開源免費，離線辨識中文語音並輸出 SRT 字幕檔，搭配本站字幕工具使用。</div><div class="res-card-bot"><span class="price-badge free">免費</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-arrow"><use href="#ico-external"/></svg></div></a>
   </div>
 
   <div class="section-title">音樂 · 音效</div>
@@ -2334,7 +2397,11 @@ if (!self.crossOriginIsolated) {
   //  setupSubtitleCard — 字幕燒錄（Canvas）
   // ═══════════════════════════════════════
   function setupSubtitleCard(card) {
-    var input = card.querySelector('input[type=file]');
+    var input = card.querySelector('input[type=file]:not(.sub-srt-input)');
+    var srtInput = card.querySelector('.sub-srt-input');
+    var srtBtn = card.querySelector('.sub-srt-btn');
+    var srtNameEl = card.querySelector('.sub-srt-name');
+    var srtCountEl = card.querySelector('.sub-srt-count');
     var dropArea = card.querySelector('.drop-area');
     var nameEl = card.querySelector('.file-info-name');
     var sizeEl = card.querySelector('.file-info-size');
@@ -2345,18 +2412,71 @@ if (!self.crossOriginIsolated) {
     var dlBtn = card.querySelector('.dl-btn');
     var resetBtn = card.querySelector('.reset-btn');
     var errEl = card.querySelector('.error-msg');
-    var textArea = card.querySelector('.sub-text');
+    var fontSel = card.querySelector('select[name=subfont]');
     var posSel = card.querySelector('select[name=subpos]');
-    var sizeSel = card.querySelector('select[name=subfontsize]');
+    var boldSel = card.querySelector('select[name=subbold]');
+    var fsRange = card.querySelector('.sub-fontsize-range');
+    var fsVal = card.querySelector('.sub-fontsize-val');
+    var colorInput = card.querySelector('input[name=subcolor]');
+    var bgColorInput = card.querySelector('input[name=subbgcolor]');
+    var marginRange = card.querySelector('.sub-margin-range');
+    var marginVal = card.querySelector('.sub-margin-val');
+    var bgAlphaRange = card.querySelector('.sub-bgalpha-range');
+    var bgAlphaVal = card.querySelector('.sub-bgalpha-val');
+    var previewText = card.querySelector('.sub-preview-text');
     var videoEl = document.createElement('video');
     videoEl.muted = true; videoEl.playsInline = true;
+    var srtCues = []; // {start, end, text}
 
-    function checkReady() {
-      var hasFile = !!fileMap.get(card);
-      var hasText = textArea.value.trim().length > 0;
-      startBtn.disabled = !(hasFile && hasText);
+    // SRT parser
+    function parseSRT(raw) {
+      var blocks = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().split(/\n\n+/);
+      var cues = [];
+      blocks.forEach(function(blk) {
+        var lines = blk.split('\n');
+        for (var i = 0; i < lines.length; i++) {
+          var m = lines[i].match(/(\d{2}):(\d{2}):(\d{2})[,.](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[,.](\d{3})/);
+          if (m) {
+            var start = +m[1]*3600 + +m[2]*60 + +m[3] + +m[4]/1000;
+            var end = +m[5]*3600 + +m[6]*60 + +m[7] + +m[8]/1000;
+            var txt = lines.slice(i+1).filter(function(l){return l.trim();}).join('\n');
+            if (txt) cues.push({ start: start, end: end, text: txt });
+            break;
+          }
+        }
+      });
+      return cues;
     }
-    textArea.addEventListener('input', checkReady);
+
+    function getCueAt(t) {
+      for (var i = 0; i < srtCues.length; i++) {
+        if (t >= srtCues[i].start && t <= srtCues[i].end) return srtCues[i].text;
+      }
+      return null;
+    }
+
+    // Style controls → live preview
+    function updatePreview() {
+      var font = fontSel.value;
+      var bold = boldSel.value;
+      var fs = fsRange.value;
+      var color = colorInput.value;
+      previewText.style.fontFamily = '"' + font + '",sans-serif';
+      previewText.style.fontWeight = bold;
+      previewText.style.fontSize = Math.min(20, Math.max(12, Math.round(fs * 0.44))) + 'px';
+      previewText.style.color = color;
+      previewText.textContent = srtCues.length > 0 ? srtCues[0].text.split('\n')[0] : '字幕預覽效果';
+    }
+    fsRange.addEventListener('input', function() { fsVal.textContent = fsRange.value; updatePreview(); });
+    marginRange.addEventListener('input', function() { marginVal.textContent = marginRange.value + 'px'; });
+    bgAlphaRange.addEventListener('input', function() { bgAlphaVal.textContent = bgAlphaRange.value + '%'; });
+    [fontSel, boldSel, colorInput, bgColorInput].forEach(function(el) { el.addEventListener('change', updatePreview); });
+
+    function updateReady() {
+      var ready = !!fileMap.get(card) && srtCues.length > 0;
+      if (ready) card.classList.add('sub-ready');
+      else card.classList.remove('sub-ready');
+    }
 
     function setFile(f) {
       fileMap.set(card, f);
@@ -2366,20 +2486,43 @@ if (!self.crossOriginIsolated) {
       sizeEl.textContent = fmtBytes(f.size);
       bar.style.width = '0%'; errEl.textContent = '';
       videoEl.src = URL.createObjectURL(f);
-      checkReady();
+      updateReady();
     }
 
     function reset() {
-      fileMap.delete(card);
+      fileMap.delete(card); srtCues = [];
+      srtNameEl.textContent = '尚未選擇（支援 .srt 格式）';
+      srtCountEl.style.display = 'none';
       if (videoEl.src) { URL.revokeObjectURL(videoEl.src); videoEl.src = ''; }
       var prevUrl = blobMap.get(card);
       if (prevUrl) URL.revokeObjectURL(prevUrl);
       blobMap.delete(card);
-      card.classList.remove('has-file', 'done', 'has-error', 'processing');
+      card.classList.remove('has-file', 'done', 'has-error', 'processing', 'sub-ready');
       if (input) input.value = '';
+      if (srtInput) srtInput.value = '';
       bar.style.width = '0%'; errEl.textContent = '';
-      startBtn.disabled = true;
+      previewText.textContent = '字幕預覽效果';
     }
+
+    srtBtn.addEventListener('click', function() { srtInput.click(); });
+    srtInput.addEventListener('change', function() {
+      if (!srtInput.files[0]) return;
+      var f = srtInput.files[0];
+      var reader = new FileReader();
+      reader.onload = function() {
+        srtCues = parseSRT(reader.result);
+        srtNameEl.textContent = f.name;
+        srtCountEl.textContent = '已解析 ' + srtCues.length + ' 段字幕';
+        srtCountEl.style.display = srtCues.length > 0 ? 'block' : 'none';
+        updateReady();
+        updatePreview();
+        if (srtCues.length === 0) {
+          errEl.textContent = '無法解析字幕，請確認 SRT 格式是否正確';
+          card.classList.add('has-error');
+        }
+      };
+      reader.readAsText(f, 'UTF-8');
+    });
 
     if (dropArea) {
       dropArea.addEventListener('click', function() { input.click(); });
@@ -2391,36 +2534,39 @@ if (!self.crossOriginIsolated) {
     if (clearBtn) clearBtn.addEventListener('click', reset);
     if (resetBtn) resetBtn.addEventListener('click', reset);
 
-    function drawSubtitle(ctx, vw, vh, text, pos, fontSize) {
+    function drawSubtitle(ctx, vw, vh, text, style) {
       var lines = text.split('\n').filter(function(l) { return l.trim(); });
       if (!lines.length) return;
-      var fs = fontSize === 'small' ? Math.round(vh * 0.032) : fontSize === 'large' ? Math.round(vh * 0.058) : Math.round(vh * 0.042);
-      fs = Math.max(14, Math.min(fs, 64));
+      var fs = Math.max(14, Math.min(parseInt(style.fontSize), Math.round(vh * 0.08)));
       var lineH = fs * 1.45;
       var pad = Math.round(fs * 0.5);
       var blockH = lines.length * lineH + pad * 2;
+      var margin = parseInt(style.margin);
 
       var yBase;
-      if (pos === 'top') yBase = pad * 2;
-      else if (pos === 'center') yBase = (vh - blockH) / 2;
-      else yBase = vh - blockH - pad * 2;
+      if (style.pos === 'top') yBase = margin;
+      else if (style.pos === 'center') yBase = (vh - blockH) / 2;
+      else yBase = vh - blockH - margin;
 
-      // semi-transparent background
+      // background
       ctx.save();
-      ctx.fillStyle = 'rgba(0,0,0,0.55)';
-      var bgW = vw * 0.88;
+      var bgA = parseInt(style.bgAlpha) / 100;
+      var bgC = style.bgColor;
+      var r = parseInt(bgC.slice(1,3),16), g = parseInt(bgC.slice(3,5),16), b = parseInt(bgC.slice(5,7),16);
+      ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + bgA.toFixed(2) + ')';
+      var bgW = vw * 0.9;
+      var bgX = (vw - bgW) / 2;
       ctx.beginPath();
-      var rx = 8, bgX = (vw - bgW) / 2;
-      ctx.roundRect(bgX, yBase, bgW, blockH, rx);
+      ctx.roundRect(bgX, yBase, bgW, blockH, 8);
       ctx.fill();
 
       // text
-      ctx.font = '700 ' + fs + 'px "Noto Sans TC",system-ui,-apple-system,sans-serif';
-      ctx.fillStyle = '#ffffff';
+      ctx.font = style.bold + ' ' + fs + 'px "' + style.font + '",system-ui,-apple-system,sans-serif';
+      ctx.fillStyle = style.color;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.shadowColor = 'rgba(0,0,0,0.7)';
-      ctx.shadowBlur = 4;
+      ctx.shadowColor = 'rgba(0,0,0,0.8)';
+      ctx.shadowBlur = 3;
       for (var i = 0; i < lines.length; i++) {
         ctx.fillText(lines[i], vw / 2, yBase + pad + i * lineH, bgW - pad * 2);
       }
@@ -2429,8 +2575,7 @@ if (!self.crossOriginIsolated) {
 
     startBtn.addEventListener('click', async function() {
       var file = fileMap.get(card);
-      var text = textArea.value.trim();
-      if (!file || !text) return;
+      if (!file || srtCues.length === 0) return;
       if (card.classList.contains('processing')) return;
       if (ffRunning) { errEl.textContent = '另一個工具正在處理中，請稍候再試'; card.classList.add('has-error'); return; }
 
@@ -2438,18 +2583,22 @@ if (!self.crossOriginIsolated) {
       bar.style.width = '5%'; errEl.textContent = '';
       currentBar = bar; currentProgressEl = progText; currentProgressBase = '燒錄字幕中...'; ffRunning = true;
 
+      var style = {
+        font: fontSel.value, pos: posSel.value, bold: boldSel.value,
+        fontSize: fsRange.value, color: colorInput.value,
+        bgColor: bgColorInput.value, bgAlpha: bgAlphaRange.value,
+        margin: marginRange.value
+      };
+
       try {
         await ensureFF(); bar.style.width = '8%';
 
-        // wait for video metadata
         await new Promise(function(res, rej) {
           if (videoEl.readyState >= 1) { res(); return; }
           videoEl.onloadedmetadata = res; videoEl.onerror = rej;
         });
         var vw = videoEl.videoWidth, vh = videoEl.videoHeight;
         var duration = videoEl.duration;
-        var pos = posSel.value;
-        var fontSize = sizeSel.value;
         var fps = 24;
         var inExt = getExt(file.name), inN = 'sub_in.' + inExt;
 
@@ -2463,7 +2612,6 @@ if (!self.crossOriginIsolated) {
         try { await ff.run('-i', inN, '-vn', '-acodec', 'aac', '-b:a', '128k', 'sub_aud.aac'); hasAudio = true; } catch(e) {}
         bar.style.width = '16%';
 
-        // Frame-by-frame canvas rendering
         var offC = document.createElement('canvas'); offC.width = vw; offC.height = vh;
         var offCtx = offC.getContext('2d');
         var totalFrames = Math.ceil(duration * fps);
@@ -2479,7 +2627,10 @@ if (!self.crossOriginIsolated) {
           });
 
           offCtx.drawImage(videoEl, 0, 0, vw, vh);
-          drawSubtitle(offCtx, vw, vh, text, pos, fontSize);
+
+          // Only draw subtitle if current time falls within a cue
+          var cueText = getCueAt(t);
+          if (cueText) drawSubtitle(offCtx, vw, vh, cueText, style);
 
           var fName = 'sub_' + String(i).padStart(6, '0') + '.jpg';
           var jBlob = await new Promise(function(r) { offC.toBlob(r, 'image/jpeg', 0.90); });
@@ -2492,7 +2643,6 @@ if (!self.crossOriginIsolated) {
           if (i % 5 === 0) await sleep(0);
         }
 
-        // Encode
         progText.textContent = '編碼輸出影片...'; bar.style.width = '85%';
         try { ff.FS('unlink', 'sub_out.mp4'); } catch(e) {}
         var args = ['-r', String(fps), '-i', 'sub_%06d.jpg'];
@@ -2503,7 +2653,6 @@ if (!self.crossOriginIsolated) {
         await ff.run.apply(ff, args);
 
         var outData = ff.FS('readFile', 'sub_out.mp4');
-        // Cleanup FS
         try { ff.FS('unlink', inN); } catch(e) {}
         try { ff.FS('unlink', 'sub_aud.aac'); } catch(e) {}
         try { ff.FS('unlink', 'sub_out.mp4'); } catch(e) {}
