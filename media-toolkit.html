@@ -375,16 +375,55 @@ footer a{color:var(--indigo2);text-decoration:none}
 .fb-limit-label strong{color:var(--text2);font-size:10.5px;display:block;margin-bottom:1px}
 .fb-limit-ico-ok{color:var(--emerald2);flex-shrink:0}
 .fb-limit-ico-warn{color:var(--amber2);flex-shrink:0}
-.fb-setup{display:none;margin-bottom:12px}
-.tool-card.has-file .fb-setup{display:block}
-.tool-card.processing .fb-setup,.tool-card.done .fb-setup{display:none}
-.fb-canvas-wrap{position:relative;background:#000;border-radius:10px;overflow:hidden;margin-bottom:8px;cursor:crosshair;border:1px solid var(--border2);line-height:0}
-.fb-canvas{width:100%;display:block}
-.fb-hint{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(0,0,0,.72),transparent);color:rgba(255,255,255,.82);font-size:10px;text-align:center;padding:10px 6px 5px;pointer-events:none;line-height:1.4}
-.fb-detect-btn{width:100%;padding:7px;border-radius:9px;border:none;background:rgba(244,63,94,.1);color:var(--rose2);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s;margin-bottom:8px}
-.fb-detect-btn:hover{background:rgba(244,63,94,.2)}
-.fb-detect-btn:disabled{opacity:.4;pointer-events:none}
-.tool-card[data-tool="faceBlur"] .start-btn:disabled{opacity:.32;pointer-events:none}
+.fb-open-btn{display:none!important;background:rgba(244,63,94,.15);color:var(--rose2);margin-bottom:10px}
+.tool-card.has-file .fb-open-btn{display:flex!important}
+.tool-card.done .fb-open-btn,.tool-card.processing .fb-open-btn{display:none!important}
+.fb-kf-chip{display:none;font-size:11.5px;margin-bottom:10px;padding:7px 12px;background:rgba(244,63,94,.07);border-radius:8px;border:1px solid rgba(244,63,94,.2);align-items:center;justify-content:space-between}
+.tool-card.has-file .fb-kf-chip{display:flex}
+.tool-card.done .fb-kf-chip,.tool-card.processing .fb-kf-chip{display:none}
+.fb-kf-lbl{font-size:11px;color:var(--text3);font-weight:600}
+.fb-kf-val{color:var(--rose2);font-weight:700;font-size:11px;font-variant-numeric:tabular-nums}
+.tool-card.has-file .fb-blur-type{display:block!important;margin-bottom:10px}
+.tool-card.done .fb-blur-type,.tool-card.processing .fb-blur-type{display:none!important}
+/* ── fb modal ── */
+.fb-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:900;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:.22s}
+.fb-modal-ov.open{opacity:1;pointer-events:all}
+.fb-modal{background:var(--surface);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:860px;overflow:hidden;display:flex;flex-direction:column;max-height:94vh}
+.fb-mhd{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.fb-mhd-left{display:flex;align-items:center;gap:10px}
+.fb-mhd-title{font-size:14px;font-weight:700;color:var(--text)}
+.fb-mhd-fname{font-size:12px;color:var(--text3);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fb-m-close{background:none;border:none;color:var(--text3);cursor:pointer;padding:5px;border-radius:8px;transition:.15s;display:flex}
+.fb-m-close:hover{color:var(--text);background:var(--surface2)}
+.fb-m-body{padding:16px 20px;overflow-y:auto;flex:1}
+.fb-m-canvas-wrap{position:relative;background:#000;border-radius:10px;overflow:hidden;margin-bottom:10px;cursor:crosshair;border:1px solid var(--border2);line-height:0}
+.fb-m-canvas{width:100%;display:block}
+.fb-m-hint{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(0,0,0,.72),transparent);color:rgba(255,255,255,.82);font-size:10.5px;text-align:center;padding:12px 6px 6px;pointer-events:none;line-height:1.4}
+.fb-m-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.fb-m-pp{width:36px;height:36px;border-radius:50%;background:rgba(244,63,94,.18);border:1.5px solid rgba(244,63,94,.4);color:var(--rose2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
+.fb-m-pp:hover{background:rgba(244,63,94,.3)}
+.fb-m-time{font-size:11px;font-weight:700;color:var(--text2);font-variant-numeric:tabular-nums}
+.fb-m-seek{flex:1;accent-color:#fb7185;height:4px;min-width:100px}
+.fb-m-detect{padding:6px 14px;border-radius:8px;border:none;background:rgba(244,63,94,.12);color:var(--rose2);font-size:11.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap}
+.fb-m-detect:hover{background:rgba(244,63,94,.22)}
+.fb-m-detect:disabled{opacity:.4;pointer-events:none}
+.fb-m-add{padding:6px 14px;border-radius:8px;border:1px solid rgba(244,63,94,.3);background:transparent;color:var(--rose2);font-size:11.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap}
+.fb-m-add:hover{background:rgba(244,63,94,.1)}
+.fb-kf-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.fb-kf-list{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;max-height:150px;overflow-y:auto}
+.fb-kf-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;font-size:11.5px;cursor:pointer;transition:.15s}
+.fb-kf-item:hover{border-color:var(--rose2);background:rgba(244,63,94,.05)}
+.fb-kf-item.active{border-color:var(--rose2);background:rgba(244,63,94,.08)}
+.fb-kf-item-time{font-weight:700;color:var(--rose2);font-variant-numeric:tabular-nums;min-width:48px}
+.fb-kf-item-status{color:var(--text2);flex:1}
+.fb-kf-item-del{background:none;border:none;color:var(--text3);cursor:pointer;padding:2px;border-radius:4px;display:flex;transition:.15s;flex-shrink:0}
+.fb-kf-item-del:hover{color:#f43f5e;background:rgba(244,63,94,.12)}
+.fb-kf-empty{font-size:11px;color:var(--text3);text-align:center;padding:12px;border:1px dashed var(--border2);border-radius:8px;margin-bottom:10px}
+.fb-m-acts{display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0}
+.fb-m-cancel{padding:10px 18px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap}
+.fb-m-cancel:hover{background:var(--surface2);color:var(--text)}
+.fb-m-go{flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#e11d48,#fb7185);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:7px}
+.fb-m-go:hover{filter:brightness(1.1)}
 
 /* bgm card */
 .bgm-pick{display:none;margin-bottom:10px}
@@ -757,28 +796,13 @@ if (!self.crossOriginIsolated) {
         </svg>
       </div>
       <div class="tool-name">人臉模糊處理</div>
-      <div class="tool-desc">自動追蹤人臉位置，全片套用高斯模糊或馬賽克，保護影片中的個人隱私。</div>
+      <div class="tool-desc">可分段定位人臉，不同片段設定不同模糊位置，自動追蹤保護隱私。</div>
 
-      <!-- 使用限制 -->
       <div class="fb-limits">
-        <div class="fb-limit">
-          <svg class="fb-limit-ico-ok" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <div class="fb-limit-label"><strong>解析度</strong>1080p 以下</div>
-        </div>
-        <div class="fb-limit">
-          <svg class="fb-limit-ico-ok" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <div class="fb-limit-label"><strong>長度</strong>5 分鐘以內</div>
-        </div>
-        <div class="fb-limit">
-          <svg class="fb-limit-ico-ok" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <div class="fb-limit-label"><strong>檔案大小</strong>300 MB 以下</div>
-        </div>
-        <div class="fb-limit">
-          <svg class="fb-limit-ico-warn" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-          <div class="fb-limit-label"><strong>處理時間</strong>影片時長 5～10 倍</div>
-        </div>
+        <div class="fb-limit"><svg class="fb-limit-ico-ok" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><div class="fb-limit-label"><strong>解析度</strong>1080p 以下</div></div>
+        <div class="fb-limit"><svg class="fb-limit-ico-ok" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><div class="fb-limit-label"><strong>長度</strong>5 分鐘以內</div></div>
+        <div class="fb-limit"><svg class="fb-limit-ico-ok" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><div class="fb-limit-label"><strong>檔案大小</strong>300 MB 以下</div></div>
+        <div class="fb-limit"><svg class="fb-limit-ico-warn" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div class="fb-limit-label"><strong>處理時間</strong>影片時長 5～10 倍</div></div>
       </div>
 
       <div class="drop-area">
@@ -792,25 +816,16 @@ if (!self.crossOriginIsolated) {
         <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
       </div>
 
-      <!-- Canvas 框選區 -->
-      <div class="fb-setup">
-        <div class="fb-canvas-wrap">
-          <canvas class="fb-canvas"></canvas>
-          <div class="fb-hint">手動拖曳框選臉部，或點「自動偵測人臉」</div>
-        </div>
-        <button class="fb-detect-btn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          自動偵測人臉
-        </button>
-        <select class="fmt-select fb-blur-type">
-          <option value="gaussian">高斯模糊（柔和自然，學術推薦）</option>
-          <option value="mosaic">馬賽克（明顯方塊遮蔽）</option>
-        </select>
-      </div>
+      <button class="tool-btn fb-open-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-sliders"/></svg>開啟人臉定位</button>
+      <div class="fb-kf-chip"><span class="fb-kf-lbl">定位點</span><span class="fb-kf-val">尚未設定</span></div>
+      <select class="fmt-select fb-blur-type" style="display:none">
+        <option value="gaussian">高斯模糊（柔和自然，學術推薦）</option>
+        <option value="mosaic">馬賽克（明顯方塊遮蔽）</option>
+      </select>
 
       <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">處理中，請稍候...</div></div>
       <div class="error-msg"></div>
-      <button class="tool-btn start-btn" disabled>
+      <button class="tool-btn start-btn" style="display:none">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始模糊處理
       </button>
       <div class="download-wrap">
@@ -1349,6 +1364,40 @@ if (!self.crossOriginIsolated) {
       <button class="trim-btn-go" id="trimGoBtn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>確認並開始裁切
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Face Blur Modal -->
+<div class="fb-modal-ov" id="fbModalOv">
+  <div class="fb-modal">
+    <div class="fb-mhd">
+      <div class="fb-mhd-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--rose2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        <span class="fb-mhd-title">人臉定位分段</span>
+        <span class="fb-mhd-fname" id="fbFname"></span>
+      </div>
+      <button class="fb-m-close" id="fbCloseBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
+    </div>
+    <div class="fb-m-body">
+      <div class="fb-m-canvas-wrap" id="fbCanvasWrap">
+        <canvas class="fb-m-canvas" id="fbCanvas"></canvas>
+        <div class="fb-m-hint" id="fbHint">拖曳框選臉部位置，或點「自動偵測」</div>
+      </div>
+      <div class="fb-m-ctrl">
+        <button class="fb-m-pp" id="fbPP"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-play"/></svg></button>
+        <span class="fb-m-time" id="fbTime">0:00 / 0:00</span>
+        <input type="range" class="fb-m-seek" id="fbSeek" min="0" max="1000" value="0">
+        <button class="fb-m-detect" id="fbDetect"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>自動偵測</button>
+        <button class="fb-m-add" id="fbAddKf"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>新增定位點</button>
+      </div>
+      <div class="fb-kf-title">定位點列表 — 每段自動追蹤至下一個定位點</div>
+      <div class="fb-kf-list" id="fbKfList"></div>
+      <div class="fb-kf-empty" id="fbKfEmpty">請在不同時間點框選臉部並新增定位點。至少需要 1 個定位點。</div>
+    </div>
+    <div class="fb-m-acts">
+      <button class="fb-m-cancel" id="fbCancelBtn">取消</button>
+      <button class="fb-m-go" id="fbGoBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>確認並開始處理</button>
     </div>
   </div>
 </div>
@@ -2151,199 +2200,59 @@ if (!self.crossOriginIsolated) {
   }
 
   function setupFaceBlurCard(card) {
-    var input    = card.querySelector('input[type=file]');
+    var input = card.querySelector('input[type=file]');
     var dropArea = card.querySelector('.drop-area');
-    var nameEl   = card.querySelector('.file-info-name');
-    var sizeEl   = card.querySelector('.file-info-size');
+    var nameEl = card.querySelector('.file-info-name');
+    var sizeEl = card.querySelector('.file-info-size');
     var clearBtn = card.querySelector('.file-clear');
-    var bar      = card.querySelector('.progress-bar');
+    var bar = card.querySelector('.progress-bar');
     var progText = card.querySelector('.progress-text');
     var startBtn = card.querySelector('.start-btn');
-    var dlBtn    = card.querySelector('.dl-btn');
+    var dlBtn = card.querySelector('.dl-btn');
     var resetBtn = card.querySelector('.reset-btn');
-    var errEl    = card.querySelector('.error-msg');
-    var canvasEl = card.querySelector('.fb-canvas');
-    var canvasWrap = card.querySelector('.fb-canvas-wrap');
-    var hintEl   = card.querySelector('.fb-hint');
-    var detectBtn= card.querySelector('.fb-detect-btn');
-    var blurSel  = card.querySelector('.fb-blur-type');
-    var ctx      = canvasEl.getContext('2d');
+    var errEl = card.querySelector('.error-msg');
+    var openBtn = card.querySelector('.fb-open-btn');
+    var blurSel = card.querySelector('.fb-blur-type');
+    var kfChipVal = card.querySelector('.fb-kf-val');
 
-    var videoEl  = document.createElement('video');
+    var videoEl = document.createElement('video');
     videoEl.muted = true; videoEl.playsInline = true;
-    var bbox = null; // video pixel coords
-    var mpReady = false, faceDet = null, _mpResolve = null;
 
-    // ── MediaPipe ──
-    function loadMP() {
-      return new Promise(function(res, rej) {
-        if (mpReady) { res(); return; }
-        var doInit = function() {
-          faceDet = new FaceDetection({
-            locateFile: function(f) {
-              return 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4.1646425229/' + f;
-            }
-          });
-          faceDet.setOptions({ model: 'short', minDetectionConfidence: 0.45 });
-          faceDet.onResults(function(r) {
-            if (_mpResolve) { var fn = _mpResolve; _mpResolve = null; fn(r.detections && r.detections.length ? r.detections[0] : null); }
-          });
-          // warm-up
-          faceDet.send({ image: canvasEl }).then(function() { mpReady = true; res(); }).catch(res);
-        };
-        if (window.FaceDetection) { doInit(); return; }
-        var s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4.1646425229/face_detection.js';
-        s.crossOrigin = 'anonymous';
-        s.onload = doInit; s.onerror = rej;
-        document.head.appendChild(s);
-      });
-    }
-
-    function detectFace(imgEl) {
-      return new Promise(function(resolve) {
-        var tid = setTimeout(function() { if (_mpResolve) { _mpResolve = null; resolve(null); } }, 4000);
-        _mpResolve = function(d) { clearTimeout(tid); resolve(d); };
-        faceDet.send({ image: imgEl });
-      });
-    }
-
-    function detToBbox(det, vw, vh) {
-      var bb = det.boundingBox;
-      var fw = bb.width * vw, fh = bb.height * vh;
-      var px = fw * 0.08, py = fh * 0.10;
-      return {
-        x: Math.round(Math.max(0, (bb.xCenter - bb.width/2) * vw - px)),
-        y: Math.round(Math.max(0, (bb.yCenter - bb.height/2) * vh - py)),
-        w: Math.round(Math.min(fw + 2*px, vw)),
-        h: Math.round(Math.min(fh + 2*py, vh))
-      };
-    }
-
-    function drawBbox(b) {
-      var vw = canvasEl.width, vh = canvasEl.height;
-      ctx.drawImage(videoEl, 0, 0, vw, vh);
-      ctx.save();
-      ctx.beginPath();
-      ctx.ellipse(b.x + b.w/2, b.y + b.h/2, b.w/2, b.h/2, 0, 0, Math.PI*2);
-      ctx.strokeStyle = '#fb7185'; ctx.lineWidth = Math.max(2, vw/220);
-      ctx.setLineDash([Math.round(vw/60), Math.round(vw/90)]);
-      ctx.stroke();
-      ctx.fillStyle = 'rgba(251,113,133,.13)';
-      ctx.fill();
-      ctx.restore();
-    }
-
-    function setReady() { startBtn.disabled = false; }
-
-    // ── File handling ──
     function setFile(f) {
-      if (f.size > 314572800) { // 300 MB
-        errEl.textContent = '檔案超過 300 MB 限制，請先壓縮再試';
-        card.classList.add('has-error'); return;
-      }
+      if (f.size > 314572800) { errEl.textContent = '檔案超過 300 MB 限制'; card.classList.add('has-error'); return; }
       fileMap.set(card, f);
-      card.classList.remove('done','has-error','processing','fb-bbox-set');
+      card.classList.remove('done','has-error','processing');
       card.classList.add('has-file');
       nameEl.textContent = f.name; sizeEl.textContent = fmtBytes(f.size);
       bar.style.width = '0%'; errEl.textContent = '';
-      bbox = null; startBtn.disabled = true;
-      hintEl.textContent = '手動拖曳框選臉部，或點「自動偵測人臉」';
-
-      if (videoEl.src.startsWith('blob:')) URL.revokeObjectURL(videoEl.src);
+      startBtn.style.display = 'none';
+      kfChipVal.textContent = '尚未設定 — 點上方按鈕設定';
+      card._fbKeyframes = null;
+      if (videoEl.src && videoEl.src.startsWith('blob:')) URL.revokeObjectURL(videoEl.src);
       videoEl.src = URL.createObjectURL(f);
-      videoEl.addEventListener('loadedmetadata', function onMeta() {
-        videoEl.removeEventListener('loadedmetadata', onMeta);
-        var vw = videoEl.videoWidth, vh = videoEl.videoHeight;
-        if (vw > 1920 || vh > 1920) {
-          errEl.textContent = '解析度超過 1080p 建議上限，處理可能不穩定';
-          card.classList.add('has-error');
-        }
-        canvasEl.width = vw; canvasEl.height = vh;
-        videoEl.currentTime = 0.05;
-        videoEl.addEventListener('seeked', function onS() {
-          videoEl.removeEventListener('seeked', onS);
-          ctx.drawImage(videoEl, 0, 0, vw, vh);
-        });
-      });
     }
 
     function reset() {
       fileMap.delete(card);
       var pu = blobMap.get(card); if (pu) URL.revokeObjectURL(pu); blobMap.delete(card);
-      if (videoEl.src.startsWith('blob:')) URL.revokeObjectURL(videoEl.src);
+      if (videoEl.src && videoEl.src.startsWith('blob:')) URL.revokeObjectURL(videoEl.src);
       videoEl.src = ''; videoEl.load();
       card.classList.remove('has-file','done','has-error','processing');
       if (input) input.value = '';
       bar.style.width = '0%'; errEl.textContent = '';
-      bbox = null; startBtn.disabled = true;
-      ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+      startBtn.style.display = 'none';
+      card._fbKeyframes = null;
     }
 
-    // ── Canvas draw ──
-    var drawing = false, ds = {};
-    canvasWrap.addEventListener('mousedown', function(e) {
-      var r = canvasEl.getBoundingClientRect();
-      ds = { x: e.clientX - r.left, y: e.clientY - r.top };
-      drawing = true; e.preventDefault();
-    });
-    document.addEventListener('mousemove', function(e) {
-      if (!drawing) return;
-      var r = canvasEl.getBoundingClientRect();
-      var cx = e.clientX - r.left, cy = e.clientY - r.top;
-      var sx = canvasEl.width/r.width, sy = canvasEl.height/r.height;
-      var bw = (cx - ds.x)*sx, bh = (cy - ds.y)*sy;
-      ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
-      ctx.save();
-      ctx.beginPath();
-      ctx.ellipse(ds.x*sx + bw/2, ds.y*sy + bh/2, Math.abs(bw/2), Math.abs(bh/2), 0, 0, Math.PI*2);
-      ctx.strokeStyle='#fb7185'; ctx.lineWidth=Math.max(2,canvasEl.width/220);
-      ctx.setLineDash([8,5]);
-      ctx.stroke();
-      ctx.fillStyle='rgba(251,113,133,.1)';
-      ctx.fill();
-      ctx.restore();
-    });
-    document.addEventListener('mouseup', function(e) {
-      if (!drawing) return; drawing = false;
-      var r = canvasEl.getBoundingClientRect();
-      var sx = canvasEl.width/r.width, sy = canvasEl.height/r.height;
-      var dx = (e.clientX - r.left - ds.x)*sx, dy = (e.clientY - r.top - ds.y)*sy;
-      if (Math.abs(dx) < 15 || Math.abs(dy) < 15) return;
-      var bx = ds.x*sx, by = ds.y*sy;
-      if (dx < 0) { bx += dx; dx = -dx; } if (dy < 0) { by += dy; dy = -dy; }
-      bbox = { x:Math.round(bx), y:Math.round(by), w:Math.round(dx), h:Math.round(dy) };
-      hintEl.textContent = '已框選臉部區域 ✓ — 拖曳可重新選取';
-      setReady();
+    openBtn.addEventListener('click', function() {
+      var f = fileMap.get(card);
+      if (f && typeof window.openFbModal === 'function') window.openFbModal(f, card, videoEl);
     });
 
-    // ── Auto-detect ──
-    detectBtn.addEventListener('click', async function() {
-      if (!fileMap.get(card)) return;
-      detectBtn.disabled = true;
-      var orig = detectBtn.innerHTML;
-      detectBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg> 載入偵測引擎...';
-      try {
-        await loadMP();
-        detectBtn.innerHTML = orig.replace('自動偵測人臉','偵測中...');
-        var det = await detectFace(canvasEl);
-        if (!det) {
-          hintEl.textContent = '⚠ 未偵測到人臉 — 請手動拖曳框選';
-        } else {
-          bbox = detToBbox(det, canvasEl.width, canvasEl.height);
-          drawBbox(bbox);
-          hintEl.textContent = '已自動偵測人臉 ✓ — 可重新拖曳調整範圍';
-          setReady();
-        }
-      } catch(e) { hintEl.textContent = '⚠ 偵測載入失敗，請手動框選'; }
-      detectBtn.disabled = false;
-      detectBtn.innerHTML = orig;
-    });
-
-    // ── Start ──
     startBtn.addEventListener('click', async function() {
       var file = fileMap.get(card);
-      if (!file || !bbox) return;
+      var keyframes = card._fbKeyframes;
+      if (!file || !keyframes || !keyframes.length) return;
       if (card.classList.contains('processing')) return;
       if (ffRunning) { errEl.textContent = '另一個工具正在處理中，請稍候再試'; card.classList.add('has-error'); return; }
 
@@ -2353,18 +2262,16 @@ if (!self.crossOriginIsolated) {
 
       try {
         await ensureFF(); bar.style.width = '8%';
-
         var vw = videoEl.videoWidth, vh = videoEl.videoHeight;
         var duration = videoEl.duration;
-        if (duration > 300) throw new Error('影片超過 5 分鐘限制（' + Math.round(duration/60) + ' 分鐘）');
+        if (duration > 300) throw new Error('影片超過 5 分鐘限制');
 
-        progText.textContent = '載入臉部偵測引擎...';
-        await loadMP(); bar.style.width = '10%';
+        progText.textContent = '載入偵測引擎...';
+        await window._fbLoadMP(); bar.style.width = '10%';
 
         var blurType = blurSel.value;
         var fps = 24;
         var inExt = getExt(file.name), inN = 'fb_in.' + inExt;
-
         progText.textContent = '載入影片...';
         try { ff.FS('unlink', inN); } catch(e) {}
         ff.FS('writeFile', inN, await fetchFile(file));
@@ -2376,37 +2283,41 @@ if (!self.crossOriginIsolated) {
         try { await ff.run('-i', inN, '-vn', '-acodec', 'aac', '-b:a', '128k', 'fb_aud.aac'); hasAudio = true; } catch(e) {}
         bar.style.width = '16%';
 
-        // Process frames
         var offC = document.createElement('canvas'); offC.width = vw; offC.height = vh;
         var offCtx = offC.getContext('2d');
         var totalFrames = Math.ceil(duration * fps);
-        var lastBbox = bbox;
         var written = 0;
+        // Sort keyframes by time
+        keyframes.sort(function(a, b) { return a.t - b.t; });
+        var kfIdx = 0;
+        var lastBbox = keyframes[0].bbox;
 
         for (var i = 0; i < totalFrames; i++) {
-          // Seek
           var t = i / fps;
+          // Check if we crossed into next keyframe segment
+          if (kfIdx < keyframes.length - 1 && t >= keyframes[kfIdx + 1].t) {
+            kfIdx++;
+            lastBbox = keyframes[kfIdx].bbox; // reset to new keyframe bbox
+          }
+
           await new Promise(function(res) {
             if (Math.abs(videoEl.currentTime - t) < 0.004) { res(); return; }
             function h() { videoEl.removeEventListener('seeked', h); res(); }
             videoEl.addEventListener('seeked', h);
             videoEl.currentTime = t;
           });
-
           offCtx.drawImage(videoEl, 0, 0, vw, vh);
 
-          // Detect & track (EMA smoothing + outlier rejection)
-          var det = await detectFace(offC);
+          var det = await window._fbDetectFace(offC);
           if (det) {
-            var raw = detToBbox(det, vw, vh);
+            var raw = window._fbDetToBbox(det, vw, vh);
             if (lastBbox) {
-              var wRatio = raw.w / lastBbox.w;
-              var hRatio = raw.h / lastBbox.h;
-              var dx = (raw.x + raw.w/2) - (lastBbox.x + lastBbox.w/2);
-              var dy = (raw.y + raw.h/2) - (lastBbox.y + lastBbox.h/2);
-              var moveDist = Math.sqrt(dx*dx + dy*dy);
-              var maxMove = Math.max(lastBbox.w, lastBbox.h) * 0.4;
-              if (wRatio < 1.4 && wRatio > 0.72 && hRatio < 1.4 && hRatio > 0.72 && moveDist < maxMove) {
+              var wR = raw.w / lastBbox.w, hR = raw.h / lastBbox.h;
+              var ddx = (raw.x + raw.w/2) - (lastBbox.x + lastBbox.w/2);
+              var ddy = (raw.y + raw.h/2) - (lastBbox.y + lastBbox.h/2);
+              var dist = Math.sqrt(ddx*ddx + ddy*ddy);
+              var maxM = Math.max(lastBbox.w, lastBbox.h) * 0.4;
+              if (wR < 1.4 && wR > 0.72 && hR < 1.4 && hR > 0.72 && dist < maxM) {
                 var a = 0.35;
                 lastBbox = {
                   x: Math.round(lastBbox.x + a*(raw.x - lastBbox.x)),
@@ -2415,28 +2326,20 @@ if (!self.crossOriginIsolated) {
                   h: Math.round(lastBbox.h + a*(raw.h - lastBbox.h))
                 };
               }
-              // else: outlier (likely hand/body), keep lastBbox unchanged
-            } else {
-              lastBbox = raw;
-            }
+            } else { lastBbox = raw; }
           }
 
-          // Apply blur
           applyBlurEffect(offCtx, offC, lastBbox, blurType);
 
-          // Write JPEG frame
           var fName = 'fb_' + String(i).padStart(6,'0') + '.jpg';
           var jBlob = await new Promise(function(r) { offC.toBlob(r, 'image/jpeg', 0.88); });
           ff.FS('writeFile', fName, new Uint8Array(await jBlob.arrayBuffer()));
           written++;
-
-          var pct = 16 + Math.round((i / totalFrames) * 68);
-          bar.style.width = pct + '%';
+          bar.style.width = (16 + Math.round((i / totalFrames) * 68)) + '%';
           progText.textContent = '處理第 ' + (i+1) + ' / ' + totalFrames + ' 幀...';
           if (i % 5 === 0) await sleep(0);
         }
 
-        // Encode
         progText.textContent = '編碼輸出影片...'; bar.style.width = '85%';
         try { ff.FS('unlink', 'fb_out.mp4'); } catch(e) {}
         var args = ['-r', String(fps), '-i', 'fb_%06d.jpg'];
@@ -2445,22 +2348,17 @@ if (!self.crossOriginIsolated) {
         if (hasAudio) args.push('-c:a','aac','-b:a','128k','-shortest');
         args.push('-max_muxing_queue_size','1024','fb_out.mp4');
         await ff.run.apply(ff, args);
-
         var outData = ff.FS('readFile', 'fb_out.mp4');
-
-        // Cleanup FS
         try { ff.FS('unlink', inN); } catch(e) {}
         try { ff.FS('unlink', 'fb_aud.aac'); } catch(e) {}
         try { ff.FS('unlink', 'fb_out.mp4'); } catch(e) {}
         for (var j = 0; j < written; j++) { try { ff.FS('unlink','fb_'+String(j).padStart(6,'0')+'.jpg'); } catch(e) {} }
-
         bar.style.width = '100%'; await sleep(350);
         card.classList.remove('processing'); card.classList.add('done');
         var blob = new Blob([outData.buffer], { type:'video/mp4' });
         var url = URL.createObjectURL(blob);
         blobMap.set(card, url);
         dlBtn.onclick = function() { var a=document.createElement('a'); a.href=url; a.download=basename(file.name)+'_blurred.mp4'; a.click(); };
-
       } catch(err) {
         console.error(err);
         card.classList.remove('processing'); card.classList.add('has-file','has-error');
@@ -2474,7 +2372,6 @@ if (!self.crossOriginIsolated) {
       }
     });
 
-    // ── Drop / input / clear / reset ──
     dropArea.addEventListener('click', function() { input.click(); });
     dropArea.addEventListener('dragover', function(e) { e.preventDefault(); dropArea.classList.add('drag-over'); });
     dropArea.addEventListener('dragleave', function() { dropArea.classList.remove('drag-over'); });
@@ -3598,6 +3495,328 @@ if (!self.crossOriginIsolated) {
     };
     reader.readAsArrayBuffer(file);
   };
+})();
+</script>
+
+<!-- ── Face Blur Modal JS ─────────────────────────────────── -->
+<script>
+(function() {
+  var ov = document.getElementById('fbModalOv');
+  var canvas = document.getElementById('fbCanvas');
+  var ctx = canvas.getContext('2d');
+  var hint = document.getElementById('fbHint');
+  var ppBtn = document.getElementById('fbPP');
+  var seekEl = document.getElementById('fbSeek');
+  var timeEl = document.getElementById('fbTime');
+  var detectBtn = document.getElementById('fbDetect');
+  var addKfBtn = document.getElementById('fbAddKf');
+  var kfListEl = document.getElementById('fbKfList');
+  var kfEmptyEl = document.getElementById('fbKfEmpty');
+  var goBtn = document.getElementById('fbGoBtn');
+  var cancelBtn = document.getElementById('fbCancelBtn');
+  var closeBtn = document.getElementById('fbCloseBtn');
+  var fnameEl = document.getElementById('fbFname');
+  var wrap = document.getElementById('fbCanvasWrap');
+
+  var vid = null; // modal-internal video element
+  var _card = null;
+  var keyframes = [];
+  var curBbox = null; // current drawn bbox (normalized 0-1)
+  var playing = false;
+  var rafId = null;
+  var drawing = false;
+  var drawStart = null;
+  var drawRect = null;
+
+  // MediaPipe state
+  var mpLoaded = false;
+  var faceDetection = null;
+  var lastDetResult = null;
+
+  function fmt(s) {
+    var m = Math.floor(s / 60), ss = Math.floor(s % 60);
+    return m + ':' + (ss < 10 ? '0' : '') + ss;
+  }
+
+  // ── MediaPipe ──
+  window._fbLoadMP = function() {
+    if (mpLoaded) return Promise.resolve();
+    return new Promise(function(res, rej) {
+      if (typeof FaceDetection !== 'undefined') {
+        initMP(res, rej);
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4.1646425229/face_detection.js';
+      s.onload = function() { initMP(res, rej); };
+      s.onerror = function() { rej(new Error('MediaPipe 載入失敗')); };
+      document.head.appendChild(s);
+    });
+  };
+
+  function initMP(res, rej) {
+    faceDetection = new FaceDetection({
+      locateFile: function(f) {
+        return 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4.1646425229/' + f;
+      }
+    });
+    faceDetection.setOptions({ model: 'short', minDetectionConfidence: 0.5 });
+    faceDetection.onResults(function(r) { lastDetResult = r; });
+    faceDetection.initialize().then(function() { mpLoaded = true; res(); }).catch(rej);
+  }
+
+  window._fbDetectFace = function(inputCanvas) {
+    lastDetResult = null;
+    return faceDetection.send({ image: inputCanvas }).then(function() {
+      if (lastDetResult && lastDetResult.detections && lastDetResult.detections.length > 0)
+        return lastDetResult.detections[0];
+      return null;
+    });
+  };
+
+  window._fbDetToBbox = function(det, vw, vh) {
+    var bb = det.boundingBox;
+    var pad = 0.35;
+    var cx = bb.xCenter * vw, cy = bb.yCenter * vh;
+    var bw = bb.width * vw * (1 + pad), bh = bb.height * vh * (1 + pad);
+    var x = Math.max(0, Math.round(cx - bw / 2));
+    var y = Math.max(0, Math.round(cy - bh / 2));
+    var w = Math.min(Math.round(bw), vw - x);
+    var h = Math.min(Math.round(bh), vh - y);
+    return { x: x, y: y, w: w, h: h };
+  };
+
+  // ── Draw helpers ──
+  function drawFrame() {
+    if (!vid) return;
+    var vw = vid.videoWidth || 640, vh = vid.videoHeight || 360;
+    canvas.width = vw; canvas.height = vh;
+    ctx.drawImage(vid, 0, 0, vw, vh);
+    // draw current bbox overlay
+    if (curBbox) {
+      var bx = curBbox.x * vw, by = curBbox.y * vh, bw = curBbox.w * vw, bh = curBbox.h * vh;
+      ctx.strokeStyle = '#fb7185';
+      ctx.lineWidth = Math.max(2, vw / 200);
+      ctx.setLineDash([6, 4]);
+      ctx.strokeRect(bx, by, bw, bh);
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(244,63,94,.12)';
+      ctx.fillRect(bx, by, bw, bh);
+      // corner marks
+      var cm = Math.min(12, bw * 0.2, bh * 0.2);
+      ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = Math.max(3, vw / 160);
+      [[bx, by, 1, 1], [bx + bw, by, -1, 1], [bx, by + bh, 1, -1], [bx + bw, by + bh, -1, -1]].forEach(function(c) {
+        ctx.beginPath(); ctx.moveTo(c[0], c[1] + c[3] * cm); ctx.lineTo(c[0], c[1]); ctx.lineTo(c[0] + c[2] * cm, c[1]); ctx.stroke();
+      });
+    }
+    // draw temp drawing rect
+    if (drawing && drawRect) {
+      ctx.strokeStyle = 'rgba(251,113,133,.7)';
+      ctx.lineWidth = 2; ctx.setLineDash([4, 3]);
+      ctx.strokeRect(drawRect.x * vw, drawRect.y * vh, drawRect.w * vw, drawRect.h * vh);
+      ctx.setLineDash([]);
+    }
+  }
+
+  function loopDraw() {
+    drawFrame();
+    if (playing) rafId = requestAnimationFrame(loopDraw);
+  }
+
+  function updateTime() {
+    if (!vid) return;
+    timeEl.textContent = fmt(vid.currentTime) + ' / ' + fmt(vid.duration || 0);
+    seekEl.value = vid.duration ? Math.round((vid.currentTime / vid.duration) * 1000) : 0;
+  }
+
+  function play() { if (!vid) return; vid.play(); playing = true; ppBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'; loopDraw(); }
+  function pause() { if (!vid) return; vid.pause(); playing = false; ppBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>'; if (rafId) cancelAnimationFrame(rafId); drawFrame(); }
+
+  // ── Canvas mouse interaction (draw bbox) ──
+  function canvasXY(e) {
+    var r = canvas.getBoundingClientRect();
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: (clientX - r.left) / r.width, y: (clientY - r.top) / r.height };
+  }
+
+  function onDrawStart(e) {
+    e.preventDefault();
+    drawing = true;
+    drawStart = canvasXY(e);
+    drawRect = null;
+  }
+  function onDrawMove(e) {
+    if (!drawing || !drawStart) return;
+    e.preventDefault();
+    var p = canvasXY(e);
+    drawRect = {
+      x: Math.min(drawStart.x, p.x), y: Math.min(drawStart.y, p.y),
+      w: Math.abs(p.x - drawStart.x), h: Math.abs(p.y - drawStart.y)
+    };
+    if (!playing) drawFrame();
+  }
+  function onDrawEnd(e) {
+    if (!drawing) return;
+    drawing = false;
+    if (drawRect && drawRect.w > 0.01 && drawRect.h > 0.01) {
+      curBbox = { x: drawRect.x, y: drawRect.y, w: drawRect.w, h: drawRect.h };
+      hint.textContent = '已框選 — 點「新增定位點」儲存此位置';
+    }
+    drawRect = null;
+    drawStart = null;
+    if (!playing) drawFrame();
+  }
+
+  wrap.addEventListener('mousedown', onDrawStart);
+  wrap.addEventListener('mousemove', onDrawMove);
+  window.addEventListener('mouseup', onDrawEnd);
+  wrap.addEventListener('touchstart', onDrawStart, { passive: false });
+  wrap.addEventListener('touchmove', onDrawMove, { passive: false });
+  window.addEventListener('touchend', onDrawEnd);
+
+  // ── Controls ──
+  ppBtn.addEventListener('click', function() { playing ? pause() : play(); });
+  seekEl.addEventListener('input', function() {
+    if (!vid) return;
+    pause();
+    vid.currentTime = (seekEl.value / 1000) * vid.duration;
+    vid.addEventListener('seeked', function h() { vid.removeEventListener('seeked', h); drawFrame(); updateTime(); });
+  });
+
+  vid = document.createElement('video');
+  vid.muted = true; vid.playsInline = true;
+  vid.addEventListener('timeupdate', function() { updateTime(); });
+  vid.addEventListener('ended', function() { pause(); });
+
+  // ── Auto detect ──
+  detectBtn.addEventListener('click', async function() {
+    if (!vid) return;
+    detectBtn.disabled = true;
+    detectBtn.textContent = '偵測中...';
+    try {
+      await window._fbLoadMP();
+      var offC = document.createElement('canvas');
+      offC.width = vid.videoWidth; offC.height = vid.videoHeight;
+      offC.getContext('2d').drawImage(vid, 0, 0, offC.width, offC.height);
+      var det = await window._fbDetectFace(offC);
+      if (det) {
+        var abs = window._fbDetToBbox(det, vid.videoWidth, vid.videoHeight);
+        curBbox = { x: abs.x / vid.videoWidth, y: abs.y / vid.videoHeight, w: abs.w / vid.videoWidth, h: abs.h / vid.videoHeight };
+        hint.textContent = '已偵測到人臉 — 點「新增定位點」儲存此位置';
+      } else {
+        hint.textContent = '未偵測到人臉，請手動框選';
+      }
+    } catch(err) {
+      hint.textContent = '偵測失敗：' + (err.message || err);
+    }
+    detectBtn.disabled = false;
+    detectBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>自動偵測';
+    if (!playing) drawFrame();
+  });
+
+  // ── Keyframe management ──
+  function renderKfList() {
+    kfListEl.innerHTML = '';
+    kfEmptyEl.style.display = keyframes.length ? 'none' : 'block';
+    keyframes.sort(function(a, b) { return a.t - b.t; });
+    keyframes.forEach(function(kf, idx) {
+      var item = document.createElement('div');
+      item.className = 'fb-kf-item';
+      item.innerHTML = '<span class="fb-kf-item-time">' + fmt(kf.t) + '</span>' +
+        '<span class="fb-kf-item-status">位置: ' + Math.round(kf.bbox.x * 100) + '%, ' + Math.round(kf.bbox.y * 100) + '% — ' + Math.round(kf.bbox.w * 100) + '% × ' + Math.round(kf.bbox.h * 100) + '%</span>' +
+        '<button class="fb-kf-item-del" title="刪除"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
+      item.querySelector('.fb-kf-item-del').addEventListener('click', function(e) {
+        e.stopPropagation();
+        keyframes.splice(idx, 1);
+        renderKfList();
+      });
+      item.addEventListener('click', function() {
+        pause();
+        vid.currentTime = kf.t;
+        curBbox = { x: kf.bbox.x, y: kf.bbox.y, w: kf.bbox.w, h: kf.bbox.h };
+        vid.addEventListener('seeked', function h() { vid.removeEventListener('seeked', h); drawFrame(); updateTime(); });
+      });
+      kfListEl.appendChild(item);
+    });
+  }
+
+  addKfBtn.addEventListener('click', function() {
+    if (!curBbox) { hint.textContent = '請先框選或偵測人臉位置'; return; }
+    if (!vid) return;
+    var t = vid.currentTime;
+    // Replace if same time exists (within 0.3s)
+    for (var i = keyframes.length - 1; i >= 0; i--) {
+      if (Math.abs(keyframes[i].t - t) < 0.3) { keyframes.splice(i, 1); break; }
+    }
+    keyframes.push({ t: t, bbox: { x: curBbox.x, y: curBbox.y, w: curBbox.w, h: curBbox.h } });
+    hint.textContent = '已新增定位點 @ ' + fmt(t);
+    renderKfList();
+  });
+
+  // ── Open modal ──
+  window.openFbModal = function(file, card, cardVideoEl) {
+    _card = card;
+    keyframes = [];
+    curBbox = null;
+    playing = false;
+    if (vid.src && vid.src.startsWith('blob:')) URL.revokeObjectURL(vid.src);
+    vid.src = URL.createObjectURL(file);
+    fnameEl.textContent = file.name;
+    hint.textContent = '拖曳框選臉部位置，或點「自動偵測」';
+    timeEl.textContent = '0:00 / 0:00';
+    seekEl.value = 0;
+    renderKfList();
+    ov.classList.add('open');
+    vid.addEventListener('loadedmetadata', function h() {
+      vid.removeEventListener('loadedmetadata', h);
+      vid.currentTime = 0;
+      vid.addEventListener('seeked', function s() {
+        vid.removeEventListener('seeked', s);
+        drawFrame();
+        updateTime();
+      });
+    });
+  };
+
+  // ── Confirm ──
+  goBtn.addEventListener('click', function() {
+    if (!keyframes.length) { hint.textContent = '請至少新增 1 個定位點'; return; }
+    if (!_card) return;
+    // Convert normalized bbox to absolute pixel values for processing
+    var vw = vid.videoWidth, vh = vid.videoHeight;
+    var absKf = keyframes.map(function(kf) {
+      return {
+        t: kf.t,
+        bbox: {
+          x: Math.round(kf.bbox.x * vw),
+          y: Math.round(kf.bbox.y * vh),
+          w: Math.round(kf.bbox.w * vw),
+          h: Math.round(kf.bbox.h * vh)
+        }
+      };
+    });
+    absKf.sort(function(a, b) { return a.t - b.t; });
+    _card._fbKeyframes = absKf;
+    // Update chip
+    var chipVal = _card.querySelector('.fb-kf-val');
+    if (chipVal) chipVal.textContent = absKf.length + ' 個定位點';
+    // Show start button
+    var startBtn = _card.querySelector('.start-btn');
+    if (startBtn) startBtn.style.display = '';
+    closeModal();
+    // Auto click start
+    setTimeout(function() { if (startBtn) startBtn.click(); }, 120);
+  });
+
+  // ── Close ──
+  function closeModal() {
+    pause();
+    ov.classList.remove('open');
+  }
+  cancelBtn.addEventListener('click', closeModal);
+  closeBtn.addEventListener('click', closeModal);
+  ov.addEventListener('click', function(e) { if (e.target === ov) closeModal(); });
 })();
 </script>
 
