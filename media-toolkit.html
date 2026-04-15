@@ -3664,7 +3664,10 @@ if (!self.crossOriginIsolated) {
   function play() { if (!vid) return; vid.play(); playing = true; ppBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'; loopDraw(); }
   function pause() { if (!vid) return; vid.pause(); playing = false; ppBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>'; if (rafId) cancelAnimationFrame(rafId); drawFrame(); }
 
-  // ── Canvas mouse interaction (draw bbox) ──
+  // ── Canvas mouse interaction (draw / move bbox) ──
+  var dragging = false; // true = moving existing bbox
+  var dragOffset = null; // {dx, dy} offset from bbox center
+
   function canvasXY(e) {
     var r = canvas.getBoundingClientRect();
     var clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -3672,13 +3675,40 @@ if (!self.crossOriginIsolated) {
     return { x: (clientX - r.left) / r.width, y: (clientY - r.top) / r.height };
   }
 
+  // Check if point is inside current ellipse
+  function insideEllipse(px, py) {
+    if (!curBbox) return false;
+    var cx = curBbox.x + curBbox.w / 2, cy = curBbox.y + curBbox.h / 2;
+    var rx = curBbox.w / 2, ry = curBbox.h / 2;
+    if (rx <= 0 || ry <= 0) return false;
+    var dx = (px - cx) / rx, dy = (py - cy) / ry;
+    return (dx * dx + dy * dy) <= 1;
+  }
+
   function onDrawStart(e) {
     e.preventDefault();
-    drawing = true;
-    drawStart = canvasXY(e);
-    drawRect = null;
+    var p = canvasXY(e);
+    if (curBbox && insideEllipse(p.x, p.y)) {
+      // Start dragging existing ellipse
+      dragging = true;
+      dragOffset = { dx: p.x - (curBbox.x + curBbox.w / 2), dy: p.y - (curBbox.y + curBbox.h / 2) };
+    } else {
+      // Start drawing new ellipse
+      drawing = true;
+      drawStart = p;
+      drawRect = null;
+    }
   }
   function onDrawMove(e) {
+    if (dragging && curBbox) {
+      e.preventDefault();
+      var p = canvasXY(e);
+      var ncx = p.x - dragOffset.dx, ncy = p.y - dragOffset.dy;
+      curBbox.x = Math.max(0, Math.min(1 - curBbox.w, ncx - curBbox.w / 2));
+      curBbox.y = Math.max(0, Math.min(1 - curBbox.h, ncy - curBbox.h / 2));
+      if (!playing) drawFrame();
+      return;
+    }
     if (!drawing || !drawStart) return;
     e.preventDefault();
     var p = canvasXY(e);
@@ -3689,16 +3719,29 @@ if (!self.crossOriginIsolated) {
     if (!playing) drawFrame();
   }
   function onDrawEnd(e) {
+    if (dragging) {
+      dragging = false; dragOffset = null;
+      hint.textContent = '已移動位置 — 跳到下一個時間點繼續調整，或點「新增定位點」';
+      if (!playing) drawFrame();
+      return;
+    }
     if (!drawing) return;
     drawing = false;
     if (drawRect && drawRect.w > 0.01 && drawRect.h > 0.01) {
       curBbox = { x: drawRect.x, y: drawRect.y, w: drawRect.w, h: drawRect.h };
-      hint.textContent = '已框選 — 點「新增定位點」儲存此位置';
+      hint.textContent = '已框選 — 拖曳可移動位置，點「新增定位點」儲存';
     }
     drawRect = null;
     drawStart = null;
     if (!playing) drawFrame();
   }
+
+  // Update cursor style based on hover state
+  wrap.addEventListener('mousemove', function(e) {
+    if (drawing || dragging) return;
+    var p = canvasXY(e);
+    wrap.style.cursor = (curBbox && insideEllipse(p.x, p.y)) ? 'grab' : 'crosshair';
+  });
 
   wrap.addEventListener('mousedown', onDrawStart);
   wrap.addEventListener('mousemove', onDrawMove);
@@ -3735,7 +3778,7 @@ if (!self.crossOriginIsolated) {
       if (det) {
         var abs = window._fbDetToBbox(det, vid.videoWidth, vid.videoHeight);
         curBbox = { x: abs.x / vid.videoWidth, y: abs.y / vid.videoHeight, w: abs.w / vid.videoWidth, h: abs.h / vid.videoHeight };
-        hint.textContent = '已偵測到人臉 — 點「新增定位點」儲存此位置';
+        hint.textContent = '已偵測到人臉 — 可拖曳調整位置，點「新增定位點」儲存';
       } else {
         hint.textContent = '未偵測到人臉，請手動框選';
       }
@@ -3782,7 +3825,7 @@ if (!self.crossOriginIsolated) {
       if (Math.abs(keyframes[i].t - t) < 0.3) { keyframes.splice(i, 1); break; }
     }
     keyframes.push({ t: t, bbox: { x: curBbox.x, y: curBbox.y, w: curBbox.w, h: curBbox.h } });
-    hint.textContent = '已新增定位點 @ ' + fmt(t);
+    hint.textContent = '已新增定位點 @ ' + fmt(t) + ' — 跳到下一段時間，拖曳橢圓到新位置';
     renderKfList();
   });
 
