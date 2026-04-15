@@ -213,6 +213,39 @@ footer a{color:var(--indigo2);text-decoration:none}
 .c-cyan::before{background:linear-gradient(90deg,#0891b2,#22d3ee)}.c-cyan:hover{box-shadow:0 0 24px rgba(34,211,238,.15)}.c-cyan .tool-icon{background:rgba(34,211,238,.15)}.c-cyan .tool-btn{background:rgba(34,211,238,.12);color:#67e8f9}.c-cyan .progress-bar{background:linear-gradient(90deg,#0891b2,#22d3ee)}.c-cyan .dl-btn{background:linear-gradient(135deg,#0891b2,#22d3ee)}.c-cyan .fmt{background:rgba(34,211,238,.1);color:#67e8f9;border-color:rgba(34,211,238,.2)}.c-cyan .drop-area{border-color:rgba(34,211,238,.35)}.c-cyan .drop-area:hover,.c-cyan .drop-area.drag-over{border-color:#22d3ee;background:rgba(34,211,238,.07)}
 .c-fuchsia::before{background:linear-gradient(90deg,#a21caf,#d946ef)}.c-fuchsia:hover{box-shadow:0 0 24px rgba(217,70,239,.15)}.c-fuchsia .tool-icon{background:rgba(217,70,239,.15)}.c-fuchsia .tool-btn{background:rgba(217,70,239,.12);color:#e879f9}.c-fuchsia .progress-bar{background:linear-gradient(90deg,#a21caf,#d946ef)}.c-fuchsia .dl-btn{background:linear-gradient(135deg,#a21caf,#d946ef)}.c-fuchsia .fmt{background:rgba(217,70,239,.1);color:#e879f9;border-color:rgba(217,70,239,.2)}.c-fuchsia .drop-area{border-color:rgba(217,70,239,.35)}.c-fuchsia .drop-area:hover,.c-fuchsia .drop-area.drag-over{border-color:#d946ef;background:rgba(217,70,239,.07)}
 
+/* ── c-yellow ── */
+.c-yellow::before{background:linear-gradient(90deg,#ca8a04,#eab308)}.c-yellow:hover{box-shadow:0 0 24px rgba(234,179,8,.15)}.c-yellow .tool-icon{background:rgba(234,179,8,.15)}.c-yellow .tool-btn{background:rgba(234,179,8,.12);color:#facc15}.c-yellow .progress-bar{background:linear-gradient(90deg,#ca8a04,#eab308)}.c-yellow .dl-btn{background:linear-gradient(135deg,#ca8a04,#eab308)}.c-yellow .fmt{background:rgba(234,179,8,.1);color:#facc15;border-color:rgba(234,179,8,.2)}.c-yellow .drop-area{border-color:rgba(234,179,8,.35)}.c-yellow .drop-area:hover,.c-yellow .drop-area.drag-over{border-color:#eab308;background:rgba(234,179,8,.07)}
+
+/* ── audio trim card ── */
+.atrim-editor{display:none;margin-bottom:10px}
+.tool-card.has-file .atrim-editor{display:block}
+.tool-card.done .atrim-editor,.tool-card.processing .atrim-editor{display:none}
+.atrim-wave-wrap{position:relative;height:72px;border-radius:10px;overflow:visible;user-select:none;margin-bottom:8px;cursor:default}
+.atrim-wave-canvas{width:100%;height:100%;display:block;border-radius:10px;background:var(--surface2)}
+.atrim-dimL,.atrim-dimR{position:absolute;top:0;bottom:0;background:rgba(0,0,0,.6);pointer-events:none;z-index:1}
+.atrim-dimL{left:0;border-radius:10px 0 0 10px}
+.atrim-dimR{right:0;border-radius:0 10px 10px 0}
+.atrim-sel{position:absolute;top:0;bottom:0;border-top:2.5px solid #eab308;border-bottom:2.5px solid #eab308;pointer-events:none;z-index:2}
+.atrim-hdl{position:absolute;top:0;bottom:0;width:18px;cursor:ew-resize;display:flex;align-items:center;justify-content:center;z-index:5;touch-action:none}
+.atrim-hdl-bar{width:14px;height:100%;border-radius:5px;background:#eab308;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(234,179,8,.55)}
+.atrim-hdl-bar::before{content:'';width:2px;height:20px;background:rgba(255,255,255,.85);border-radius:2px;box-shadow:4px 0 0 rgba(255,255,255,.85)}
+.atrim-hdl-tip{position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:#eab308;color:#000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;font-variant-numeric:tabular-nums;pointer-events:none}
+.atrim-hdl-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:#eab308}
+.atrim-ph{position:absolute;top:-6px;bottom:-6px;width:2px;background:rgba(255,255,255,.7);border-radius:2px;pointer-events:none;z-index:4;transform:translateX(-1px)}
+.atrim-ph::before{content:'';position:absolute;top:4px;left:50%;transform:translateX(-50%);width:6px;height:6px;background:#fff;border-radius:50%}
+.atrim-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.atrim-pp{width:32px;height:32px;border-radius:50%;background:rgba(234,179,8,.18);border:1.5px solid rgba(234,179,8,.4);color:#facc15;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
+.atrim-pp:hover{background:rgba(234,179,8,.3)}
+.atrim-time{font-size:11px;font-weight:700;color:var(--text2);font-variant-numeric:tabular-nums}
+.atrim-inputs{display:flex;gap:8px;margin-bottom:8px;align-items:center;flex-wrap:wrap}
+.atrim-inp-g{display:flex;align-items:center;gap:6px;flex:1;min-width:120px}
+.atrim-inp-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
+.atrim-inp{flex:1;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:5px 8px;font-size:12px;font-weight:700;font-family:monospace;text-align:center;outline:none;transition:.18s}
+.atrim-inp:focus{border-color:#eab308}
+.atrim-dur-chip{background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:600;padding:4px 10px;border-radius:8px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tool-card[data-tool="audioTrim"] .start-btn{display:none}
+.tool-card[data-tool="audioTrim"].atrim-ready .start-btn{display:flex}
+
 /* ── trim card additions ── */
 .trim-open-btn{display:none!important;background:rgba(14,165,233,.15);color:var(--sky2);margin-bottom:10px}
 .tool-card.has-file .trim-open-btn{display:flex!important}
@@ -450,6 +483,7 @@ if (!self.crossOriginIsolated) {
   <symbol id="ico-speed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
   <symbol id="ico-subtitle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="14" x2="10" y2="14"/><line x1="12" y1="14" x2="18" y2="14"/><line x1="6" y1="17" x2="14" y2="17"/></symbol>
   <symbol id="ico-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+  <symbol id="ico-audiocut" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h2"/><path d="M7 8v8"/><path d="M11 5v14"/><path d="M15 8v8"/><path d="M19 10v4"/><circle cx="6" cy="6" r="2" stroke-width="1.5"/><circle cx="6" cy="18" r="2" stroke-width="1.5"/><line x1="18" y1="4" x2="8" y2="15"/></symbol>
 </svg>
 
 <header>
@@ -515,6 +549,7 @@ if (!self.crossOriginIsolated) {
       <a class="guide-pill" data-guide="snapshot"><span class="gp-dot gp-fuchsia"></span>截取影格</a>
       <a class="guide-pill" data-guide="toAudio"><span class="gp-dot gp-indigo"></span>影片轉音樂</a>
       <a class="guide-pill" data-guide="audioConvert"><span class="gp-dot gp-violet"></span>音訊轉換</a>
+      <a class="guide-pill" data-guide="audioTrim"><span class="gp-dot" style="background:#eab308"></span>音訊裁切</a>
     </div>
   </div>
 
@@ -1103,6 +1138,71 @@ if (!self.crossOriginIsolated) {
       </div>
     </div>
 
+    <!-- 音訊裁切片段 -->
+    <div class="tool-card c-yellow" data-tool="audioTrim">
+      <input type="file" hidden accept="audio/*,.mp3,.wav,.aac,.flac,.ogg,.m4a,.opus">
+      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-audiocut"/></svg></div>
+      <div class="tool-name">音訊裁切片段</div>
+      <div class="tool-desc">拖曳波形範圍，精準裁切音訊片段並即時預覽。</div>
+      <select class="fmt-select" name="atrimfmt">
+        <option value="mp3">輸出 MP3（推薦，相容性高）</option>
+        <option value="wav">輸出 WAV（無損）</option>
+        <option value="aac">輸出 AAC（Apple 裝置）</option>
+        <option value="flac">輸出 FLAC（無損壓縮）</option>
+        <option value="ogg">輸出 OGG（開源格式）</option>
+      </select>
+      <div class="drop-area">
+        <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
+        <div class="drop-area-text">拖曳音訊到這裡，或點擊選取</div>
+        <div class="drop-area-sub">支援 MP3、WAV、AAC、FLAC、OGG、M4A</div>
+      </div>
+      <div class="file-info">
+        <span class="file-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg></span>
+        <span class="file-info-name"></span><span class="file-info-size"></span>
+        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
+      </div>
+      <div class="atrim-editor">
+        <div class="atrim-wave-wrap">
+          <canvas class="atrim-wave-canvas"></canvas>
+          <div class="atrim-dimL" style="width:0"></div>
+          <div class="atrim-dimR" style="width:0;left:100%"></div>
+          <div class="atrim-sel" style="left:0;width:100%"></div>
+          <div class="atrim-hdl atrim-hdl-s" style="left:0">
+            <div class="atrim-hdl-bar"></div>
+            <div class="atrim-hdl-tip">0:00</div>
+          </div>
+          <div class="atrim-hdl atrim-hdl-e" style="left:100%">
+            <div class="atrim-hdl-bar"></div>
+            <div class="atrim-hdl-tip">0:00</div>
+          </div>
+          <div class="atrim-ph" style="left:0"></div>
+        </div>
+        <div class="atrim-ctrl">
+          <button class="atrim-pp"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-play"/></svg></button>
+          <span class="atrim-time">0:00 / 0:00</span>
+          <span style="flex:1"></span>
+          <span class="atrim-dur-chip">片段長度：--</span>
+        </div>
+        <div class="atrim-inputs">
+          <div class="atrim-inp-g">
+            <span class="atrim-inp-lbl">開始</span>
+            <input class="atrim-inp atrim-inp-s" type="text" value="0:00:00">
+          </div>
+          <div class="atrim-inp-g">
+            <span class="atrim-inp-lbl">結束</span>
+            <input class="atrim-inp atrim-inp-e" type="text" value="0:00:00">
+          </div>
+        </div>
+      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">裁切中...</div></div>
+      <div class="error-msg"></div>
+      <button class="tool-btn start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始裁切</button>
+      <div class="download-wrap">
+        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載音訊片段</button>
+        <button class="reset-btn">再次裁切</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1446,6 +1546,28 @@ if (!self.crossOriginIsolated) {
       var data = ff.FS('readFile', outN);
       fsClean(inN, outN);
       return { data: data, ext: ofmt, filename: basename(file.name) + '.' + ofmt };
+    },
+    audioTrim: async function(file, card) {
+      var startT = parseFloat(card.dataset.atrimStart) || 0;
+      var endT = parseFloat(card.dataset.atrimEnd) || 0;
+      var dur = endT > startT ? (endT - startT) : null;
+      if (!dur) throw new Error('請先拖曳波形設定裁切範圍');
+      var ofmt = card.querySelector('select[name=atrimfmt]').value;
+      var inExt = getExt(file.name), inN = 'in.' + inExt, outN = 'out.' + ofmt;
+      try { ff.FS('unlink', inN); } catch(e) {}
+      ff.FS('writeFile', inN, await fetchFile(file));
+      try { ff.FS('unlink', outN); } catch(e) {}
+      var args = ['-ss', String(startT), '-i', inN, '-t', String(dur)];
+      if (ofmt === 'mp3') args.push('-acodec', 'libmp3lame', '-ab', '192k', '-q:a', '0');
+      else if (ofmt === 'wav') args.push('-acodec', 'pcm_s16le');
+      else if (ofmt === 'aac') args.push('-acodec', 'aac', '-ab', '192k');
+      else if (ofmt === 'flac') args.push('-acodec', 'flac');
+      else args.push('-acodec', 'libvorbis', '-aq', '4');
+      args.push(outN);
+      await ff.run.apply(ff, args);
+      var data = ff.FS('readFile', outN);
+      fsClean(inN, outN);
+      return { data: data, ext: ofmt, filename: basename(file.name) + '_trim.' + ofmt };
     },
     speed: async function(file, card) {
       var spd = parseFloat(card.querySelector('select[name=speed]').value);
@@ -2775,6 +2897,287 @@ if (!self.crossOriginIsolated) {
     if (resetBtn) resetBtn.addEventListener('click', reset);
   }
 
+  // ── Audio Trim Card ──────────────────────────────────────
+  function setupAudioTrimCard(card) {
+    var input = card.querySelector('input[type=file]');
+    var dropArea = card.querySelector('.drop-area');
+    var nameEl = card.querySelector('.file-info-name');
+    var sizeEl = card.querySelector('.file-info-size');
+    var clearBtn = card.querySelector('.file-clear');
+    var bar = card.querySelector('.progress-bar');
+    var startBtn = card.querySelector('.start-btn');
+    var dlBtn = card.querySelector('.dl-btn');
+    var resetBtn = card.querySelector('.reset-btn');
+    var errEl = card.querySelector('.error-msg');
+
+    var canvas = card.querySelector('.atrim-wave-canvas');
+    var ctx = canvas.getContext('2d');
+    var waveWrap = card.querySelector('.atrim-wave-wrap');
+    var dimL = card.querySelector('.atrim-dimL');
+    var dimR = card.querySelector('.atrim-dimR');
+    var sel = card.querySelector('.atrim-sel');
+    var hdlS = card.querySelector('.atrim-hdl-s');
+    var hdlE = card.querySelector('.atrim-hdl-e');
+    var tipS = hdlS.querySelector('.atrim-hdl-tip');
+    var tipE = hdlE.querySelector('.atrim-hdl-tip');
+    var ph = card.querySelector('.atrim-ph');
+    var ppBtn = card.querySelector('.atrim-pp');
+    var timeEl = card.querySelector('.atrim-time');
+    var durChip = card.querySelector('.atrim-dur-chip');
+    var inpS = card.querySelector('.atrim-inp-s');
+    var inpE = card.querySelector('.atrim-inp-e');
+
+    var audio = new Audio();
+    var audioBuf = null;
+    var dur = 0, startT = 0, endT = 0;
+    var rafId = null;
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    function fmt(s) {
+      s = Math.max(0, s) | 0;
+      var h = (s / 3600) | 0, m = ((s % 3600) / 60) | 0, sec = s % 60;
+      return h > 0 ? h + ':' + pad(m) + ':' + pad(sec) : m + ':' + pad(sec);
+    }
+    function fmtFull(s) {
+      s = Math.max(0, s) | 0;
+      return pad((s / 3600) | 0) + ':' + pad(((s % 3600) / 60) | 0) + ':' + pad(s % 60);
+    }
+    function parseT(s) {
+      s = (s || '').trim(); if (!s) return null;
+      var p = s.split(':').map(Number);
+      if (p.length === 3) return p[0] * 3600 + p[1] * 60 + (p[2] || 0);
+      if (p.length === 2) return p[0] * 60 + (p[1] || 0);
+      return p[0] || 0;
+    }
+    function pct(t) { return dur > 0 ? (t / dur) * 100 : 0; }
+
+    function drawWaveform(buffer) {
+      var dpr = window.devicePixelRatio || 1;
+      var w = canvas.clientWidth, h = canvas.clientHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, w, h);
+      // Get audio data — merge all channels
+      var raw = buffer.getChannelData(0);
+      var step = Math.ceil(raw.length / w);
+      var amp = h / 2;
+      // Draw waveform bars
+      for (var i = 0; i < w; i++) {
+        var min = 1, max = -1;
+        for (var j = 0; j < step; j++) {
+          var idx = i * step + j;
+          if (idx < raw.length) {
+            var d = raw[idx];
+            if (d < min) min = d;
+            if (d > max) max = d;
+          }
+        }
+        // Gradient coloring
+        var ratio = i / w;
+        var inRange = ratio >= (startT / dur) && ratio <= (endT / dur);
+        ctx.fillStyle = inRange ? 'rgba(234,179,8,.7)' : 'rgba(255,255,255,.18)';
+        var y1 = (1 + min) * amp;
+        var y2 = (1 + max) * amp;
+        var barH = Math.max(1, y2 - y1);
+        ctx.fillRect(i, y1, 1, barH);
+      }
+    }
+
+    function updateUI() {
+      var sP = pct(startT), eP = pct(endT);
+      hdlS.style.left = sP + '%';
+      hdlE.style.left = eP + '%';
+      sel.style.left = sP + '%';
+      sel.style.width = (eP - sP) + '%';
+      dimL.style.width = sP + '%';
+      dimR.style.left = eP + '%';
+      dimR.style.width = (100 - eP) + '%';
+      tipS.textContent = fmt(startT);
+      tipE.textContent = fmt(endT);
+      inpS.value = fmtFull(startT);
+      inpE.value = fmtFull(endT);
+      var d = endT - startT;
+      durChip.textContent = d > 0 ? '片段長度：' + fmt(d) : '片段長度：--';
+      card.dataset.atrimStart = startT;
+      card.dataset.atrimEnd = endT;
+      if (d > 0.1) { card.classList.add('atrim-ready'); } else { card.classList.remove('atrim-ready'); }
+      if (audioBuf) drawWaveform(audioBuf);
+    }
+
+    function tickPH() {
+      if (!audio.paused) {
+        ph.style.left = pct(audio.currentTime) + '%';
+        timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(dur);
+        if (audio.currentTime >= endT) {
+          audio.pause(); setPaused(true);
+        } else {
+          rafId = requestAnimationFrame(tickPH);
+        }
+      }
+    }
+
+    function setPaused(paused) {
+      ppBtn.innerHTML = paused
+        ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-play"/></svg>'
+        : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-pause"/></svg>';
+    }
+
+    ppBtn.addEventListener('click', function() {
+      if (!dur) return;
+      if (audio.paused) {
+        if (audio.currentTime >= endT || audio.currentTime < startT) audio.currentTime = startT;
+        audio.play(); setPaused(false);
+        rafId = requestAnimationFrame(tickPH);
+      } else {
+        audio.pause(); setPaused(true); cancelAnimationFrame(rafId);
+      }
+    });
+
+    // Click on waveform to seek
+    waveWrap.addEventListener('click', function(e) {
+      if (e.target.closest('.atrim-hdl')) return;
+      if (!dur) return;
+      var r = waveWrap.getBoundingClientRect();
+      var t = ((e.clientX - r.left) / r.width) * dur;
+      audio.currentTime = Math.max(0, Math.min(dur, t));
+      ph.style.left = pct(audio.currentTime) + '%';
+      timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(dur);
+    });
+
+    // Drag handles
+    function makeDrag(hdl, isStart) {
+      function onDown(e) {
+        e.preventDefault();
+        var r = waveWrap.getBoundingClientRect();
+        function onMove(ev) {
+          var cx = ev.touches ? ev.touches[0].clientX : ev.clientX;
+          var x = Math.max(0, Math.min(1, (cx - r.left) / r.width));
+          var t = x * dur;
+          if (isStart) { startT = Math.max(0, Math.min(t, endT - 0.5)); }
+          else { endT = Math.min(dur, Math.max(t, startT + 0.5)); }
+          updateUI();
+        }
+        function onUp() {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+          document.removeEventListener('touchmove', onMove);
+          document.removeEventListener('touchend', onUp);
+        }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onUp);
+      }
+      hdl.addEventListener('mousedown', onDown);
+      hdl.addEventListener('touchstart', onDown, { passive: false });
+    }
+    makeDrag(hdlS, true);
+    makeDrag(hdlE, false);
+
+    // Input sync
+    inpS.addEventListener('change', function() {
+      var t = parseT(inpS.value);
+      if (t !== null && dur) { startT = Math.max(0, Math.min(t, endT - 0.5)); updateUI(); }
+    });
+    inpE.addEventListener('change', function() {
+      var t = parseT(inpE.value);
+      if (t !== null && dur) { endT = Math.min(dur, Math.max(t, startT + 0.5)); updateUI(); }
+    });
+
+    function setFile(f) {
+      fileMap.set(card, f);
+      card.classList.remove('done', 'has-error', 'processing', 'atrim-ready');
+      card.classList.add('has-file');
+      nameEl.textContent = f.name;
+      sizeEl.textContent = fmtBytes(f.size);
+      bar.style.width = '0%';
+      errEl.textContent = '';
+      // Decode audio for waveform
+      var blobUrl = URL.createObjectURL(f);
+      audio.src = blobUrl;
+      var reader = new FileReader();
+      reader.onload = function() {
+        var actx = new (window.AudioContext || window.webkitAudioContext)();
+        actx.decodeAudioData(reader.result, function(buffer) {
+          audioBuf = buffer;
+          dur = buffer.duration;
+          startT = 0; endT = dur;
+          timeEl.textContent = '0:00 / ' + fmt(dur);
+          ph.style.left = '0%';
+          setPaused(true);
+          updateUI();
+          actx.close();
+        }, function() {
+          // fallback: use audio element duration
+          audio.addEventListener('loadedmetadata', function onMeta() {
+            audio.removeEventListener('loadedmetadata', onMeta);
+            dur = audio.duration;
+            startT = 0; endT = dur;
+            timeEl.textContent = '0:00 / ' + fmt(dur);
+            updateUI();
+          });
+          actx.close();
+        });
+      };
+      reader.readAsArrayBuffer(f);
+    }
+
+    function reset() {
+      fileMap.delete(card);
+      var prevUrl = blobMap.get(card);
+      if (prevUrl) URL.revokeObjectURL(prevUrl);
+      blobMap.delete(card);
+      audio.pause(); audio.src = '';
+      cancelAnimationFrame(rafId);
+      audioBuf = null; dur = 0; startT = 0; endT = 0;
+      card.classList.remove('has-file', 'done', 'has-error', 'processing', 'atrim-ready');
+      card.dataset.atrimStart = '0';
+      card.dataset.atrimEnd = '0';
+      if (input) input.value = '';
+      bar.style.width = '0%';
+      errEl.textContent = '';
+    }
+
+    if (dropArea) {
+      dropArea.addEventListener('click', function() { input.click(); });
+      dropArea.addEventListener('dragover', function(e) { e.preventDefault(); dropArea.classList.add('drag-over'); });
+      dropArea.addEventListener('dragleave', function() { dropArea.classList.remove('drag-over'); });
+      dropArea.addEventListener('drop', function(e) {
+        e.preventDefault(); dropArea.classList.remove('drag-over');
+        if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+      });
+    }
+    if (input) input.addEventListener('change', function() { if (input.files[0]) setFile(input.files[0]); });
+    if (clearBtn) clearBtn.addEventListener('click', reset);
+    if (resetBtn) resetBtn.addEventListener('click', reset);
+
+    startBtn.addEventListener('click', async function() {
+      var file = fileMap.get(card);
+      if (!file) return;
+      if (card.classList.contains('processing')) return;
+      if (ffRunning) { errEl.textContent = '另一個工具正在處理中，請稍候再試'; return; }
+      card.classList.remove('has-error', 'done');
+      card.classList.add('processing');
+      audio.pause(); setPaused(true); cancelAnimationFrame(rafId);
+      try {
+        await loadFF();
+        var result = await PROC.audioTrim(file, card);
+        var blob = new Blob([result.data.buffer], { type: MIME[result.ext] || 'application/octet-stream' });
+        var url = URL.createObjectURL(blob);
+        blobMap.set(card, url);
+        dlBtn.onclick = function() {
+          var a = document.createElement('a'); a.href = url; a.download = result.filename; a.click();
+        };
+        card.classList.remove('processing');
+        card.classList.add('done');
+      } catch(e) {
+        card.classList.remove('processing');
+        card.classList.add('has-error');
+        errEl.textContent = '裁切失敗：' + (e.message || e);
+      }
+    });
+  }
+
   window.showPanel = function(id, btn) {
     document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
     document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
@@ -2786,13 +3189,14 @@ if (!self.crossOriginIsolated) {
     }
   };
 
-  document.querySelectorAll('.tool-card[data-tool]:not([data-tool="merge"]):not([data-tool="watermark"]):not([data-tool="faceBlur"]):not([data-tool="bgm"]):not([data-tool="subtitle"]):not([data-tool="snapshot"])').forEach(setupCard);
+  document.querySelectorAll('.tool-card[data-tool]:not([data-tool="merge"]):not([data-tool="watermark"]):not([data-tool="faceBlur"]):not([data-tool="bgm"]):not([data-tool="subtitle"]):not([data-tool="snapshot"]):not([data-tool="audioTrim"])').forEach(setupCard);
   document.querySelectorAll('.tool-card[data-tool="watermark"]').forEach(setupWatermarkCard);
   document.querySelectorAll('.tool-card[data-tool="merge"]').forEach(setupMergeCard);
   document.querySelectorAll('.tool-card[data-tool="faceBlur"]').forEach(setupFaceBlurCard);
   document.querySelectorAll('.tool-card[data-tool="bgm"]').forEach(setupBgmCard);
   document.querySelectorAll('.tool-card[data-tool="subtitle"]').forEach(setupSubtitleCard);
   document.querySelectorAll('.tool-card[data-tool="snapshot"]').forEach(setupSnapshotCard);
+  document.querySelectorAll('.tool-card[data-tool="audioTrim"]').forEach(setupAudioTrimCard);
 
   // Guide pills → scroll to card
   document.querySelectorAll('.guide-pill[data-guide]').forEach(function(pill) {
