@@ -3740,18 +3740,36 @@ if (!self.crossOriginIsolated) {
       }
     }
 
-    // Show saved keyframe reference (green) if near one and no curBbox override
+    // Always show ALL saved keyframe positions as reference overlays
     var nearKf = getNearKf();
-    if (nearKf && !curBbox && !drawing) {
-      var ab = nearKf.bbox;
+    var fontSize = Math.max(10, Math.min(14, vw / 55));
+    keyframes.forEach(function(kf) {
+      var ab = kf.bbox;
       var ax = ab.x * vw, ay = ab.y * vh, aw = ab.w * vw, ah = ab.h * vh;
-      shapePath(ax, ay, aw, ah, 0); ctx.fillStyle = 'rgba(34,197,94,.08)'; ctx.fill();
-      shapePath(ax, ay, aw, ah, 0); ctx.strokeStyle = '#22c55e'; ctx.lineWidth = Math.max(2, vw/200);
-      ctx.setLineDash([8, 4]); ctx.stroke(); ctx.setLineDash([]);
-      // "已儲存" label
-      ctx.fillStyle = 'rgba(34,197,94,.85)'; ctx.font = 'bold ' + Math.max(11, vw/50) + 'px sans-serif';
-      ctx.fillText('✓ 已儲存', ax + 6, ay - 6 > 14 ? ay - 6 : ay + 16);
-    }
+      var isNear = (nearKf === kf);
+      // Near keyframe: brighter green; others: faded
+      var alpha = isNear ? 0.7 : 0.35;
+      var fillA = isNear ? 'rgba(34,197,94,.08)' : 'rgba(34,197,94,.03)';
+      var strokeC = 'rgba(34,197,94,' + alpha + ')';
+      // fill
+      shapePath(ax, ay, aw, ah, 0); ctx.fillStyle = fillA; ctx.fill();
+      // stroke
+      shapePath(ax, ay, aw, ah, 0); ctx.strokeStyle = strokeC;
+      ctx.lineWidth = isNear ? Math.max(2, vw / 200) : 1.5;
+      ctx.setLineDash(isNear ? [] : [4, 3]); ctx.stroke(); ctx.setLineDash([]);
+      // time label
+      var labelY = ay - 4 > fontSize + 2 ? ay - 4 : ay + ah + fontSize + 2;
+      ctx.fillStyle = 'rgba(0,0,0,.55)';
+      var tw = ctx.measureText ? 0 : 0; // will measure below
+      ctx.font = 'bold ' + fontSize + 'px sans-serif';
+      var label = fmtPrecise(kf.t);
+      tw = ctx.measureText(label).width;
+      // background pill
+      ctx.beginPath(); ctx.roundRect(ax + 2, labelY - fontSize, tw + 10, fontSize + 4, 4); ctx.fill();
+      // text
+      ctx.fillStyle = isNear ? '#4ade80' : 'rgba(74,222,128,' + alpha + ')';
+      ctx.fillText(label, ax + 7, labelY - 2);
+    });
 
     // Draw curBbox (editable, pink dashed)
     if (curBbox) {
