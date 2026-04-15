@@ -504,18 +504,24 @@ if ('serviceWorker' in navigator) {
     }
   }).catch(function(){});
 }
-// 若 crossOriginIsolated 未啟用，顯示提示 Banner
+// 若 crossOriginIsolated 未啟用，顯示全螢幕彈窗要求重新整理
 if (!self.crossOriginIsolated) {
   document.addEventListener('DOMContentLoaded', function() {
-    var b = document.createElement('div');
-    b.id = 'coi-banner';
-    b.innerHTML = '<div style="display:flex;align-items:center;gap:12px;max-width:700px;margin:0 auto">'
-      + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
-      + '<span style="flex:1;font-size:13px">首次載入需啟用瀏覽器安全功能，<strong>請重新整理頁面</strong>（Service Worker 正在安裝中）</span>'
-      + '<button onclick="location.reload()" style="background:#fbbf24;color:#000;border:none;border-radius:8px;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">立即重新整理</button>'
-      + '</div>';
-    b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#1c1a0a;border-bottom:1px solid #92400e;padding:12px 20px';
-    document.body.prepend(b);
+    var ov = document.createElement('div');
+    ov.id = 'coi-modal-ov';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)';
+    var box = document.createElement('div');
+    box.style.cssText = 'background:#1e1e24;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:32px 28px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 12px 48px rgba(0,0,0,.6)';
+    box.innerHTML = ''
+      + '<div style="width:52px;height:52px;border-radius:50%;background:rgba(251,191,36,.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">'
+      + '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+      + '</div>'
+      + '<div style="font-size:17px;font-weight:700;color:#f5f5f5;margin-bottom:8px">需要重新整理頁面</div>'
+      + '<div style="font-size:13px;color:#a1a1aa;line-height:1.7;margin-bottom:24px">首次載入需啟用瀏覽器安全功能<br>（Service Worker 正在安裝中）<br>請點擊下方按鈕重新整理後即可使用</div>'
+      + '<button id="coi-reload-btn" style="width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:14px;font-weight:700;cursor:pointer;transition:.15s;letter-spacing:.5px">重新整理</button>';
+    ov.appendChild(box);
+    document.body.prepend(ov);
+    document.getElementById('coi-reload-btn').addEventListener('click', function() { location.reload(); });
   });
 }
 </script>
