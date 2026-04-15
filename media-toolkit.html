@@ -3050,7 +3050,7 @@ if (!self.crossOriginIsolated) {
       card.classList.remove('has-error', 'done');
       card.classList.add('processing');
       try {
-        await loadFF();
+        await ensureFF();
         var result = await PROC.audioTrim(file, card);
         var blob = new Blob([result.data.buffer], { type: MIME[result.ext] || 'application/octet-stream' });
         var url = URL.createObjectURL(blob);
