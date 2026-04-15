@@ -3623,26 +3623,30 @@ if (!self.crossOriginIsolated) {
     // draw current bbox overlay
     if (curBbox) {
       var bx = curBbox.x * vw, by = curBbox.y * vh, bw = curBbox.w * vw, bh = curBbox.h * vh;
-      ctx.strokeStyle = '#fb7185';
-      ctx.lineWidth = Math.max(2, vw / 200);
-      ctx.setLineDash([6, 4]);
-      ctx.strokeRect(bx, by, bw, bh);
-      ctx.setLineDash([]);
-      ctx.fillStyle = 'rgba(244,63,94,.12)';
-      ctx.fillRect(bx, by, bw, bh);
-      // corner marks
-      var cm = Math.min(12, bw * 0.2, bh * 0.2);
-      ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = Math.max(3, vw / 160);
-      [[bx, by, 1, 1], [bx + bw, by, -1, 1], [bx, by + bh, 1, -1], [bx + bw, by + bh, -1, -1]].forEach(function(c) {
-        ctx.beginPath(); ctx.moveTo(c[0], c[1] + c[3] * cm); ctx.lineTo(c[0], c[1]); ctx.lineTo(c[0] + c[2] * cm, c[1]); ctx.stroke();
-      });
+      var cx = bx + bw / 2, cy = by + bh / 2, rx = bw / 2, ry = bh / 2;
+      // filled ellipse
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(244,63,94,.1)'; ctx.fill();
+      // dashed ellipse stroke
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = '#fb7185'; ctx.lineWidth = Math.max(2, vw / 200);
+      ctx.setLineDash([6, 4]); ctx.stroke(); ctx.setLineDash([]);
+      // solid inner ellipse (feather preview)
+      var feather = Math.round(Math.max(5, Math.min(10, Math.min(bw, bh) * 0.08)));
+      ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(1, rx - feather), Math.max(1, ry - feather), 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(244,63,94,.35)'; ctx.lineWidth = 1; ctx.stroke();
+      // crosshair at center
+      var ch = Math.min(8, rx * 0.3, ry * 0.3);
+      ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(cx - ch, cy); ctx.lineTo(cx + ch, cy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, cy - ch); ctx.lineTo(cx, cy + ch); ctx.stroke();
     }
-    // draw temp drawing rect
+    // draw temp drawing ellipse
     if (drawing && drawRect) {
-      ctx.strokeStyle = 'rgba(251,113,133,.7)';
-      ctx.lineWidth = 2; ctx.setLineDash([4, 3]);
-      ctx.strokeRect(drawRect.x * vw, drawRect.y * vh, drawRect.w * vw, drawRect.h * vh);
-      ctx.setLineDash([]);
+      var dx = drawRect.x * vw, dy = drawRect.y * vh, dw = drawRect.w * vw, dh = drawRect.h * vh;
+      ctx.beginPath(); ctx.ellipse(dx + dw / 2, dy + dh / 2, dw / 2, dh / 2, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(251,113,133,.7)'; ctx.lineWidth = 2;
+      ctx.setLineDash([4, 3]); ctx.stroke(); ctx.setLineDash([]);
     }
   }
 
