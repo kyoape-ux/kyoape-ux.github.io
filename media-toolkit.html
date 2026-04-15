@@ -1458,7 +1458,7 @@ if (!self.crossOriginIsolated) {
         </div>
         <div class="fb-m-srow">
           <span class="fb-m-slbl">模糊強度</span>
-          <input type="range" class="fb-m-slider" id="fbBlurStr" min="1" max="10" value="5">
+          <input type="range" class="fb-m-slider" id="fbBlurStr" min="0" max="10" value="5">
           <span class="fb-m-sval" id="fbBlurStrVal">5</span>
         </div>
         <div class="fb-m-srow">
@@ -2247,17 +2247,18 @@ if (!self.crossOriginIsolated) {
     var feather = (shape === 'rect' && featherStr === 0) ? 0 : Math.round(Math.max(0, Math.min(w, h) * 0.02 * featherStr));
 
     // Step 1: render blur/pixelate effect to face-sized canvas
+    if (blurStr <= 0) return; // 0 = no effect
     var fc = document.createElement('canvas'); fc.width = w; fc.height = h;
     var fCtx = fc.getContext('2d');
     if (blurType === 'gaussian') {
-      // blurStr 1-10 maps to blur radius
-      var blurPx = Math.round(Math.max(4, Math.min(w, h) * 0.02 * blurStr));
+      // blurStr 0-10 maps to blur radius
+      var blurPx = Math.round(Math.max(2, Math.min(w, h) * 0.02 * blurStr));
       fCtx.filter = 'blur(' + blurPx + 'px)';
       fCtx.drawImage(srcCanvas, -x, -y);
       fCtx.filter = 'none';
     } else {
-      // mosaic: blurStr 1-10 maps to pixel size
-      var ps = Math.max(2, Math.round(Math.min(w, h) / (22 - blurStr * 2)));
+      // mosaic: blurStr 0-10 maps to pixel size
+      var ps = Math.max(2, Math.round(Math.min(w, h) / Math.max(2, 22 - blurStr * 2)));
       var tw = Math.max(1, Math.ceil(w / ps)), th = Math.max(1, Math.ceil(h / ps));
       var m = document.createElement('canvas'); m.width = tw; m.height = th;
       m.getContext('2d').drawImage(srcCanvas, x, y, w, h, 0, 0, tw, th);
