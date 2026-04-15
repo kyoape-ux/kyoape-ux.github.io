@@ -402,6 +402,12 @@ footer a{color:var(--indigo2);text-decoration:none}
 .fb-m-pp:hover{background:rgba(244,63,94,.3)}
 .fb-m-time{font-size:11px;font-weight:700;color:var(--text2);font-variant-numeric:tabular-nums}
 .fb-m-seek{flex:1;accent-color:#fb7185;height:4px;min-width:100px}
+.fb-m-frame-btn{width:30px;height:30px;border-radius:50%;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);color:var(--rose2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0;padding:0}
+.fb-m-frame-btn:hover{background:rgba(244,63,94,.22)}
+.fb-m-frame-btn:active{transform:scale(.92)}
+.fb-m-frame-lbl{font-size:10px;font-weight:700;color:var(--text3);font-variant-numeric:tabular-nums;white-space:nowrap;background:var(--bg2);padding:2px 7px;border-radius:5px;border:1px solid var(--border);letter-spacing:.5px}
+.fb-m-ctrl2{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.fb-m-fps-wrap{display:flex;align-items:center;gap:5px;margin-right:auto}
 .fb-m-detect{padding:6px 14px;border-radius:8px;border:none;background:rgba(244,63,94,.12);color:var(--rose2);font-size:11.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap}
 .fb-m-detect:hover{background:rgba(244,63,94,.22)}
 .fb-m-detect:disabled{opacity:.4;pointer-events:none}
@@ -1417,9 +1423,23 @@ if (!self.crossOriginIsolated) {
         <div class="fb-m-hint" id="fbHint">拖曳框選臉部位置，或點「自動偵測」</div>
       </div>
       <div class="fb-m-ctrl">
-        <button class="fb-m-pp" id="fbPP"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-play"/></svg></button>
-        <span class="fb-m-time" id="fbTime">0:00 / 0:00</span>
+        <button class="fb-m-pp" id="fbPP" title="播放/暫停"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-play"/></svg></button>
+        <button class="fb-m-frame-btn" id="fbPrevFrame" title="上一幀"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><line x1="6" y1="12" x2="18" y2="12"/></svg></button>
+        <button class="fb-m-frame-btn" id="fbNextFrame" title="下一幀"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 7 18 12 13 17"/><line x1="6" y1="12" x2="18" y2="12"/></svg></button>
+        <span class="fb-m-time" id="fbTime">0:00.00 / 0:00</span>
+        <span class="fb-m-frame-lbl" id="fbFrameLbl">F 0/0</span>
         <input type="range" class="fb-m-seek" id="fbSeek" min="0" max="1000" value="0">
+      </div>
+      <div class="fb-m-ctrl2">
+        <div class="fb-m-fps-wrap">
+          <span class="fb-m-slbl">FPS</span>
+          <select class="fb-m-sel" id="fbFpsSel">
+            <option value="24">24</option>
+            <option value="25">25</option>
+            <option value="30">30</option>
+            <option value="60">60</option>
+          </select>
+        </div>
         <button class="fb-m-detect" id="fbDetect"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>自動偵測</button>
         <button class="fb-m-add" id="fbAddKf"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>新增定位點</button>
       </div>
@@ -2355,7 +2375,7 @@ if (!self.crossOriginIsolated) {
         await window._fbLoadMP(); bar.style.width = '10%';
 
         var blurOpts = card._fbBlurOpts || { blurType:'gaussian', shape:'ellipse', blurStr:5, featherStr:4 };
-        var fps = 24;
+        var fps = card._fbFps || 24;
         var inExt = getExt(file.name), inN = 'fb_in.' + inExt;
         progText.textContent = '載入影片...';
         try { ff.FS('unlink', inN); } catch(e) {}
@@ -3608,8 +3628,13 @@ if (!self.crossOriginIsolated) {
   var blurStrValEl = document.getElementById('fbBlurStrVal');
   var featherStrEl = document.getElementById('fbFeatherStr');
   var featherStrValEl = document.getElementById('fbFeatherStrVal');
+  var prevFrameBtn = document.getElementById('fbPrevFrame');
+  var nextFrameBtn = document.getElementById('fbNextFrame');
+  var frameLbl = document.getElementById('fbFrameLbl');
+  var fpsSel = document.getElementById('fbFpsSel');
 
   var curShape = 'ellipse'; // 'ellipse' or 'rect'
+  var modalFps = 24;
 
   // Shape toggle
   shapeToggle.addEventListener('click', function(e) {
@@ -3621,6 +3646,7 @@ if (!self.crossOriginIsolated) {
   });
   blurStrEl.addEventListener('input', function() { blurStrValEl.textContent = blurStrEl.value; });
   featherStrEl.addEventListener('input', function() { featherStrValEl.textContent = featherStrEl.value; if (!playing) drawFrame(); });
+  fpsSel.addEventListener('change', function() { modalFps = parseInt(fpsSel.value) || 24; updateTime(); });
 
   var vid = null; // modal-internal video element
   var _card = null;
@@ -3640,6 +3666,11 @@ if (!self.crossOriginIsolated) {
   function fmt(s) {
     var m = Math.floor(s / 60), ss = Math.floor(s % 60);
     return m + ':' + (ss < 10 ? '0' : '') + ss;
+  }
+  function fmtPrecise(s) {
+    var m = Math.floor(s / 60), rest = s - m * 60;
+    var ss = Math.floor(rest), ms = Math.round((rest - ss) * 100);
+    return m + ':' + (ss < 10 ? '0' : '') + ss + '.' + (ms < 10 ? '0' : '') + ms;
   }
 
   // ── MediaPipe ──
@@ -3751,8 +3782,11 @@ if (!self.crossOriginIsolated) {
 
   function updateTime() {
     if (!vid) return;
-    timeEl.textContent = fmt(vid.currentTime) + ' / ' + fmt(vid.duration || 0);
+    timeEl.textContent = fmtPrecise(vid.currentTime) + ' / ' + fmt(vid.duration || 0);
     seekEl.value = vid.duration ? Math.round((vid.currentTime / vid.duration) * 1000) : 0;
+    var curFrame = Math.round(vid.currentTime * modalFps);
+    var totalFrames = vid.duration ? Math.round(vid.duration * modalFps) : 0;
+    frameLbl.textContent = 'F ' + curFrame + ' / ' + totalFrames;
   }
 
   function play() { if (!vid) return; vid.play(); playing = true; ppBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'; loopDraw(); }
@@ -3856,6 +3890,27 @@ if (!self.crossOriginIsolated) {
     vid.addEventListener('seeked', function h() { vid.removeEventListener('seeked', h); drawFrame(); updateTime(); });
   });
 
+  // Frame step helpers
+  function stepFrame(delta) {
+    if (!vid || !vid.duration) return;
+    pause();
+    var frameDur = 1 / modalFps;
+    var t = Math.max(0, Math.min(vid.duration, vid.currentTime + delta * frameDur));
+    vid.currentTime = t;
+    vid.addEventListener('seeked', function h() { vid.removeEventListener('seeked', h); drawFrame(); updateTime(); });
+  }
+  prevFrameBtn.addEventListener('click', function() { stepFrame(-1); });
+  nextFrameBtn.addEventListener('click', function() { stepFrame(1); });
+
+  // Keyboard shortcuts: left/right arrow for frame step, space for play/pause
+  document.addEventListener('keydown', function(e) {
+    if (!ov.classList.contains('open')) return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); stepFrame(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); stepFrame(1); }
+    else if (e.key === ' ') { e.preventDefault(); playing ? pause() : play(); }
+  });
+
   vid = document.createElement('video');
   vid.muted = true; vid.playsInline = true;
   vid.addEventListener('timeupdate', function() { updateTime(); });
@@ -3938,6 +3993,8 @@ if (!self.crossOriginIsolated) {
     blurTypeEl.value = 'gaussian';
     blurStrEl.value = 5; blurStrValEl.textContent = '5';
     featherStrEl.value = 4; featherStrValEl.textContent = '4';
+    modalFps = 24; fpsSel.value = '24';
+    frameLbl.textContent = 'F 0/0';
     if (vid.src && vid.src.startsWith('blob:')) URL.revokeObjectURL(vid.src);
     vid.src = URL.createObjectURL(file);
     fnameEl.textContent = file.name;
@@ -3982,6 +4039,7 @@ if (!self.crossOriginIsolated) {
       blurStr: parseInt(blurStrEl.value) || 5,
       featherStr: parseInt(featherStrEl.value) || 4
     };
+    _card._fbFps = modalFps;
     // Update chip
     var chipVal = _card.querySelector('.fb-kf-val');
     var shapeLabel = curShape === 'ellipse' ? '橢圓' : '矩形';
