@@ -1410,9 +1410,9 @@ if (!self.crossOriginIsolated) {
           <span class="atrim-fx-lbl">🔇 降噪</span>
           <select id="atrimDenoise">
             <option value="off">關閉</option>
-            <option value="light">輕度 — 保留細節</option>
-            <option value="medium" selected>中度 — 推薦</option>
-            <option value="strong">強力 — 最大降噪</option>
+            <option value="light">輕度 — 濾除低頻雜音</option>
+            <option value="medium">中度 — 推薦</option>
+            <option value="strong">強力 — 僅保留人聲頻段</option>
           </select>
         </div>
       </div>
@@ -1635,9 +1635,10 @@ if (!self.crossOriginIsolated) {
       // Build audio filter chain
       var filters = [];
       if (vol !== 100) filters.push('volume=' + (vol / 100).toFixed(2));
-      if (denoise === 'light') filters.push('highpass=f=80,lowpass=f=14000,afftdn=nf=-20');
-      else if (denoise === 'medium') filters.push('highpass=f=120,lowpass=f=12000,afftdn=nf=-30');
-      else if (denoise === 'strong') filters.push('highpass=f=200,lowpass=f=10000,afftdn=nf=-40');
+      // highpass+lowpass are universally supported in ffmpeg.wasm
+      if (denoise === 'light') filters.push('highpass=f=80','lowpass=f=14000');
+      else if (denoise === 'medium') filters.push('highpass=f=120','lowpass=f=12000');
+      else if (denoise === 'strong') filters.push('highpass=f=200','lowpass=f=10000');
       var args = ['-ss', String(startT), '-i', inN, '-t', String(dur)];
       if (filters.length > 0) args.push('-af', filters.join(','));
       if (ofmt === 'mp3') args.push('-acodec', 'libmp3lame', '-ab', '192k', '-q:a', '0');
@@ -3049,9 +3050,18 @@ if (!self.crossOriginIsolated) {
       if (ffRunning) { errEl.textContent = '另一個工具正在處理中，請稍候再試'; return; }
       card.classList.remove('has-error', 'done');
       card.classList.add('processing');
+      bar.style.width = '5%';
+      errEl.textContent = '';
+      currentBar = bar;
+      currentProgressEl = card.querySelector('.progress-text');
+      currentProgressBase = '裁切中...';
+      ffRunning = true;
       try {
         await ensureFF();
+        bar.style.width = '10%';
         var result = await PROC.audioTrim(file, card);
+        bar.style.width = '100%';
+        await sleep(350);
         var blob = new Blob([result.data.buffer], { type: MIME[result.ext] || 'application/octet-stream' });
         var url = URL.createObjectURL(blob);
         blobMap.set(card, url);
@@ -3063,7 +3073,14 @@ if (!self.crossOriginIsolated) {
       } catch(e) {
         card.classList.remove('processing');
         card.classList.add('has-error');
+        bar.style.width = '0%';
         errEl.textContent = '裁切失敗：' + (e.message || e);
+        if (e.message && e.message.indexOf('one command at a time') >= 0) ffReady = false;
+      } finally {
+        currentBar = null;
+        if (currentProgressEl) currentProgressEl.textContent = currentProgressBase;
+        currentProgressEl = null; currentProgressBase = '';
+        ffRunning = false;
       }
     });
   }
@@ -3548,7 +3565,7 @@ if (!self.crossOriginIsolated) {
     fname.textContent = file.name;
     // Reset controls
     volSlider.value = 100; volVal.textContent = '100%';
-    denoiseSelect.value = 'medium';
+    denoiseSelect.value = 'off';
     ov.classList.add('open');
     // Decode audio buffer for waveform
     var reader = new FileReader();
