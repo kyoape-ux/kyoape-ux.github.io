@@ -217,10 +217,30 @@ footer a{color:var(--indigo2);text-decoration:none}
 .c-yellow::before{background:linear-gradient(90deg,#ca8a04,#eab308)}.c-yellow:hover{box-shadow:0 0 24px rgba(234,179,8,.15)}.c-yellow .tool-icon{background:rgba(234,179,8,.15)}.c-yellow .tool-btn{background:rgba(234,179,8,.12);color:#facc15}.c-yellow .progress-bar{background:linear-gradient(90deg,#ca8a04,#eab308)}.c-yellow .dl-btn{background:linear-gradient(135deg,#ca8a04,#eab308)}.c-yellow .fmt{background:rgba(234,179,8,.1);color:#facc15;border-color:rgba(234,179,8,.2)}.c-yellow .drop-area{border-color:rgba(234,179,8,.35)}.c-yellow .drop-area:hover,.c-yellow .drop-area.drag-over{border-color:#eab308;background:rgba(234,179,8,.07)}
 
 /* ── audio trim card ── */
-.atrim-editor{display:none;margin-bottom:10px}
-.tool-card.has-file .atrim-editor{display:block}
-.tool-card.done .atrim-editor,.tool-card.processing .atrim-editor{display:none}
-.atrim-wave-wrap{position:relative;height:72px;border-radius:10px;overflow:visible;user-select:none;margin-bottom:8px;cursor:default}
+.atrim-open-btn{display:none!important;background:rgba(234,179,8,.15);color:#facc15;margin-bottom:10px}
+.tool-card.has-file .atrim-open-btn{display:flex!important}
+.tool-card.done .atrim-open-btn,.tool-card.processing .atrim-open-btn{display:none!important}
+.atrim-range-chip{display:none;font-size:11.5px;margin-bottom:10px;padding:7px 12px;background:rgba(234,179,8,.07);border-radius:8px;border:1px solid rgba(234,179,8,.2);align-items:center;justify-content:space-between}
+.tool-card.has-file .atrim-range-chip{display:flex}
+.tool-card.done .atrim-range-chip,.tool-card.processing .atrim-range-chip{display:none}
+.atrim-range-lbl{font-size:11px;color:var(--text3);font-weight:600}
+.atrim-range-val{color:#facc15;font-weight:700;font-size:11px;font-variant-numeric:tabular-nums}
+
+/* ── audio trim modal ── */
+.atrim-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:900;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:.22s}
+.atrim-modal-ov.open{opacity:1;pointer-events:all}
+.atrim-modal{background:var(--surface);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:720px;overflow:hidden;display:flex;flex-direction:column;max-height:92vh}
+.atrim-mhd{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.atrim-mhd-left{display:flex;align-items:center;gap:10px}
+.atrim-mhd-title{font-size:14px;font-weight:700;color:var(--text)}
+.atrim-mhd-fname{font-size:12px;color:var(--text3);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.atrim-close{background:none;border:none;color:var(--text3);cursor:pointer;padding:5px;border-radius:8px;transition:.15s;display:flex}
+.atrim-close:hover{color:var(--text);background:var(--surface2)}
+.atrim-body{padding:16px 20px;overflow-y:auto;flex:1}
+.atrim-tl-toprow{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.atrim-tl-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase}
+.atrim-tl-dur{font-size:11px;color:var(--text3);font-variant-numeric:tabular-nums}
+.atrim-wave-wrap{position:relative;height:80px;border-radius:10px;overflow:visible;user-select:none;margin-bottom:10px;cursor:default}
 .atrim-wave-canvas{width:100%;height:100%;display:block;border-radius:10px;background:var(--surface2)}
 .atrim-dimL,.atrim-dimR{position:absolute;top:0;bottom:0;background:rgba(0,0,0,.6);pointer-events:none;z-index:1}
 .atrim-dimL{left:0;border-radius:10px 0 0 10px}
@@ -233,18 +253,28 @@ footer a{color:var(--indigo2);text-decoration:none}
 .atrim-hdl-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:#eab308}
 .atrim-ph{position:absolute;top:-6px;bottom:-6px;width:2px;background:rgba(255,255,255,.7);border-radius:2px;pointer-events:none;z-index:4;transform:translateX(-1px)}
 .atrim-ph::before{content:'';position:absolute;top:4px;left:50%;transform:translateX(-50%);width:6px;height:6px;background:#fff;border-radius:50%}
-.atrim-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.atrim-pp{width:32px;height:32px;border-radius:50%;background:rgba(234,179,8,.18);border:1.5px solid rgba(234,179,8,.4);color:#facc15;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
+.atrim-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.atrim-pp{width:36px;height:36px;border-radius:50%;background:rgba(234,179,8,.18);border:1.5px solid rgba(234,179,8,.4);color:#facc15;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
 .atrim-pp:hover{background:rgba(234,179,8,.3)}
 .atrim-time{font-size:11px;font-weight:700;color:var(--text2);font-variant-numeric:tabular-nums}
-.atrim-inputs{display:flex;gap:8px;margin-bottom:8px;align-items:center;flex-wrap:wrap}
-.atrim-inp-g{display:flex;align-items:center;gap:6px;flex:1;min-width:120px}
-.atrim-inp-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
-.atrim-inp{flex:1;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:5px 8px;font-size:12px;font-weight:700;font-family:monospace;text-align:center;outline:none;transition:.18s}
+.atrim-inputs{display:flex;gap:10px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
+.atrim-inp-g{display:flex;align-items:center;gap:7px;flex:1;min-width:140px}
+.atrim-inp-lbl{font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
+.atrim-inp{flex:1;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;font-family:monospace;text-align:center;outline:none;transition:.18s}
 .atrim-inp:focus{border-color:#eab308}
-.atrim-dur-chip{background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:600;padding:4px 10px;border-radius:8px;white-space:nowrap;font-variant-numeric:tabular-nums}
-.tool-card[data-tool="audioTrim"] .start-btn{display:none}
-.tool-card[data-tool="audioTrim"].atrim-ready .start-btn{display:flex}
+.atrim-dur-chip{background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:600;padding:5px 12px;border-radius:8px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.atrim-fx{display:flex;flex-direction:column;gap:8px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border2);border-radius:12px}
+.atrim-fx-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}
+.atrim-fx-row{display:flex;align-items:center;gap:8px}
+.atrim-fx-lbl{font-size:11.5px;font-weight:600;color:var(--text2);white-space:nowrap;min-width:52px;flex-shrink:0}
+.atrim-fx-row input[type=range]{flex:1;accent-color:#eab308;height:4px}
+.atrim-fx-val{font-size:11.5px;font-weight:700;color:#facc15;min-width:42px;text-align:right;font-variant-numeric:tabular-nums}
+.atrim-fx-row select{flex:1;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;outline:none}
+.atrim-acts{display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0}
+.atrim-btn-cancel{padding:10px 18px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap}
+.atrim-btn-cancel:hover{background:var(--surface2);color:var(--text)}
+.atrim-btn-go{flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#ca8a04,#eab308);color:#000;font-size:13px;font-weight:700;cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:7px}
+.atrim-btn-go:hover{filter:brightness(1.1)}
 
 /* ── trim card additions ── */
 .trim-open-btn{display:none!important;background:rgba(14,165,233,.15);color:var(--sky2);margin-bottom:10px}
@@ -1143,7 +1173,7 @@ if (!self.crossOriginIsolated) {
       <input type="file" hidden accept="audio/*,.mp3,.wav,.aac,.flac,.ogg,.m4a,.opus">
       <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-audiocut"/></svg></div>
       <div class="tool-name">音訊裁切片段</div>
-      <div class="tool-desc">拖曳波形範圍，精準裁切音訊片段並即時預覽。</div>
+      <div class="tool-desc">視覺化波形剪輯，可調整音量與降噪，精準裁切音訊。</div>
       <select class="fmt-select" name="atrimfmt">
         <option value="mp3">輸出 MP3（推薦，相容性高）</option>
         <option value="wav">輸出 WAV（無損）</option>
@@ -1161,42 +1191,11 @@ if (!self.crossOriginIsolated) {
         <span class="file-info-name"></span><span class="file-info-size"></span>
         <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
       </div>
-      <div class="atrim-editor">
-        <div class="atrim-wave-wrap">
-          <canvas class="atrim-wave-canvas"></canvas>
-          <div class="atrim-dimL" style="width:0"></div>
-          <div class="atrim-dimR" style="width:0;left:100%"></div>
-          <div class="atrim-sel" style="left:0;width:100%"></div>
-          <div class="atrim-hdl atrim-hdl-s" style="left:0">
-            <div class="atrim-hdl-bar"></div>
-            <div class="atrim-hdl-tip">0:00</div>
-          </div>
-          <div class="atrim-hdl atrim-hdl-e" style="left:100%">
-            <div class="atrim-hdl-bar"></div>
-            <div class="atrim-hdl-tip">0:00</div>
-          </div>
-          <div class="atrim-ph" style="left:0"></div>
-        </div>
-        <div class="atrim-ctrl">
-          <button class="atrim-pp"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-play"/></svg></button>
-          <span class="atrim-time">0:00 / 0:00</span>
-          <span style="flex:1"></span>
-          <span class="atrim-dur-chip">片段長度：--</span>
-        </div>
-        <div class="atrim-inputs">
-          <div class="atrim-inp-g">
-            <span class="atrim-inp-lbl">開始</span>
-            <input class="atrim-inp atrim-inp-s" type="text" value="0:00:00">
-          </div>
-          <div class="atrim-inp-g">
-            <span class="atrim-inp-lbl">結束</span>
-            <input class="atrim-inp atrim-inp-e" type="text" value="0:00:00">
-          </div>
-        </div>
-      </div>
+      <button class="tool-btn atrim-open-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-sliders"/></svg>開啟音訊剪輯</button>
+      <div class="atrim-range-chip"><span class="atrim-range-lbl">裁切範圍</span><span class="atrim-range-val">尚未設定</span></div>
       <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">裁切中...</div></div>
       <div class="error-msg"></div>
-      <button class="tool-btn start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始裁切</button>
+      <button class="tool-btn start-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始裁切</button>
       <div class="download-wrap">
         <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載音訊片段</button>
         <button class="reset-btn">再次裁切</button>
@@ -1347,6 +1346,80 @@ if (!self.crossOriginIsolated) {
     <div class="trim-acts">
       <button class="trim-btn-cancel" id="trimCancelBtn">取消</button>
       <button class="trim-btn-go" id="trimGoBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>確認並開始裁切
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Audio Trim Modal -->
+<div class="atrim-modal-ov" id="atrimModalOv">
+  <div class="atrim-modal">
+    <div class="atrim-mhd">
+      <div class="atrim-mhd-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-audiocut"/></svg>
+        <span class="atrim-mhd-title">音訊剪輯</span>
+        <span class="atrim-mhd-fname" id="atrimFname"></span>
+      </div>
+      <button class="atrim-close" id="atrimCloseBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
+    </div>
+    <div class="atrim-body">
+      <div class="atrim-tl-toprow">
+        <span class="atrim-tl-label">波形時間軸</span>
+        <span class="atrim-tl-dur" id="atrimDurLbl">--</span>
+      </div>
+      <div class="atrim-wave-wrap" id="atrimWaveWrap">
+        <canvas class="atrim-wave-canvas" id="atrimCanvas"></canvas>
+        <div class="atrim-dimL" id="atrimDimL" style="width:0"></div>
+        <div class="atrim-dimR" id="atrimDimR" style="width:0;left:100%"></div>
+        <div class="atrim-sel" id="atrimSel" style="left:0;width:100%"></div>
+        <div class="atrim-hdl atrim-hdl-s" id="atrimHdlS" style="left:0">
+          <div class="atrim-hdl-bar"></div>
+          <div class="atrim-hdl-tip" id="atrimTipS">0:00</div>
+        </div>
+        <div class="atrim-hdl atrim-hdl-e" id="atrimHdlE" style="left:100%">
+          <div class="atrim-hdl-bar"></div>
+          <div class="atrim-hdl-tip" id="atrimTipE">0:00</div>
+        </div>
+        <div class="atrim-ph" id="atrimPH" style="left:0"></div>
+      </div>
+      <div class="atrim-ctrl">
+        <button class="atrim-pp" id="atrimPP"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-play"/></svg></button>
+        <span class="atrim-time" id="atrimTime">0:00 / 0:00</span>
+        <span style="flex:1"></span>
+        <span class="atrim-dur-chip" id="atrimSelDur">片段長度：--</span>
+      </div>
+      <div class="atrim-inputs">
+        <div class="atrim-inp-g">
+          <span class="atrim-inp-lbl">開始</span>
+          <input class="atrim-inp" id="atrimInS" type="text" value="0:00:00">
+        </div>
+        <div class="atrim-inp-g">
+          <span class="atrim-inp-lbl">結束</span>
+          <input class="atrim-inp" id="atrimInE" type="text" value="0:00:00">
+        </div>
+      </div>
+      <div class="atrim-fx">
+        <div class="atrim-fx-title">音訊效果</div>
+        <div class="atrim-fx-row">
+          <span class="atrim-fx-lbl">🔊 音量</span>
+          <input type="range" id="atrimVol" min="0" max="300" value="100" step="5">
+          <span class="atrim-fx-val" id="atrimVolVal">100%</span>
+        </div>
+        <div class="atrim-fx-row">
+          <span class="atrim-fx-lbl">🔇 降噪</span>
+          <select id="atrimDenoise">
+            <option value="off">關閉</option>
+            <option value="light">輕度 — 保留細節</option>
+            <option value="medium" selected>中度 — 推薦</option>
+            <option value="strong">強力 — 最大降噪</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="atrim-acts">
+      <button class="atrim-btn-cancel" id="atrimCancelBtn">取消</button>
+      <button class="atrim-btn-go" id="atrimGoBtn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>確認並開始裁切
       </button>
     </div>
@@ -1553,11 +1626,20 @@ if (!self.crossOriginIsolated) {
       var dur = endT > startT ? (endT - startT) : null;
       if (!dur) throw new Error('請先拖曳波形設定裁切範圍');
       var ofmt = card.querySelector('select[name=atrimfmt]').value;
+      var vol = parseInt(card.dataset.atrimVol) || 100;
+      var denoise = card.dataset.atrimDenoise || 'off';
       var inExt = getExt(file.name), inN = 'in.' + inExt, outN = 'out.' + ofmt;
       try { ff.FS('unlink', inN); } catch(e) {}
       ff.FS('writeFile', inN, await fetchFile(file));
       try { ff.FS('unlink', outN); } catch(e) {}
+      // Build audio filter chain
+      var filters = [];
+      if (vol !== 100) filters.push('volume=' + (vol / 100).toFixed(2));
+      if (denoise === 'light') filters.push('highpass=f=80,lowpass=f=14000,afftdn=nf=-20');
+      else if (denoise === 'medium') filters.push('highpass=f=120,lowpass=f=12000,afftdn=nf=-30');
+      else if (denoise === 'strong') filters.push('highpass=f=200,lowpass=f=10000,afftdn=nf=-40');
       var args = ['-ss', String(startT), '-i', inN, '-t', String(dur)];
+      if (filters.length > 0) args.push('-af', filters.join(','));
       if (ofmt === 'mp3') args.push('-acodec', 'libmp3lame', '-ab', '192k', '-q:a', '0');
       else if (ofmt === 'wav') args.push('-acodec', 'pcm_s16le');
       else if (ofmt === 'aac') args.push('-acodec', 'aac', '-ab', '192k');
@@ -2897,7 +2979,7 @@ if (!self.crossOriginIsolated) {
     if (resetBtn) resetBtn.addEventListener('click', reset);
   }
 
-  // ── Audio Trim Card ──────────────────────────────────────
+  // ── Audio Trim Card (card-level only, modal is separate) ──
   function setupAudioTrimCard(card) {
     var input = card.querySelector('input[type=file]');
     var dropArea = card.querySelector('.drop-area');
@@ -2909,217 +2991,21 @@ if (!self.crossOriginIsolated) {
     var dlBtn = card.querySelector('.dl-btn');
     var resetBtn = card.querySelector('.reset-btn');
     var errEl = card.querySelector('.error-msg');
-
-    var canvas = card.querySelector('.atrim-wave-canvas');
-    var ctx = canvas.getContext('2d');
-    var waveWrap = card.querySelector('.atrim-wave-wrap');
-    var dimL = card.querySelector('.atrim-dimL');
-    var dimR = card.querySelector('.atrim-dimR');
-    var sel = card.querySelector('.atrim-sel');
-    var hdlS = card.querySelector('.atrim-hdl-s');
-    var hdlE = card.querySelector('.atrim-hdl-e');
-    var tipS = hdlS.querySelector('.atrim-hdl-tip');
-    var tipE = hdlE.querySelector('.atrim-hdl-tip');
-    var ph = card.querySelector('.atrim-ph');
-    var ppBtn = card.querySelector('.atrim-pp');
-    var timeEl = card.querySelector('.atrim-time');
-    var durChip = card.querySelector('.atrim-dur-chip');
-    var inpS = card.querySelector('.atrim-inp-s');
-    var inpE = card.querySelector('.atrim-inp-e');
-
-    var audio = new Audio();
-    var audioBuf = null;
-    var dur = 0, startT = 0, endT = 0;
-    var rafId = null;
-
-    function pad(n) { return n < 10 ? '0' + n : '' + n; }
-    function fmt(s) {
-      s = Math.max(0, s) | 0;
-      var h = (s / 3600) | 0, m = ((s % 3600) / 60) | 0, sec = s % 60;
-      return h > 0 ? h + ':' + pad(m) + ':' + pad(sec) : m + ':' + pad(sec);
-    }
-    function fmtFull(s) {
-      s = Math.max(0, s) | 0;
-      return pad((s / 3600) | 0) + ':' + pad(((s % 3600) / 60) | 0) + ':' + pad(s % 60);
-    }
-    function parseT(s) {
-      s = (s || '').trim(); if (!s) return null;
-      var p = s.split(':').map(Number);
-      if (p.length === 3) return p[0] * 3600 + p[1] * 60 + (p[2] || 0);
-      if (p.length === 2) return p[0] * 60 + (p[1] || 0);
-      return p[0] || 0;
-    }
-    function pct(t) { return dur > 0 ? (t / dur) * 100 : 0; }
-
-    function drawWaveform(buffer) {
-      var dpr = window.devicePixelRatio || 1;
-      var w = canvas.clientWidth, h = canvas.clientHeight;
-      canvas.width = w * dpr; canvas.height = h * dpr;
-      ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, w, h);
-      // Get audio data — merge all channels
-      var raw = buffer.getChannelData(0);
-      var step = Math.ceil(raw.length / w);
-      var amp = h / 2;
-      // Draw waveform bars
-      for (var i = 0; i < w; i++) {
-        var min = 1, max = -1;
-        for (var j = 0; j < step; j++) {
-          var idx = i * step + j;
-          if (idx < raw.length) {
-            var d = raw[idx];
-            if (d < min) min = d;
-            if (d > max) max = d;
-          }
-        }
-        // Gradient coloring
-        var ratio = i / w;
-        var inRange = ratio >= (startT / dur) && ratio <= (endT / dur);
-        ctx.fillStyle = inRange ? 'rgba(234,179,8,.7)' : 'rgba(255,255,255,.18)';
-        var y1 = (1 + min) * amp;
-        var y2 = (1 + max) * amp;
-        var barH = Math.max(1, y2 - y1);
-        ctx.fillRect(i, y1, 1, barH);
-      }
-    }
-
-    function updateUI() {
-      var sP = pct(startT), eP = pct(endT);
-      hdlS.style.left = sP + '%';
-      hdlE.style.left = eP + '%';
-      sel.style.left = sP + '%';
-      sel.style.width = (eP - sP) + '%';
-      dimL.style.width = sP + '%';
-      dimR.style.left = eP + '%';
-      dimR.style.width = (100 - eP) + '%';
-      tipS.textContent = fmt(startT);
-      tipE.textContent = fmt(endT);
-      inpS.value = fmtFull(startT);
-      inpE.value = fmtFull(endT);
-      var d = endT - startT;
-      durChip.textContent = d > 0 ? '片段長度：' + fmt(d) : '片段長度：--';
-      card.dataset.atrimStart = startT;
-      card.dataset.atrimEnd = endT;
-      if (d > 0.1) { card.classList.add('atrim-ready'); } else { card.classList.remove('atrim-ready'); }
-      if (audioBuf) drawWaveform(audioBuf);
-    }
-
-    function tickPH() {
-      if (!audio.paused) {
-        ph.style.left = pct(audio.currentTime) + '%';
-        timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(dur);
-        if (audio.currentTime >= endT) {
-          audio.pause(); setPaused(true);
-        } else {
-          rafId = requestAnimationFrame(tickPH);
-        }
-      }
-    }
-
-    function setPaused(paused) {
-      ppBtn.innerHTML = paused
-        ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-play"/></svg>'
-        : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-pause"/></svg>';
-    }
-
-    ppBtn.addEventListener('click', function() {
-      if (!dur) return;
-      if (audio.paused) {
-        if (audio.currentTime >= endT || audio.currentTime < startT) audio.currentTime = startT;
-        audio.play(); setPaused(false);
-        rafId = requestAnimationFrame(tickPH);
-      } else {
-        audio.pause(); setPaused(true); cancelAnimationFrame(rafId);
-      }
-    });
-
-    // Click on waveform to seek
-    waveWrap.addEventListener('click', function(e) {
-      if (e.target.closest('.atrim-hdl')) return;
-      if (!dur) return;
-      var r = waveWrap.getBoundingClientRect();
-      var t = ((e.clientX - r.left) / r.width) * dur;
-      audio.currentTime = Math.max(0, Math.min(dur, t));
-      ph.style.left = pct(audio.currentTime) + '%';
-      timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(dur);
-    });
-
-    // Drag handles
-    function makeDrag(hdl, isStart) {
-      function onDown(e) {
-        e.preventDefault();
-        var r = waveWrap.getBoundingClientRect();
-        function onMove(ev) {
-          var cx = ev.touches ? ev.touches[0].clientX : ev.clientX;
-          var x = Math.max(0, Math.min(1, (cx - r.left) / r.width));
-          var t = x * dur;
-          if (isStart) { startT = Math.max(0, Math.min(t, endT - 0.5)); }
-          else { endT = Math.min(dur, Math.max(t, startT + 0.5)); }
-          updateUI();
-        }
-        function onUp() {
-          document.removeEventListener('mousemove', onMove);
-          document.removeEventListener('mouseup', onUp);
-          document.removeEventListener('touchmove', onMove);
-          document.removeEventListener('touchend', onUp);
-        }
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onUp);
-        document.addEventListener('touchmove', onMove, { passive: false });
-        document.addEventListener('touchend', onUp);
-      }
-      hdl.addEventListener('mousedown', onDown);
-      hdl.addEventListener('touchstart', onDown, { passive: false });
-    }
-    makeDrag(hdlS, true);
-    makeDrag(hdlE, false);
-
-    // Input sync
-    inpS.addEventListener('change', function() {
-      var t = parseT(inpS.value);
-      if (t !== null && dur) { startT = Math.max(0, Math.min(t, endT - 0.5)); updateUI(); }
-    });
-    inpE.addEventListener('change', function() {
-      var t = parseT(inpE.value);
-      if (t !== null && dur) { endT = Math.min(dur, Math.max(t, startT + 0.5)); updateUI(); }
-    });
+    var openBtn = card.querySelector('.atrim-open-btn');
 
     function setFile(f) {
       fileMap.set(card, f);
-      card.classList.remove('done', 'has-error', 'processing', 'atrim-ready');
+      card.classList.remove('done', 'has-error', 'processing');
       card.classList.add('has-file');
       nameEl.textContent = f.name;
       sizeEl.textContent = fmtBytes(f.size);
       bar.style.width = '0%';
       errEl.textContent = '';
-      // Decode audio for waveform
-      var blobUrl = URL.createObjectURL(f);
-      audio.src = blobUrl;
-      var reader = new FileReader();
-      reader.onload = function() {
-        var actx = new (window.AudioContext || window.webkitAudioContext)();
-        actx.decodeAudioData(reader.result, function(buffer) {
-          audioBuf = buffer;
-          dur = buffer.duration;
-          startT = 0; endT = dur;
-          timeEl.textContent = '0:00 / ' + fmt(dur);
-          ph.style.left = '0%';
-          setPaused(true);
-          updateUI();
-          actx.close();
-        }, function() {
-          // fallback: use audio element duration
-          audio.addEventListener('loadedmetadata', function onMeta() {
-            audio.removeEventListener('loadedmetadata', onMeta);
-            dur = audio.duration;
-            startT = 0; endT = dur;
-            timeEl.textContent = '0:00 / ' + fmt(dur);
-            updateUI();
-          });
-          actx.close();
-        });
-      };
-      reader.readAsArrayBuffer(f);
+      var chip = card.querySelector('.atrim-range-val');
+      if (chip) chip.textContent = '尚未設定 — 點上方按鈕設定';
+      card.dataset.atrimStart = '0';
+      card.dataset.atrimEnd = '0';
+      startBtn.style.display = 'none';
     }
 
     function reset() {
@@ -3127,15 +3013,13 @@ if (!self.crossOriginIsolated) {
       var prevUrl = blobMap.get(card);
       if (prevUrl) URL.revokeObjectURL(prevUrl);
       blobMap.delete(card);
-      audio.pause(); audio.src = '';
-      cancelAnimationFrame(rafId);
-      audioBuf = null; dur = 0; startT = 0; endT = 0;
-      card.classList.remove('has-file', 'done', 'has-error', 'processing', 'atrim-ready');
+      card.classList.remove('has-file', 'done', 'has-error', 'processing');
       card.dataset.atrimStart = '0';
       card.dataset.atrimEnd = '0';
       if (input) input.value = '';
       bar.style.width = '0%';
       errEl.textContent = '';
+      startBtn.style.display = 'none';
     }
 
     if (dropArea) {
@@ -3151,6 +3035,13 @@ if (!self.crossOriginIsolated) {
     if (clearBtn) clearBtn.addEventListener('click', reset);
     if (resetBtn) resetBtn.addEventListener('click', reset);
 
+    if (openBtn) {
+      openBtn.addEventListener('click', function() {
+        var f = fileMap.get(card);
+        if (f && typeof window.openAudioTrimModal === 'function') window.openAudioTrimModal(f, card);
+      });
+    }
+
     startBtn.addEventListener('click', async function() {
       var file = fileMap.get(card);
       if (!file) return;
@@ -3158,7 +3049,6 @@ if (!self.crossOriginIsolated) {
       if (ffRunning) { errEl.textContent = '另一個工具正在處理中，請稍候再試'; return; }
       card.classList.remove('has-error', 'done');
       card.classList.add('processing');
-      audio.pause(); setPaused(true); cancelAnimationFrame(rafId);
       try {
         await loadFF();
         var result = await PROC.audioTrim(file, card);
@@ -3434,6 +3324,264 @@ if (!self.crossOriginIsolated) {
   };
 })();
 </script>
+
+<script>
+// ── Audio Trim Modal ─────────────────────────────────────────
+(function() {
+  var ov = document.getElementById('atrimModalOv');
+  var fname = document.getElementById('atrimFname');
+  var closeBtn = document.getElementById('atrimCloseBtn');
+  var cancelBtn = document.getElementById('atrimCancelBtn');
+  var goBtn = document.getElementById('atrimGoBtn');
+  var canvas = document.getElementById('atrimCanvas');
+  var ctx = canvas.getContext('2d');
+  var waveWrap = document.getElementById('atrimWaveWrap');
+  var dimL = document.getElementById('atrimDimL');
+  var dimR = document.getElementById('atrimDimR');
+  var sel = document.getElementById('atrimSel');
+  var hdlS = document.getElementById('atrimHdlS');
+  var hdlE = document.getElementById('atrimHdlE');
+  var tipS = document.getElementById('atrimTipS');
+  var tipE = document.getElementById('atrimTipE');
+  var ph = document.getElementById('atrimPH');
+  var ppBtn = document.getElementById('atrimPP');
+  var timeEl = document.getElementById('atrimTime');
+  var durChip = document.getElementById('atrimSelDur');
+  var durLbl = document.getElementById('atrimDurLbl');
+  var inS = document.getElementById('atrimInS');
+  var inE = document.getElementById('atrimInE');
+  var volSlider = document.getElementById('atrimVol');
+  var volVal = document.getElementById('atrimVolVal');
+  var denoiseSelect = document.getElementById('atrimDenoise');
+
+  var audio = new Audio();
+  var audioBuf = null;
+  var dur = 0, startT = 0, endT = 0;
+  var currentCard = null;
+  var blobUrl = null;
+  var rafId = null;
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function fmt(s) {
+    s = Math.max(0, s) | 0;
+    var h = (s / 3600) | 0, m = ((s % 3600) / 60) | 0, sec = s % 60;
+    return h > 0 ? h + ':' + pad(m) + ':' + pad(sec) : m + ':' + pad(sec);
+  }
+  function fmtFull(s) {
+    s = Math.max(0, s) | 0;
+    return pad((s / 3600) | 0) + ':' + pad(((s % 3600) / 60) | 0) + ':' + pad(s % 60);
+  }
+  function parseT(s) {
+    s = (s || '').trim(); if (!s) return null;
+    var p = s.split(':').map(Number);
+    if (p.length === 3) return p[0] * 3600 + p[1] * 60 + (p[2] || 0);
+    if (p.length === 2) return p[0] * 60 + (p[1] || 0);
+    return p[0] || 0;
+  }
+  function pct(t) { return dur > 0 ? (t / dur) * 100 : 0; }
+
+  function drawWaveform() {
+    if (!audioBuf) return;
+    var dpr = window.devicePixelRatio || 1;
+    var w = canvas.clientWidth, h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+    var raw = audioBuf.getChannelData(0);
+    var step = Math.ceil(raw.length / w);
+    var amp = h / 2;
+    for (var i = 0; i < w; i++) {
+      var min = 1, max = -1;
+      for (var j = 0; j < step; j++) {
+        var idx = i * step + j;
+        if (idx < raw.length) {
+          var d = raw[idx];
+          if (d < min) min = d;
+          if (d > max) max = d;
+        }
+      }
+      var ratio = i / w;
+      var inRange = ratio >= (startT / dur) && ratio <= (endT / dur);
+      ctx.fillStyle = inRange ? 'rgba(234,179,8,.7)' : 'rgba(255,255,255,.18)';
+      var y1 = (1 + min) * amp;
+      var y2 = (1 + max) * amp;
+      ctx.fillRect(i, y1, 1, Math.max(1, y2 - y1));
+    }
+  }
+
+  function updateUI() {
+    var sP = pct(startT), eP = pct(endT);
+    hdlS.style.left = sP + '%';
+    hdlE.style.left = eP + '%';
+    sel.style.left = sP + '%';
+    sel.style.width = (eP - sP) + '%';
+    dimL.style.width = sP + '%';
+    dimR.style.left = eP + '%';
+    dimR.style.width = (100 - eP) + '%';
+    tipS.textContent = fmt(startT);
+    tipE.textContent = fmt(endT);
+    inS.value = fmtFull(startT);
+    inE.value = fmtFull(endT);
+    var d = endT - startT;
+    durChip.textContent = d > 0 ? '片段長度：' + fmt(d) : '片段長度：--';
+    drawWaveform();
+  }
+
+  function tickPH() {
+    if (!audio.paused) {
+      ph.style.left = pct(audio.currentTime) + '%';
+      timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(dur);
+      if (audio.currentTime >= endT) {
+        audio.pause(); setPaused(true);
+      } else {
+        rafId = requestAnimationFrame(tickPH);
+      }
+    }
+  }
+
+  function setPaused(paused) {
+    ppBtn.innerHTML = paused
+      ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-play"/></svg>'
+      : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-pause"/></svg>';
+  }
+
+  ppBtn.addEventListener('click', function() {
+    if (!dur) return;
+    if (audio.paused) {
+      if (audio.currentTime >= endT || audio.currentTime < startT) audio.currentTime = startT;
+      audio.play(); setPaused(false);
+      rafId = requestAnimationFrame(tickPH);
+    } else {
+      audio.pause(); setPaused(true); cancelAnimationFrame(rafId);
+    }
+  });
+
+  // Click on waveform to seek
+  waveWrap.addEventListener('click', function(e) {
+    if (e.target.closest('.atrim-hdl')) return;
+    if (!dur) return;
+    var r = waveWrap.getBoundingClientRect();
+    var t = ((e.clientX - r.left) / r.width) * dur;
+    audio.currentTime = Math.max(0, Math.min(dur, t));
+    ph.style.left = pct(audio.currentTime) + '%';
+    timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(dur);
+  });
+
+  // Drag handles
+  function makeDrag(hdl, isStart) {
+    function onDown(e) {
+      e.preventDefault();
+      var r = waveWrap.getBoundingClientRect();
+      function onMove(ev) {
+        var cx = ev.touches ? ev.touches[0].clientX : ev.clientX;
+        var x = Math.max(0, Math.min(1, (cx - r.left) / r.width));
+        var t = x * dur;
+        if (isStart) { startT = Math.max(0, Math.min(t, endT - 0.5)); }
+        else { endT = Math.min(dur, Math.max(t, startT + 0.5)); }
+        updateUI();
+      }
+      function onUp() {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onUp);
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('touchend', onUp);
+    }
+    hdl.addEventListener('mousedown', onDown);
+    hdl.addEventListener('touchstart', onDown, { passive: false });
+  }
+  makeDrag(hdlS, true);
+  makeDrag(hdlE, false);
+
+  // Input sync
+  inS.addEventListener('change', function() {
+    var t = parseT(inS.value);
+    if (t !== null && dur) { startT = Math.max(0, Math.min(t, endT - 0.5)); updateUI(); }
+  });
+  inE.addEventListener('change', function() {
+    var t = parseT(inE.value);
+    if (t !== null && dur) { endT = Math.min(dur, Math.max(t, startT + 0.5)); updateUI(); }
+  });
+
+  // Volume slider live label
+  volSlider.addEventListener('input', function() {
+    volVal.textContent = volSlider.value + '%';
+  });
+
+  function closeModal() {
+    audio.pause(); cancelAnimationFrame(rafId);
+    ov.classList.remove('open');
+    currentCard = null;
+  }
+
+  closeBtn.addEventListener('click', closeModal);
+  cancelBtn.addEventListener('click', closeModal);
+  ov.addEventListener('click', function(e) { if (e.target === ov) closeModal(); });
+
+  goBtn.addEventListener('click', function() {
+    if (!currentCard) return;
+    // Store settings on card for PROC to read
+    currentCard.dataset.atrimStart = startT;
+    currentCard.dataset.atrimEnd = endT;
+    // Store vol/denoise as hidden data
+    currentCard.dataset.atrimVol = volSlider.value;
+    currentCard.dataset.atrimDenoise = denoiseSelect.value;
+    // Update chip on card
+    var chip = currentCard.querySelector('.atrim-range-val');
+    if (chip) chip.textContent = fmtFull(startT) + ' → ' + fmtFull(endT) + '（' + fmt(endT - startT) + '）';
+    // Show start button
+    currentCard.querySelector('.start-btn').style.display = '';
+    var card = currentCard;
+    closeModal();
+    card.querySelector('.start-btn').click();
+  });
+
+  window.openAudioTrimModal = async function(file, card) {
+    currentCard = card;
+    if (blobUrl) URL.revokeObjectURL(blobUrl);
+    blobUrl = URL.createObjectURL(file);
+    audio.src = blobUrl;
+    fname.textContent = file.name;
+    // Reset controls
+    volSlider.value = 100; volVal.textContent = '100%';
+    denoiseSelect.value = 'medium';
+    ov.classList.add('open');
+    // Decode audio buffer for waveform
+    var reader = new FileReader();
+    reader.onload = function() {
+      var actx = new (window.AudioContext || window.webkitAudioContext)();
+      actx.decodeAudioData(reader.result, function(buffer) {
+        audioBuf = buffer;
+        dur = buffer.duration;
+        startT = 0; endT = dur;
+        durLbl.textContent = fmt(dur) + ' 總長';
+        timeEl.textContent = '0:00 / ' + fmt(dur);
+        ph.style.left = '0%';
+        setPaused(true);
+        updateUI();
+        actx.close();
+      }, function() {
+        // fallback
+        audio.addEventListener('loadedmetadata', function onMeta() {
+          audio.removeEventListener('loadedmetadata', onMeta);
+          dur = audio.duration;
+          startT = 0; endT = dur;
+          durLbl.textContent = fmt(dur) + ' 總長';
+          timeEl.textContent = '0:00 / ' + fmt(dur);
+          updateUI();
+        });
+        actx.close();
+      });
+    };
+    reader.readAsArrayBuffer(file);
+  };
+})();
+</script>
+
 <script>
 window.eqSwCards = function() {
   var cards = [].slice.call(document.querySelectorAll('.sw-card'));
