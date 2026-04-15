@@ -397,7 +397,7 @@ footer a{color:var(--indigo2);text-decoration:none}
 .fb-m-canvas-wrap{position:relative;background:#000;border-radius:10px;overflow:hidden;margin-bottom:10px;cursor:crosshair;border:1px solid var(--border2);line-height:0;display:flex;align-items:center;justify-content:center;max-height:45vh}
 .fb-m-canvas{max-width:100%;max-height:45vh;display:block;object-fit:contain}
 .fb-m-hint{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(0,0,0,.72),transparent);color:rgba(255,255,255,.82);font-size:10.5px;text-align:center;padding:12px 6px 6px;pointer-events:none;line-height:1.4}
-.fb-m-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.fb-m-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;position:relative}
 .fb-m-pp{width:36px;height:36px;border-radius:50%;background:rgba(244,63,94,.18);border:1.5px solid rgba(244,63,94,.4);color:var(--rose2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
 .fb-m-pp:hover{background:rgba(244,63,94,.3)}
 .fb-m-time{font-size:11px;font-weight:700;color:var(--text2);font-variant-numeric:tabular-nums}
@@ -3727,49 +3727,63 @@ if (!self.crossOriginIsolated) {
     var vw = vid.videoWidth || 640, vh = vid.videoHeight || 360;
     canvas.width = vw; canvas.height = vh;
     ctx.drawImage(vid, 0, 0, vw, vh);
-    // draw current bbox overlay
-    if (curBbox) {
+    // shape path helper (reusable)
+    function shapePath(bx, by, bw, bh, inset) {
+      var ins = inset || 0;
+      ctx.beginPath();
+      if (curShape === 'ellipse') {
+        ctx.ellipse(bx + bw/2, by + bh/2, Math.max(1, bw/2 - ins), Math.max(1, bh/2 - ins), 0, 0, Math.PI * 2);
+      } else {
+        var rr = ins > 0 ? Math.min(ins * 1.2, Math.min(bw, bh) * 0.15) : Math.min(4, Math.min(bw, bh) * 0.08);
+        ctx.roundRect(bx + ins, by + ins, Math.max(1, bw - ins*2), Math.max(1, bh - ins*2), rr);
+      }
+    }
+
+    // Determine active keyframe for current time
+    var activeKf = getActiveKf();
+
+    // Draw LOCKED keyframe bbox (green, solid)
+    if (activeKf) {
+      var ab = activeKf.bbox;
+      var ax = ab.x * vw, ay = ab.y * vh, aw = ab.w * vw, ah = ab.h * vh;
+      // filled
+      shapePath(ax, ay, aw, ah, 0); ctx.fillStyle = 'rgba(34,197,94,.1)'; ctx.fill();
+      // solid stroke
+      shapePath(ax, ay, aw, ah, 0); ctx.strokeStyle = '#22c55e'; ctx.lineWidth = Math.max(2, vw/200);
+      ctx.setLineDash([]); ctx.stroke();
+      // lock icon at top-right
+      var lx = ax + aw - 16, ly = ay + 4;
+      ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.beginPath(); ctx.roundRect(lx-2, ly-2, 20, 20, 4); ctx.fill();
+      ctx.fillStyle = '#22c55e'; ctx.font = '13px sans-serif'; ctx.fillText('🔒', lx, ly + 14);
+      // center dot
+      ctx.fillStyle = '#22c55e'; ctx.beginPath(); ctx.arc(ax+aw/2, ay+ah/2, 3, 0, Math.PI*2); ctx.fill();
+    }
+
+    // Draw DRAFT curBbox (pink dashed) — only if no active keyframe at this time
+    if (curBbox && !activeKf) {
       var bx = curBbox.x * vw, by = curBbox.y * vh, bw = curBbox.w * vw, bh = curBbox.h * vh;
-      var ccx = bx + bw / 2, ccy = by + bh / 2, rrx = bw / 2, rry = bh / 2;
       var fStr = parseInt(featherStrEl.value) || 0;
       var featherPx = (curShape === 'rect' && fStr === 0) ? 0 : Math.round(Math.max(0, Math.min(bw, bh) * 0.02 * fStr));
-
-      // shape path helper
-      function shapePath(inset) {
-        var ins = inset || 0;
-        ctx.beginPath();
-        if (curShape === 'ellipse') {
-          ctx.ellipse(ccx, ccy, Math.max(1, rrx - ins), Math.max(1, rry - ins), 0, 0, Math.PI * 2);
-        } else {
-          var rr = ins > 0 ? Math.min(ins * 1.2, Math.min(bw, bh) * 0.15) : Math.min(4, Math.min(bw, bh) * 0.08);
-          ctx.roundRect(bx + ins, by + ins, Math.max(1, bw - ins * 2), Math.max(1, bh - ins * 2), rr);
-        }
-      }
-
-      // filled shape
-      shapePath(0); ctx.fillStyle = 'rgba(244,63,94,.1)'; ctx.fill();
+      // filled
+      shapePath(bx, by, bw, bh, 0); ctx.fillStyle = 'rgba(244,63,94,.1)'; ctx.fill();
       // dashed outer stroke
-      shapePath(0); ctx.strokeStyle = '#fb7185'; ctx.lineWidth = Math.max(2, vw / 200);
+      shapePath(bx, by, bw, bh, 0); ctx.strokeStyle = '#fb7185'; ctx.lineWidth = Math.max(2, vw/200);
       ctx.setLineDash([6, 4]); ctx.stroke(); ctx.setLineDash([]);
       // feather inner boundary
       if (featherPx > 0) {
-        shapePath(featherPx); ctx.strokeStyle = 'rgba(244,63,94,.3)'; ctx.lineWidth = 1; ctx.stroke();
+        shapePath(bx, by, bw, bh, featherPx); ctx.strokeStyle = 'rgba(244,63,94,.3)'; ctx.lineWidth = 1; ctx.stroke();
       }
-      // crosshair at center
-      var ch = Math.min(8, rrx * 0.3, rry * 0.3);
+      // crosshair
+      var ccx = bx+bw/2, ccy = by+bh/2, ch = Math.min(8, bw*0.15, bh*0.15);
       ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.moveTo(ccx - ch, ccy); ctx.lineTo(ccx + ch, ccy); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(ccx, ccy - ch); ctx.lineTo(ccx, ccy + ch); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ccx-ch, ccy); ctx.lineTo(ccx+ch, ccy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ccx, ccy-ch); ctx.lineTo(ccx, ccy+ch); ctx.stroke();
     }
-    // draw temp drawing shape
+
+    // Draw temp drawing shape
     if (drawing && drawRect) {
       var dx = drawRect.x * vw, dy = drawRect.y * vh, dw = drawRect.w * vw, dh = drawRect.h * vh;
-      ctx.beginPath();
-      if (curShape === 'ellipse') {
-        ctx.ellipse(dx + dw / 2, dy + dh / 2, dw / 2, dh / 2, 0, 0, Math.PI * 2);
-      } else {
-        ctx.roundRect(dx, dy, dw, dh, Math.min(4, Math.min(dw, dh) * 0.08));
-      }
+      shapePath(dx, dy, dw, dh, 0);
       ctx.strokeStyle = 'rgba(251,113,133,.7)'; ctx.lineWidth = 2;
       ctx.setLineDash([4, 3]); ctx.stroke(); ctx.setLineDash([]);
     }
@@ -3780,6 +3794,18 @@ if (!self.crossOriginIsolated) {
     if (playing) rafId = requestAnimationFrame(loopDraw);
   }
 
+  // Find the active (locked) keyframe for current video time
+  function getActiveKf() {
+    if (!keyframes.length || !vid) return null;
+    var t = vid.currentTime;
+    var sorted = keyframes.slice().sort(function(a, b) { return a.t - b.t; });
+    var active = null;
+    for (var i = sorted.length - 1; i >= 0; i--) {
+      if (t >= sorted[i].t - 0.05) { active = sorted[i]; break; }
+    }
+    return active;
+  }
+
   function updateTime() {
     if (!vid) return;
     timeEl.textContent = fmtPrecise(vid.currentTime) + ' / ' + fmt(vid.duration || 0);
@@ -3787,6 +3813,29 @@ if (!self.crossOriginIsolated) {
     var curFrame = Math.round(vid.currentTime * modalFps);
     var totalFrames = vid.duration ? Math.round(vid.duration * modalFps) : 0;
     frameLbl.textContent = 'F ' + curFrame + ' / ' + totalFrames;
+    // Show active keyframe status
+    var ak = getActiveKf();
+    if (ak) {
+      hint.textContent = '🔒 定位點 @ ' + fmtPrecise(ak.t) + '（已鎖定）— 跳到其他時間新增定位點';
+    }
+    renderKfMarkers();
+  }
+
+  // Draw keyframe markers on seek bar
+  function renderKfMarkers() {
+    // Remove old markers
+    var old = seekEl.parentNode.querySelectorAll('.fb-seek-marker');
+    old.forEach(function(m) { m.remove(); });
+    if (!vid || !vid.duration) return;
+    var parent = seekEl.parentNode;
+    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
+    keyframes.forEach(function(kf) {
+      var pct = (kf.t / vid.duration) * 100;
+      var mk = document.createElement('div');
+      mk.className = 'fb-seek-marker';
+      mk.style.cssText = 'position:absolute;bottom:-2px;left:calc(' + pct + '% - 3px);width:6px;height:6px;border-radius:50%;background:#22c55e;border:1px solid rgba(0,0,0,.3);pointer-events:none;z-index:2';
+      parent.appendChild(mk);
+    });
   }
 
   function play() { if (!vid) return; vid.play(); playing = true; ppBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'; loopDraw(); }
@@ -3817,14 +3866,14 @@ if (!self.crossOriginIsolated) {
   }
 
   function onDrawStart(e) {
+    // Block interaction if current time has a locked keyframe
+    if (getActiveKf()) return;
     e.preventDefault();
     var p = canvasXY(e);
     if (curBbox && insideShape(p.x, p.y)) {
-      // Start dragging existing ellipse
       dragging = true;
       dragOffset = { dx: p.x - (curBbox.x + curBbox.w / 2), dy: p.y - (curBbox.y + curBbox.h / 2) };
     } else {
-      // Start drawing new ellipse
       drawing = true;
       drawStart = p;
       drawRect = null;
@@ -3852,7 +3901,7 @@ if (!self.crossOriginIsolated) {
   function onDrawEnd(e) {
     if (dragging) {
       dragging = false; dragOffset = null;
-      hint.textContent = '已移動位置 — 跳到下一個時間點繼續調整，或點「新增定位點」';
+      hint.textContent = '已移動位置 — 拖曳可微調，點「新增定位點」鎖定';
       if (!playing) drawFrame();
       return;
     }
@@ -3860,16 +3909,17 @@ if (!self.crossOriginIsolated) {
     drawing = false;
     if (drawRect && drawRect.w > 0.01 && drawRect.h > 0.01) {
       curBbox = { x: drawRect.x, y: drawRect.y, w: drawRect.w, h: drawRect.h };
-      hint.textContent = '已框選 — 拖曳可移動位置，點「新增定位點」儲存';
+      hint.textContent = '已框選 — 拖曳可移動，點「新增定位點」鎖定此位置';
     }
     drawRect = null;
     drawStart = null;
     if (!playing) drawFrame();
   }
 
-  // Update cursor style based on hover state
+  // Update cursor style
   wrap.addEventListener('mousemove', function(e) {
     if (drawing || dragging) return;
+    if (getActiveKf()) { wrap.style.cursor = 'not-allowed'; return; }
     var p = canvasXY(e);
     wrap.style.cursor = (curBbox && insideShape(p.x, p.y)) ? 'grab' : 'crosshair';
   });
@@ -3919,6 +3969,7 @@ if (!self.crossOriginIsolated) {
   // ── Auto detect ──
   detectBtn.addEventListener('click', async function() {
     if (!vid) return;
+    if (getActiveKf()) { hint.textContent = '此時間已有定位點，請跳到其他時間再偵測'; return; }
     detectBtn.disabled = true;
     detectBtn.textContent = '偵測中...';
     try {
@@ -3957,11 +4008,14 @@ if (!self.crossOriginIsolated) {
         e.stopPropagation();
         keyframes.splice(idx, 1);
         renderKfList();
+        renderKfMarkers();
+        hint.textContent = '已刪除定位點 — 可重新框選此時間段的位置';
+        if (!playing) drawFrame();
       });
       item.addEventListener('click', function() {
         pause();
+        curBbox = null; // clear any draft
         vid.currentTime = kf.t;
-        curBbox = { x: kf.bbox.x, y: kf.bbox.y, w: kf.bbox.w, h: kf.bbox.h };
         vid.addEventListener('seeked', function h() { vid.removeEventListener('seeked', h); drawFrame(); updateTime(); });
       });
       kfListEl.appendChild(item);
@@ -3971,14 +4025,18 @@ if (!self.crossOriginIsolated) {
   addKfBtn.addEventListener('click', function() {
     if (!curBbox) { hint.textContent = '請先框選或偵測人臉位置'; return; }
     if (!vid) return;
+    if (getActiveKf()) { hint.textContent = '此時間已有定位點，請先刪除再重新設定'; return; }
     var t = vid.currentTime;
     // Replace if same time exists (within 0.3s)
     for (var i = keyframes.length - 1; i >= 0; i--) {
       if (Math.abs(keyframes[i].t - t) < 0.3) { keyframes.splice(i, 1); break; }
     }
     keyframes.push({ t: t, bbox: { x: curBbox.x, y: curBbox.y, w: curBbox.w, h: curBbox.h } });
-    hint.textContent = '已新增定位點 @ ' + fmt(t) + ' — 跳到下一段時間，拖曳橢圓到新位置';
+    curBbox = null; // clear draft — keyframe is now locked
+    hint.textContent = '🔒 已鎖定定位點 @ ' + fmtPrecise(t) + ' — 跳到下一段時間新增';
     renderKfList();
+    renderKfMarkers();
+    if (!playing) drawFrame();
   });
 
   // ── Open modal ──
