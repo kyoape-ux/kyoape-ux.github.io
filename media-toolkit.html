@@ -245,12 +245,13 @@ footer a{color:var(--indigo2);text-decoration:none}
 .atrim-dimL,.atrim-dimR{position:absolute;top:0;bottom:0;background:rgba(0,0,0,.6);pointer-events:none;z-index:1}
 .atrim-dimL{left:0;border-radius:10px 0 0 10px}
 .atrim-dimR{right:0;border-radius:0 10px 10px 0}
-.atrim-sel{position:absolute;top:0;bottom:0;border-top:2.5px solid #eab308;border-bottom:2.5px solid #eab308;pointer-events:none;z-index:2}
-.atrim-hdl{position:absolute;top:0;bottom:0;width:18px;cursor:ew-resize;display:flex;align-items:center;justify-content:center;z-index:5;touch-action:none}
-.atrim-hdl-bar{width:14px;height:100%;border-radius:5px;background:#eab308;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(234,179,8,.55)}
-.atrim-hdl-bar::before{content:'';width:2px;height:20px;background:rgba(255,255,255,.85);border-radius:2px;box-shadow:4px 0 0 rgba(255,255,255,.85)}
-.atrim-hdl-tip{position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:#eab308;color:#000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;font-variant-numeric:tabular-nums;pointer-events:none}
-.atrim-hdl-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:#eab308}
+.atrim-sel{position:absolute;top:0;bottom:0;border-top:2px solid rgba(234,179,8,.6);border-bottom:2px solid rgba(234,179,8,.6);pointer-events:none;z-index:2}
+.atrim-hdl{position:absolute;top:-4px;bottom:-4px;width:12px;cursor:ew-resize;display:flex;align-items:center;justify-content:center;z-index:5;touch-action:none}
+.atrim-hdl-bar{width:3px;height:100%;border-radius:2px;background:#eab308;position:relative}
+.atrim-hdl-bar::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:11px;height:22px;border-radius:4px;background:#eab308;box-shadow:0 1px 6px rgba(234,179,8,.5)}
+.atrim-hdl-bar::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:1.5px;height:10px;background:rgba(0,0,0,.4);border-radius:1px;box-shadow:2.5px 0 0 rgba(0,0,0,.4)}
+.atrim-hdl-tip{position:absolute;top:-28px;left:50%;transform:translateX(-50%);background:#eab308;color:#000;font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:5px;white-space:nowrap;font-variant-numeric:tabular-nums;pointer-events:none}
+.atrim-hdl-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:3px solid transparent;border-top-color:#eab308}
 .atrim-ph{position:absolute;top:-6px;bottom:-6px;width:2px;background:rgba(255,255,255,.7);border-radius:2px;pointer-events:none;z-index:4;transform:translateX(-1px)}
 .atrim-ph::before{content:'';position:absolute;top:4px;left:50%;transform:translateX(-50%);width:6px;height:6px;background:#fff;border-radius:50%}
 .atrim-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:10px}
@@ -1403,8 +1404,8 @@ if (!self.crossOriginIsolated) {
         <div class="atrim-fx-title">音訊效果</div>
         <div class="atrim-fx-row">
           <span class="atrim-fx-lbl">🔊 音量</span>
-          <input type="range" id="atrimVol" min="0" max="300" value="100" step="5">
-          <span class="atrim-fx-val" id="atrimVolVal">100%</span>
+          <input type="range" id="atrimVol" min="-20" max="20" value="0" step="1">
+          <span class="atrim-fx-val" id="atrimVolVal">0 dB</span>
         </div>
         <div class="atrim-fx-row">
           <span class="atrim-fx-lbl">🔇 降噪</span>
@@ -1626,7 +1627,7 @@ if (!self.crossOriginIsolated) {
       var dur = endT > startT ? (endT - startT) : null;
       if (!dur) throw new Error('請先拖曳波形設定裁切範圍');
       var ofmt = card.querySelector('select[name=atrimfmt]').value;
-      var vol = parseInt(card.dataset.atrimVol) || 100;
+      var volDb = parseInt(card.dataset.atrimVol) || 0;
       var denoise = card.dataset.atrimDenoise || 'off';
       var inExt = getExt(file.name), inN = 'in.' + inExt, outN = 'out.' + ofmt;
       try { ff.FS('unlink', inN); } catch(e) {}
@@ -1634,7 +1635,7 @@ if (!self.crossOriginIsolated) {
       try { ff.FS('unlink', outN); } catch(e) {}
       // Build audio filter chain
       var filters = [];
-      if (vol !== 100) filters.push('volume=' + (vol / 100).toFixed(2));
+      if (volDb !== 0) filters.push('volume=' + volDb + 'dB');
       // highpass+lowpass are universally supported in ffmpeg.wasm
       if (denoise === 'light') filters.push('highpass=f=80','lowpass=f=14000');
       else if (denoise === 'medium') filters.push('highpass=f=120','lowpass=f=12000');
@@ -3526,7 +3527,8 @@ if (!self.crossOriginIsolated) {
 
   // Volume slider live label
   volSlider.addEventListener('input', function() {
-    volVal.textContent = volSlider.value + '%';
+    var db = parseInt(volSlider.value);
+    volVal.textContent = (db >= 0 ? '+' : '') + db + ' dB';
   });
 
   function closeModal() {
@@ -3564,7 +3566,7 @@ if (!self.crossOriginIsolated) {
     audio.src = blobUrl;
     fname.textContent = file.name;
     // Reset controls
-    volSlider.value = 100; volVal.textContent = '100%';
+    volSlider.value = 0; volVal.textContent = '0 dB';
     denoiseSelect.value = 'off';
     ov.classList.add('open');
     // Decode audio buffer for waveform
