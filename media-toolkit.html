@@ -3796,15 +3796,16 @@ if (!self.crossOriginIsolated) {
   }
 
   // Find the active (locked) keyframe for current video time
+  // Only return a keyframe if current time is within ±0.5s of its exact time
+  // (not the entire segment after it)
   function getActiveKf() {
     if (!keyframes.length || !vid) return null;
     var t = vid.currentTime;
-    var sorted = keyframes.slice().sort(function(a, b) { return a.t - b.t; });
-    var active = null;
-    for (var i = sorted.length - 1; i >= 0; i--) {
-      if (t >= sorted[i].t - 0.05) { active = sorted[i]; break; }
+    var threshold = 0.5; // seconds
+    for (var i = 0; i < keyframes.length; i++) {
+      if (Math.abs(t - keyframes[i].t) <= threshold) return keyframes[i];
     }
-    return active;
+    return null;
   }
 
   function updateTime() {
