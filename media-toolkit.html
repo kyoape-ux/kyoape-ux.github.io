@@ -3740,28 +3740,21 @@ if (!self.crossOriginIsolated) {
       }
     }
 
-    // Determine active keyframe for current time
-    var activeKf = getActiveKf();
-
-    // Draw LOCKED keyframe bbox (green, solid)
-    if (activeKf) {
-      var ab = activeKf.bbox;
+    // Show saved keyframe reference (green) if near one and no curBbox override
+    var nearKf = getNearKf();
+    if (nearKf && !curBbox && !drawing) {
+      var ab = nearKf.bbox;
       var ax = ab.x * vw, ay = ab.y * vh, aw = ab.w * vw, ah = ab.h * vh;
-      // filled
-      shapePath(ax, ay, aw, ah, 0); ctx.fillStyle = 'rgba(34,197,94,.1)'; ctx.fill();
-      // solid stroke
+      shapePath(ax, ay, aw, ah, 0); ctx.fillStyle = 'rgba(34,197,94,.08)'; ctx.fill();
       shapePath(ax, ay, aw, ah, 0); ctx.strokeStyle = '#22c55e'; ctx.lineWidth = Math.max(2, vw/200);
-      ctx.setLineDash([]); ctx.stroke();
-      // lock icon at top-right
-      var lx = ax + aw - 16, ly = ay + 4;
-      ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.beginPath(); ctx.roundRect(lx-2, ly-2, 20, 20, 4); ctx.fill();
-      ctx.fillStyle = '#22c55e'; ctx.font = '13px sans-serif'; ctx.fillText('🔒', lx, ly + 14);
-      // center dot
-      ctx.fillStyle = '#22c55e'; ctx.beginPath(); ctx.arc(ax+aw/2, ay+ah/2, 3, 0, Math.PI*2); ctx.fill();
+      ctx.setLineDash([8, 4]); ctx.stroke(); ctx.setLineDash([]);
+      // "已儲存" label
+      ctx.fillStyle = 'rgba(34,197,94,.85)'; ctx.font = 'bold ' + Math.max(11, vw/50) + 'px sans-serif';
+      ctx.fillText('✓ 已儲存', ax + 6, ay - 6 > 14 ? ay - 6 : ay + 16);
     }
 
-    // Draw DRAFT curBbox (pink dashed) — only if no active keyframe at this time
-    if (curBbox && !activeKf) {
+    // Draw curBbox (editable, pink dashed)
+    if (curBbox) {
       var bx = curBbox.x * vw, by = curBbox.y * vh, bw = curBbox.w * vw, bh = curBbox.h * vh;
       var fStr = parseInt(featherStrEl.value) || 0;
       var featherPx = (curShape === 'rect' && fStr === 0) ? 0 : Math.round(Math.max(0, Math.min(bw, bh) * 0.02 * fStr));
@@ -3795,17 +3788,16 @@ if (!self.crossOriginIsolated) {
     if (playing) rafId = requestAnimationFrame(loopDraw);
   }
 
-  // Find the active (locked) keyframe for current video time
-  // Only return a keyframe if current time is within ±0.5s of its exact time
-  // (not the entire segment after it)
-  function getActiveKf() {
+  // Find nearest keyframe within ±0.5s (for display/reference only, not blocking)
+  function getNearKf() {
     if (!keyframes.length || !vid) return null;
     var t = vid.currentTime;
-    var threshold = 0.5; // seconds
+    var best = null, bestDist = Infinity;
     for (var i = 0; i < keyframes.length; i++) {
-      if (Math.abs(t - keyframes[i].t) <= threshold) return keyframes[i];
+      var d = Math.abs(t - keyframes[i].t);
+      if (d <= 0.5 && d < bestDist) { best = keyframes[i]; bestDist = d; }
     }
-    return null;
+    return best;
   }
 
   function updateTime() {
@@ -3815,10 +3807,10 @@ if (!self.crossOriginIsolated) {
     var curFrame = Math.round(vid.currentTime * modalFps);
     var totalFrames = vid.duration ? Math.round(vid.duration * modalFps) : 0;
     frameLbl.textContent = 'F ' + curFrame + ' / ' + totalFrames;
-    // Show active keyframe status
-    var ak = getActiveKf();
-    if (ak) {
-      hint.textContent = '🔒 定位點 @ ' + fmtPrecise(ak.t) + '（已鎖定）— 跳到其他時間新增定位點';
+    // Show keyframe hint if near a saved keyframe
+    var nk = getNearKf();
+    if (nk && !curBbox) {
+      hint.textContent = '✓ 定位點 @ ' + fmtPrecise(nk.t) + ' — 可拖曳調整或重新框選覆蓋';
     }
     renderKfMarkers();
   }
@@ -3868,10 +3860,16 @@ if (!self.crossOriginIsolated) {
   }
 
   function onDrawStart(e) {
-    // Block interaction if current time has a locked keyframe
-    if (getActiveKf()) return;
     e.preventDefault();
     var p = canvasXY(e);
+    // If near a saved keyframe and no curBbox yet, load it for editing
+    if (!curBbox) {
+      var nk = getNearKf();
+      if (nk) {
+        curBbox = { x: nk.bbox.x, y: nk.bbox.y, w: nk.bbox.w, h: nk.bbox.h };
+        if (!playing) drawFrame();
+      }
+    }
     if (curBbox && insideShape(p.x, p.y)) {
       dragging = true;
       dragOffset = { dx: p.x - (curBbox.x + curBbox.w / 2), dy: p.y - (curBbox.y + curBbox.h / 2) };
@@ -3921,9 +3919,20 @@ if (!self.crossOriginIsolated) {
   // Update cursor style
   wrap.addEventListener('mousemove', function(e) {
     if (drawing || dragging) return;
-    if (getActiveKf()) { wrap.style.cursor = 'not-allowed'; return; }
     var p = canvasXY(e);
-    wrap.style.cursor = (curBbox && insideShape(p.x, p.y)) ? 'grab' : 'crosshair';
+    // Show grab on curBbox or on saved keyframe bbox (clickable to load)
+    if (curBbox && insideShape(p.x, p.y)) { wrap.style.cursor = 'grab'; return; }
+    if (!curBbox) {
+      var nk = getNearKf();
+      if (nk) {
+        var nb = nk.bbox;
+        var inside = curShape === 'rect'
+          ? (p.x >= nb.x && p.x <= nb.x+nb.w && p.y >= nb.y && p.y <= nb.y+nb.h)
+          : (Math.pow((p.x-nb.x-nb.w/2)/(nb.w/2),2) + Math.pow((p.y-nb.y-nb.h/2)/(nb.h/2),2) <= 1);
+        if (inside) { wrap.style.cursor = 'grab'; return; }
+      }
+    }
+    wrap.style.cursor = 'crosshair';
   });
 
   wrap.addEventListener('mousedown', onDrawStart);
@@ -3938,6 +3947,7 @@ if (!self.crossOriginIsolated) {
   seekEl.addEventListener('input', function() {
     if (!vid) return;
     pause();
+    curBbox = null; // clear draft when seeking
     vid.currentTime = (seekEl.value / 1000) * vid.duration;
     vid.addEventListener('seeked', function h() { vid.removeEventListener('seeked', h); drawFrame(); updateTime(); });
   });
@@ -3946,6 +3956,7 @@ if (!self.crossOriginIsolated) {
   function stepFrame(delta) {
     if (!vid || !vid.duration) return;
     pause();
+    curBbox = null; // clear draft when stepping
     var frameDur = 1 / modalFps;
     var t = Math.max(0, Math.min(vid.duration, vid.currentTime + delta * frameDur));
     vid.currentTime = t;
@@ -3971,7 +3982,6 @@ if (!self.crossOriginIsolated) {
   // ── Auto detect ──
   detectBtn.addEventListener('click', async function() {
     if (!vid) return;
-    if (getActiveKf()) { hint.textContent = '此時間已有定位點，請跳到其他時間再偵測'; return; }
     detectBtn.disabled = true;
     detectBtn.textContent = '偵測中...';
     try {
@@ -4016,8 +4026,9 @@ if (!self.crossOriginIsolated) {
       });
       item.addEventListener('click', function() {
         pause();
-        curBbox = null; // clear any draft
+        curBbox = { x: kf.bbox.x, y: kf.bbox.y, w: kf.bbox.w, h: kf.bbox.h }; // load for editing
         vid.currentTime = kf.t;
+        hint.textContent = '編輯定位點 @ ' + fmtPrecise(kf.t) + ' — 拖曳調整後點「新增定位點」覆蓋';
         vid.addEventListener('seeked', function h() { vid.removeEventListener('seeked', h); drawFrame(); updateTime(); });
       });
       kfListEl.appendChild(item);
@@ -4027,15 +4038,15 @@ if (!self.crossOriginIsolated) {
   addKfBtn.addEventListener('click', function() {
     if (!curBbox) { hint.textContent = '請先框選或偵測人臉位置'; return; }
     if (!vid) return;
-    if (getActiveKf()) { hint.textContent = '此時間已有定位點，請先刪除再重新設定'; return; }
     var t = vid.currentTime;
-    // Replace if same time exists (within 0.3s)
+    var replaced = false;
+    // Auto-overwrite if same time exists (within 0.5s)
     for (var i = keyframes.length - 1; i >= 0; i--) {
-      if (Math.abs(keyframes[i].t - t) < 0.3) { keyframes.splice(i, 1); break; }
+      if (Math.abs(keyframes[i].t - t) < 0.5) { keyframes.splice(i, 1); replaced = true; break; }
     }
     keyframes.push({ t: t, bbox: { x: curBbox.x, y: curBbox.y, w: curBbox.w, h: curBbox.h } });
-    curBbox = null; // clear draft — keyframe is now locked
-    hint.textContent = '🔒 已鎖定定位點 @ ' + fmtPrecise(t) + ' — 跳到下一段時間新增';
+    curBbox = null; // clear draft, saved keyframe will show as green reference
+    hint.textContent = (replaced ? '✓ 已更新' : '✓ 已儲存') + '定位點 @ ' + fmtPrecise(t) + ' — 跳到下一段時間繼續';
     renderKfList();
     renderKfMarkers();
     if (!playing) drawFrame();
