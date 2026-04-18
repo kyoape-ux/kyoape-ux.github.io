@@ -323,13 +323,26 @@ footer a{color:var(--indigo2);text-decoration:none}
 .trim-dimL{left:0;border-radius:10px 0 0 10px}
 .trim-dimR{right:0;border-radius:0 10px 10px 0}
 .trim-sel{position:absolute;top:0;bottom:0;border-top:2.5px solid var(--sky);border-bottom:2.5px solid var(--sky);pointer-events:none}
-.trim-hdl{position:absolute;top:0;bottom:0;width:18px;cursor:ew-resize;display:flex;align-items:center;justify-content:center;z-index:5;touch-action:none}
-.trim-hdl-bar{width:14px;height:100%;border-radius:5px;background:var(--sky);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(14,165,233,.55)}
-.trim-hdl-bar::before{content:'';width:2px;height:20px;background:rgba(255,255,255,.85);border-radius:2px;box-shadow:4px 0 0 rgba(255,255,255,.85)}
-.trim-hdl-tip{position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:var(--sky);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;font-variant-numeric:tabular-nums;pointer-events:none}
+.trim-hdl{position:absolute;top:-4px;bottom:-4px;width:14px;cursor:ew-resize;display:flex;align-items:center;justify-content:center;z-index:5;touch-action:none;transform:translateX(-7px)}
+.trim-hdl-bar{width:3px;height:100%;border-radius:2px;background:var(--sky);position:relative;box-shadow:0 0 8px rgba(14,165,233,.8)}
+.trim-hdl-bar::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:11px;height:22px;border-radius:4px;background:var(--sky);box-shadow:0 2px 8px rgba(14,165,233,.5);border:1px solid rgba(255,255,255,.25)}
+.trim-hdl-bar::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:1.5px;height:10px;background:rgba(255,255,255,.85);border-radius:1px;box-shadow:3px 0 0 rgba(255,255,255,.85);z-index:1}
+.trim-hdl-tip{position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:var(--sky);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;font-variant-numeric:tabular-nums;pointer-events:none;z-index:6}
 .trim-hdl-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--sky)}
-.trim-ph{position:absolute;top:-6px;bottom:-6px;width:2px;background:rgba(255,255,255,.7);border-radius:2px;pointer-events:none;z-index:4;transform:translateX(-1px)}
+.trim-ph{position:absolute;top:-6px;bottom:-6px;width:2px;background:rgba(255,255,255,.85);border-radius:2px;pointer-events:none;z-index:4;transform:translateX(-1px);box-shadow:0 0 4px rgba(255,255,255,.5)}
 .trim-ph::before{content:'';position:absolute;top:4px;left:50%;transform:translateX(-50%);width:6px;height:6px;background:#fff;border-radius:50%}
+.trim-wave-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;border-radius:10px;opacity:.6}
+.trim-frame-btn{width:28px;height:28px;border-radius:50%;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.3);color:var(--sky2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0;padding:0}
+.trim-frame-btn:hover{background:rgba(14,165,233,.22)}
+.trim-frame-btn:active{transform:scale(.92)}
+.trim-set-btn{padding:5px 10px;border-radius:7px;border:1px solid rgba(14,165,233,.3);background:rgba(14,165,233,.08);color:var(--sky2);font-size:10.5px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0}
+.trim-set-btn:hover{background:rgba(14,165,233,.2)}
+.trim-mini-sel{background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:10.5px;padding:3px 6px;cursor:pointer;flex-shrink:0;font-variant-numeric:tabular-nums}
+.trim-mini-lbl{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.5px}
+.trim-frame-lbl{font-size:10px;font-weight:700;color:var(--text3);font-variant-numeric:tabular-nums;white-space:nowrap;background:var(--bg2);padding:2px 7px;border-radius:5px;border:1px solid var(--border);letter-spacing:.3px}
+.trim-ctrl2{display:flex;align-items:center;gap:6px;margin:8px 0 4px;flex-wrap:wrap;padding:0 20px}
+.trim-loop-btn{padding:5px 10px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:10.5px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0}
+.trim-loop-btn.active{background:rgba(14,165,233,.15);color:var(--sky2);border-color:rgba(14,165,233,.4)}
 .trim-inputs-row{display:flex;gap:10px;padding:8px 20px 14px;align-items:center;flex-shrink:0;flex-wrap:wrap}
 .trim-inp-g{display:flex;align-items:center;gap:7px;flex:1;min-width:140px}
 .trim-inp-lbl{font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
@@ -1362,16 +1375,40 @@ if (!self.crossOriginIsolated) {
       <video id="trimVideo" preload="auto" playsinline></video>
       <div class="trim-prev-ctrl">
         <button class="trim-pp" id="trimPP"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-play"/></svg></button>
-        <span class="trim-cur" id="trimCurTime">0:00</span>
+        <span class="trim-cur" id="trimCurTime">0:00.00</span>
       </div>
+    </div>
+    <div class="trim-ctrl2">
+      <button class="trim-frame-btn" id="trimPrevFrame" title="上一幀 (←)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><line x1="6" y1="12" x2="18" y2="12"/></svg></button>
+      <button class="trim-frame-btn" id="trimNextFrame" title="下一幀 (→)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 7 18 12 13 17"/><line x1="6" y1="12" x2="18" y2="12"/></svg></button>
+      <span class="trim-frame-lbl" id="trimFrameLbl">F 0/0</span>
+      <span class="trim-mini-lbl">FPS</span>
+      <select class="trim-mini-sel" id="trimFpsSel">
+        <option value="24">24</option>
+        <option value="25">25</option>
+        <option value="30" selected>30</option>
+        <option value="60">60</option>
+      </select>
+      <span class="trim-mini-lbl">速度</span>
+      <select class="trim-mini-sel" id="trimRateSel">
+        <option value="0.25">0.25x</option>
+        <option value="0.5">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2">2x</option>
+      </select>
+      <button class="trim-loop-btn" id="trimLoopBtn" title="循環播放選取範圍"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>循環</button>
+      <button class="trim-set-btn" id="trimSetInBtn" title="將目前時間設為開始點 (I)">[ 設為開始</button>
+      <button class="trim-set-btn" id="trimSetOutBtn" title="將目前時間設為結束點 (O)">設為結束 ]</button>
     </div>
     <div class="trim-tl-wrap">
       <div class="trim-tl-toprow">
-        <span class="trim-tl-label">時間軸</span>
+        <span class="trim-tl-label">時間軸 · ←→ 逐幀 · 空白鍵 播放/暫停 · I/O 設開始/結束</span>
         <span class="trim-tl-dur" id="trimDurLbl">--</span>
       </div>
       <div class="trim-tl" id="trimTL">
         <div class="trim-thumbs" id="trimThumbs"></div>
+        <canvas class="trim-wave-canvas" id="trimWaveCanvas"></canvas>
         <div class="trim-dimL" id="trimDimL" style="width:0"></div>
         <div class="trim-dimR" id="trimDimR" style="width:0;left:100%"></div>
         <div class="trim-sel" id="trimSel" style="left:0;width:100%"></div>
@@ -1389,11 +1426,11 @@ if (!self.crossOriginIsolated) {
     <div class="trim-inputs-row">
       <div class="trim-inp-g">
         <span class="trim-inp-lbl">開始</span>
-        <input class="trim-inp" id="trimInS" type="text" value="0:00:00">
+        <input class="trim-inp" id="trimInS" type="text" value="00:00:00.000" placeholder="HH:MM:SS.mmm">
       </div>
       <div class="trim-inp-g">
         <span class="trim-inp-lbl">結束</span>
-        <input class="trim-inp" id="trimInE" type="text" value="0:00:00">
+        <input class="trim-inp" id="trimInE" type="text" value="00:00:00.000" placeholder="HH:MM:SS.mmm">
       </div>
       <div class="trim-dur-chip" id="trimSelDur">片段長度：--</div>
     </div>
@@ -3149,12 +3186,25 @@ if (!self.crossOriginIsolated) {
   var cancelBtn = document.getElementById('trimCancelBtn');
   var closeBtn  = document.getElementById('trimCloseBtn');
   var goBtn = document.getElementById('trimGoBtn');
+  var prevFrameBtn = document.getElementById('trimPrevFrame');
+  var nextFrameBtn = document.getElementById('trimNextFrame');
+  var frameLbl = document.getElementById('trimFrameLbl');
+  var fpsSel = document.getElementById('trimFpsSel');
+  var rateSel = document.getElementById('trimRateSel');
+  var loopBtn = document.getElementById('trimLoopBtn');
+  var setInBtn = document.getElementById('trimSetInBtn');
+  var setOutBtn = document.getElementById('trimSetOutBtn');
+  var waveCanvas = document.getElementById('trimWaveCanvas');
+  var waveCtx = waveCanvas.getContext('2d');
 
   var dur = 0, startT = 0, endT = 0;
   var currentCard = null;
   var blobUrl = null;
   var rafId = null;
   var THUMB_N = 12;
+  var modalFps = 30;
+  var audioBuf = null;
+  var loopMode = false;
 
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
   function fmt(s) {
@@ -3162,18 +3212,83 @@ if (!self.crossOriginIsolated) {
     var h = (s/3600)|0, m = ((s%3600)/60)|0, sec = s%60;
     return h > 0 ? h+':'+pad(m)+':'+pad(sec) : m+':'+pad(sec);
   }
+  function fmtPrecise(s) {
+    s = Math.max(0, s);
+    var m = Math.floor(s / 60), rest = s - m * 60;
+    var sec = Math.floor(rest), ms = Math.round((rest - sec) * 100);
+    return m + ':' + pad(sec) + '.' + pad(ms);
+  }
   function fmtFull(s) {
-    s = Math.max(0, s|0);
-    return pad((s/3600)|0)+':'+pad(((s%3600)/60)|0)+':'+pad(s%60);
+    // HH:MM:SS.mmm format with ms precision
+    s = Math.max(0, s);
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+    var sec = Math.floor(s % 60);
+    var ms = Math.round((s - Math.floor(s)) * 1000);
+    return pad(h) + ':' + pad(m) + ':' + pad(sec) + '.' + String(ms).padStart(3, '0');
   }
   function parseT(s) {
     s = (s||'').trim(); if (!s) return null;
-    var p = s.split(':').map(Number);
-    if (p.length===3) return p[0]*3600+p[1]*60+(p[2]||0);
-    if (p.length===2) return p[0]*60+(p[1]||0);
-    return p[0]||0;
+    // Support HH:MM:SS.mmm or MM:SS.mmm or SS.mmm
+    var msMatch = s.match(/^(.*?)(?:\.(\d{1,3}))?$/);
+    var main = msMatch[1], msStr = msMatch[2] || '0';
+    var ms = parseInt(msStr.padEnd(3, '0')) / 1000;
+    var p = main.split(':').map(Number);
+    var base = 0;
+    if (p.length===3) base = p[0]*3600+p[1]*60+(p[2]||0);
+    else if (p.length===2) base = p[0]*60+(p[1]||0);
+    else base = p[0]||0;
+    return base + ms;
   }
   function pct(t) { return dur > 0 ? (t/dur)*100 : 0; }
+
+  // Waveform decode + draw
+  async function decodeAudio(file) {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      var actx = new AC();
+      var buf = await file.arrayBuffer();
+      return await new Promise(function(res, rej) {
+        actx.decodeAudioData(buf, function(b) { actx.close(); res(b); }, function(e) { actx.close(); rej(e); });
+      });
+    } catch(e) { return null; }
+  }
+  function drawWaveform() {
+    if (!audioBuf || !dur) { waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height); return; }
+    var dpr = window.devicePixelRatio || 1;
+    var w = waveCanvas.clientWidth, h = waveCanvas.clientHeight;
+    if (!w || !h) return;
+    waveCanvas.width = w * dpr; waveCanvas.height = h * dpr;
+    waveCtx.setTransform(1, 0, 0, 1, 0, 0);
+    waveCtx.scale(dpr, dpr);
+    waveCtx.clearRect(0, 0, w, h);
+    var raw = audioBuf.getChannelData(0);
+    var step = Math.ceil(raw.length / w);
+    var amp = h / 2;
+    for (var i = 0; i < w; i++) {
+      var min = 1, max = -1;
+      for (var j = 0; j < step; j++) {
+        var idx = i * step + j;
+        if (idx < raw.length) {
+          var d = raw[idx];
+          if (d < min) min = d;
+          if (d > max) max = d;
+        }
+      }
+      var ratio = i / w;
+      var inRange = ratio >= (startT / dur) && ratio <= (endT / dur);
+      waveCtx.fillStyle = inRange ? 'rgba(125,211,252,.85)' : 'rgba(255,255,255,.3)';
+      var y1 = (1 + min) * amp;
+      var y2 = (1 + max) * amp;
+      waveCtx.fillRect(i, y1, 1, Math.max(1, y2 - y1));
+    }
+  }
+
+  function updateFrameLbl() {
+    var cf = Math.round(video.currentTime * modalFps);
+    var tf = dur ? Math.round(dur * modalFps) : 0;
+    frameLbl.textContent = 'F ' + cf + ' / ' + tf;
+  }
 
   function updateUI() {
     var sP = pct(startT), eP = pct(endT);
@@ -3184,24 +3299,31 @@ if (!self.crossOriginIsolated) {
     dimL.style.width = sP + '%';
     dimR.style.left  = eP + '%';
     dimR.style.width = (100 - eP) + '%';
-    tipS.textContent = fmt(startT);
-    tipE.textContent = fmt(endT);
+    tipS.textContent = fmtPrecise(startT);
+    tipE.textContent = fmtPrecise(endT);
     inS.value = fmtFull(startT);
     inE.value = fmtFull(endT);
     var d = endT - startT;
-    durChip.textContent = d > 0 ? '片段長度：' + fmt(d) : '片段長度：--';
+    durChip.textContent = d > 0 ? '片段長度：' + fmtPrecise(d) : '片段長度：--';
+    drawWaveform();
   }
 
   function seekTo(t) {
     video.currentTime = Math.max(0, Math.min(dur, t));
     ph.style.left = pct(video.currentTime) + '%';
-    curEl.textContent = fmt(video.currentTime);
+    curEl.textContent = fmtPrecise(video.currentTime);
+    updateFrameLbl();
   }
 
   function tickPH() {
     if (!video.paused) {
       ph.style.left = pct(video.currentTime) + '%';
-      curEl.textContent = fmt(video.currentTime);
+      curEl.textContent = fmtPrecise(video.currentTime);
+      updateFrameLbl();
+      // loop mode: jump back to startT when reaching endT
+      if (loopMode && video.currentTime >= endT) {
+        video.currentTime = startT;
+      }
       rafId = requestAnimationFrame(tickPH);
     }
   }
@@ -3223,15 +3345,25 @@ if (!self.crossOriginIsolated) {
   });
   video.addEventListener('timeupdate', function() {
     if (!video.paused && video.currentTime >= endT) {
-      video.pause(); setPaused(true); cancelAnimationFrame(rafId);
+      if (loopMode) {
+        video.currentTime = startT;
+      } else {
+        video.pause(); setPaused(true); cancelAnimationFrame(rafId);
+      }
     }
   });
 
   // Seek on timeline click
   tl.addEventListener('click', function(e) {
     if (e.target.closest('.trim-hdl')) return;
+    if (!dur) return;
     var r = tl.getBoundingClientRect();
     seekTo(((e.clientX - r.left) / r.width) * dur);
+  });
+
+  // Redraw waveform on window resize
+  window.addEventListener('resize', function() {
+    if (ov.classList.contains('open')) drawWaveform();
   });
 
   // Drag handles
@@ -3264,14 +3396,65 @@ if (!self.crossOriginIsolated) {
   makeDrag(hdlS, true);
   makeDrag(hdlE, false);
 
-  // Input sync
+  // Input sync — allow ms precision, minimum 0.04s gap (~1 frame at 24fps)
   inS.addEventListener('change', function() {
     var t = parseT(inS.value);
-    if (t !== null) { startT = Math.max(0, Math.min(t, endT - 0.5)); seekTo(startT); updateUI(); }
+    if (t !== null) { startT = Math.max(0, Math.min(t, endT - 0.04)); seekTo(startT); updateUI(); }
   });
   inE.addEventListener('change', function() {
     var t = parseT(inE.value);
-    if (t !== null) { endT = Math.min(dur, Math.max(t, startT + 0.5)); seekTo(endT); updateUI(); }
+    if (t !== null) { endT = Math.min(dur, Math.max(t, startT + 0.04)); seekTo(endT); updateUI(); }
+  });
+
+  // Frame step
+  function stepFrame(delta) {
+    if (!dur) return;
+    if (!video.paused) { video.pause(); setPaused(true); cancelAnimationFrame(rafId); }
+    var frameDur = 1 / modalFps;
+    seekTo(video.currentTime + delta * frameDur);
+  }
+  prevFrameBtn.addEventListener('click', function() { stepFrame(-1); });
+  nextFrameBtn.addEventListener('click', function() { stepFrame(1); });
+
+  // FPS change
+  fpsSel.addEventListener('change', function() {
+    modalFps = parseInt(fpsSel.value) || 30;
+    updateFrameLbl();
+  });
+
+  // Playback rate
+  rateSel.addEventListener('change', function() {
+    video.playbackRate = parseFloat(rateSel.value) || 1;
+  });
+
+  // Loop toggle
+  loopBtn.addEventListener('click', function() {
+    loopMode = !loopMode;
+    loopBtn.classList.toggle('active', loopMode);
+  });
+
+  // Set in/out at current time
+  setInBtn.addEventListener('click', function() {
+    if (!dur) return;
+    startT = Math.max(0, Math.min(video.currentTime, endT - 0.04));
+    updateUI();
+  });
+  setOutBtn.addEventListener('click', function() {
+    if (!dur) return;
+    endT = Math.min(dur, Math.max(video.currentTime, startT + 0.04));
+    updateUI();
+  });
+
+  // Keyboard shortcuts (only when modal is open and not typing in input)
+  document.addEventListener('keydown', function(e) {
+    if (!ov.classList.contains('open')) return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); stepFrame(e.shiftKey ? -10 : -1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); stepFrame(e.shiftKey ? 10 : 1); }
+    else if (e.key === ' ') { e.preventDefault(); ppBtn.click(); }
+    else if (e.key === 'i' || e.key === 'I') { e.preventDefault(); setInBtn.click(); }
+    else if (e.key === 'o' || e.key === 'O') { e.preventDefault(); setOutBtn.click(); }
+    else if (e.key === 'l' || e.key === 'L') { e.preventDefault(); loopBtn.click(); }
   });
 
   // Thumbnail generation
@@ -3330,6 +3513,12 @@ if (!self.crossOriginIsolated) {
     blobUrl = URL.createObjectURL(file);
     video.src = blobUrl;
     fname.textContent = file.name;
+    // Reset controls
+    modalFps = parseInt(fpsSel.value) || 30;
+    video.playbackRate = parseFloat(rateSel.value) || 1;
+    loopMode = false; loopBtn.classList.remove('active');
+    audioBuf = null;
+    waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
     ov.classList.add('open');
     await new Promise(function(res) {
       function h() { video.removeEventListener('loadedmetadata', h); res(); }
@@ -3339,9 +3528,14 @@ if (!self.crossOriginIsolated) {
     startT = 0; endT = dur;
     durLbl.textContent = fmt(dur) + ' 總長';
     ph.style.left = '0%';
-    setPaused(true); curEl.textContent = '0:00';
+    setPaused(true); curEl.textContent = '0:00.00';
     updateUI();
+    updateFrameLbl();
     genThumbs();
+    // Decode audio for waveform (non-blocking)
+    decodeAudio(file).then(function(buf) {
+      if (buf) { audioBuf = buf; drawWaveform(); }
+    }).catch(function(){});
   };
 })();
 </script>
