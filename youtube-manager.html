@@ -1327,12 +1327,17 @@ async function apiPost(a,p){if(!USE_API())return null;try{const r=await fetch(AP
 async function syncFromSheets(){
   const r=await apiGet('getVideos');
   if(r&&r.videos){
-    // 保留本機軟刪除標記（若 Sheets 端尚未支援 deleted_at 欄位）
-    const localTrash=new Map(DATA.filter(d=>d.deleted_at).map(d=>[d.id,{deleted_at:d.deleted_at,deleted_by:d.deleted_by}]));
+    // 保留本機軟刪除標記與 Sheets 端未支援的欄位（tags 等）
+    const localMap=new Map(DATA.map(d=>[d.id,d]));
     DATA=r.videos.map(v=>{
       const row={...v,date:fixDate(v.date)};
-      const t=localTrash.get(v.id);
-      if(t&&!row.deleted_at){row.deleted_at=t.deleted_at;row.deleted_by=t.deleted_by;}
+      const local=localMap.get(v.id);
+      if(local){
+        // 保留軟刪除標記
+        if(local.deleted_at&&!row.deleted_at){row.deleted_at=local.deleted_at;row.deleted_by=local.deleted_by;}
+        // 保留本機標籤（Sheets 端不一定存 tags）
+        if(local.tags&&(!row.tags||(Array.isArray(row.tags)&&row.tags.length===0))){row.tags=local.tags;}
+      }
       return row;
     });
     saveData();
@@ -1343,7 +1348,26 @@ async function syncFromSheets(){
 async function pushToSheets(a,p){const r=await apiPost(a,p);return r&&r.success;}
 async function syncConfigFromSheets(){const r=await apiGet('getConfig');if(r&&!r.error){CFG={...CFG,...r};localStorage.setItem('kt_yt_cfg',JSON.stringify(CFG));return true;}return false;}
 function fixDate(d){if(!d)return '';if(d.length===10)return d;try{const dt=new Date(d);const local=new Date(dt.getTime()+8*3600000);return local.toISOString().substring(0,10);}catch(e){return String(d).substring(0,10);}}
-async function syncIgFromSheets(){const r=await apiGet('getIgPosts');if(r&&r.posts){if(r.posts.length===0&&IG_DATA.length>0){return false;}const localTrash=new Map(IG_DATA.filter(d=>d.deleted_at).map(d=>[d.id,{deleted_at:d.deleted_at,deleted_by:d.deleted_by}]));IG_DATA=r.posts.map(p=>{const row={...p,date:fixDate(p.date)};const t=localTrash.get(p.id);if(t&&!row.deleted_at){row.deleted_at=t.deleted_at;row.deleted_by=t.deleted_by;}return row;});saveIgData();return true;}return false;}
+async function syncIgFromSheets(){
+  const r=await apiGet('getIgPosts');
+  if(r&&r.posts){
+    if(r.posts.length===0&&IG_DATA.length>0){return false;}
+    // 保留本機軟刪除標記與 Sheets 端未支援的欄位（tags 等）
+    const localMap=new Map(IG_DATA.map(d=>[d.id,d]));
+    IG_DATA=r.posts.map(p=>{
+      const row={...p,date:fixDate(p.date)};
+      const local=localMap.get(p.id);
+      if(local){
+        if(local.deleted_at&&!row.deleted_at){row.deleted_at=local.deleted_at;row.deleted_by=local.deleted_by;}
+        if(local.tags&&(!row.tags||(Array.isArray(row.tags)&&row.tags.length===0))){row.tags=local.tags;}
+      }
+      return row;
+    });
+    saveIgData();
+    return true;
+  }
+  return false;
+}
 
 // ============================================================
 // 資料層
