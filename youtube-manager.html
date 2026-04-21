@@ -1429,6 +1429,31 @@ function deleteSnapshot(id){
   saveSnapshots(loadSnapshots().filter(s=>s.id!==id));
   renderBackupPage();
 }
+// 只還原標籤（不影響其他欄位，避免回滾今日新增的影片/IG 資料）
+function restoreTagsOnly(id){
+  if(!canWrite()){alert('請先登入');return;}
+  const arr=loadSnapshots();
+  const snap=arr.find(s=>s.id===id);
+  if(!snap){alert('找不到快照');return;}
+  const snapVideos=snap.data||[],snapIg=snap.ig||[];
+  // 建立 id→tags 對照表（只取有標籤的）
+  const vTagMap=new Map(snapVideos.filter(v=>v.tags&&v.tags.length).map(v=>[v.id,v.tags]));
+  const iTagMap=new Map(snapIg.filter(p=>p.tags&&p.tags.length).map(p=>[p.id,p.tags]));
+  if(vTagMap.size===0&&iTagMap.size===0){alert('此快照沒有任何標籤可還原');return;}
+  if(!confirm(`即將從「${snap.reason}」（${new Date(snap.ts).toLocaleString('zh-TW')}）還原標籤：\n\n• 影片：${vTagMap.size} 筆有標籤\n• IG：${iTagMap.size} 筆有標籤\n\n只會補上目前缺少的標籤，不會覆蓋已存在的標籤。確定？`))return;
+  createSnapshot('還原標籤前（自動）',true);
+  let vAdd=0,iAdd=0;
+  DATA.forEach(d=>{
+    const t=vTagMap.get(d.id);
+    if(t&&(!d.tags||d.tags.length===0)){d.tags=JSON.parse(JSON.stringify(t));vAdd++;}
+  });
+  IG_DATA.forEach(d=>{
+    const t=iTagMap.get(d.id);
+    if(t&&(!d.tags||d.tags.length===0)){d.tags=JSON.parse(JSON.stringify(t));iAdd++;}
+  });
+  saveData();saveIgData();renderAll();renderIgAll();
+  alert(`✅ 已還原標籤：\n• 影片 ${vAdd} 筆\n• IG ${iAdd} 筆`);
+}
 
 // ============================================================
 // JSON 備份下載 / 還原
@@ -1538,7 +1563,8 @@ function renderSnapshotList(){
         <div style="font-size:11px;color:var(--txt3);margin-top:2px;">${new Date(s.ts).toLocaleString('zh-TW')} · ${(s.data||[]).length} 影片 / ${(s.ig||[]).length} IG · ${s.role||'?'}</div>
       </div>
       <div style="display:flex;gap:6px;">
-        <button class="btn btn-secondary btn-sm leader-only" onclick="restoreSnapshot('${s.id}')">還原</button>
+        <button class="btn btn-secondary btn-sm write-only" onclick="restoreTagsOnly('${s.id}')" title="僅補回標籤，不覆蓋其他資料">僅還原標籤</button>
+        <button class="btn btn-secondary btn-sm leader-only" onclick="restoreSnapshot('${s.id}')">完整還原</button>
         <button class="btn btn-danger btn-sm leader-only" onclick="deleteSnapshot('${s.id}')">刪除</button>
       </div>
     </div>`).join('')}</div>`;
