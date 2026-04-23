@@ -367,9 +367,10 @@ body{
   }
   function submit(){
     if(inp.value === ACCESS_PW){
+      var target = pending;
       sessionStorage.setItem(SK,'1');
       closeModal();
-      window.open(pending,'_blank','noopener');
+      if(target){ window.open(target,'_blank','noopener'); }
     } else {
       err.textContent = '密碼錯誤，請重新輸入';
       inp.value = '';
@@ -381,8 +382,10 @@ body{
   }
 
   document.querySelectorAll('[data-internal]').forEach(function(card){
-    card.addEventListener('click', function(){
+    card.addEventListener('click', function(e){
+      if(e.target.closest('[data-expand]')) return;
       var href = card.getAttribute('data-href');
+      if(!href) return;
       if(sessionStorage.getItem(SK) === '1'){
         window.open(href,'_blank','noopener');
       } else {
