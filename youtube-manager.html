@@ -3101,6 +3101,28 @@ tr:nth-child(even) td{background:#FAFAFA;}
     const postQuiz=igPosts.filter(d=>String(d.type)==='1'||String(d.type)==='2');
     const reels=igPosts.filter(d=>String(d.type)==='3');
     const sumOf=(arr,k)=>arr.reduce((s,d)=>s+(Number(d[k])||0),0);
+    // 粉絲數區塊：當月 vs 上月
+    const fSorted=[...IG_FOLLOWERS].sort((a,b)=>(a.ym||'').localeCompare(b.ym||''));
+    const cur=fSorted.find(r=>r.ym===ym);
+    const prevYm=(()=>{const d=new Date(parseInt(yr),parseInt(mo)-2,1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;})();
+    const prev=fSorted.find(r=>r.ym===prevYm);
+    let followerHtml='';
+    if(cur||prev){
+      const curC=cur?cur.count:null;
+      const prevC=prev?prev.count:null;
+      const diff=(curC!==null&&prevC!==null)?(curC-prevC):null;
+      const pct=(diff!==null&&prevC>0)?(diff/prevC*100):null;
+      const diffColor=diff===null?'#9D174D':(diff>=0?'#0F6E56':'#C0313D');
+      const diffStr=diff===null?'—':`${diff>=0?'+':''}${diff.toLocaleString()}`;
+      const pctStr=pct===null?'—':`${pct>=0?'+':''}${pct.toFixed(1)}%`;
+      followerHtml=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Instagram 粉絲數變化</div>
+      <div class="ig-kpi-row">
+        <div class="ig-kpi"><div class="val">${curC!==null?curC.toLocaleString():'—'}</div><div class="lbl">${moLabel}（當月）</div></div>
+        <div class="ig-kpi"><div class="val" style="color:#9D174D;">${prevC!==null?prevC.toLocaleString():'—'}</div><div class="lbl">上月</div></div>
+        <div class="ig-kpi"><div class="val" style="color:${diffColor};">${diffStr}</div><div class="lbl">月增量</div></div>
+        <div class="ig-kpi"><div class="val" style="color:${diffColor};">${pctStr}</div><div class="lbl">月成長率</div></div>
+      </div>${(!curC||!prevC)?`<p style="font-size:11px;color:#aaa;margin-top:6px;">${!curC?'※ 本月尚未記錄粉絲數，請至 IG 貼文成效頁面登錄。':!prevC?'※ 無上月紀錄，無法計算月增量。':''}</p>`:''}`;
+    }
     const renderRows=arr=>arr.length>0?arr.map(d=>`<tr>
       <td>${(d.date||'').substring(0,10)}</td>
       <td style="text-align:left;max-width:220px;">${d.title||''}</td>
@@ -3124,7 +3146,7 @@ tr:nth-child(even) td{background:#FAFAFA;}
         <td style="font-weight:900;color:#BE185D;">${(Number(d.saves)||0).toLocaleString()}</td>
       </tr>`).join('');
     };
-    let html='';
+    let html=followerHtml;
     // 貼文 + 測驗
     if(postQuiz.length>0){
       const pV=sumOf(postQuiz,'views'),pI=sumOf(postQuiz,'interactions'),pS=sumOf(postQuiz,'shares'),pSv=sumOf(postQuiz,'saves'),pL=sumOf(postQuiz,'likes'),pC=sumOf(postQuiz,'comments');
@@ -3323,7 +3345,42 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
         <td>${sumOf(qRl,'interactions').toLocaleString()}</td>
       </tr>`;
     }).join('');
-    let html=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg> Instagram 年度成效（依貼文類型）</div>
+    // 年度粉絲成長
+    let followerHtml='';
+    const yrFollowers=IG_FOLLOWERS.filter(r=>(r.ym||'').startsWith(String(yr))).sort((a,b)=>(a.ym||'').localeCompare(b.ym||''));
+    if(yrFollowers.length>0){
+      const first=yrFollowers[0],last=yrFollowers[yrFollowers.length-1];
+      const netDiff=last.count-first.count;
+      const netPct=first.count>0?(netDiff/first.count*100):0;
+      const netColor=netDiff>=0?'#0F6E56':'#C0313D';
+      const peak=yrFollowers.reduce((p,r)=>r.count>p.count?r:p,yrFollowers[0]);
+      const monthRows=[1,2,3,4,5,6,7,8,9,10,11,12].map(m=>{
+        const ymKey=`${yr}-${String(m).padStart(2,'0')}`;
+        const rec=yrFollowers.find(r=>r.ym===ymKey);
+        const idx=yrFollowers.findIndex(r=>r.ym===ymKey);
+        const prevRec=idx>0?yrFollowers[idx-1]:null;
+        const diff=(rec&&prevRec)?(rec.count-prevRec.count):null;
+        const pct=(diff!==null&&prevRec.count>0)?(diff/prevRec.count*100):null;
+        const c=diff===null?'#aaa':(diff>=0?'#0F6E56':'#C0313D');
+        return `<tr>
+          <td>${m} 月</td>
+          <td style="font-weight:${rec?'700':'400'};color:${rec?'#BE185D':'#ccc'};">${rec?rec.count.toLocaleString():'—'}</td>
+          <td style="color:${c};">${diff===null?'—':(diff>=0?'+':'')+diff.toLocaleString()}</td>
+          <td style="color:${c};">${pct===null?'—':(pct>=0?'+':'')+pct.toFixed(1)+'%'}</td>
+        </tr>`;
+      }).join('');
+      followerHtml=`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Instagram 粉絲數年度成長</div>
+      <div class="ig-kpi-row">
+        <div class="ig-kpi"><div class="val">${first.count.toLocaleString()}</div><div class="lbl">年初（${first.ym}）</div></div>
+        <div class="ig-kpi"><div class="val">${last.count.toLocaleString()}</div><div class="lbl">最新（${last.ym}）</div></div>
+        <div class="ig-kpi"><div class="val" style="color:${netColor};">${netDiff>=0?'+':''}${netDiff.toLocaleString()}</div><div class="lbl">年度淨增</div></div>
+        <div class="ig-kpi"><div class="val" style="color:${netColor};">${netPct>=0?'+':''}${netPct.toFixed(1)}%</div><div class="lbl">年度成長率</div></div>
+      </div>
+      <p style="font-size:11px;color:#888;margin:6px 0 12px;">本年度高峰：${peak.ym}（${peak.count.toLocaleString()} 位粉絲）｜共記錄 ${yrFollowers.length} / 12 個月</p>
+      <table><thead><tr><th>月份</th><th>月底粉絲數</th><th>月增量</th><th>月成長率</th></tr></thead>
+      <tbody>${monthRows}</tbody></table>`;
+    }
+    let html=followerHtml+`<div class="sec-title" style="border-color:#F472B6;color:#BE185D;margin-top:28px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg> Instagram 年度成效（依貼文類型）</div>
     <table><thead><tr><th>季度</th><th>貼文+測驗 數</th><th>觀看</th><th>互動</th><th>Reels 數</th><th>觀看</th><th>互動</th></tr></thead>
     <tbody>${igQRows}</tbody></table>`;
     // 貼文+測驗
