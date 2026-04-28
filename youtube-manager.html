@@ -735,6 +735,37 @@ tr:hover td{background:rgba(52,211,153,.03);}
             <canvas id="ig-chart-cat"></canvas>
           </div>
         </div>
+        <!-- IG 粉絲數追蹤 -->
+        <div style="margin-top:24px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <span class="icon" style="color:var(--ig);"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+            <h3 style="margin:0;font-size:15px;font-weight:600;color:var(--txt);">IG 粉絲數成長趨勢</h3>
+            <span style="font-size:11px;color:var(--txt3);margin-left:auto;">每月手動記錄一次，用來觀察粉絲成長</span>
+          </div>
+          <!-- 輸入區 -->
+          <div class="write-only" style="display:flex;flex-wrap:wrap;align-items:end;gap:10px;padding:12px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;">
+            <div>
+              <label style="font-size:11px;color:var(--txt3);display:block;margin-bottom:4px;">年月</label>
+              <input type="month" id="igf-ym" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-1);color:var(--txt);outline:none;">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--txt3);display:block;margin-bottom:4px;">當月粉絲數</label>
+              <input type="number" id="igf-count" min="0" placeholder="例：12500" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-1);color:var(--txt);outline:none;width:140px;">
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="saveIgFollower()" style="height:30px;">記錄／更新</button>
+            <span style="font-size:11px;color:var(--txt3);margin-left:auto;">同月再次儲存會覆蓋舊值</span>
+          </div>
+          <!-- 圖表 + 列表 -->
+          <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;">
+            <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+              <canvas id="ig-chart-followers" style="max-height:260px;"></canvas>
+            </div>
+            <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:14px;max-height:300px;overflow-y:auto;">
+              <div style="font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:10px;">月度紀錄</div>
+              <div id="igf-list"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2629,9 +2660,14 @@ function matchKind(d){
   if(igsKind==='reel')return t==='3';
   return t==='1'||t==='2';
 }
+function syncIgsFiltersFromDom(){
+  // 在 buildIgsFilters 重建 DOM 之前，先抓使用者當前選的值更新狀態
+  const yEl=document.getElementById('igs-year');
+  const mEl=document.getElementById('igs-month');
+  if(yEl&&yEl.value)igsYear=parseInt(yEl.value);
+  if(igsMode==='month'&&mEl&&mEl.value)igsMonth=parseInt(mEl.value);
+}
 function getIgFilteredData(){
-  igsYear=parseInt(document.getElementById('igs-year')?.value||igsYear);
-  if(igsMode==='month')igsMonth=parseInt(document.getElementById('igs-month')?.value||igsMonth);
   const kindLabel=igsKind==='reel'?'影片 Reels':'貼文+測驗';
   const _AIG=activeIgPosts();
   let base,rangeLabel;
@@ -2650,8 +2686,108 @@ function getIgFilteredData(){
   return{data:base.filter(matchKind),label:`${rangeLabel} · ${kindLabel}`};
 }
 
+// ============================================================
+// IG 粉絲數追蹤
+// ============================================================
+const IG_FOLLOWERS_KEY='kt_ig_followers';
+let IG_FOLLOWERS=[]; // [{ym:'2026-04', count:12500, updatedAt:'...'}]
+let igFollowersChart=null;
+function loadIgFollowers(){try{IG_FOLLOWERS=JSON.parse(localStorage.getItem(IG_FOLLOWERS_KEY)||'[]');}catch(e){IG_FOLLOWERS=[];}if(!Array.isArray(IG_FOLLOWERS))IG_FOLLOWERS=[];}
+function saveIgFollowersData(){IG_FOLLOWERS.sort((a,b)=>(a.ym||'').localeCompare(b.ym||''));localStorage.setItem(IG_FOLLOWERS_KEY,JSON.stringify(IG_FOLLOWERS));}
+function saveIgFollower(){
+  if(!canWrite()){alert('請先以組員或組長身份登入');return;}
+  const ym=document.getElementById('igf-ym').value;
+  const cnt=parseInt(document.getElementById('igf-count').value);
+  if(!ym||!/^\d{4}-\d{2}$/.test(ym)){alert('請選擇年月');return;}
+  if(!cnt||cnt<0){alert('請輸入有效的粉絲數');return;}
+  const idx=IG_FOLLOWERS.findIndex(r=>r.ym===ym);
+  if(idx>=0){IG_FOLLOWERS[idx].count=cnt;IG_FOLLOWERS[idx].updatedAt=new Date().toISOString();}
+  else{IG_FOLLOWERS.push({ym,count:cnt,updatedAt:new Date().toISOString()});}
+  saveIgFollowersData();renderIgFollowers();
+  document.getElementById('igf-count').value='';
+  showSyncBadge(`已記錄 ${ym}：${cnt.toLocaleString()} 位粉絲`);
+}
+function deleteIgFollower(ym){
+  if(!canDelete()){alert('僅組長可刪除');return;}
+  if(!confirm(`刪除 ${ym} 的紀錄？`))return;
+  IG_FOLLOWERS=IG_FOLLOWERS.filter(r=>r.ym!==ym);
+  saveIgFollowersData();renderIgFollowers();
+}
+function renderIgFollowers(){
+  // 列表
+  const list=document.getElementById('igf-list');
+  if(list){
+    if(IG_FOLLOWERS.length===0){
+      list.innerHTML='<p style="font-size:11px;color:var(--txt3);padding:14px 0;text-align:center;">尚無紀錄。請於上方輸入第一筆。</p>';
+    }else{
+      const sorted=[...IG_FOLLOWERS].sort((a,b)=>(b.ym||'').localeCompare(a.ym||''));
+      list.innerHTML=sorted.map((r,i)=>{
+        const prev=sorted[i+1];
+        const diff=prev?r.count-prev.count:0;
+        const pct=prev&&prev.count>0?(diff/prev.count*100):0;
+        const diffStr=prev?(diff>=0?`+${diff.toLocaleString()}`:diff.toLocaleString()):'—';
+        const pctStr=prev?(pct>=0?`+${pct.toFixed(1)}%`:`${pct.toFixed(1)}%`):'—';
+        const color=diff>=0?'#34D399':'#F87171';
+        return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;color:var(--txt);">${r.ym}</div>
+            <div style="color:${color};font-size:11px;margin-top:2px;">${diffStr} (${pctStr})</div>
+          </div>
+          <div style="font-weight:600;color:var(--txt);font-family:'Inter',sans-serif;">${(r.count||0).toLocaleString()}</div>
+          <button class="btn btn-danger btn-sm leader-only" onclick="deleteIgFollower('${r.ym}')" style="padding:3px 8px;font-size:10px;">刪</button>
+        </div>`;
+      }).join('');
+    }
+  }
+  // 圖表
+  const cv=document.getElementById('ig-chart-followers');if(!cv)return;
+  if(igFollowersChart){igFollowersChart.destroy();igFollowersChart=null;}
+  if(IG_FOLLOWERS.length===0){
+    const ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.fillStyle='#5A6B80';ctx.font='13px Noto Sans TC';ctx.textAlign='center';
+    ctx.fillText('尚無粉絲數紀錄', cv.width/2, cv.height/2);
+    return;
+  }
+  const sorted=[...IG_FOLLOWERS].sort((a,b)=>(a.ym||'').localeCompare(b.ym||''));
+  const labels=sorted.map(r=>r.ym);
+  const data=sorted.map(r=>r.count||0);
+  igFollowersChart=new Chart(cv,{
+    type:'line',
+    data:{labels,datasets:[{
+      label:'IG 粉絲數',data,
+      borderColor:'#F472B6',backgroundColor:'rgba(244,114,182,.15)',
+      pointBackgroundColor:'#F472B6',pointBorderColor:'#fff',pointRadius:5,pointHoverRadius:7,
+      tension:.3,fill:true,borderWidth:2.5
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label:ctx=>{
+              const v=ctx.parsed.y;const i=ctx.dataIndex;
+              const prev=i>0?data[i-1]:null;
+              const diff=prev!==null?v-prev:0;
+              const pct=prev>0?(diff/prev*100):0;
+              const tail=prev!==null?` (${diff>=0?'+':''}${diff.toLocaleString()}, ${pct>=0?'+':''}${pct.toFixed(1)}%)`:'';
+              return `粉絲數 ${v.toLocaleString()}${tail}`;
+            }
+          }
+        }
+      },
+      scales:{
+        x:{ticks:{color:'#94A3B8',font:{size:11}},grid:{color:'rgba(148,163,184,.08)'}},
+        y:{ticks:{color:'#94A3B8',font:{size:11},callback:v=>v.toLocaleString()},grid:{color:'rgba(148,163,184,.08)'},beginAtZero:false}
+      }
+    }
+  });
+}
+
 function renderIgCharts(){
+  syncIgsFiltersFromDom();
   buildIgsFilters();
+  renderIgFollowers();
   const{data:filtered,label}=getIgFilteredData();
   const labelEl=document.getElementById('igs-label');if(labelEl)labelEl.textContent=`${label} · 共 ${filtered.length} 則`;
   const kpiTitle=document.getElementById('igs-kpi-title');
@@ -3232,8 +3368,11 @@ tr:last-child td{border-bottom:none;}tr:nth-child(even) td{background:#FAFAFA;}
 // ============================================================
 document.addEventListener('DOMContentLoaded',()=>{
   checkAuth();
-  checkSetup();loadTags();loadData();loadIgData();renderIgAll();
+  checkSetup();loadTags();loadData();loadIgData();loadIgFollowers();renderIgAll();
   initTagInput('f-tags',[]);initTagInput('ig-tags',[]);
+  // 預設粉絲數輸入年月為當月
+  const _ymEl=document.getElementById('igf-ym');
+  if(_ymEl){const _now=new Date();_ymEl.value=`${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}`;}
   if(USE_API()){syncIgFromSheets().then(ok=>{if(ok){renderIgAll();showSyncBadge('IG 已同步 Sheets');}});}
   document.getElementById('f-date').value=new Date().toISOString().slice(0,10);
   document.getElementById('ig-date').value=new Date().toISOString().slice(0,10);
