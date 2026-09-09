@@ -5719,7 +5719,7 @@ window.dispatchEvent(new Event('transcription-ready'));
     screenRecord: ['transcribe', 'trim', 'compress', 'faceBlur'],
     audioRecord:  ['transcribe', 'audioTrim', 'audioConvert'],
     transcribe:   ['subtitle'],
-    trim:         ['faceBlur', 'compress', 'subtitle', 'transcribe', 'blurPad'],
+    trim:         ['faceBlur', 'watermark', 'compress', 'subtitle', 'transcribe', 'blurPad'],
     toAudio:      ['transcribe', 'audioTrim', 'audioConvert'],
     compress:     ['trim', 'faceBlur', 'watermark'],
     faceBlur:     ['watermark', 'compress', 'trim', 'subtitle'],
@@ -7533,7 +7533,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-09-09 15:19</span>
+  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-09-09 17:22</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 
