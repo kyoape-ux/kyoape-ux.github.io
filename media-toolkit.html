@@ -745,6 +745,15 @@ footer a{color:var(--indigo2);text-decoration:none}
 .tool-card[data-tool="bgm"] .start-btn{display:none}
 .tool-card[data-tool="bgm"].bgm-ready .start-btn{display:flex}
 
+.bgm-mode{display:none;gap:7px;margin-bottom:10px}
+.tool-card.has-file .bgm-mode{display:flex}
+.tool-card.processing .bgm-mode,.tool-card.done .bgm-mode{display:none}
+.bgm-mode-btn{flex:1;padding:8px 6px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);
+  color:var(--text2);font-size:12px;font-family:inherit;cursor:pointer;transition:.15s}
+.bgm-mode-btn:hover{color:var(--text);border-color:var(--border2)}
+.bgm-mode-btn.active{border-color:#ec4899;background:rgba(236,72,153,.14);color:#f9a8d4}
+.tool-card.bgm-mute .bgm-pick,.tool-card.bgm-mute .bgm-opts{display:none!important}
+
 /* snapshot card */
 .snap-preview{display:none;margin-bottom:10px}
 .tool-card.has-file .snap-preview{display:block}
@@ -979,7 +988,7 @@ if (!self.crossOriginIsolated) {
         <div class="hm-chain">
         <span class="hm-step"><i>1</i><span class="hm-dot" style="background:#10b981"></span>影片壓縮</span>
         <span class="hm-arw">&rarr;</span>
-        <span class="hm-step"><i>2</i><span class="hm-dot" style="background:#f59e0b"></span>格式轉換</span>
+        <span class="hm-step"><i>2</i><span class="hm-dot" style="background:#f97316"></span>壓製浮水印</span>
         </div>
       </button>
       <button class="hm-task" style="--tc:#3b82f6" data-hm-tool="blurPad" type="button">
@@ -1025,14 +1034,12 @@ if (!self.crossOriginIsolated) {
     <div class="guide-scroll">
       <a class="guide-pill" data-guide="screenRecord"><span class="gp-dot" style="background:#ef4444"></span>螢幕錄影</a>
       <a class="guide-pill" data-guide="audioRecord"><span class="gp-dot" style="background:#3b82f6"></span>電腦音訊錄製</a>
-      <a class="guide-pill" data-guide="compress"><span class="gp-dot gp-emerald"></span>影片壓縮</a>
-      <a class="guide-pill" data-guide="convert"><span class="gp-dot gp-amber"></span>格式轉換</a>
+      <a class="guide-pill" data-guide="compress"><span class="gp-dot gp-emerald"></span>壓縮與轉檔</a>
       <a class="guide-pill" data-guide="trim"><span class="gp-dot gp-sky"></span>影片裁剪</a>
       <a class="guide-pill" data-guide="merge"><span class="gp-dot gp-teal"></span>影片合併</a>
       <a class="guide-pill" data-guide="faceBlur"><span class="gp-dot gp-rose"></span>區域模糊</a>
       <a class="guide-pill" data-guide="watermark"><span class="gp-dot gp-orange"></span>壓製浮水印</a>
-      <a class="guide-pill" data-guide="mute"><span class="gp-dot gp-rose"></span>移除聲音</a>
-      <a class="guide-pill" data-guide="bgm"><span class="gp-dot gp-pink"></span>背景音樂</a>
+      <a class="guide-pill" data-guide="bgm"><span class="gp-dot gp-pink"></span>背景音樂／靜音</a>
       <a class="guide-pill" data-guide="speed"><span class="gp-dot gp-lime"></span>調整速度</a>
       <a class="guide-pill" data-guide="subtitle"><span class="gp-dot gp-cyan"></span>加入字幕</a>
       <a class="guide-pill" data-guide="snapshot"><span class="gp-dot gp-fuchsia"></span>截取影格</a>
@@ -1194,15 +1201,22 @@ if (!self.crossOriginIsolated) {
     </div>
 
     <div class="tool-card c-emerald" data-tool="compress">
-      <input type="file" hidden accept="video/*,.mkv,.avi">
+      <input type="file" hidden accept="video/*,.mkv,.avi,.webm,.flv,.ts">
       <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-compress"/></svg></div>
-      <div class="tool-name">影片壓縮</div>
-      <div class="tool-desc">縮小影片檔案大小，方便上傳或分享。</div>
+      <div class="tool-name">影片壓縮與轉檔</div>
+      <div class="tool-desc">縮小檔案大小或轉換格式。選「不重新編碼」時只換容器，畫質零損失、速度最快。</div>
       <select class="fmt-select" name="quality">
         <option value="high">高畫質（輕度壓縮）</option>
         <option value="standard" selected>標準（均衡推薦）</option>
         <option value="small">小檔案（大幅縮小）</option>
         <option value="line">LINE 傳送（200MB / 5 分鐘以內）</option>
+        <option value="copy">不重新編碼（只換容器，零損失）</option>
+      </select>
+      <select class="fmt-select" name="outfmt" style="margin-top:8px">
+        <option value="mp4" selected>輸出 MP4（最相容）</option>
+        <option value="mov">輸出 MOV（Apple 用）</option>
+        <option value="avi">輸出 AVI</option>
+        <option value="webm">輸出 WebM（網頁用）</option>
       </select>
       <div class="line-hint" style="display:none">📱 LINE 上限 200MB · 5 分鐘以內。超過 5 分鐘將自動裁切為前 5 分鐘。</div>
       <div class="drop-area">
@@ -1323,36 +1337,6 @@ if (!self.crossOriginIsolated) {
     </div>
 
     <!-- 格式轉換 -->
-    <div class="tool-card c-amber" data-tool="convert">
-      <input type="file" hidden accept="video/*,.mkv,.avi,.webm,.flv,.ts">
-      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-convert"/></svg></div>
-      <div class="tool-name">格式轉換</div>
-      <div class="tool-desc">影片格式互轉，解決播放器相容性問題。</div>
-      <select class="fmt-select" name="outfmt">
-        <option value="mp4">轉成 MP4（最相容）</option>
-        <option value="webm">轉成 WebM（網頁用）</option>
-        <option value="mov">轉成 MOV（Apple 用）</option>
-        <option value="avi">轉成 AVI</option>
-      </select>
-      <div class="drop-area">
-        <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
-        <div class="drop-area-text">拖曳影片到這裡，或點擊選取</div>
-        <div class="drop-area-sub">支援所有主流影片格式</div>
-      </div>
-      <div class="file-info">
-        <span class="file-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg></span>
-        <span class="file-info-name"></span><span class="file-info-size"></span>
-        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
-      </div>
-      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">轉換中...</div></div>
-      <div class="error-msg"></div>
-      <button class="tool-btn start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始轉換</button>
-      <div class="download-wrap">
-        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載轉換後影片</button>
-        <button class="reset-btn">再次轉換</button>
-      </div>
-    </div>
-
     <!-- 區域模糊（人臉／病歷號／姓名／文字皆可） -->
     <div class="tool-card c-rose" data-tool="faceBlur">
       <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
@@ -1461,39 +1445,14 @@ if (!self.crossOriginIsolated) {
     </div>
 
     <!-- 移除聲音 -->
-    <div class="tool-card c-rose" data-tool="mute">
-      <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
-      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-mute"/></svg></div>
-      <div class="tool-name">移除影片聲音</div>
-      <div class="tool-desc">將影片音軌完全移除，輸出無聲影片，適合重新配音或配樂。</div>
-      <div class="tool-formats"><span class="fmt">去除音軌</span><span class="fmt">保留畫面</span><span class="fmt">快速處理</span></div>
-      <div class="drop-area">
-        <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
-        <div class="drop-area-text">拖曳影片到這裡，或點擊選取</div>
-        <div class="drop-area-sub">支援 MP4、MOV、AVI、MKV</div>
-      </div>
-      <div class="file-info">
-        <span class="file-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg></span>
-        <span class="file-info-name"></span><span class="file-info-size"></span>
-        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
-      </div>
-      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">移除音軌中...</div></div>
-      <div class="error-msg"></div>
-      <button class="tool-btn start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>移除聲音</button>
-      <div class="download-wrap">
-        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載無聲影片</button>
-        <button class="reset-btn">再次處理</button>
-      </div>
-    </div>
-
     <!-- 背景音樂 -->
     <div class="tool-card c-pink" data-tool="bgm">
       <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
       <input type="file" hidden accept="audio/*,.mp3,.wav,.aac,.flac,.ogg,.m4a" class="bgm-audio-input">
       <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bgm"/></svg></div>
-      <div class="tool-name">加入背景音樂</div>
-      <div class="tool-desc">將音樂混入影片音軌，支援調整原聲與音樂音量比例，自動淡入淡出。</div>
-      <div class="tool-formats"><span class="fmt">混音處理</span><span class="fmt">音量控制</span><span class="fmt">淡入淡出</span></div>
+      <div class="tool-name">背景音樂與靜音</div>
+      <div class="tool-desc">換上背景音樂並調整原聲與音樂的比例，或直接把原聲整軌移除，輸出無聲影片。</div>
+      <div class="tool-formats"><span class="fmt">混音處理</span><span class="fmt">音量控制</span><span class="fmt">整軌移除</span></div>
       <div class="drop-area">
         <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
         <div class="drop-area-text">拖曳影片到這裡，或點擊選取</div>
@@ -1503,6 +1462,10 @@ if (!self.crossOriginIsolated) {
         <span class="file-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg></span>
         <span class="file-info-name"></span><span class="file-info-size"></span>
         <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
+      </div>
+      <div class="bgm-mode">
+        <button type="button" class="bgm-mode-btn active" data-mode="music">換上背景音樂</button>
+        <button type="button" class="bgm-mode-btn" data-mode="mute">只移除原聲</button>
       </div>
       <div class="bgm-pick">
         <button class="bgm-pick-btn">
@@ -2603,25 +2566,29 @@ window.dispatchEvent(new Event('transcription-ready'));
         return { data: data, ext: 'mp4', filename: basename(file.name) + suffix + '.mp4' };
       }
 
-      var crf = q === 'high' ? '20' : q === 'standard' ? '28' : '36';
-      await ff.run('-i', inN, '-vcodec', 'libx264', '-crf', crf, '-preset', 'ultrafast', '-pix_fmt', 'yuv420p', '-acodec', 'aac', '-b:a', '128k', '-max_muxing_queue_size', '1024', outN);
-      var data = ff.FS('readFile', outN);
-      fsClean(inN, outN);
-      return { data: data, ext: 'mp4', filename: basename(file.name) + '_compressed.mp4' };
-    },
-    convert: async function(file, card) {
-      var ofmt = card.querySelector('select[name=outfmt]').value;
-      var inN = 'in.' + getExt(file.name), outN = 'out.' + ofmt;
-      ff.FS('writeFile', inN, await fetchFile(file));
-      var args = ['-i', inN];
-      if (ofmt === 'mp4') args.push('-vcodec', 'libx264', '-preset', 'ultrafast', '-crf', '23', '-pix_fmt', 'yuv420p', '-acodec', 'aac', '-max_muxing_queue_size', '1024');
-      else if (ofmt === 'webm') args.push('-vcodec', 'libvpx', '-crf', '10', '-b:v', '1M', '-acodec', 'libvorbis');
-      else args.push('-vcodec', 'copy', '-acodec', 'copy');
-      args.push(outN);
-      await ff.run.apply(ff, args);
-      var data = ff.FS('readFile', outN);
-      fsClean(inN, outN);
-      return { data: data, ext: ofmt, filename: basename(file.name) + '.' + ofmt };
+      var fmtSel = card.querySelector('select[name=outfmt]');
+      var fmt = fmtSel ? fmtSel.value : 'mp4';
+      var outF = 'out.' + fmt;
+      try { ff.FS('unlink', outF); } catch(e) {}
+      var cArgs = ['-i', inN];
+      if (q === 'copy') {
+        // 只換容器、不重新編碼：WebM 裝不下 H.264，得擋下來
+        if (fmt === 'webm') throw new Error('WebM 一定要重新編碼，請改選其他畫質選項');
+        cArgs.push('-c', 'copy');
+      } else if (fmt === 'webm') {
+        var vq = q === 'high' ? '8' : q === 'standard' ? '10' : '14';
+        cArgs.push('-vcodec', 'libvpx', '-crf', vq, '-b:v', '1M', '-acodec', 'libvorbis');
+      } else {
+        var crf = q === 'high' ? '20' : q === 'standard' ? '28' : '36';
+        cArgs.push('-vcodec', 'libx264', '-crf', crf, '-preset', 'ultrafast', '-pix_fmt', 'yuv420p',
+                   '-acodec', 'aac', '-b:a', '128k', '-max_muxing_queue_size', '1024');
+      }
+      cArgs.push(outF);
+      await ff.run.apply(ff, cArgs);
+      var data = ff.FS('readFile', outF);
+      fsClean(inN, outF);
+      var sfx = q === 'copy' ? '' : '_compressed';
+      return { data: data, ext: fmt, filename: basename(file.name) + sfx + '.' + fmt };
     },
     trim: async function(file, card) {
       var start = parseTime(card.querySelector('.time-start').value) || 0;
@@ -2677,14 +2644,6 @@ window.dispatchEvent(new Event('transcription-ready'));
           return { data: data, ext: 'mp4', filename: basename(file.name) + '_trim.mp4' };
         }
       }
-    },
-    mute: async function(file, card) {
-      var inN = 'in.' + getExt(file.name), outN = 'out.mp4';
-      ff.FS('writeFile', inN, await fetchFile(file));
-      await ff.run('-i', inN, '-vcodec', 'copy', '-an', outN);
-      var data = ff.FS('readFile', outN);
-      fsClean(inN, outN);
-      return { data: data, ext: 'mp4', filename: basename(file.name) + '_muted.mp4' };
     },
     audioConvert: async function(file, card) {
       var ofmt = card.querySelector('select[name=audiofmt]').value;
@@ -3987,6 +3946,17 @@ window.dispatchEvent(new Event('transcription-ready'));
     var volOrigVal = volOrigSlider.nextElementSibling;
     var volMusicVal = volMusicSlider.nextElementSibling;
     var bgmFile = null;
+    var mode = 'music';
+
+    // 換檔或重設時要退回「換上背景音樂」：否則上次選過靜音會被沿用，
+    // 使用者接著挑了音樂檔卻被靜音掉
+    function resetMode() {
+      mode = 'music';
+      card.classList.remove('bgm-mute');
+      card.querySelectorAll('.bgm-mode-btn').forEach(function(x) {
+        x.classList.toggle('active', x.dataset.mode === 'music');
+      });
+    }
 
     volOrigSlider.addEventListener('input', function() { volOrigVal.textContent = volOrigSlider.value + '%'; });
     volMusicSlider.addEventListener('input', function() { volMusicVal.textContent = volMusicSlider.value + '%'; });
@@ -3998,6 +3968,7 @@ window.dispatchEvent(new Event('transcription-ready'));
     }
 
     function setFile(f) {
+      resetMode();
       fileMap.set(card, f);
       card.classList.remove('done', 'has-error', 'processing');
       card.classList.add('has-file');
@@ -4009,6 +3980,7 @@ window.dispatchEvent(new Event('transcription-ready'));
 
     function reset() {
       fileMap.delete(card); bgmFile = null;
+      resetMode();
       pickName.textContent = '尚未選擇（支援 MP3、WAV、AAC、FLAC）';
       var prevUrl = blobMap.get(card);
       if (prevUrl) URL.revokeObjectURL(prevUrl);
@@ -4038,9 +4010,21 @@ window.dispatchEvent(new Event('transcription-ready'));
     if (clearBtn) clearBtn.addEventListener('click', reset);
     if (resetBtn) resetBtn.addEventListener('click', reset);
 
+    card.querySelectorAll('.bgm-mode-btn').forEach(function(b) {
+      b.addEventListener('click', function() {
+        mode = b.dataset.mode;
+        card.querySelectorAll('.bgm-mode-btn').forEach(function(x) { x.classList.toggle('active', x === b); });
+        card.classList.toggle('bgm-mute', mode === 'mute');
+        // 靜音模式不需要音樂檔，直接可以開始
+        if (mode === 'mute') card.classList.add('bgm-ready');
+        else card.classList.toggle('bgm-ready', !!bgmFile);
+      });
+    });
+
     startBtn.addEventListener('click', async function() {
       var file = fileMap.get(card);
-      if (!file || !bgmFile) return;
+      if (!file) return;
+      if (mode === 'music' && !bgmFile) return;
       if (card.classList.contains('processing')) return;
       if (ffRunning) { errEl.textContent = '另一個工具正在處理中，請稍候再試'; return; }
       card.classList.remove('has-error', 'done'); card.classList.add('processing');
@@ -4049,10 +4033,26 @@ window.dispatchEvent(new Event('transcription-ready'));
       try {
         await ensureFF(); bar.style.width = '10%';
         var inN = 'in.' + getExt(file.name);
-        var bgmN = 'bgm.' + getExt(bgmFile.name);
+        var bgmN = bgmFile ? ('bgm.' + getExt(bgmFile.name)) : null;
         var outN = 'out.mp4';
         ff.FS('writeFile', inN, await fetchFile(file)); bar.style.width = '30%';
-        ff.FS('writeFile', bgmN, await fetchFile(bgmFile)); bar.style.width = '45%';
+        if (mode === 'music') { ff.FS('writeFile', bgmN, await fetchFile(bgmFile)); bar.style.width = '45%'; }
+        if (mode === 'mute') {
+          await ff.run('-i', inN, '-vcodec', 'copy', '-an', outN);
+          bar.style.width = '95%';
+          var mData = ff.FS('readFile', outN);
+          fsClean(inN, outN);
+          bar.style.width = '100%'; await sleep(350);
+          card.classList.remove('processing'); card.classList.add('done');
+          var mBlob = new Blob([mData.buffer], { type: 'video/mp4' });
+          var mUrl = URL.createObjectURL(mBlob);
+          var mName = basename(file.name) + '_muted.mp4';
+          blobMap.set(card, mUrl);
+          dlBtn.onclick = function() { var a = document.createElement('a'); a.href = mUrl; a.download = mName; a.click(); };
+          card._chainOutput = { blob: mBlob, filename: mName };
+          if (window.__addChainBar) window.__addChainBar(card, 'bgm', function(){ return card._chainOutput; });
+          return;
+        }
         var origVol = (parseInt(volOrigSlider.value) / 100).toFixed(2);
         var musicVol = (parseInt(volMusicSlider.value) / 100).toFixed(2);
         // amix with volume control + fade out on shorter stream
@@ -5627,12 +5627,10 @@ window.dispatchEvent(new Event('transcription-ready'));
     transcribe:   ['subtitle'],
     trim:         ['faceBlur', 'compress', 'subtitle', 'transcribe', 'blurPad'],
     toAudio:      ['transcribe', 'audioTrim', 'audioConvert'],
-    compress:     ['trim', 'faceBlur'],
-    convert:      ['trim', 'compress', 'faceBlur'],
+    compress:     ['trim', 'faceBlur', 'watermark'],
     faceBlur:     ['watermark', 'compress', 'trim', 'subtitle'],
     watermark:    ['compress', 'trim'],
-    mute:         ['bgm', 'subtitle'],
-    bgm:          ['compress', 'subtitle'],
+    bgm:          ['compress', 'subtitle', 'watermark'],
     speed:        ['compress', 'trim'],
     subtitle:     ['compress'],
     audioConvert: ['transcribe', 'audioTrim', 'audioDenoise'],
@@ -7428,7 +7426,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.12.1</span><span class="ver-date">更新於 2026-09-09 14:32</span>
+  <span class="ver">v1.12.1</span><span class="ver-date">更新於 2026-09-09 14:41</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 
