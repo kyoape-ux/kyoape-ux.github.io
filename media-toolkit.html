@@ -310,6 +310,73 @@ footer a{color:var(--indigo2);text-decoration:none}
 /* ── c-aqua （音訊降噪）── */
 .c-aqua::before{background:linear-gradient(90deg,#0e7490,#0891b2)}.c-aqua:hover{box-shadow:0 0 24px rgba(8,145,178,.18)}.c-aqua .tool-icon{background:rgba(8,145,178,.15)}.c-aqua .tool-btn{background:rgba(8,145,178,.12);color:#22d3ee}.c-aqua .progress-bar{background:linear-gradient(90deg,#0e7490,#0891b2)}.c-aqua .dl-btn{background:linear-gradient(135deg,#0e7490,#0891b2)}.c-aqua .fmt{background:rgba(8,145,178,.1);color:#22d3ee;border-color:rgba(8,145,178,.2)}.c-aqua .drop-area{border-color:rgba(8,145,178,.35)}.c-aqua .drop-area:hover,.c-aqua .drop-area.drag-over{border-color:#0891b2;background:rgba(8,145,178,.07)}
 
+/* ══════════ 任務導向首頁（hm- = home）══════════ */
+.hm-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:34px;padding:30px 0 22px}
+.hm-hero h2{margin:0 0 12px;font-size:clamp(26px,3.4vw,36px);font-weight:800;line-height:1.24;letter-spacing:-.02em;color:#fff}
+.hm-hero h2 em{font-style:normal;background:linear-gradient(96deg,#a5b4fc,#7dd3fc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hm-hero p{margin:0;color:var(--text2);font-size:14px;max-width:52ch;line-height:1.7}
+.hm-privacy{flex:none;width:268px;border:1px solid rgba(52,211,153,.26);background:rgba(52,211,153,.055);border-radius:13px;padding:14px 16px}
+.hm-privacy b{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:#a7f3d0}
+.hm-privacy b svg{width:14px;height:14px;flex:none}
+.hm-privacy span{display:block;margin-top:6px;font-size:11.5px;line-height:1.65;color:#6ee7b7;opacity:.85}
+
+.hm-slab{display:flex;align-items:center;gap:13px;margin:26px 0 14px}
+.hm-slab h3{margin:0;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap}
+.hm-slab .hm-hint{font-size:11.5px;color:var(--text3);white-space:nowrap}
+.hm-slab .hm-rule{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+
+.hm-tasks{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.hm-task{--tc:#818cf8;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--radius);
+  background:linear-gradient(168deg,var(--surface2),var(--surface));padding:18px 18px 15px;text-align:left;
+  font-family:inherit;color:inherit;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s}
+.hm-task:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--tc) 46%,var(--border));box-shadow:0 16px 38px rgba(0,0,0,.42)}
+.hm-task:focus-visible{outline:2px solid var(--tc);outline-offset:2px}
+.hm-task--lead{grid-column:span 3}
+.hm-task--lead h4{font-size:19px}
+.hm-task--lead > p{font-size:13px;max-width:56ch}
+.hm-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}
+.hm-tile{width:38px;height:38px;flex:none;border-radius:11px;display:grid;place-items:center;background:color-mix(in srgb,var(--tc) 17%,transparent);color:var(--tc)}
+.hm-tile svg{width:19px;height:19px}
+.hm-go{color:var(--text3);transition:.18s}
+.hm-go svg{width:17px;height:17px;display:block}
+.hm-task:hover .hm-go{color:var(--tc);transform:translateX(2px)}
+.hm-task h4{margin:0 0 6px;font-size:16px;font-weight:700;letter-spacing:-.01em;line-height:1.4;color:#fff}
+.hm-task > p{margin:0 0 14px;font-size:12.5px;line-height:1.72;color:var(--text2)}
+.hm-flag{display:inline-flex;align-self:flex-start;align-items:center;margin-bottom:9px;font-size:10.5px;
+  letter-spacing:.06em;color:#93c5fd;background:rgba(96,165,250,.14);border:1px solid rgba(96,165,250,.3);border-radius:6px;padding:3px 8px}
+.hm-flag--use{color:var(--text2);background:rgba(255,255,255,.05);border-color:var(--border2)}
+.hm-chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:auto;padding-top:13px;border-top:1px dashed var(--border)}
+.hm-step{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border2);background:rgba(255,255,255,.035);
+  border-radius:7px;padding:4px 9px 4px 7px;font-size:11.5px;color:#cbd2e6;white-space:nowrap}
+.hm-step i{font-style:normal;font-size:10px;color:var(--text3)}
+.hm-step .hm-dot{width:6px;height:6px;border-radius:50%;flex:none}
+.hm-arw{color:var(--text3);font-size:11px;line-height:1}
+
+.hm-more{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:14px}
+.hm-more-lab{font-size:11.5px;color:var(--text3);margin-right:3px}
+.hm-pill{border:1px solid var(--border);background:rgba(255,255,255,.02);color:var(--text2);border-radius:8px;
+  padding:6px 11px;font-size:12px;font-family:inherit;cursor:pointer;transition:.16s}
+.hm-pill:hover{color:var(--text);border-color:var(--border2);background:rgba(255,255,255,.05)}
+.hm-pill--all{display:inline-flex;align-items:center;gap:6px;margin-left:4px;color:#c7d2fe;
+  border-color:rgba(129,140,248,.5);background:rgba(99,102,241,.14)}
+.hm-pill--all:hover{color:#e0e7ff;border-color:var(--indigo2);background:rgba(99,102,241,.22)}
+.hm-pill--all svg{width:13px;height:13px}
+
+@media(max-width:940px){
+  .hm-hero{display:block}
+  .hm-privacy{width:auto;margin-top:20px}
+  .hm-tasks{grid-template-columns:repeat(2,1fr)}
+  .hm-task--lead{grid-column:span 2}
+}
+@media(max-width:640px){
+  .hm-tasks{grid-template-columns:1fr}
+  .hm-task--lead{grid-column:span 1}
+}
+@media(prefers-reduced-motion:reduce){
+  .hm-task,.hm-pill,.hm-go{transition:none}
+  .hm-task:hover{transform:none}
+}
+
 /* ── c-azure （直式轉橫式）── */
 .c-azure::before{background:linear-gradient(90deg,#1d4ed8,#60a5fa)}.c-azure:hover{box-shadow:0 0 24px rgba(59,130,246,.18)}.c-azure .tool-icon{background:rgba(59,130,246,.15)}.c-azure .tool-btn{background:rgba(59,130,246,.12);color:#93c5fd}.c-azure .progress-bar{background:linear-gradient(90deg,#1d4ed8,#60a5fa)}.c-azure .dl-btn{background:linear-gradient(135deg,#1d4ed8,#60a5fa)}.c-azure .fmt{background:rgba(59,130,246,.1);color:#93c5fd;border-color:rgba(59,130,246,.2)}.c-azure .drop-area{border-color:rgba(59,130,246,.35)}.c-azure .drop-area:hover,.c-azure .drop-area.drag-over{border-color:#60a5fa;background:rgba(59,130,246,.07)}
 
@@ -829,12 +896,103 @@ if (!self.crossOriginIsolated) {
 <main>
 
 <div class="panel active" id="panel-tools">
-  <div class="tips" style="margin-top:24px">
-    <div class="tips-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-lock"/></svg></div>
+  <section class="hm-hero">
     <div>
-      <div class="tips-title">完全在瀏覽器內處理，檔案不會離開你的電腦</div>
-      <div class="tips-text">所有轉檔由 FFmpeg 在本機執行，無需帳號、無需上傳，完全保護隱私。首次使用需下載引擎（約 25 MB），之後即時處理。</div>
+      <h2>今天想完成<em>什麼影音工作</em>？</h2>
+      <p>選一個任務開始，系統會依序準備好需要的工具與輸出設定。</p>
     </div>
+    <aside class="hm-privacy">
+      <b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-lock"/></svg>檔案只在你的電腦處理</b>
+      <span>不需上傳、不需登入，FFmpeg 於本機執行。首次使用需下載引擎約 25 MB，之後即時處理。</span>
+    </aside>
+  </section>
+
+  <div class="hm-slab">
+    <h3>常用任務</h3>
+    <span class="hm-hint">已標示每項任務會依序使用到的工具</span>
+    <span class="hm-rule"></span>
+  </div>
+
+  <section class="hm-tasks">
+      <button class="hm-task hm-task--lead" style="--tc:#818cf8" data-hm-tool="trim" type="button">
+        <div class="hm-head">
+          <div class="hm-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-layers"/></svg></div>
+          <span class="hm-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <span class="hm-flag">最常使用的組合</span>
+        <h4>影片發布前完整處理</h4>
+        <p>剪出片段、遮蔽敏感畫面、加上識別標誌、壓縮輸出 — 四個步驟依序接續完成，每一步的結果會自動送進下一個工具，中途不需重新選檔或重複下載。</p>
+        <div class="hm-chain">
+        <span class="hm-step"><i>1</i><span class="hm-dot" style="background:#0ea5e9"></span>影片裁切</span>
+        <span class="hm-arw">&rarr;</span>
+        <span class="hm-step"><i>2</i><span class="hm-dot" style="background:#f43f5e"></span>區域模糊</span>
+        <span class="hm-arw">&rarr;</span>
+        <span class="hm-step"><i>3</i><span class="hm-dot" style="background:#f97316"></span>壓製浮水印</span>
+        <span class="hm-arw">&rarr;</span>
+        <span class="hm-step"><i>4</i><span class="hm-dot" style="background:#10b981"></span>影片壓縮</span>
+        </div>
+      </button>
+      <button class="hm-task" style="--tc:#10b981" data-hm-tool="compress" type="button">
+        <div class="hm-head">
+          <div class="hm-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-compress"/></svg></div>
+          <span class="hm-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <span class="hm-flag hm-flag--use">常用</span>
+        <h4>縮小影片檔案大小</h4>
+        <p>壓縮至可上傳或寄送的容量，輸出前可比較不同畫質的結果。</p>
+        <div class="hm-chain">
+        <span class="hm-step"><i>1</i><span class="hm-dot" style="background:#10b981"></span>影片壓縮</span>
+        <span class="hm-arw">&rarr;</span>
+        <span class="hm-step"><i>2</i><span class="hm-dot" style="background:#f59e0b"></span>格式轉換</span>
+        </div>
+      </button>
+      <button class="hm-task" style="--tc:#3b82f6" data-hm-tool="blurPad" type="button">
+        <div class="hm-head">
+          <div class="hm-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-blurpad"/></svg></div>
+          <span class="hm-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <span class="hm-flag">新增</span>
+        <h4>直式影片轉橫式輸出</h4>
+        <p>將 9:16 影片補成 16:9，背景以同一畫面的高斯模糊填滿，可即時預覽後輸出。</p>
+        <div class="hm-chain">
+        <span class="hm-step"><i>1</i><span class="hm-dot" style="background:#3b82f6"></span>直式轉橫式</span>
+        <span class="hm-arw">&rarr;</span>
+        <span class="hm-step"><i>2</i><span class="hm-dot" style="background:#10b981"></span>影片壓縮</span>
+        </div>
+      </button>
+      <button class="hm-task" style="--tc:#22d3ee" data-hm-tool="transcribe" type="button">
+        <div class="hm-head">
+          <div class="hm-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-subtitle"/></svg></div>
+          <span class="hm-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <h4>影片加上字幕</h4>
+        <p>先於本機產生逐字稿，校對後燒錄至畫面，字級與位置可調整。</p>
+        <div class="hm-chain">
+        <span class="hm-step"><i>1</i><span class="hm-dot" style="background:#a855f7"></span>音訊轉文字</span>
+        <span class="hm-arw">&rarr;</span>
+        <span class="hm-step"><i>2</i><span class="hm-dot" style="background:#22d3ee"></span>字幕燒錄</span>
+        </div>
+      </button>
+    </section>
+
+  <div class="hm-more">
+    <span class="hm-more-lab">其他任務</span>
+    <button class="hm-pill" data-hm-tool="faceBlur" type="button">遮蔽畫面敏感資訊</button>
+    <button class="hm-pill" data-hm-tool="watermark" type="button">加上識別標誌</button>
+    <button class="hm-pill" data-hm-tool="trim" type="button">擷取影片重點片段</button>
+    <button class="hm-pill" data-hm-tool="merge" type="button">多段影片合併輸出</button>
+    <button class="hm-pill" data-hm-tool="screenRecord" type="button">錄製操作示範影片</button>
+    <button class="hm-pill" data-hm-tool="bgm" type="button">更換影片背景音樂</button>
+    <button class="hm-pill" data-hm-tool="transcribe" type="button">錄音轉成文字稿</button>
+    <button class="hm-pill" data-hm-tool="ytdl" type="button">下載線上影片素材</button>
+    <button class="hm-pill" data-hm-tool="snapshot" type="button">擷取影片畫面</button>
+    <button class="hm-pill hm-pill--all" id="hmGoAll" type="button">全部 22 項工具<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v13M6 13l6 6 6-6"/></svg></button>
+  </div>
+
+  <div class="hm-slab" id="hm-all-tools">
+    <h3>全部工具</h3>
+    <span class="hm-hint">完整保留現有全部功能</span>
+    <span class="hm-rule"></span>
   </div>
 
   <div class="guide-bar">
@@ -5001,11 +5159,11 @@ window.dispatchEvent(new Event('transcription-ready'));
     screenRecord: ['transcribe', 'trim', 'compress', 'faceBlur'],
     audioRecord:  ['transcribe', 'audioTrim', 'audioConvert'],
     transcribe:   ['subtitle'],
-    trim:         ['compress', 'faceBlur', 'subtitle', 'transcribe', 'blurPad'],
+    trim:         ['faceBlur', 'compress', 'subtitle', 'transcribe', 'blurPad'],
     toAudio:      ['transcribe', 'audioTrim', 'audioConvert'],
     compress:     ['trim', 'faceBlur'],
     convert:      ['trim', 'compress', 'faceBlur'],
-    faceBlur:     ['compress', 'trim', 'subtitle'],
+    faceBlur:     ['watermark', 'compress', 'trim', 'subtitle'],
     watermark:    ['compress', 'trim'],
     mute:         ['bgm', 'subtitle'],
     bgm:          ['compress', 'subtitle'],
@@ -6797,9 +6955,51 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.12.1</span><span class="ver-date">更新於 2026-09-03 17:45</span>
+  <span class="ver">v1.12.1</span><span class="ver-date">更新於 2026-09-09 13:38</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
+
+<script>
+/* ══════════ 任務首頁：任務卡 / 其他任務 → 開對應工具 ══════════ */
+(function () {
+  function openTool(name) {
+    var card = document.querySelector('.tool-card[data-tool="' + name + '"]');
+    if (!card) return;
+    if (typeof window.__openToolCard === 'function') {
+      window.__openToolCard(card);
+    } else {
+      card.scrollIntoView({ block: 'center' });
+    }
+  }
+
+  document.querySelectorAll('[data-hm-tool]').forEach(function (el) {
+    el.addEventListener('click', function () { openTool(el.dataset.hmTool); });
+  });
+
+  var goAll = document.getElementById('hmGoAll');
+  if (goAll) {
+    goAll.addEventListener('click', function () {
+      var target = document.getElementById('hm-all-tools');
+      if (!target) return;
+      var to = target.getBoundingClientRect().top + window.pageYOffset - 20;
+      // 減少動態偏好、或分頁在背景（此時 requestAnimationFrame 不會執行）就直接跳
+      if (document.hidden || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        window.scrollTo(0, to);
+        return;
+      }
+      // 自己跑動畫：scrollIntoView 與 behavior:'smooth' 在部分內嵌瀏覽環境不會作用
+      var from = window.pageYOffset, t0 = null, dur = 420;
+      requestAnimationFrame(function step(now) {
+        if (t0 === null) t0 = now;
+        var k = Math.min((now - t0) / dur, 1);
+        var ease = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        window.scrollTo(0, from + (to - from) * ease);
+        if (k < 1) requestAnimationFrame(step);
+      });
+    });
+  }
+})();
+</script>
 
 </body>
 </html>
