@@ -310,6 +310,18 @@ footer a{color:var(--indigo2);text-decoration:none}
 /* ── c-aqua （音訊降噪）── */
 .c-aqua::before{background:linear-gradient(90deg,#0e7490,#0891b2)}.c-aqua:hover{box-shadow:0 0 24px rgba(8,145,178,.18)}.c-aqua .tool-icon{background:rgba(8,145,178,.15)}.c-aqua .tool-btn{background:rgba(8,145,178,.12);color:#22d3ee}.c-aqua .progress-bar{background:linear-gradient(90deg,#0e7490,#0891b2)}.c-aqua .dl-btn{background:linear-gradient(135deg,#0e7490,#0891b2)}.c-aqua .fmt{background:rgba(8,145,178,.1);color:#22d3ee;border-color:rgba(8,145,178,.2)}.c-aqua .drop-area{border-color:rgba(8,145,178,.35)}.c-aqua .drop-area:hover,.c-aqua .drop-area.drag-over{border-color:#0891b2;background:rgba(8,145,178,.07)}
 
+/* ── 分區收合 ── */
+#panel-tools .section-title.sec-toggle{cursor:pointer;user-select:none;margin-top:22px;padding:9px 12px;
+  border:1px solid var(--border);border-radius:11px;background:rgba(255,255,255,.02);transition:.16s}
+#panel-tools .section-title.sec-toggle:hover{border-color:var(--border2);background:rgba(255,255,255,.045);color:var(--text2)}
+#panel-tools .section-title.sec-toggle:focus-visible{outline:2px solid var(--indigo2);outline-offset:2px}
+.sec-count{font-size:10px;letter-spacing:.5px;color:var(--text3);border:1px solid var(--border);
+  border-radius:5px;padding:2px 6px;text-transform:none}
+.sec-chev{margin-left:auto;width:14px;height:14px;flex:none;transition:transform .2s}
+.section-title.collapsed .sec-chev{transform:rotate(-90deg)}
+.tools-grid.sec-hidden{display:none}
+@media(prefers-reduced-motion:reduce){.sec-chev{transition:none}}
+
 /* ── 組合流程卡（pl- = pipeline）── */
 .pl-steps{display:none;margin-top:12px}
 .tool-card.has-file .pl-steps{display:block}
@@ -5749,7 +5761,12 @@ window.dispatchEvent(new Event('transcription-ready'));
       backdrop.classList.add('show');
       document.body.style.overflow = 'hidden';
     }
-    window.__openToolCard = openCard;   // 給 guide pills 用
+    window.__openToolCard = function(card) {
+      // 卡片所屬分區若是收合的，要先展開，否則 display:none 之下 modal 開不出來
+      var grid = card.closest('.tools-grid');
+      if (grid && grid.classList.contains('sec-hidden') && grid._secExpand) grid._secExpand();
+      openCard(card);
+    };
 
     // 每張卡加關閉按鈕 + 攔截點擊（capture phase）
     document.querySelectorAll('.tool-card[data-tool]').forEach(function(card) {
@@ -7411,7 +7428,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.12.1</span><span class="ver-date">更新於 2026-09-09 14:24</span>
+  <span class="ver">v1.12.1</span><span class="ver-date">更新於 2026-09-09 14:32</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 
@@ -7457,6 +7474,55 @@ window.addEventListener('resize', function() {
       });
     });
   }
+})();
+</script>
+
+<script>
+/* ══════════ 全部工具：分區收合／展開 ══════════ */
+(function () {
+  var SEC_KEY = 'mt_sections_v1';
+  function load() {
+    try { return JSON.parse(localStorage.getItem(SEC_KEY) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function save(state) {
+    try { localStorage.setItem(SEC_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  var saved = load();
+  var titles = document.querySelectorAll('#panel-tools .section-title');
+
+  titles.forEach(function (title) {
+    var grid = title.nextElementSibling;
+    if (!grid || !grid.classList.contains('tools-grid')) return;
+    var name = title.textContent.trim();
+    var count = grid.querySelectorAll('.tool-card').length;
+
+    title.classList.add('sec-toggle');
+    title.setAttribute('role', 'button');
+    title.setAttribute('tabindex', '0');
+    title.innerHTML = '<span>' + name + '</span>'
+      + '<span class="sec-count">' + count + ' 項</span>'
+      + '<svg class="sec-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" '
+      + 'stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+
+    // 預設只展開影片工具，其餘收合；使用者調整過就記住
+    var open = saved.hasOwnProperty(name) ? !!saved[name] : (name === '影片工具');
+
+    function apply(isOpen, persist) {
+      grid.classList.toggle('sec-hidden', !isOpen);
+      title.classList.toggle('collapsed', !isOpen);
+      title.setAttribute('aria-expanded', String(isOpen));
+      if (persist) { saved[name] = isOpen; save(saved); }
+    }
+    grid._secExpand = function () { apply(true, true); };
+    apply(open, false);
+
+    function toggle() { apply(grid.classList.contains('sec-hidden'), true); }
+    title.addEventListener('click', toggle);
+    title.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
 })();
 </script>
 
