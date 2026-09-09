@@ -322,6 +322,16 @@ footer a{color:var(--indigo2);text-decoration:none}
 .tools-grid.sec-hidden{display:none}
 @media(prefers-reduced-motion:reduce){.sec-chev{transition:none}}
 
+.pl-preview{display:none;margin-top:12px}
+.tool-card.has-file .pl-preview{display:block}
+.tool-card.processing .pl-preview,.tool-card.done .pl-preview{display:none}
+.pl-stage{position:relative;width:100%;border-radius:10px;overflow:hidden;background:#000;border:1px solid var(--border);line-height:0}
+.pl-canvas{width:100%;display:block}
+.pl-pv-bar{display:flex;align-items:center;gap:9px;margin-top:8px}
+.pl-pv-seek{flex:1;min-width:0;accent-color:var(--indigo2)}
+.pl-pv-time{font-size:10.5px;color:var(--text3);flex:none}
+.pl-pv-note{margin-top:6px;font-size:10.5px;color:var(--text3);line-height:1.55}
+
 /* ── 組合流程卡（pl- = pipeline）── */
 .pl-steps{display:none;margin-top:12px}
 .tool-card.has-file .pl-steps{display:block}
@@ -1136,6 +1146,15 @@ if (!self.crossOriginIsolated) {
         <span class="file-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg></span>
         <span class="file-info-name"></span><span class="file-info-size"></span>
         <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
+      </div>
+
+      <div class="pl-preview">
+        <div class="pl-stage"><canvas class="pl-canvas" width="640" height="360"></canvas></div>
+        <div class="pl-pv-bar">
+          <input type="range" class="pl-pv-seek" min="0" max="1000" value="100">
+          <span class="pl-pv-time">預覽 00:00</span>
+        </div>
+        <div class="pl-pv-note">預覽會即時反映裁切範圍、遮蔽區域與浮水印位置。遮蔽以定位點的位置顯示，實際輸出還會自動追蹤人臉移動。</div>
       </div>
 
       <div class="pl-steps">
@@ -3506,7 +3525,7 @@ window.dispatchEvent(new Event('transcription-ready'));
       valEl.classList.add('set');
       if (logoImg && logoImg.src) URL.revokeObjectURL(logoImg.src);
       logoImg = new Image();
-      logoImg.onload = refreshSummary;
+      logoImg.onload = function() { refreshSummary(); if (card._plDrawPreview) card._plDrawPreview(); };
       logoImg.src = URL.createObjectURL(f);
       refreshSummary();
     });
@@ -3517,8 +3536,81 @@ window.dispatchEvent(new Event('transcription-ready'));
       });
     });
 
+    // ── 合成預覽：畫面＋遮蔽＋浮水印，跟輸出走同一套幾何 ──
+    var pvCanvas = card.querySelector('.pl-canvas');
+    var pvCtx = pvCanvas.getContext('2d');
+    var pvSeek = card.querySelector('.pl-pv-seek');
+    var pvTime = card.querySelector('.pl-pv-time');
+    var pvBusy = false, pvPending = false;
+
+    function fmtPv(sec) {
+      var m = Math.floor(sec / 60), ss = Math.floor(sec % 60);
+      return String(m).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
+    }
+
+    function pvRange() {
+      var trim = getTrim();
+      var dur = videoEl.duration || 0;
+      var st = trim ? trim.start : 0;
+      var en = (trim && trim.end) ? trim.end : dur;
+      if (!(en > st)) { st = 0; en = dur; }
+      return { start: st, end: en };
+    }
+
+    async function drawPreview() {
+      if (!videoEl.videoWidth || !videoEl.duration) return;
+      if (pvBusy) { pvPending = true; return; }
+      pvBusy = true;
+      try {
+        var vw = videoEl.videoWidth, vh = videoEl.videoHeight;
+        var rg = pvRange();
+        var t = rg.start + (rg.end - rg.start) * (parseInt(pvSeek.value, 10) / 1000);
+        pvTime.textContent = '預覽 ' + fmtPv(t);
+        await new Promise(function(res) {
+          if (Math.abs(videoEl.currentTime - t) < 0.02) { res(); return; }
+          var done = false;
+          function h() { if (done) return; done = true; videoEl.removeEventListener('seeked', h); res(); }
+          videoEl.addEventListener('seeked', h);
+          videoEl.currentTime = t;
+          setTimeout(h, 1200);
+        });
+        pvCanvas.width = vw; pvCanvas.height = vh;
+        pvCtx.drawImage(videoEl, 0, 0, vw, vh);
+
+        // 遮蔽：取該時間點之前最後一個定位點，與輸出的推進方式一致
+        var kfs = card._fbKeyframes;
+        if (kfs && kfs.length && typeof applyBlurEffect === 'function') {
+          var sorted = kfs.slice().sort(function(a, b) { return a.t - b.t; });
+          var box = sorted[0].bbox;
+          for (var i = 1; i < sorted.length; i++) { if (t >= sorted[i].t) box = sorted[i].bbox; }
+          applyBlurEffect(pvCtx, pvCanvas, box,
+            card._fbBlurOpts || { blurType:'gaussian', shape:'ellipse', blurStr:5, featherStr:4 });
+        }
+
+        // 浮水印：與輸出共用 logoBox()
+        if (logoImg && logoImg.complete && logoImg.naturalWidth) {
+          var posBtn = card.querySelector('.pl-pos.active');
+          var pos = posBtn ? posBtn.dataset.pos : 'tr';
+          var pct = (parseInt(card.querySelector('.pl-wm-size').value, 10) || 13) / 100;
+          var lb = logoBox(vw, vh, pos, pct);
+          pvCtx.drawImage(logoImg, lb.x, lb.y, lb.w, lb.h);
+        }
+      } catch (e) {
+        console.warn('preview failed', e);
+      } finally {
+        pvBusy = false;
+        if (pvPending) { pvPending = false; drawPreview(); }
+      }
+    }
+    card._plDrawPreview = drawPreview;
+
+    pvSeek.addEventListener('input', drawPreview);
+    videoEl.addEventListener('loadeddata', function() { pvSeek.value = '100'; drawPreview(); });
+    card.querySelector('.pl-wm-size').addEventListener('change', drawPreview);
+    card.querySelectorAll('.pl-pos').forEach(function(b) { b.addEventListener('click', drawPreview); });
+
     // 兩個 modal 套用設定後會回寫欄位，這裡定期把摘要與步驟狀態同步回來
-    var mo = new MutationObserver(refreshSummary);
+    var mo = new MutationObserver(function() { refreshSummary(); drawPreview(); });
     mo.observe(card.querySelector('.trim-range-val'), { childList: true, characterData: true, subtree: true });
     mo.observe(card.querySelector('.fb-kf-val'), { childList: true, characterData: true, subtree: true });
 
@@ -3739,6 +3831,8 @@ window.dispatchEvent(new Event('transcription-ready'));
 
     refreshSummary();
   }
+
+  window.__fbApplyBlur = applyBlurEffect;   // 給區域定位視窗即時預覽用
 
   function setupFaceBlurCard(card) {
     var input = card.querySelector('input[type=file]');
@@ -6651,8 +6745,9 @@ window.dispatchEvent(new Event('transcription-ready'));
     shapeToggle.querySelectorAll('.fb-shape-btn').forEach(function(b) { b.classList.toggle('active', b === btn); });
     if (!playing) drawFrame();
   });
-  blurStrEl.addEventListener('input', function() { blurStrValEl.textContent = blurStrEl.value; });
+  blurStrEl.addEventListener('input', function() { blurStrValEl.textContent = blurStrEl.value; if (!playing) drawFrame(); });
   featherStrEl.addEventListener('input', function() { featherStrValEl.textContent = featherStrEl.value; if (!playing) drawFrame(); });
+  blurTypeEl.addEventListener('change', function() { if (!playing) drawFrame(); });
   fpsSel.addEventListener('change', function() { modalFps = parseInt(fpsSel.value) || 24; updateTime(); });
 
   var vid = null; // modal-internal video element
@@ -6734,6 +6829,18 @@ window.dispatchEvent(new Event('transcription-ready'));
     var vw = vid.videoWidth || 640, vh = vid.videoHeight || 360;
     canvas.width = vw; canvas.height = vh;
     ctx.drawImage(vid, 0, 0, vw, vh);
+
+    // 先把實際的模糊效果套上去，模糊程度與羽化才不用盲調
+    var pvKf = getNearKf();
+    var pvBox = curBbox || (pvKf ? pvKf.bbox : null);
+    if (pvBox && window.__fbApplyBlur) {
+      window.__fbApplyBlur(ctx, canvas,
+        { x: pvBox.x * vw, y: pvBox.y * vh, w: pvBox.w * vw, h: pvBox.h * vh },
+        { blurType: blurTypeEl.value, shape: curShape,
+          blurStr: parseInt(blurStrEl.value) || 5,
+          featherStr: parseInt(featherStrEl.value) || 4 });
+    }
+
     // shape path helper (reusable)
     function shapePath(bx, by, bw, bh, inset) {
       var ins = inset || 0;
@@ -7426,7 +7533,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.12.1</span><span class="ver-date">更新於 2026-09-09 14:41</span>
+  <span class="ver">v1.12.1</span><span class="ver-date">更新於 2026-09-09 15:15</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 
