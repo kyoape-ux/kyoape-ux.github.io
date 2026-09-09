@@ -310,6 +310,30 @@ footer a{color:var(--indigo2);text-decoration:none}
 /* ── c-aqua （音訊降噪）── */
 .c-aqua::before{background:linear-gradient(90deg,#0e7490,#0891b2)}.c-aqua:hover{box-shadow:0 0 24px rgba(8,145,178,.18)}.c-aqua .tool-icon{background:rgba(8,145,178,.15)}.c-aqua .tool-btn{background:rgba(8,145,178,.12);color:#22d3ee}.c-aqua .progress-bar{background:linear-gradient(90deg,#0e7490,#0891b2)}.c-aqua .dl-btn{background:linear-gradient(135deg,#0e7490,#0891b2)}.c-aqua .fmt{background:rgba(8,145,178,.1);color:#22d3ee;border-color:rgba(8,145,178,.2)}.c-aqua .drop-area{border-color:rgba(8,145,178,.35)}.c-aqua .drop-area:hover,.c-aqua .drop-area.drag-over{border-color:#0891b2;background:rgba(8,145,178,.07)}
 
+/* ── 組合流程卡（pl- = pipeline）── */
+.pl-steps{display:none;margin-top:12px}
+.tool-card.has-file .pl-steps{display:block}
+.tool-card.processing .pl-steps,.tool-card.done .pl-steps{display:none}
+.pl-step{border:1px solid var(--border);border-radius:11px;padding:11px 12px;margin-bottom:8px;background:rgba(255,255,255,.02)}
+.pl-step-hd{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:9px}
+.pl-num{width:18px;height:18px;flex:none;border-radius:5px;background:rgba(99,102,241,.2);color:#a5b4fc;font-size:10.5px;display:grid;place-items:center}
+.pl-opt{margin-left:auto;font-size:10px;color:var(--text3);border:1px solid var(--border);border-radius:5px;padding:2px 6px}
+.pl-step.pl-on .pl-num{background:rgba(52,211,153,.22);color:#6ee7b7}
+.pl-step.pl-on .pl-opt{color:#6ee7b7;border-color:rgba(52,211,153,.35)}
+.pl-btn{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);font-size:12px;font-family:inherit;cursor:pointer;transition:.15s}
+.pl-btn:hover{color:var(--text);border-color:var(--indigo2)}
+.pl-val{margin-top:7px;font-size:11px;color:var(--text3);line-height:1.5;word-break:break-all}
+.pl-val.set{color:#93c5fd}
+.pl-row{display:flex;gap:7px;flex-wrap:wrap}
+.pl-row .pl-btn{width:auto;flex:1;min-width:64px}
+.pl-pos{padding:7px 4px;font-size:11px}
+.pl-pos.active{border-color:var(--indigo2);background:rgba(99,102,241,.16);color:#c7d2fe}
+.pl-step select{width:100%}
+.pl-step select + select{margin-top:7px}
+.pl-sum{display:flex;align-items:flex-start;gap:8px;margin:10px 0 2px;padding:9px 11px;border-radius:9px;
+  border:1px solid rgba(52,211,153,.28);background:rgba(52,211,153,.07);font-size:11.5px;color:#8de3bd;line-height:1.55}
+.pl-sum svg{width:13px;height:13px;flex:none;margin-top:2px}
+
 /* ══════════ 任務導向首頁（hm- = home）══════════ */
 .hm-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:34px;padding:30px 0 22px}
 .hm-hero h2{margin:0 0 12px;font-size:clamp(26px,3.4vw,36px);font-weight:800;line-height:1.24;letter-spacing:-.02em;color:#fff}
@@ -914,14 +938,14 @@ if (!self.crossOriginIsolated) {
   </div>
 
   <section class="hm-tasks">
-      <button class="hm-task hm-task--lead" style="--tc:#818cf8" data-hm-tool="trim" type="button">
+      <button class="hm-task hm-task--lead" style="--tc:#818cf8" data-hm-tool="pipeline" type="button">
         <div class="hm-head">
           <div class="hm-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-layers"/></svg></div>
           <span class="hm-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
         </div>
         <span class="hm-flag">最常使用的組合</span>
         <h4>影片發布前完整處理</h4>
-        <p>剪出片段、遮蔽敏感畫面、加上識別標誌、壓縮輸出 — 四個步驟依序接續完成，每一步的結果會自動送進下一個工具，中途不需重新選檔或重複下載。</p>
+        <p>剪出片段、遮蔽敏感畫面、加上識別標誌、壓縮輸出 — 四個步驟在同一次處理裡完成，只重新編碼一次，畫質不會被反覆壓損，也不用一步一步存檔再上傳。</p>
         <div class="hm-chain">
         <span class="hm-step"><i>1</i><span class="hm-dot" style="background:#0ea5e9"></span>影片裁切</span>
         <span class="hm-arw">&rarr;</span>
@@ -1090,6 +1114,87 @@ if (!self.crossOriginIsolated) {
     </div>
 
     <!-- 影片壓縮 -->
+    <!-- 組合流程：裁切＋遮蔽＋浮水印＋壓縮，只重新編碼一次 -->
+    <div class="tool-card c-indigo" data-tool="pipeline" data-no-autostart="1">
+      <input type="file" hidden accept="video/*,.mkv,.avi,.webm,.flv,.ts">
+      <input type="file" hidden class="pl-logo-input" accept="image/png,image/jpeg,image/webp">
+      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-layers"/></svg></div>
+      <div class="tool-name">影片發布前完整處理</div>
+      <div class="tool-desc">裁切片段、遮蔽敏感畫面、加上識別標誌、壓縮輸出，四個步驟一次做完。每一步都可以略過，整條流程只重新編碼一次，畫質不會被反覆壓損。</div>
+      <div class="tool-formats"><span class="fmt">四步一次完成</span><span class="fmt">單次編碼</span><span class="fmt">步驟可略過</span></div>
+      <div class="drop-area">
+        <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
+        <div class="drop-area-text">拖曳影片到這裡，或點擊選取</div>
+        <div class="drop-area-sub">支援 MP4、MOV、AVI、MKV、WebM</div>
+      </div>
+      <div class="file-info">
+        <span class="file-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg></span>
+        <span class="file-info-name"></span><span class="file-info-size"></span>
+        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
+      </div>
+
+      <div class="pl-steps">
+        <input type="hidden" class="time-start"><input type="hidden" class="time-end">
+
+        <div class="pl-step" data-step="trim">
+          <div class="pl-step-hd"><span class="pl-num">1</span>裁切片段<span class="pl-opt">未設定</span></div>
+          <button class="pl-btn pl-trim-btn" type="button">開啟時間軸設定範圍</button>
+          <div class="pl-val trim-range-val">未設定時輸出整段影片</div>
+        </div>
+
+        <div class="pl-step" data-step="blur">
+          <div class="pl-step-hd"><span class="pl-num">2</span>遮蔽區域<span class="pl-opt">未設定</span></div>
+          <button class="pl-btn pl-blur-btn" type="button">開啟區域定位</button>
+          <div class="pl-val fb-kf-val">未設定時不做遮蔽</div>
+        </div>
+
+        <div class="pl-step" data-step="wm">
+          <div class="pl-step-hd"><span class="pl-num">3</span>浮水印<span class="pl-opt">未設定</span></div>
+          <button class="pl-btn pl-logo-btn" type="button">選擇 LOGO 圖檔（PNG 透明背景）</button>
+          <div class="pl-val pl-logo-val">未選擇時不加浮水印</div>
+          <div class="pl-row" style="margin-top:8px">
+            <button class="pl-btn pl-pos" data-pos="tl" type="button">↖ 左上</button>
+            <button class="pl-btn pl-pos active" data-pos="tr" type="button">↗ 右上</button>
+            <button class="pl-btn pl-pos" data-pos="bl" type="button">↙ 左下</button>
+            <button class="pl-btn pl-pos" data-pos="br" type="button">↘ 右下</button>
+          </div>
+          <select class="fmt-select pl-wm-size" style="margin-top:8px">
+            <option value="10">小（佔畫面寬 10%）</option>
+            <option value="13" selected>標準（佔畫面寬 13%）</option>
+            <option value="16">中（佔畫面寬 16%）</option>
+            <option value="20">大（佔畫面寬 20%）</option>
+          </select>
+        </div>
+
+        <div class="pl-step pl-on" data-step="out">
+          <div class="pl-step-hd"><span class="pl-num">4</span>輸出設定<span class="pl-opt">必要</span></div>
+          <select class="fmt-select pl-crf">
+            <option value="20">高畫質（檔案較大）</option>
+            <option value="23" selected>標準畫質（推薦）</option>
+            <option value="28">檔案最小（畫質普通）</option>
+          </select>
+          <select class="fmt-select pl-res" style="margin-top:7px">
+            <option value="0" selected>維持原解析度</option>
+            <option value="1080">最高 1080p</option>
+            <option value="720">最高 720p</option>
+          </select>
+        </div>
+
+        <div class="pl-sum">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="pl-sum-text">目前只會壓縮輸出，重新編碼 1 次。</span>
+        </div>
+      </div>
+
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">處理中...</div></div>
+      <div class="error-msg"></div>
+      <button class="tool-btn start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始處理</button>
+      <div class="download-wrap">
+        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載完成影片</button>
+        <button class="reset-btn">處理下一支</button>
+      </div>
+    </div>
+
     <div class="tool-card c-emerald" data-tool="compress">
       <input type="file" hidden accept="video/*,.mkv,.avi">
       <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-compress"/></svg></div>
@@ -3316,6 +3421,368 @@ window.dispatchEvent(new Event('transcription-ready'));
     ctx.drawImage(fc, x, y);
   }
 
+  // ── 組合流程卡：裁切＋遮蔽＋浮水印＋壓縮，整條只重新編碼一次 ──
+  // 有設遮蔽 → 逐幀在 canvas 處理（遮蔽本來就不是 FFmpeg 濾鏡），裁切與浮水印一併在同一輪畫完，最後編碼一次
+  // 沒設遮蔽 → 純 FFmpeg 單次呼叫，裁切／浮水印／縮放／壓縮全部在同一條 filter 裡
+  function setupPipelineCard(card) {
+    var input = card.querySelector('input[type=file]:not(.pl-logo-input)');
+    var logoInput = card.querySelector('.pl-logo-input');
+    var dropArea = card.querySelector('.drop-area');
+    var nameEl = card.querySelector('.file-info-name');
+    var sizeEl = card.querySelector('.file-info-size');
+    var clearBtn = card.querySelector('.file-clear');
+    var bar = card.querySelector('.progress-bar');
+    var progText = card.querySelector('.progress-text');
+    var startBtn = card.querySelector('.start-btn');
+    var dlBtn = card.querySelector('.dl-btn');
+    var resetBtn = card.querySelector('.reset-btn');
+    var errEl = card.querySelector('.error-msg');
+    var sumText = card.querySelector('.pl-sum-text');
+
+    var videoEl = document.createElement('video');
+    videoEl.muted = true; videoEl.playsInline = true;
+    var logoFile = null, logoImg = null;
+
+    function stepEl(name) { return card.querySelector('.pl-step[data-step="' + name + '"]'); }
+    function setStep(name, on, label) {
+      var el = stepEl(name);
+      if (!el) return;
+      el.classList.toggle('pl-on', !!on);
+      var chip = el.querySelector('.pl-opt');
+      if (chip) chip.textContent = label;
+    }
+
+    function parseT(v) {
+      v = (v || '').trim();
+      if (!v) return null;
+      var parts = v.split(':').map(parseFloat);
+      if (parts.some(isNaN)) return null;
+      var sec = 0;
+      for (var i = 0; i < parts.length; i++) sec = sec * 60 + parts[i];
+      return sec;
+    }
+
+    function getTrim() {
+      var st = parseT(card.querySelector('.time-start').value);
+      var en = parseT(card.querySelector('.time-end').value);
+      if (st === null && en === null) return null;
+      return { start: st || 0, end: en };
+    }
+
+    function refreshSummary() {
+      var trim = getTrim();
+      var kf = card._fbKeyframes;
+      var steps = [];
+      setStep('trim', !!trim, trim ? '已設定' : '未設定');
+      setStep('blur', !!(kf && kf.length), (kf && kf.length) ? kf.length + ' 個定位點' : '未設定');
+      setStep('wm', !!logoFile, logoFile ? '已選擇' : '未設定');
+      if (trim) steps.push('裁切');
+      if (kf && kf.length) steps.push('遮蔽');
+      if (logoFile) steps.push('浮水印');
+      steps.push('壓縮');
+      var mode = (kf && kf.length) ? '逐幀處理後編碼 1 次' : 'FFmpeg 單次處理';
+      sumText.textContent = '本次會執行：' + steps.join(' → ') + '，' + mode + '。';
+    }
+
+    function setFile(f) {
+      fileMap.set(card, f);
+      card.classList.remove('done', 'has-error', 'processing');
+      card.classList.add('has-file');
+      nameEl.textContent = f.name;
+      sizeEl.textContent = fmtBytes(f.size);
+      bar.style.width = '0%'; errEl.textContent = '';
+      card.querySelector('.time-start').value = '';
+      card.querySelector('.time-end').value = '';
+      card.querySelector('.trim-range-val').textContent = '未設定時輸出整段影片';
+      card.querySelector('.fb-kf-val').textContent = '未設定時不做遮蔽';
+      card._fbKeyframes = null; card._fbBlurOpts = null; card._fbFps = null;
+      if (videoEl.src && videoEl.src.indexOf('blob:') === 0) URL.revokeObjectURL(videoEl.src);
+      videoEl.src = URL.createObjectURL(f);
+      refreshSummary();
+    }
+
+    function reset() {
+      fileMap.delete(card);
+      var pu = blobMap.get(card); if (pu) URL.revokeObjectURL(pu);
+      blobMap.delete(card);
+      if (videoEl.src && videoEl.src.indexOf('blob:') === 0) URL.revokeObjectURL(videoEl.src);
+      videoEl.removeAttribute('src'); videoEl.load();
+      card.classList.remove('has-file', 'done', 'has-error', 'processing');
+      if (input) input.value = '';
+      bar.style.width = '0%'; errEl.textContent = '';
+      card._fbKeyframes = null; card._fbBlurOpts = null; card._fbFps = null;
+      logoFile = null; logoImg = null;
+      if (logoInput) logoInput.value = '';
+      card.querySelector('.pl-logo-val').textContent = '未選擇時不加浮水印';
+      card.querySelector('.pl-logo-val').classList.remove('set');
+      refreshSummary();
+    }
+
+    if (dropArea) {
+      dropArea.addEventListener('click', function() { input.click(); });
+      dropArea.addEventListener('dragover', function(e) { e.preventDefault(); dropArea.classList.add('drag-over'); });
+      dropArea.addEventListener('dragleave', function() { dropArea.classList.remove('drag-over'); });
+      dropArea.addEventListener('drop', function(e) {
+        e.preventDefault(); dropArea.classList.remove('drag-over');
+        if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+      });
+    }
+    if (input) input.addEventListener('change', function() { if (input.files[0]) setFile(input.files[0]); });
+    if (clearBtn) clearBtn.addEventListener('click', reset);
+    if (resetBtn) resetBtn.addEventListener('click', reset);
+
+    card.querySelector('.pl-trim-btn').addEventListener('click', function() {
+      var f = fileMap.get(card);
+      if (f && typeof window.openTrimModal === 'function') window.openTrimModal(f, card);
+    });
+    card.querySelector('.pl-blur-btn').addEventListener('click', function() {
+      var f = fileMap.get(card);
+      if (f && typeof window.openFbModal === 'function') window.openFbModal(f, card, videoEl);
+    });
+    card.querySelector('.pl-logo-btn').addEventListener('click', function() { logoInput.click(); });
+    logoInput.addEventListener('change', function() {
+      var f = logoInput.files[0];
+      if (!f) return;
+      logoFile = f;
+      var valEl = card.querySelector('.pl-logo-val');
+      valEl.textContent = f.name + '（' + fmtBytes(f.size) + '）';
+      valEl.classList.add('set');
+      if (logoImg && logoImg.src) URL.revokeObjectURL(logoImg.src);
+      logoImg = new Image();
+      logoImg.onload = refreshSummary;
+      logoImg.src = URL.createObjectURL(f);
+      refreshSummary();
+    });
+    card.querySelectorAll('.pl-pos').forEach(function(b) {
+      b.addEventListener('click', function() {
+        card.querySelectorAll('.pl-pos').forEach(function(x) { x.classList.remove('active'); });
+        b.classList.add('active');
+      });
+    });
+
+    // 兩個 modal 套用設定後會回寫欄位，這裡定期把摘要與步驟狀態同步回來
+    var mo = new MutationObserver(refreshSummary);
+    mo.observe(card.querySelector('.trim-range-val'), { childList: true, characterData: true, subtree: true });
+    mo.observe(card.querySelector('.fb-kf-val'), { childList: true, characterData: true, subtree: true });
+
+    // LOGO 疊放位置與「壓製浮水印」工具同一套公式：寬 = 影片寬×size%，邊距 x=W×0.8%、y=H×4%
+    function logoBox(vw, vh, pos, pct) {
+      var lw = Math.max(2, Math.round(vw * pct));
+      var lh = Math.max(2, Math.round(lw * (logoImg.naturalHeight / logoImg.naturalWidth)));
+      var mx = Math.round(vw * 0.008), my = Math.round(vh * 0.04);
+      return {
+        w: lw, h: lh,
+        x: pos.charAt(1) === 'l' ? mx : vw - lw - mx,
+        y: pos.charAt(0) === 't' ? my : vh - lh - my
+      };
+    }
+
+    startBtn.addEventListener('click', async function() {
+      var file = fileMap.get(card);
+      if (!file) return;
+      if (card.classList.contains('processing')) return;
+      if (ffRunning) { errEl.textContent = '另一個工具正在處理中，請稍候再試'; card.classList.add('has-error'); return; }
+
+      var trim = getTrim();
+      var keyframes = card._fbKeyframes;
+      var hasBlur = !!(keyframes && keyframes.length);
+      var pos = (card.querySelector('.pl-pos.active') || {}).dataset ? card.querySelector('.pl-pos.active').dataset.pos : 'tr';
+      var pct = (parseInt(card.querySelector('.pl-wm-size').value, 10) || 13) / 100;
+      var crf = card.querySelector('.pl-crf').value || '23';
+      var maxH = parseInt(card.querySelector('.pl-res').value, 10) || 0;
+
+      card.classList.remove('has-error', 'done');
+      card.classList.add('processing');
+      bar.style.width = '4%'; errEl.textContent = '';
+      currentBar = bar; currentProgressEl = progText; currentProgressBase = '處理中...';
+      ffRunning = true;
+
+      var inExt = getExt(file.name), inN = 'pl_in.' + inExt, outN = 'pl_out.mp4';
+      var logoN = logoFile ? ('pl_logo.' + getExt(logoFile.name)) : null;
+      var written = 0;
+
+      try {
+        await ensureFF();
+        bar.style.width = '8%';
+
+        var vw = videoEl.videoWidth, vh = videoEl.videoHeight, duration = videoEl.duration;
+        if (!vw || !vh) throw new Error('讀不到影片尺寸，請換一個檔案再試');
+        var startT = trim ? trim.start : 0;
+        var endT = (trim && trim.end) ? trim.end : duration;
+        if (endT <= startT) throw new Error('裁切範圍不正確，請重新設定');
+        var outDur = endT - startT;
+
+        // 需要縮放時在 JS 先算好目標高度，避免在 FFmpeg 參數裡寫運算式
+        var scaleH = (maxH && vh > maxH) ? maxH : 0;
+
+        progText.textContent = '載入影片...';
+        try { ff.FS('unlink', inN); } catch(e) {}
+        try { ff.FS('unlink', outN); } catch(e) {}
+        ff.FS('writeFile', inN, await fetchFile(file));
+        if (logoN) {
+          try { ff.FS('unlink', logoN); } catch(e) {}
+          ff.FS('writeFile', logoN, await fetchFile(logoFile));
+        }
+        bar.style.width = '12%';
+
+        if (!hasBlur) {
+          // ── 純 FFmpeg 單次：裁切 → 縮放 → 浮水印 → 編碼 ──
+          progText.textContent = '處理中...';
+          var args = [];
+          if (startT > 0) args.push('-ss', String(startT));
+          args.push('-i', inN);
+          if (logoN) args.push('-i', logoN);
+
+          var overlayPos = { tl:'W*0.008:H*0.04', tr:'W-w-W*0.008:H*0.04',
+                             bl:'W*0.008:H-h-H*0.04', br:'W-w-W*0.008:H-h-H*0.04' }[pos];
+          if (logoN) {
+            var flt = '';
+            var baseRef = '[0:v]';
+            if (scaleH) { flt += '[0:v]scale=-2:' + scaleH + '[base0];'; baseRef = '[base0]'; }
+            flt += '[1:v]' + baseRef + 'scale2ref=w=iw*' + pct.toFixed(2) + ':h=ow/mdar[logo][base];'
+                 + '[base][logo]overlay=' + overlayPos + ',format=yuv420p[v]';
+            args.push('-filter_complex', flt, '-map', '[v]', '-map', '0:a?');
+          } else if (scaleH) {
+            args.push('-vf', 'scale=-2:' + scaleH + ',format=yuv420p');
+          } else {
+            args.push('-vf', 'format=yuv420p');
+          }
+          // -t 必須放在所有 -i 之後才算輸出選項；夾在兩個輸入中間會變成套用到 LOGO 那個輸入，裁切等於沒作用
+          if (trim) args.push('-t', String(outDur));
+          // preset 只能用 ultrafast：這版 ffmpeg.wasm core 換成 veryfast 會 function signature mismatch 當掉
+          args.push('-c:v', 'libx264', '-preset', 'ultrafast', '-crf', String(crf),
+                    '-c:a', 'aac', '-b:a', '128k', '-max_muxing_queue_size', '1024', outN);
+          await ff.run.apply(ff, args);
+        } else {
+          // ── 逐幀路徑：只處理裁切後的區間，畫面上同時完成遮蔽與浮水印，最後編碼一次 ──
+          if (outDur > 300) throw new Error('遮蔽處理限 5 分鐘以內，請先縮小裁切範圍');
+          progText.textContent = '載入偵測引擎...';
+          await window._fbLoadMP();
+          bar.style.width = '14%';
+
+          progText.textContent = '提取音軌...';
+          try { ff.FS('unlink', 'pl_aud.aac'); } catch(e) {}
+          var hasAudio = false;
+          try {
+            var aArgs = [];
+            if (startT > 0) aArgs.push('-ss', String(startT));
+            aArgs.push('-i', inN);
+            if (trim) aArgs.push('-t', String(outDur));
+            aArgs.push('-vn', '-acodec', 'aac', '-b:a', '128k', 'pl_aud.aac');
+            await ff.run.apply(ff, aArgs);
+            hasAudio = true;
+          } catch(e) {}
+          bar.style.width = '17%';
+
+          var blurOpts = card._fbBlurOpts || { blurType:'gaussian', shape:'ellipse', blurStr:5, featherStr:4 };
+          var fps = card._fbFps || 24;
+          var offC = document.createElement('canvas');
+          offC.width = vw; offC.height = vh;
+          var offCtx = offC.getContext('2d');
+          var lb = logoImg ? logoBox(vw, vh, pos, pct) : null;
+
+          var kfs = keyframes.slice().sort(function(a, b) { return a.t - b.t; });
+          var totalFrames = Math.ceil(outDur * fps);
+          var kfIdx = 0, lastBbox = kfs[0].bbox;
+
+          for (var i = 0; i < totalFrames; i++) {
+            var t = startT + i / fps;
+            // 定位點時間是相對原片的絕對秒數，裁切後可能一次跨過好幾個，所以用 while
+            while (kfIdx < kfs.length - 1 && t >= kfs[kfIdx + 1].t) {
+              kfIdx++;
+              lastBbox = kfs[kfIdx].bbox;
+            }
+            await new Promise(function(res) {
+              if (Math.abs(videoEl.currentTime - t) < 0.004) { res(); return; }
+              function h() { videoEl.removeEventListener('seeked', h); res(); }
+              videoEl.addEventListener('seeked', h);
+              videoEl.currentTime = t;
+            });
+            offCtx.drawImage(videoEl, 0, 0, vw, vh);
+
+            var det = await window._fbDetectFace(offC);
+            if (det) {
+              var raw = window._fbDetToBbox(det, vw, vh);
+              if (lastBbox) {
+                var wR = raw.w / lastBbox.w, hR = raw.h / lastBbox.h;
+                var ddx = (raw.x + raw.w/2) - (lastBbox.x + lastBbox.w/2);
+                var ddy = (raw.y + raw.h/2) - (lastBbox.y + lastBbox.h/2);
+                var dist = Math.sqrt(ddx*ddx + ddy*ddy);
+                var maxM = Math.max(lastBbox.w, lastBbox.h) * 0.4;
+                if (wR < 1.4 && wR > 0.72 && hR < 1.4 && hR > 0.72 && dist < maxM) {
+                  var a = 0.35;
+                  lastBbox = {
+                    x: Math.round(lastBbox.x + a*(raw.x - lastBbox.x)),
+                    y: Math.round(lastBbox.y + a*(raw.y - lastBbox.y)),
+                    w: Math.round(lastBbox.w + a*(raw.w - lastBbox.w)),
+                    h: Math.round(lastBbox.h + a*(raw.h - lastBbox.h))
+                  };
+                }
+              } else { lastBbox = raw; }
+            }
+
+            applyBlurEffect(offCtx, offC, lastBbox, blurOpts);
+            if (lb) offCtx.drawImage(logoImg, lb.x, lb.y, lb.w, lb.h);
+
+            var fName = 'pl_' + String(i).padStart(6, '0') + '.jpg';
+            var jBlob = await new Promise(function(r) { offC.toBlob(r, 'image/jpeg', 0.92); });
+            ff.FS('writeFile', fName, new Uint8Array(await jBlob.arrayBuffer()));
+            written++;
+            bar.style.width = (17 + Math.round((i / totalFrames) * 66)) + '%';
+            progText.textContent = '處理第 ' + (i + 1) + ' / ' + totalFrames + ' 幀...';
+            if (i % 5 === 0) await sleep(0);
+          }
+
+          progText.textContent = '編碼輸出影片...';
+          bar.style.width = '84%';
+          var eArgs = ['-r', String(fps), '-i', 'pl_%06d.jpg'];
+          if (hasAudio) eArgs.push('-i', 'pl_aud.aac');
+          if (scaleH) eArgs.push('-vf', 'scale=-2:' + scaleH);
+          eArgs.push('-c:v', 'libx264', '-preset', 'ultrafast', '-crf', String(crf), '-pix_fmt', 'yuv420p');
+          if (hasAudio) eArgs.push('-c:a', 'copy', '-shortest');   // 音訊上一步已轉成 AAC，這裡不再編一次
+          eArgs.push('-max_muxing_queue_size', '1024', outN);
+          await ff.run.apply(ff, eArgs);
+        }
+
+        var outData = ff.FS('readFile', outN);
+        bar.style.width = '100%';
+        await sleep(300);
+        card.classList.remove('processing');
+        card.classList.add('done');
+        var blob = new Blob([outData.buffer], { type: 'video/mp4' });
+        var url = URL.createObjectURL(blob);
+        blobMap.set(card, url);
+        var outName = basename(file.name) + '_processed.mp4';
+        dlBtn.onclick = function() {
+          var a = document.createElement('a'); a.href = url; a.download = outName; a.click();
+        };
+        card._chainOutput = { blob: blob, filename: outName };
+        if (window.__addChainBar) window.__addChainBar(card, 'pipeline', function() { return card._chainOutput; });
+      } catch (err) {
+        console.error(err);
+        card.classList.remove('processing');
+        card.classList.add('has-file', 'has-error');
+        bar.style.width = '0%';
+        errEl.textContent = '處理失敗：' + (err.message || '格式不支援或記憶體不足');
+        if (err.message && err.message.indexOf('one command at a time') >= 0) ffReady = false;
+      } finally {
+        try { ff.FS('unlink', inN); } catch(e) {}
+        try { ff.FS('unlink', outN); } catch(e) {}
+        try { ff.FS('unlink', 'pl_aud.aac'); } catch(e) {}
+        if (logoN) { try { ff.FS('unlink', logoN); } catch(e) {} }
+        for (var j = 0; j < written; j++) {
+          try { ff.FS('unlink', 'pl_' + String(j).padStart(6, '0') + '.jpg'); } catch(e) {}
+        }
+        currentBar = null;
+        if (currentProgressEl) currentProgressEl.textContent = '處理中...';
+        currentProgressEl = null;
+        ffRunning = false;
+      }
+    });
+
+    refreshSummary();
+  }
+
   function setupFaceBlurCard(card) {
     var input = card.querySelector('input[type=file]');
     var dropArea = card.querySelector('.drop-area');
@@ -5104,7 +5571,8 @@ window.dispatchEvent(new Event('transcription-ready'));
     }
   };
 
-  document.querySelectorAll('.tool-card[data-tool]:not([data-tool="merge"]):not([data-tool="watermark"]):not([data-tool="faceBlur"]):not([data-tool="bgm"]):not([data-tool="subtitle"]):not([data-tool="snapshot"]):not([data-tool="audioTrim"]):not([data-tool="screenRecord"]):not([data-tool="audioRecord"]):not([data-tool="transcribe"]):not([data-tool="ytdl"])').forEach(setupCard);
+  document.querySelectorAll('.tool-card[data-tool]:not([data-tool="merge"]):not([data-tool="watermark"]):not([data-tool="faceBlur"]):not([data-tool="bgm"]):not([data-tool="subtitle"]):not([data-tool="snapshot"]):not([data-tool="audioTrim"]):not([data-tool="screenRecord"]):not([data-tool="audioRecord"]):not([data-tool="transcribe"]):not([data-tool="ytdl"]):not([data-tool="pipeline"])').forEach(setupCard);
+  document.querySelectorAll('.tool-card[data-tool="pipeline"]').forEach(setupPipelineCard);
   document.querySelectorAll('.tool-card[data-tool="blurPad"]').forEach(setupBlurPadPreview);
   document.querySelectorAll('.tool-card[data-tool="watermark"]').forEach(setupWatermarkCard);
   document.querySelectorAll('.tool-card[data-tool="merge"]').forEach(setupMergeCard);
@@ -5174,6 +5642,7 @@ window.dispatchEvent(new Event('transcription-ready'));
     merge:        ['compress', 'trim', 'faceBlur'],
     videoDenoise: ['compress', 'trim', 'faceBlur'],
     blurPad:      ['compress', 'watermark', 'subtitle'],
+    pipeline:     ['subtitle', 'blurPad', 'compress'],
     audioDenoise: ['transcribe', 'audioTrim', 'audioConvert']
   };
 
@@ -5846,7 +6315,7 @@ window.dispatchEvent(new Event('transcription-ready'));
     if (chip) chip.textContent = fmtFull(startT) + ' → ' + fmtFull(endT) + '（' + fmt(endT - startT) + '）';
     var card = currentCard;
     closeModal();
-    card.querySelector('.start-btn').click();
+    if (!card.dataset.noAutostart) card.querySelector('.start-btn').click();
   });
 
   window.openTrimModal = async function(file, card) {
@@ -6095,7 +6564,7 @@ window.dispatchEvent(new Event('transcription-ready'));
     currentCard.querySelector('.start-btn').style.display = '';
     var card = currentCard;
     closeModal();
-    card.querySelector('.start-btn').click();
+    if (!card.dataset.noAutostart) card.querySelector('.start-btn').click();
   });
 
   window.openAudioTrimModal = async function(file, card) {
@@ -6690,9 +7159,10 @@ window.dispatchEvent(new Event('transcription-ready'));
     // Show start button
     var startBtn = _card.querySelector('.start-btn');
     if (startBtn) startBtn.style.display = '';
+    var noAuto = _card.dataset.noAutostart;
     closeModal();
     // Auto click start
-    setTimeout(function() { if (startBtn) startBtn.click(); }, 120);
+    setTimeout(function() { if (startBtn && !noAuto) startBtn.click(); }, 120);
   });
 
   // ── Close ──
@@ -6955,7 +7425,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.12.1</span><span class="ver-date">更新於 2026-09-09 13:38</span>
+  <span class="ver">v1.12.1</span><span class="ver-date">更新於 2026-09-09 14:06</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 
