@@ -20,23 +20,23 @@
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px}
 
-header{background:linear-gradient(160deg,#1a1040 0%,#0f1628 40%,#0d0e14 100%);padding:36px 24px 40px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
+header{background:linear-gradient(120deg,#1a1040 0%,#141a33 45%,#0d0e14 100%);padding:12px 24px;text-align:left;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
 header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 15% 60%,rgba(99,102,241,.22) 0%,transparent 55%),radial-gradient(ellipse at 85% 30%,rgba(139,92,246,.16) 0%,transparent 50%),radial-gradient(ellipse at 50% 100%,rgba(16,185,129,.08) 0%,transparent 40%)}
-header::after{content:'';position:absolute;inset:0;opacity:.04;background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);background-size:40px 40px}
-.header-inner{position:relative;z-index:1;max-width:720px;margin:0 auto}
-.logo-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px}
-.logo-icon{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f46e5,#7c3aed);box-shadow:0 4px 20px rgba(99,102,241,.5),0 0 0 1px rgba(255,255,255,.1)}
-.logo-title{font-size:28px;font-weight:800;color:#fff;letter-spacing:.5px;text-shadow:0 2px 12px rgba(99,102,241,.4)}
-.logo-sub{font-size:12px;color:rgba(255,255,255,.4);letter-spacing:2.5px;text-transform:uppercase;margin-top:3px}
+header::after{content:'';position:absolute;inset:0;opacity:.03;background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);background-size:40px 40px}
+.header-inner{position:relative;z-index:1;max-width:1240px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.logo-row{display:flex;align-items:center;gap:12px}
+.logo-icon{width:40px;height:40px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f46e5,#7c3aed);box-shadow:0 4px 20px rgba(99,102,241,.5),0 0 0 1px rgba(255,255,255,.1)}
+.logo-title{font-size:18px;font-weight:800;color:#fff;letter-spacing:.3px;line-height:1.25}
+.logo-sub{font-size:10.5px;color:rgba(255,255,255,.42);letter-spacing:1.4px;text-transform:uppercase;margin-top:2px}
 .logo-tagline{margin-top:16px;font-size:13px;color:rgba(255,255,255,.5);letter-spacing:.5px}
 
-.nav-wrap{display:flex;justify-content:center;padding:22px 16px 0}
-.nav{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:4px;display:inline-flex;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.4)}
-.nav-btn{padding:9px 22px;border-radius:10px;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;transition:.18s;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.nav-wrap{display:flex;justify-content:flex-end;padding:0}
+.nav{background:rgba(26,28,39,.72);border:1px solid var(--border);border-radius:11px;padding:3px;display:inline-flex;gap:2px}
+.nav-btn{padding:7px 15px;border-radius:9px;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;transition:.18s;display:flex;align-items:center;gap:7px;white-space:nowrap}
 .nav-btn.active{background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff;box-shadow:0 2px 12px rgba(99,102,241,.4)}
 .nav-btn:hover:not(.active){background:var(--surface2);color:var(--text)}
 .nav-sep{width:1px;align-self:stretch;margin:5px 4px;background:var(--border)}
-.nav-ezcut{padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:7px;white-space:nowrap;transition:.18s;color:var(--indigo2);background:linear-gradient(120deg,rgba(99,102,241,.10),rgba(139,92,246,.10));border:1px solid rgba(129,140,248,.3)}
+.nav-ezcut{padding:7px 13px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:7px;white-space:nowrap;transition:.18s;color:var(--indigo2);background:linear-gradient(120deg,rgba(99,102,241,.10),rgba(139,92,246,.10));border:1px solid rgba(129,140,248,.3)}
 .nav-ezcut:hover{color:#fff;border-color:var(--indigo2);background:linear-gradient(135deg,var(--indigo),var(--violet));box-shadow:0 2px 12px rgba(99,102,241,.4)}
 @media (max-width:560px){.nav-sep,.nav-ezcut{display:none}}
 
@@ -335,7 +335,7 @@ footer a{color:var(--indigo2);text-decoration:none}
 .pl-sum svg{width:13px;height:13px;flex:none;margin-top:2px}
 
 /* ══════════ 任務導向首頁（hm- = home）══════════ */
-.hm-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:34px;padding:30px 0 22px}
+.hm-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:34px;padding:26px 0 22px}
 .hm-hero h2{margin:0 0 12px;font-size:clamp(26px,3.4vw,36px);font-weight:800;line-height:1.24;letter-spacing:-.02em;color:#fff}
 .hm-hero h2 em{font-style:normal;background:linear-gradient(96deg,#a5b4fc,#7dd3fc);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hm-hero p{margin:0;color:var(--text2);font-size:14px;max-width:52ch;line-height:1.7}
@@ -376,12 +376,11 @@ footer a{color:var(--indigo2);text-decoration:none}
 .hm-step .hm-dot{width:6px;height:6px;border-radius:50%;flex:none}
 .hm-arw{color:var(--text3);font-size:11px;line-height:1}
 
-.hm-more{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:14px}
-.hm-more-lab{font-size:11.5px;color:var(--text3);margin-right:3px}
+.hm-more{display:flex;justify-content:flex-end;margin-top:12px}
 .hm-pill{border:1px solid var(--border);background:rgba(255,255,255,.02);color:var(--text2);border-radius:8px;
   padding:6px 11px;font-size:12px;font-family:inherit;cursor:pointer;transition:.16s}
 .hm-pill:hover{color:var(--text);border-color:var(--border2);background:rgba(255,255,255,.05)}
-.hm-pill--all{display:inline-flex;align-items:center;gap:6px;margin-left:4px;color:#c7d2fe;
+.hm-pill--all{display:inline-flex;align-items:center;gap:6px;color:#c7d2fe;
   border-color:rgba(129,140,248,.5);background:rgba(99,102,241,.14)}
 .hm-pill--all:hover{color:#e0e7ff;border-color:var(--indigo2);background:rgba(99,102,241,.22)}
 .hm-pill--all svg{width:13px;height:13px}
@@ -639,8 +638,11 @@ footer a{color:var(--indigo2);text-decoration:none}
 .merge-hint.vis{display:block}
 
 @media(max-width:600px){
-  .logo-title{font-size:22px}
-  .nav-btn{padding:8px 12px;font-size:12px}
+  header{padding:10px 16px}
+  .header-inner{gap:12px}
+  .logo-title{font-size:16px}
+  .nav-wrap{justify-content:flex-start;width:100%}
+  .nav-btn{padding:7px 11px;font-size:12px}
   .tools-grid,.sw-grid{grid-template-columns:1fr}
 }
 
@@ -765,7 +767,7 @@ footer a{color:var(--indigo2);text-decoration:none}
 .tool-card[data-tool="subtitle"].sub-ready .start-btn{display:flex}
 
 /* guide bar (inline quick-jump) */
-.guide-bar{margin-bottom:20px}
+.guide-bar{margin-top:-2px;margin-bottom:20px}
 .guide-bar-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;letter-spacing:.3px}
 .guide-bar-title svg{opacity:.55}
 .guide-scroll{display:flex;flex-wrap:wrap;gap:6px}
@@ -887,18 +889,14 @@ if (!self.crossOriginIsolated) {
   <div class="header-inner">
     <div class="logo-row">
       <div class="logo-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-film"/></svg>
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-film"/></svg>
       </div>
       <div>
         <div class="logo-title">影音小助手</div>
-        <div class="logo-sub">Media Toolkit</div>
+        <div class="logo-sub">Media Toolkit · 全在瀏覽器完成</div>
       </div>
     </div>
-    <div class="logo-tagline">轉檔、剪輯、錄製、下載素材 — 全在瀏覽器完成</div>
-  </div>
-</header>
-
-<div class="nav-wrap">
+    <div class="nav-wrap">
   <div class="nav">
     <button class="nav-btn active" onclick="showPanel('tools',this)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-tool"/></svg>影音工具
@@ -915,7 +913,9 @@ if (!self.crossOriginIsolated) {
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
     </a>
   </div>
-</div>
+    </div>
+  </div>
+</header>
 
 <main>
 
@@ -945,7 +945,7 @@ if (!self.crossOriginIsolated) {
         </div>
         <span class="hm-flag">最常使用的組合</span>
         <h4>影片發布前完整處理</h4>
-        <p>剪出片段、遮蔽敏感畫面、加上識別標誌、壓縮輸出 — 四個步驟在同一次處理裡完成，只重新編碼一次，畫質不會被反覆壓損，也不用一步一步存檔再上傳。</p>
+        <p>四個步驟在同一次處理裡完成，只重新編碼一次，畫質不會被反覆壓損。每一步都可以略過。</p>
         <div class="hm-chain">
         <span class="hm-step"><i>1</i><span class="hm-dot" style="background:#0ea5e9"></span>影片裁切</span>
         <span class="hm-arw">&rarr;</span>
@@ -1000,16 +1000,6 @@ if (!self.crossOriginIsolated) {
     </section>
 
   <div class="hm-more">
-    <span class="hm-more-lab">其他任務</span>
-    <button class="hm-pill" data-hm-tool="faceBlur" type="button">遮蔽畫面敏感資訊</button>
-    <button class="hm-pill" data-hm-tool="watermark" type="button">加上識別標誌</button>
-    <button class="hm-pill" data-hm-tool="trim" type="button">擷取影片重點片段</button>
-    <button class="hm-pill" data-hm-tool="merge" type="button">多段影片合併輸出</button>
-    <button class="hm-pill" data-hm-tool="screenRecord" type="button">錄製操作示範影片</button>
-    <button class="hm-pill" data-hm-tool="bgm" type="button">更換影片背景音樂</button>
-    <button class="hm-pill" data-hm-tool="transcribe" type="button">錄音轉成文字稿</button>
-    <button class="hm-pill" data-hm-tool="ytdl" type="button">下載線上影片素材</button>
-    <button class="hm-pill" data-hm-tool="snapshot" type="button">擷取影片畫面</button>
     <button class="hm-pill hm-pill--all" id="hmGoAll" type="button">全部 22 項工具<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v13M6 13l6 6 6-6"/></svg></button>
   </div>
 
@@ -1020,10 +1010,6 @@ if (!self.crossOriginIsolated) {
   </div>
 
   <div class="guide-bar">
-    <div class="guide-bar-title">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      使用指南 — 點擊快速跳轉至該工具
-    </div>
     <div class="guide-scroll">
       <a class="guide-pill" data-guide="screenRecord"><span class="gp-dot" style="background:#ef4444"></span>螢幕錄影</a>
       <a class="guide-pill" data-guide="audioRecord"><span class="gp-dot" style="background:#3b82f6"></span>電腦音訊錄製</a>
@@ -7425,7 +7411,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.12.1</span><span class="ver-date">更新於 2026-09-09 14:06</span>
+  <span class="ver">v1.12.1</span><span class="ver-date">更新於 2026-09-09 14:24</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 
@@ -7448,6 +7434,9 @@ window.addEventListener('resize', function() {
 
   var goAll = document.getElementById('hmGoAll');
   if (goAll) {
+    // 數量直接數畫面上的卡片，之後增減工具不用再回來改字
+    var n = document.querySelectorAll('#panel-tools .tools-grid .tool-card').length;
+    if (n) goAll.childNodes[0].nodeValue = '全部 ' + n + ' 項工具';
     goAll.addEventListener('click', function () {
       var target = document.getElementById('hm-all-tools');
       if (!target) return;
