@@ -1,5 +1,24 @@
-node_modules/
-dist/
-out/
+# === 機敏：絕不可上公開站 ===
+.oauth_token.json
+.oauth_port.txt
+.clasp.json
+.deploy_result.json
+
+# === 本機部署工具（已在私有備份 backup remote）===
+deploy_oauth.py
+do_deploy.py
+oauth_server.py
+build_xlsx.py
+serve_signage.py
+serve_video_tool.py
+ig_import.json
+files/
+
+# === 雜物 ===
 .DS_Store
-*.log
+node_modules/
+.claude/
+functions/
+deploy-pages.sh
+pages_dist/
+src_youtube-manager.html
