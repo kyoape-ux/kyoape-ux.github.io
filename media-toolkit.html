@@ -354,6 +354,9 @@ footer a{color:var(--indigo2);text-decoration:none}
 .gif-result-meta{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--text3);margin-top:7px;font-variant-numeric:tabular-nums}
 .gif-result-meta b{color:#fbbf24;font-weight:600}
 .gif-result-meta .warn{color:#fb7185}
+.gif-result-note{margin-top:8px;padding:8px 10px;border-radius:8px;font-size:11.5px;line-height:1.6;color:#fcd34d;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25)}
+.gif-result-note.ok{color:#6ee7b7;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.25)}
+.gif-line-tip{margin-top:8px;font-size:11.5px;line-height:1.65;color:var(--text2);padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--border)}
 
 /* ── 組合流程卡（pl- = pipeline）── */
 .pl-steps{display:none;margin-top:12px}
@@ -1689,6 +1692,10 @@ if (!self.crossOriginIsolated) {
       <div class="trim-range-chip"><span class="trim-range-lbl">片段範圍</span><span class="trim-range-val">未設定 — 轉整段影片</span></div>
 
       <div class="gif-opts">
+        <select class="fmt-select" name="gifTarget" style="margin-bottom:7px">
+          <option value="line" selected>用途：LINE 傳送（自動控制在 10 MB 內）</option>
+          <option value="">用途：不限制檔案大小</option>
+        </select>
         <div class="gif-row">
           <select class="fmt-select" name="gifWidth">
             <option value="320">寬 320px（貼文、聊天）</option>
@@ -1728,7 +1735,7 @@ if (!self.crossOriginIsolated) {
             <label class="gif-chk"><input type="checkbox" name="gifLanczos" checked><span>高品質縮放（Lanczos）<small>縮小時邊緣較銳利，處理時間略增。</small></span></label>
           </div>
         </details>
-        <div class="gif-hint gif-big-hint" hidden>原尺寸 GIF 非常大：動態畫面 1080×1080、15fps，5 秒約 50 MB、12 秒約 130 MB。要保留原尺寸建議改 10fps、128 色、Bayer 抖動（約少 60%），並把片段控制在 5 秒內。</div>
+        <div class="gif-hint gif-big-hint" hidden>原尺寸 GIF 可能非常大：畫面動得多的 1080×1080、15fps，5 秒約 50 MB。要保留原尺寸建議改 10fps、128 色、Bayer 抖動（約少 60%），或把用途改回「LINE 傳送」讓系統自動控制大小。</div>
         <div class="gif-hint">GIF 沒有聲音，也不適合太長：建議 3～10 秒、480px 以內。</div>
       </div>
 
@@ -1738,6 +1745,8 @@ if (!self.crossOriginIsolated) {
       <div class="gif-result">
         <img class="gif-result-img" alt="GIF 預覽">
         <div class="gif-result-meta"><span class="gif-result-dims"></span><span class="gif-result-size"></span></div>
+        <div class="gif-result-note" hidden></div>
+        <div class="gif-line-tip" hidden>用手機傳到 LINE：聊天室「＋」→ 相簿選這張 GIF → 勾選右下角「原始畫質」再傳送。沒勾的話 LINE 會壓縮，對方看到的可能不會動。</div>
       </div>
       <div class="download-wrap">
         <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載 GIF</button>
@@ -2823,52 +2832,97 @@ window.dispatchEvent(new Event('transcription-ready'));
       fsClean(inN, outN);
       return { data: data, ext: 'mp4', filename: basename(file.name) + '_16x9.mp4' };
     },
-    // ── 影片轉 GIF：兩段式調色盤（palettegen → paletteuse）一次呼叫完成 ──
+    // ── 影片轉 GIF：兩段式調色盤（先算調色盤、再套色輸出）──
     gif: async function(file, card) {
       var v = function(n) { return card.querySelector('[name=' + n + ']'); };
-      var width = parseInt(v('gifWidth').value, 10) || 0;
-      var fps = parseInt(v('gifFps').value, 10) || 15;
+      var target = v('gifTarget') ? v('gifTarget').value : '';
+      var LIMIT = 9.5e6;                        // LINE 抓 10 MB 以內，留一點餘裕
       var loop = v('gifLoop').value || '0';
-      var colors = parseInt(v('gifColors').value, 10) || 256;
-      var dither = v('gifDither').value || 'sierra2_4a';
       var staticOpt = !!v('gifStatic').checked;
       var lanczos = !!v('gifLanczos').checked;
       var start = parseTime(card.querySelector('.time-start').value) || 0;
       var end = parseTime(card.querySelector('.time-end').value);
       var dur = (end !== null && end > start) ? (end - start) : null;
+      var srcW = parseInt(card.dataset.gifSrcW, 10) || 1080;
 
-      var inN = 'in.' + getExt(file.name), outN = 'out.gif';
-      try { ff.FS('unlink', outN); } catch(e) {}
+      var inN = 'in.' + getExt(file.name), outN = 'out.gif', palN = 'gif_pal.png';
       ff.FS('writeFile', inN, await fetchFile(file));
 
-      var pre = 'fps=' + fps;
-      if (width > 0) pre += ',scale=' + width + ':-1' + (lanczos ? ':flags=lanczos' : '');
-      // 靜態背景最佳化：調色盤只統計有變動的像素、輸出只重繪變動的矩形
-      var gen = 'palettegen=max_colors=' + colors + ':stats_mode=' + (staticOpt ? 'diff' : 'full');
-      var use = 'paletteuse=dither=' + dither + (dither === 'bayer' ? ':bayer_scale=5' : '')
-              + (staticOpt ? ':diff_mode=rectangle' : '');
-      var palN = 'gif_pal.png';
-      try { ff.FS('unlink', palN); } catch(e) {}
-
-      // 分兩次跑：先算調色盤、再套色輸出。
-      // 用 split 一次跑完的話，palettegen 要等全部幀進來才吐調色盤，所有幀都得暫存在記憶體，
+      // 分兩次跑：用 split 一次跑完的話，palettegen 要等全部幀進來才吐調色盤，所有幀都得暫存在記憶體，
       // 1080×1080 十幾秒在 ffmpeg.wasm 會慢到接近卡死；分兩次則記憶體不隨長度增加，輸出完全相同。
-      var a1 = [];
-      if (start > 0) a1.push('-ss', String(start));
-      a1.push('-i', inN);
-      if (dur) a1.push('-t', String(dur));
-      a1.push('-vf', pre + ',' + gen, palN);
-      await ff.run.apply(ff, a1);
+      async function encode(o) {
+        var pre = 'fps=' + o.fps;
+        if (o.width > 0) pre += ',scale=' + o.width + ':-1' + (lanczos ? ':flags=lanczos' : '');
+        var gen = 'palettegen=max_colors=' + o.colors + ':stats_mode=' + (staticOpt ? 'diff' : 'full');
+        var use = 'paletteuse=dither=' + o.dither + (o.dither === 'bayer' ? ':bayer_scale=5' : '')
+                + (staticOpt ? ':diff_mode=rectangle' : '');
+        try { ff.FS('unlink', palN); } catch(e) {}
+        try { ff.FS('unlink', outN); } catch(e) {}
+        var a1 = [];
+        if (start > 0) a1.push('-ss', String(start));
+        a1.push('-i', inN);
+        if (dur) a1.push('-t', String(dur));
+        a1.push('-vf', pre + ',' + gen, palN);
+        await ff.run.apply(ff, a1);
+        var a2 = [];
+        if (start > 0) a2.push('-ss', String(start));
+        a2.push('-i', inN, '-i', palN);
+        a2.push('-filter_complex', '[0:v]' + pre + '[x];[x][1:v]' + use + '[out]', '-map', '[out]');
+        if (dur) a2.push('-t', String(dur));   // 兩個輸入時 -t 必須放在所有 -i 之後才是輸出選項
+        a2.push('-loop', String(loop), '-an', outN);
+        await ff.run.apply(ff, a2);
+        return ff.FS('readFile', outN);
+      }
 
-      var a2 = [];
-      if (start > 0) a2.push('-ss', String(start));
-      a2.push('-i', inN, '-i', palN);
-      a2.push('-filter_complex', '[0:v]' + pre + '[x];[x][1:v]' + use + '[out]', '-map', '[out]');
-      if (dur) a2.push('-t', String(dur));   // 兩個輸入時 -t 必須放在所有 -i 之後才是輸出選項
-      a2.push('-loop', String(loop), '-an', outN);
-      await ff.run.apply(ff, a2);
+      function effW(o) { return o.width > 0 ? Math.min(o.width, srcW) : srcW; }
+      function colorFactor(o) { return o.colors <= 64 ? 0.5 : (o.colors <= 128 || o.dither === 'bayer') ? 0.63 : 1; }
+      function label(o) { return (o.width > 0 ? o.width + 'px' : '原尺寸') + '／' + o.fps + 'fps／' + o.colors + ' 色'; }
 
-      var data = ff.FS('readFile', outN);
+      var first = {
+        width: parseInt(v('gifWidth').value, 10) || 0,
+        fps: parseInt(v('gifFps').value, 10) || 15,
+        colors: parseInt(v('gifColors').value, 10) || 256,
+        dither: v('gifDither').value || 'sierra2_4a'
+      };
+      var data = await encode(first), used = first, tried = [{ o: first, size: data.length }];
+
+      if (target === 'line' && data.length > LIMIT) {
+        var d2 = first.dither === 'none' ? 'none' : 'bayer';
+        // 優先保住原尺寸：先降幀率與顏色，還不夠才縮寬度
+        var ladder = [
+          { width: first.width, fps: Math.min(first.fps, 10), colors: Math.min(first.colors, 128), dither: d2 },
+          { width: 800, fps: 10, colors: 128, dither: d2 },
+          { width: 640, fps: 10, colors: 128, dither: d2 },
+          { width: 480, fps: 10, colors: 128, dither: d2 },
+          { width: 360, fps: 8, colors: 64, dither: d2 }
+        ];
+        var key = function(o) { return effW(o) + '/' + o.fps + '/' + o.colors + '/' + o.dither; };
+        var seen = {}; seen[key(first)] = 1;
+        ladder = ladder.filter(function(o, idx) {
+          if (idx > 0 && o.width >= effW(first)) return false;   // 只縮不放大
+          if (seen[key(o)]) return false;                         // 跟前面一樣的設定不重跑
+          seen[key(o)] = 1;
+          return true;
+        });
+        for (var i = 0; i < ladder.length && data.length > LIMIT; i++) {
+          var o = ladder[i], last = tried[tried.length - 1];
+          // 用上一次的實際大小估算，明顯還會超標的階段直接跳過，省下編碼時間（最後一階一定跑）
+          var est = last.size * Math.pow(effW(o) / effW(last.o), 2) * (o.fps / last.o.fps) * (colorFactor(o) / colorFactor(last.o));
+          if (est > LIMIT * 1.3 && i < ladder.length - 1) continue;
+          currentProgressBase = (last.size / 1e6).toFixed(1) + ' MB 超過 LINE 建議，改用 ' + label(o) + ' 重新產生...';
+          if (currentProgressEl) currentProgressEl.textContent = currentProgressBase;
+          data = await encode(o); used = o;
+          tried.push({ o: o, size: data.length });
+        }
+      }
+
+      card._gifInfo = {
+        target: target,
+        adjusted: used !== first,
+        firstSize: tried[0].size,
+        label: label(used),
+        fits: data.length <= LIMIT
+      };
       fsClean(inN, palN, outN);
       return { data: data, ext: 'gif', filename: basename(file.name) + '.gif' };
     },
@@ -4950,12 +5004,14 @@ window.dispatchEvent(new Event('transcription-ready'));
     var bigHint = card.querySelector('.gif-big-hint');
     var origOpt = wSel ? wSel.querySelector('option[value="0"]') : null;
     var srcW = 0;
+    var tSel = card.querySelector('[name=gifTarget]');
     function syncBigHint() {
       if (!wSel || !bigHint) return;
       var w = parseInt(wSel.value, 10) === 0 ? srcW : parseInt(wSel.value, 10);
-      bigHint.hidden = !(w > 800);
+      bigHint.hidden = !(w > 800) || (tSel && tSel.value === 'line');
     }
     if (wSel) wSel.addEventListener('change', syncBigHint);
+    if (tSel) tSel.addEventListener('change', syncBigHint);
     var probeInput = card.querySelector('input[type=file]');
     if (probeInput && origOpt) probeInput.addEventListener('change', function() {
       var f = probeInput.files[0];
@@ -4964,6 +5020,7 @@ window.dispatchEvent(new Event('transcription-ready'));
       pv.preload = 'metadata'; pv.muted = true;
       pv.onloadedmetadata = function() {
         srcW = pv.videoWidth || 0;
+        card.dataset.gifSrcW = String(srcW);
         origOpt.textContent = srcW ? ('原始尺寸（' + pv.videoWidth + '×' + pv.videoHeight + '）') : '維持原始寬度';
         URL.revokeObjectURL(pv.src);
         syncBigHint();
@@ -4983,9 +5040,27 @@ window.dispatchEvent(new Event('transcription-ready'));
         img._blob = out.blob;
         img.onload = function() { dimsEl.textContent = img.naturalWidth + ' × ' + img.naturalHeight + ' px'; };
         img.src = shownUrl;
-        var mb = out.blob.size / 1048576;
+        var info = card._gifInfo || {};
+        var isLine = info.target === 'line';
         sizeEl.innerHTML = '<b>' + fmtBytes(out.blob.size) + '</b>'
-          + (mb > 8 ? ' <span class="warn">偏大，可降寬度或幀率</span>' : '');
+          + (!isLine && out.blob.size > 10e6 ? ' <span class="warn">超過 10 MB，LINE 可能傳不動</span>' : '');
+        var noteEl = card.querySelector('.gif-result-note');
+        var tipEl = card.querySelector('.gif-line-tip');
+        if (noteEl) {
+          if (isLine && info.adjusted) {
+            noteEl.className = 'gif-result-note' + (info.fits ? ' ok' : '');
+            noteEl.textContent = '依你的設定產生是 ' + (info.firstSize / 1e6).toFixed(1) + ' MB，超過 LINE 建議的 10 MB，已自動改為'
+              + info.label + (info.fits ? '。' : '，仍然偏大 — 請縮短片段再轉一次。');
+            noteEl.hidden = false;
+          } else if (isLine) {
+            noteEl.className = 'gif-result-note ok';
+            noteEl.textContent = '已在 LINE 建議的 10 MB 以內，照你的設定輸出，沒有降畫質。';
+            noteEl.hidden = false;
+          } else {
+            noteEl.hidden = true;
+          }
+        }
+        if (tipEl) tipEl.hidden = !isLine;
       }
       if (!card.classList.contains('done') && img.src) {
         img.removeAttribute('src'); img._blob = null;
@@ -7737,7 +7812,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-09-11 21:13</span>
+  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-09-11 21:22</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 
