@@ -1728,6 +1728,7 @@ if (!self.crossOriginIsolated) {
             <label class="gif-chk"><input type="checkbox" name="gifLanczos" checked><span>高品質縮放（Lanczos）<small>縮小時邊緣較銳利，處理時間略增。</small></span></label>
           </div>
         </details>
+        <div class="gif-hint gif-big-hint" hidden>原尺寸 GIF 非常大：動態畫面 1080×1080、15fps，5 秒約 50 MB、12 秒約 130 MB。要保留原尺寸建議改 10fps、128 色、Bayer 抖動（約少 60%），並把片段控制在 5 秒內。</div>
         <div class="gif-hint">GIF 沒有聲音，也不適合太長：建議 3～10 秒、480px 以內。</div>
       </div>
 
@@ -2846,16 +2847,29 @@ window.dispatchEvent(new Event('transcription-ready'));
       var gen = 'palettegen=max_colors=' + colors + ':stats_mode=' + (staticOpt ? 'diff' : 'full');
       var use = 'paletteuse=dither=' + dither + (dither === 'bayer' ? ':bayer_scale=5' : '')
               + (staticOpt ? ':diff_mode=rectangle' : '');
-      var flt = '[0:v]' + pre + ',split[a][b];[a]' + gen + '[p];[b][p]' + use + '[out]';
+      var palN = 'gif_pal.png';
+      try { ff.FS('unlink', palN); } catch(e) {}
 
-      var args = [];
-      if (start > 0) args.push('-ss', String(start));
-      args.push('-i', inN);
-      if (dur) args.push('-t', String(dur));   // 單一輸入，放在輸出前即為輸出選項
-      args.push('-filter_complex', flt, '-map', '[out]', '-loop', String(loop), '-an', outN);
-      await ff.run.apply(ff, args);
+      // 分兩次跑：先算調色盤、再套色輸出。
+      // 用 split 一次跑完的話，palettegen 要等全部幀進來才吐調色盤，所有幀都得暫存在記憶體，
+      // 1080×1080 十幾秒在 ffmpeg.wasm 會慢到接近卡死；分兩次則記憶體不隨長度增加，輸出完全相同。
+      var a1 = [];
+      if (start > 0) a1.push('-ss', String(start));
+      a1.push('-i', inN);
+      if (dur) a1.push('-t', String(dur));
+      a1.push('-vf', pre + ',' + gen, palN);
+      await ff.run.apply(ff, a1);
+
+      var a2 = [];
+      if (start > 0) a2.push('-ss', String(start));
+      a2.push('-i', inN, '-i', palN);
+      a2.push('-filter_complex', '[0:v]' + pre + '[x];[x][1:v]' + use + '[out]', '-map', '[out]');
+      if (dur) a2.push('-t', String(dur));   // 兩個輸入時 -t 必須放在所有 -i 之後才是輸出選項
+      a2.push('-loop', String(loop), '-an', outN);
+      await ff.run.apply(ff, a2);
+
       var data = ff.FS('readFile', outN);
-      fsClean(inN, outN);
+      fsClean(inN, palN, outN);
       return { data: data, ext: 'gif', filename: basename(file.name) + '.gif' };
     },
     // ── 音訊降噪（anlmdn + 頻段過濾）──
@@ -4931,6 +4945,31 @@ window.dispatchEvent(new Event('transcription-ready'));
 
   // GIF 卡：完成後直接把動圖顯示出來，不用下載才看得到
   function setupGifPreview(card) {
+    // 原尺寸選項標上實際尺寸；選到寬度超過 800 時提醒檔案大小
+    var wSel = card.querySelector('[name=gifWidth]');
+    var bigHint = card.querySelector('.gif-big-hint');
+    var origOpt = wSel ? wSel.querySelector('option[value="0"]') : null;
+    var srcW = 0;
+    function syncBigHint() {
+      if (!wSel || !bigHint) return;
+      var w = parseInt(wSel.value, 10) === 0 ? srcW : parseInt(wSel.value, 10);
+      bigHint.hidden = !(w > 800);
+    }
+    if (wSel) wSel.addEventListener('change', syncBigHint);
+    var probeInput = card.querySelector('input[type=file]');
+    if (probeInput && origOpt) probeInput.addEventListener('change', function() {
+      var f = probeInput.files[0];
+      if (!f) return;
+      var pv = document.createElement('video');
+      pv.preload = 'metadata'; pv.muted = true;
+      pv.onloadedmetadata = function() {
+        srcW = pv.videoWidth || 0;
+        origOpt.textContent = srcW ? ('原始尺寸（' + pv.videoWidth + '×' + pv.videoHeight + '）') : '維持原始寬度';
+        URL.revokeObjectURL(pv.src);
+        syncBigHint();
+      };
+      pv.src = URL.createObjectURL(f);
+    });
     var img = card.querySelector('.gif-result-img');
     var dimsEl = card.querySelector('.gif-result-dims');
     var sizeEl = card.querySelector('.gif-result-size');
@@ -7698,7 +7737,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-09-11 20:53</span>
+  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-09-11 21:13</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 
