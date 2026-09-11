@@ -332,6 +332,29 @@ footer a{color:var(--indigo2);text-decoration:none}
 .pl-pv-time{font-size:10.5px;color:var(--text3);flex:none}
 .pl-pv-note{margin-top:6px;font-size:10.5px;color:var(--text3);line-height:1.55}
 
+/* ── GIF 動圖卡 ── */
+.gif-opts{display:none;margin-bottom:10px}
+.tool-card.has-file .gif-opts{display:block}
+.tool-card.processing .gif-opts,.tool-card.done .gif-opts{display:none}
+.gif-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px}
+.gif-row .fmt-select{margin-bottom:0}
+.gif-adv{border:1px solid var(--border);border-radius:10px;padding:0 11px;margin-top:8px;background:rgba(255,255,255,.02)}
+.gif-adv summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--text2);padding:9px 0;list-style:none;display:flex;align-items:center;gap:7px}
+.gif-adv summary::-webkit-details-marker{display:none}
+.gif-adv summary::after{content:'';width:6px;height:6px;border-right:1.5px solid var(--text3);border-bottom:1.5px solid var(--text3);transform:rotate(-45deg);margin-left:auto;transition:transform .18s}
+.gif-adv[open] summary::after{transform:rotate(45deg)}
+.gif-adv-body{padding:2px 0 11px}
+.gif-chk{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text2);margin-top:8px;cursor:pointer;line-height:1.5}
+.gif-chk input{margin-top:3px;accent-color:#f59e0b}
+.gif-chk small{display:block;font-size:10.5px;color:var(--text3)}
+.gif-hint{font-size:11px;color:var(--text3);line-height:1.6;margin-top:8px}
+.gif-result{display:none;margin:12px 0 4px}
+.tool-card.done .gif-result{display:block}
+.gif-result img{width:100%;display:block;border-radius:10px;border:1px solid var(--border2);background:#000}
+.gif-result-meta{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--text3);margin-top:7px;font-variant-numeric:tabular-nums}
+.gif-result-meta b{color:#fbbf24;font-weight:600}
+.gif-result-meta .warn{color:#fb7185}
+
 /* ── 組合流程卡（pl- = pipeline）── */
 .pl-steps{display:none;margin-top:12px}
 .tool-card.has-file .pl-steps{display:block}
@@ -912,6 +935,7 @@ if (!self.crossOriginIsolated) {
   <symbol id="ico-transcribe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></symbol>
   <symbol id="ico-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
   <symbol id="ico-denoise-audio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h2"/><path d="M7 9v6"/><path d="M11 6v12"/><path d="M15 9v6"/><path d="M19 11v2"/><path d="M21 3l.5 1.5L23 5l-1.5.5L21 7l-.5-1.5L19 5l1.5-.5z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="ico-gif" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="M8.5 10.2a1.8 1.8 0 0 0-1.7-1.2c-1.1 0-1.8.9-1.8 3s.7 3 1.8 3c1 0 1.7-.6 1.7-1.7v-.8H7.3"/><path d="M12 9v6"/><path d="M15 15V9h3.5M15 12h3"/></symbol>
   <symbol id="ico-blurpad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="5" width="21" height="14" rx="2"/><rect x="9" y="2.5" width="6" height="19" rx="1.5" fill="currentColor" fill-opacity=".22"/><path d="M4.5 9.5h2.5M4.5 12.5h2.5M4.5 15.5h2.5M17 9.5h2.5M17 12.5h2.5M17 15.5h2.5" stroke-opacity=".5"/></symbol>
   <symbol id="ico-denoise-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M2 9h4M8 9h2M12 9h6M2 13h6M10 13h4M16 13h4"/><path d="M21 3l.5 1.5L23 5l-1.5.5L21 7l-.5-1.5L19 5l1.5-.5z" fill="currentColor" stroke="none"/></symbol>
 </svg>
@@ -1052,6 +1076,7 @@ if (!self.crossOriginIsolated) {
       <a class="guide-pill" data-guide="bgm"><span class="gp-dot gp-pink"></span>背景音樂／靜音</a>
       <a class="guide-pill" data-guide="speed"><span class="gp-dot gp-lime"></span>調整速度</a>
       <a class="guide-pill" data-guide="subtitle"><span class="gp-dot gp-cyan"></span>加入字幕</a>
+      <a class="guide-pill" data-guide="gif"><span class="gp-dot" style="background:#f59e0b"></span>轉 GIF 動圖</a>
       <a class="guide-pill" data-guide="snapshot"><span class="gp-dot gp-fuchsia"></span>截取影格</a>
       <a class="guide-pill" data-guide="toAudio"><span class="gp-dot gp-indigo"></span>影片轉音樂</a>
       <a class="guide-pill" data-guide="audioConvert"><span class="gp-dot gp-violet"></span>音訊轉換</a>
@@ -1642,6 +1667,83 @@ if (!self.crossOriginIsolated) {
     </div>
 
     <!-- 截取影格 -->
+    <!-- 影片轉 GIF 動圖 -->
+    <div class="tool-card c-amber" data-tool="gif" data-no-autostart="1">
+      <input type="file" hidden accept="video/*,.mkv,.avi,.webm,.flv,.ts">
+      <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-gif"/></svg></div>
+      <div class="tool-name">影片轉 GIF 動圖</div>
+      <div class="tool-desc">把影片片段轉成 GIF，可選輸出寬度與幀率；進階選項可調顏色數、抖動方式與靜態背景最佳化，控制檔案大小與畫質。</div>
+      <div class="tool-formats"><span class="fmt">兩段式調色盤</span><span class="fmt">可選片段</span><span class="fmt">完成即預覽</span></div>
+      <div class="drop-area">
+        <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
+        <div class="drop-area-text">拖曳影片到這裡，或點擊選取</div>
+        <div class="drop-area-sub">支援 MP4、MOV、AVI、MKV、WebM</div>
+      </div>
+      <div class="file-info">
+        <span class="file-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-file"/></svg></span>
+        <span class="file-info-name"></span><span class="file-info-size"></span>
+        <button class="file-clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-x"/></svg></button>
+      </div>
+      <input type="hidden" class="time-start"><input type="hidden" class="time-end">
+      <button class="tool-btn trim-open-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-sliders"/></svg>選擇要轉的片段（可略過）</button>
+      <div class="trim-range-chip"><span class="trim-range-lbl">片段範圍</span><span class="trim-range-val">未設定 — 轉整段影片</span></div>
+
+      <div class="gif-opts">
+        <div class="gif-row">
+          <select class="fmt-select" name="gifWidth">
+            <option value="320">寬 320px（貼文、聊天）</option>
+            <option value="480" selected>寬 480px（推薦）</option>
+            <option value="640">寬 640px（清楚）</option>
+            <option value="800">寬 800px（大圖）</option>
+            <option value="0">維持原始寬度</option>
+          </select>
+          <select class="fmt-select" name="gifFps">
+            <option value="10">10 fps（檔案最小）</option>
+            <option value="15" selected>15 fps（推薦）</option>
+            <option value="20">20 fps（較流暢）</option>
+            <option value="25">25 fps（最流暢）</option>
+          </select>
+        </div>
+        <select class="fmt-select" name="gifLoop">
+          <option value="0" selected>無限循環播放</option>
+          <option value="-1">只播放一次</option>
+          <option value="2">重複播放 3 次</option>
+        </select>
+        <details class="gif-adv">
+          <summary>進階選項 — 增強 GIF 輸出效果</summary>
+          <div class="gif-adv-body">
+            <div class="gif-row">
+              <select class="fmt-select" name="gifColors">
+                <option value="256" selected>256 色（最佳）</option>
+                <option value="128">128 色（較小）</option>
+                <option value="64">64 色（最小）</option>
+              </select>
+              <select class="fmt-select" name="gifDither">
+                <option value="sierra2_4a" selected>Sierra 抖動（自然）</option>
+                <option value="bayer">Bayer 抖動（較小）</option>
+                <option value="none">不抖動（純色圖）</option>
+              </select>
+            </div>
+            <label class="gif-chk"><input type="checkbox" name="gifStatic" checked><span>靜態背景最佳化<small>只記錄畫面有變動的區域，背景固定的影片檔案可小很多；畫面整體晃動時建議關閉。</small></span></label>
+            <label class="gif-chk"><input type="checkbox" name="gifLanczos" checked><span>高品質縮放（Lanczos）<small>縮小時邊緣較銳利，處理時間略增。</small></span></label>
+          </div>
+        </details>
+        <div class="gif-hint">GIF 沒有聲音，也不適合太長：建議 3～10 秒、480px 以內。</div>
+      </div>
+
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">產生 GIF 中...</div></div>
+      <div class="error-msg"></div>
+      <button class="tool-btn start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始轉成 GIF</button>
+      <div class="gif-result">
+        <img class="gif-result-img" alt="GIF 預覽">
+        <div class="gif-result-meta"><span class="gif-result-dims"></span><span class="gif-result-size"></span></div>
+      </div>
+      <div class="download-wrap">
+        <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載 GIF</button>
+        <button class="reset-btn">再轉一支</button>
+      </div>
+    </div>
+
     <div class="tool-card c-fuchsia" data-tool="snapshot">
       <input type="file" hidden accept="video/*,.mkv,.avi,.webm">
       <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-camera"/></svg></div>
@@ -2498,7 +2600,7 @@ window.dispatchEvent(new Event('transcription-ready'));
   var MIME = {
     mp4:'video/mp4', webm:'video/webm', mov:'video/quicktime', avi:'video/x-msvideo',
     mp3:'audio/mpeg', wav:'audio/wav', aac:'audio/aac', flac:'audio/flac', ogg:'audio/ogg',
-    png:'image/png', jpg:'image/jpeg'
+    png:'image/png', jpg:'image/jpeg', gif:'image/gif'
   };
 
   async function ensureFF() {
@@ -2720,6 +2822,42 @@ window.dispatchEvent(new Event('transcription-ready'));
       fsClean(inN, outN);
       return { data: data, ext: 'mp4', filename: basename(file.name) + '_16x9.mp4' };
     },
+    // ── 影片轉 GIF：兩段式調色盤（palettegen → paletteuse）一次呼叫完成 ──
+    gif: async function(file, card) {
+      var v = function(n) { return card.querySelector('[name=' + n + ']'); };
+      var width = parseInt(v('gifWidth').value, 10) || 0;
+      var fps = parseInt(v('gifFps').value, 10) || 15;
+      var loop = v('gifLoop').value || '0';
+      var colors = parseInt(v('gifColors').value, 10) || 256;
+      var dither = v('gifDither').value || 'sierra2_4a';
+      var staticOpt = !!v('gifStatic').checked;
+      var lanczos = !!v('gifLanczos').checked;
+      var start = parseTime(card.querySelector('.time-start').value) || 0;
+      var end = parseTime(card.querySelector('.time-end').value);
+      var dur = (end !== null && end > start) ? (end - start) : null;
+
+      var inN = 'in.' + getExt(file.name), outN = 'out.gif';
+      try { ff.FS('unlink', outN); } catch(e) {}
+      ff.FS('writeFile', inN, await fetchFile(file));
+
+      var pre = 'fps=' + fps;
+      if (width > 0) pre += ',scale=' + width + ':-1' + (lanczos ? ':flags=lanczos' : '');
+      // 靜態背景最佳化：調色盤只統計有變動的像素、輸出只重繪變動的矩形
+      var gen = 'palettegen=max_colors=' + colors + ':stats_mode=' + (staticOpt ? 'diff' : 'full');
+      var use = 'paletteuse=dither=' + dither + (dither === 'bayer' ? ':bayer_scale=5' : '')
+              + (staticOpt ? ':diff_mode=rectangle' : '');
+      var flt = '[0:v]' + pre + ',split[a][b];[a]' + gen + '[p];[b][p]' + use + '[out]';
+
+      var args = [];
+      if (start > 0) args.push('-ss', String(start));
+      args.push('-i', inN);
+      if (dur) args.push('-t', String(dur));   // 單一輸入，放在輸出前即為輸出選項
+      args.push('-filter_complex', flt, '-map', '[out]', '-loop', String(loop), '-an', outN);
+      await ff.run.apply(ff, args);
+      var data = ff.FS('readFile', outN);
+      fsClean(inN, outN);
+      return { data: data, ext: 'gif', filename: basename(file.name) + '.gif' };
+    },
     // ── 音訊降噪（anlmdn + 頻段過濾）──
     audioDenoise: async function(file, card) {
       var lvl = card.querySelector('select[name=adnLevel]').value;
@@ -2850,7 +2988,7 @@ window.dispatchEvent(new Event('transcription-ready'));
       bar.style.width = '0%';
       errEl.textContent = '';
       var chip = card.querySelector('.trim-range-val');
-      if (chip) chip.textContent = '尚未設定 — 點上方按鈕設定';
+      if (chip) chip.textContent = toolId === 'gif' ? '未設定 — 轉整段影片' : '尚未設定 — 點上方按鈕設定';
       var hs = card.querySelector('.time-start'); if (hs) hs.value = '0';
       var he = card.querySelector('.time-end'); if (he) he.value = '';
     }
@@ -4791,6 +4929,32 @@ window.dispatchEvent(new Event('transcription-ready'));
     card.addEventListener('bp-stop', pausePreview);
   }
 
+  // GIF 卡：完成後直接把動圖顯示出來，不用下載才看得到
+  function setupGifPreview(card) {
+    var img = card.querySelector('.gif-result-img');
+    var dimsEl = card.querySelector('.gif-result-dims');
+    var sizeEl = card.querySelector('.gif-result-size');
+    if (!img) return;
+    var shownUrl = null;
+    new MutationObserver(function() {
+      var out = card._chainOutput;
+      if (card.classList.contains('done') && out && out.blob && out.blob !== img._blob) {
+        if (shownUrl) URL.revokeObjectURL(shownUrl);
+        shownUrl = URL.createObjectURL(out.blob);
+        img._blob = out.blob;
+        img.onload = function() { dimsEl.textContent = img.naturalWidth + ' × ' + img.naturalHeight + ' px'; };
+        img.src = shownUrl;
+        var mb = out.blob.size / 1048576;
+        sizeEl.innerHTML = '<b>' + fmtBytes(out.blob.size) + '</b>'
+          + (mb > 8 ? ' <span class="warn">偏大，可降寬度或幀率</span>' : '');
+      }
+      if (!card.classList.contains('done') && img.src) {
+        img.removeAttribute('src'); img._blob = null;
+        if (shownUrl) { URL.revokeObjectURL(shownUrl); shownUrl = null; }
+      }
+    }).observe(card, { attributes: true, attributeFilter: ['class'] });
+  }
+
   // ── Audio Trim Card (card-level only, modal is separate) ──
   function setupAudioTrimCard(card) {
     var input = card.querySelector('input[type=file]');
@@ -5664,6 +5828,7 @@ window.dispatchEvent(new Event('transcription-ready'));
   };
 
   document.querySelectorAll('.tool-card[data-tool]:not([data-tool="merge"]):not([data-tool="watermark"]):not([data-tool="faceBlur"]):not([data-tool="bgm"]):not([data-tool="subtitle"]):not([data-tool="snapshot"]):not([data-tool="audioTrim"]):not([data-tool="screenRecord"]):not([data-tool="audioRecord"]):not([data-tool="transcribe"]):not([data-tool="ytdl"]):not([data-tool="pipeline"])').forEach(setupCard);
+  document.querySelectorAll('.tool-card[data-tool="gif"]').forEach(setupGifPreview);
   document.querySelectorAll('.tool-card[data-tool="pipeline"]').forEach(setupPipelineCard);
   document.querySelectorAll('.tool-card[data-tool="blurPad"]').forEach(setupBlurPadPreview);
   document.querySelectorAll('.tool-card[data-tool="watermark"]').forEach(setupWatermarkCard);
@@ -5719,7 +5884,7 @@ window.dispatchEvent(new Event('transcription-ready'));
     screenRecord: ['transcribe', 'trim', 'compress', 'faceBlur'],
     audioRecord:  ['transcribe', 'audioTrim', 'audioConvert'],
     transcribe:   ['subtitle'],
-    trim:         ['faceBlur', 'watermark', 'compress', 'subtitle', 'transcribe', 'blurPad'],
+    trim:         ['faceBlur', 'watermark', 'compress', 'gif', 'subtitle', 'transcribe', 'blurPad'],
     toAudio:      ['transcribe', 'audioTrim', 'audioConvert'],
     compress:     ['trim', 'faceBlur', 'watermark'],
     faceBlur:     ['watermark', 'compress', 'trim', 'subtitle'],
@@ -7533,7 +7698,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-09-09 17:22</span>
+  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-09-11 20:53</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 

@@ -23,13 +23,13 @@ const VIDEO_HEADERS = [
   'yt_url','yt_views','yt_likes','yt_comments','yt_imp','yt_ctr','yt_ratio','yt_avgdur',
   'fb_url','fb_views','fb_likes','fb_comments','fb_shares','fb_reach',
   'ig_url','ig_views','ig_likes','ig_comments','ig_shares','ig_reach',
-  'note','statsDate','createdAt','updatedAt'
+  'note','statsDate','createdAt','updatedAt','series','tags'
 ];
 
 const IG_HEADERS = [
   'id','title','date','type','cat',
   'views','likes','comments','interactions','shares','saves','reach',
-  'link','createdAt','updatedAt'
+  'link','createdAt','updatedAt','tags','videoId'
 ];
 
 const TH_HEADERS = [
@@ -38,15 +38,52 @@ const TH_HEADERS = [
   'link','createdAt','updatedAt'
 ];
 
+
+// ── 依試算表「實際表頭」寫入，避免欄位順序不一致造成整列位移 ──────
+function ensureHeaders(sh, defaults) {
+  var lastCol = sh.getLastColumn();
+  var headers = lastCol > 0 ? sh.getRange(1, 1, 1, lastCol).getValues()[0].map(String) : [];
+  headers = headers.filter(function (h) { return h !== ''; });
+  if (!headers.length) { sh.appendRow(defaults); return defaults.slice(); }
+  var missing = defaults.filter(function (h) { return headers.indexOf(h) === -1; });
+  if (missing.length) {
+    sh.getRange(1, headers.length + 1, 1, missing.length).setValues([missing]);
+    headers = headers.concat(missing);
+  }
+  return headers;
+}
+function buildRow(headers, data, keepCreatedAt) {
+  var now = new Date().toISOString();
+  return headers.map(function (h) {
+    if (h === 'createdAt') return keepCreatedAt || data.createdAt || now;
+    if (h === 'updatedAt') return now;
+    return data[h] !== undefined ? data[h] : '';
+  });
+}
+
+// ── 存取金鑰 ──────────────────────────────────────────────
+// 部署網址是公開的，沒有金鑰等於任何人都能讀寫整個資料庫。
+// 金鑰存在「專案設定 → 指令碼屬性」的 API_KEY；前端不持有，
+// 由 Cloudflare Pages Function（/api 代理）與影音企劃中心 Worker 帶上。
+// 屬性還沒設定時放行，避免部署順序把自己鎖在外面。
+function _checkKey(e) {
+  var want = PropertiesService.getScriptProperties().getProperty('API_KEY');
+  if (!want) return true;
+  var got = (e && e.parameter && e.parameter.key) || '';
+  return got === want;
+}
+
 // ── doGet ────────────────────────────────────────────────────
 
 function doGet(e) {
+  if (!_checkKey(e)) return jsonRes({ error: 'unauthorized' });
   const action = e.parameter.action || '';
   const module = e.parameter.module || '';
   try {
     if (module === 'youtube') {
       if (action === 'getVideos') return jsonRes(getVideos());
       if (action === 'getConfig') return jsonRes(getYtConfig());
+      if (action === 'ytStats') return jsonRes(ytStats(e.parameter.ids, e.parameter.part));
     }
     if (module === 'youtube' || module === 'ig') {
       if (action === 'getIgPosts') return jsonRes(getIgPosts());
@@ -63,6 +100,7 @@ function doGet(e) {
 // ── doPost ───────────────────────────────────────────────────
 
 function doPost(e) {
+  if (!_checkKey(e)) return jsonRes({ error: 'unauthorized' });
   const body = JSON.parse(e.postData.contents || '{}');
   const action = body.action || '';
   const module = body.module || '';
@@ -114,15 +152,14 @@ function saveVideo(data) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
   let sh = ss.getSheetByName(YT_SHEET);
   if (!sh) { sh = ss.insertSheet(YT_SHEET); sh.appendRow(VIDEO_HEADERS); }
-  const now = new Date().toISOString();
+  const headers = ensureHeaders(sh, VIDEO_HEADERS);
   const id = data.id || (Date.now().toString(36) + Math.random().toString(36).slice(2,6));
-  const row = VIDEO_HEADERS.map(h => {
-    if (h === 'id') return id;
-    if (h === 'createdAt') return data.createdAt || now;
-    if (h === 'updatedAt') return now;
-    return data[h] !== undefined ? data[h] : '';
-  });
-  sh.appendRow(row);
+  // 已存在相同 id 則改為更新，避免重複列
+  const rows = sh.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) === String(id)) return updateVideo(Object.assign({}, data, { id: id }));
+  }
+  sh.appendRow(buildRow(headers, Object.assign({}, data, { id: id })));
   return { success: true, id };
 }
 
@@ -130,21 +167,15 @@ function updateVideo(data) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
   const sh = ss.getSheetByName(YT_SHEET);
   if (!sh) return { success: false, error: 'Sheet not found' };
+  const headers = ensureHeaders(sh, VIDEO_HEADERS);
   const rows = sh.getDataRange().getValues();
-  const headers = rows[0];
   for (let i = 1; i < rows.length; i++) {
     if (String(rows[i][0]) === String(data.id)) {
-      const now = new Date().toISOString();
-      const newRow = VIDEO_HEADERS.map(h => {
-        if (h === 'createdAt') return rows[i][headers.indexOf('createdAt')] || '';
-        if (h === 'updatedAt') return now;
-        return data[h] !== undefined ? data[h] : '';
-      });
-      sh.getRange(i+1, 1, 1, VIDEO_HEADERS.length).setValues([newRow]);
+      const created = rows[i][headers.indexOf('createdAt')] || '';
+      sh.getRange(i+1, 1, 1, headers.length).setValues([buildRow(headers, data, created)]);
       return { success: true };
     }
   }
-  // Not found → append as new
   return saveVideo(data);
 }
 
@@ -180,38 +211,27 @@ function saveIgPost(data) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
   let sh = ss.getSheetByName(IG_SHEET);
   if (!sh) { sh = ss.insertSheet(IG_SHEET); sh.appendRow(IG_HEADERS); }
-  const now = new Date().toISOString();
+  const headers = ensureHeaders(sh, IG_HEADERS);
   const id = data.id || (Date.now().toString(36) + Math.random().toString(36).slice(2,6));
   // 已存在相同 id 則改為更新，避免重複列（批次匯入時會發生）
-  const existing = sh.getDataRange().getValues();
-  for (let i = 1; i < existing.length; i++) {
-    if (String(existing[i][0]) === String(id)) return updateIgPost(Object.assign({}, data, { id: id }));
+  const rows = sh.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) === String(id)) return updateIgPost(Object.assign({}, data, { id: id }));
   }
-  const row = IG_HEADERS.map(h => {
-    if (h === 'id') return id;
-    if (h === 'createdAt') return data.createdAt || now;
-    if (h === 'updatedAt') return now;
-    return data[h] !== undefined ? data[h] : '';
-  });
-  sh.appendRow(row);
+  sh.appendRow(buildRow(headers, Object.assign({}, data, { id: id })));
   return { success: true, id };
 }
 
 function updateIgPost(data) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
   const sh = ss.getSheetByName(IG_SHEET);
-  if (!sh) return saveIgPost(data); // sheet 不存在時自動建立並新增
+  if (!sh) return saveIgPost(data);
+  const headers = ensureHeaders(sh, IG_HEADERS);
   const rows = sh.getDataRange().getValues();
-  const headers = rows[0];
   for (let i = 1; i < rows.length; i++) {
     if (String(rows[i][0]) === String(data.id)) {
-      const now = new Date().toISOString();
-      const newRow = IG_HEADERS.map(h => {
-        if (h === 'createdAt') return rows[i][headers.indexOf('createdAt')] || '';
-        if (h === 'updatedAt') return now;
-        return data[h] !== undefined ? data[h] : '';
-      });
-      sh.getRange(i+1, 1, 1, IG_HEADERS.length).setValues([newRow]);
+      const created = rows[i][headers.indexOf('createdAt')] || '';
+      sh.getRange(i+1, 1, 1, headers.length).setValues([buildRow(headers, data, created)]);
       return { success: true };
     }
   }
@@ -250,20 +270,14 @@ function saveThreadsPost(data) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
   let sh = ss.getSheetByName(TH_SHEET);
   if (!sh) { sh = ss.insertSheet(TH_SHEET); sh.appendRow(TH_HEADERS); }
-  const now = new Date().toISOString();
+  const headers = ensureHeaders(sh, TH_HEADERS);
   const id = data.id || (Date.now().toString(36) + Math.random().toString(36).slice(2,6));
-  // 已存在則改為更新，避免重複
+  // 已存在相同 id 則改為更新，避免重複列（批次匯入時會發生）
   const rows = sh.getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
-    if (String(rows[i][0]) === String(id)) return updateThreadsPost(data);
+    if (String(rows[i][0]) === String(id)) return updateThreadsPost(Object.assign({}, data, { id: id }));
   }
-  const row = TH_HEADERS.map(h => {
-    if (h === 'id') return id;
-    if (h === 'createdAt') return data.createdAt || now;
-    if (h === 'updatedAt') return now;
-    return data[h] !== undefined ? data[h] : '';
-  });
-  sh.appendRow(row);
+  sh.appendRow(buildRow(headers, Object.assign({}, data, { id: id })));
   return { success: true, id };
 }
 
@@ -271,17 +285,12 @@ function updateThreadsPost(data) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
   const sh = ss.getSheetByName(TH_SHEET);
   if (!sh) return saveThreadsPost(data);
+  const headers = ensureHeaders(sh, TH_HEADERS);
   const rows = sh.getDataRange().getValues();
-  const headers = rows[0];
   for (let i = 1; i < rows.length; i++) {
     if (String(rows[i][0]) === String(data.id)) {
-      const now = new Date().toISOString();
-      const newRow = TH_HEADERS.map(h => {
-        if (h === 'createdAt') return rows[i][headers.indexOf('createdAt')] || '';
-        if (h === 'updatedAt') return now;
-        return data[h] !== undefined ? data[h] : '';
-      });
-      sh.getRange(i+1, 1, 1, TH_HEADERS.length).setValues([newRow]);
+      const created = rows[i][headers.indexOf('createdAt')] || '';
+      sh.getRange(i+1, 1, 1, headers.length).setValues([buildRow(headers, data, created)]);
       return { success: true };
     }
   }
@@ -297,6 +306,21 @@ function deleteThreadsPost(id) {
     if (String(rows[i][0]) === String(id)) { sh.deleteRow(i+1); return { success: true }; }
   }
   return { success: false, error: 'ID not found' };
+}
+
+// ── YouTube Data API 代理 ───────────────────────────────────
+// 金鑰存在「指令碼屬性」的 YT_API_KEY，前端與各瀏覽器都不持有；
+// 前端呼叫 /api?action=ytStats 由這裡帶金鑰去打 YouTube API。
+function ytStats(ids, part) {
+  var key = PropertiesService.getScriptProperties().getProperty('YT_API_KEY');
+  if (!key) return { error: 'YT_API_KEY 未設定（請在專案設定→指令碼屬性新增）' };
+  if (!ids) return { error: 'missing ids' };
+  part = part || 'statistics';
+  var url = 'https://www.googleapis.com/youtube/v3/videos?part=' + encodeURIComponent(part)
+          + '&id=' + encodeURIComponent(ids) + '&key=' + encodeURIComponent(key);
+  var res = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+  try { return JSON.parse(res.getContentText()); }
+  catch (e) { return { error: 'YouTube API 回應解析失敗：' + res.getContentText().slice(0, 200) }; }
 }
 
 // ── 設定 ─────────────────────────────────────────────────────
