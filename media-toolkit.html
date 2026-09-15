@@ -358,6 +358,12 @@ footer a{color:var(--indigo2);text-decoration:none}
 .gif-result-note.ok{color:#6ee7b7;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.25)}
 .gif-line-tip{margin-top:8px;font-size:11.5px;line-height:1.65;color:var(--text2);padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--border)}
 
+/* ── 大檔快速裁切提示 ── */
+.trim-big-hint{margin:10px 0 2px;padding:9px 11px;border-radius:9px;font-size:11.5px;line-height:1.65;color:#bae6fd;background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.28)}
+.trim-big-hint b{color:#e0f2fe}
+.tool-card.processing .trim-big-hint,.tool-card.done .trim-big-hint{display:none}
+.result-note{margin:10px 0 4px;padding:9px 11px;border-radius:9px;font-size:11.5px;line-height:1.65;color:#a7f3d0;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.25)}
+.tool-card:not(.done) .result-note{display:none}
 /* ── 組合流程卡（pl- = pipeline）── */
 .pl-steps{display:none;margin-top:12px}
 .tool-card.has-file .pl-steps{display:block}
@@ -1347,8 +1353,10 @@ if (!self.crossOriginIsolated) {
           </div>
         </div>
       </div>
+      <div class="trim-big-hint" hidden>檔案超過 1 GB：會自動改用<b>快速裁切</b>，保留原始畫質、不重新編碼，幾秒就完成，不受檔案大小限制。畫質與位元率設定不會套用；只輸出聲音時會取出原始音軌（M4A）。</div>
       <div class="progress-wrap"><div class="progress-track"><div class="progress-bar"></div></div><div class="progress-text">裁切中...</div></div>
       <div class="error-msg"></div>
+      <div class="result-note" hidden></div>
       <button class="tool-btn start-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-bolt"/></svg>開始裁切</button>
       <div class="download-wrap">
         <button class="dl-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-download"/></svg>下載裁切後影片</button>
@@ -2484,6 +2492,403 @@ if (!self.crossOriginIsolated) {
   <div class="ff-loading-sub">首次使用需下載約 25 MB，請稍候</div>
 </div>
 
+<script>
+/* ══════════ MP4／MOV 大檔快速裁切 ══════════
+ * 不把整支影片讀進記憶體：只讀檔頭的 moov（索引），算出要保留的影格在原檔的位置，
+ * 輸出時直接引用原檔的位元組片段（Blob 切片，不複製），重寫新的索引。
+ * 不重新編碼，所以沒有 2 GB 限制、幾秒就完成；起點會對齊到前一個關鍵影格。
+ */
+(function (root) {
+  var CONTAINERS = { moov: 1, trak: 1, mdia: 1, minf: 1, stbl: 1, edts: 1 };
+
+  function fail(code, msg) { var e = new Error(msg); e.code = code; return e; }
+
+  async function readBytes(file, start, len) {
+    return new Uint8Array(await file.slice(start, start + len).arrayBuffer());
+  }
+  function typeAt(buf, o) { return String.fromCharCode(buf[o], buf[o + 1], buf[o + 2], buf[o + 3]); }
+  function u64(dv, o) { return dv.getUint32(o) * 4294967296 + dv.getUint32(o + 4); }
+
+  async function scanTop(file) {
+    var boxes = [], pos = 0, total = file.size;
+    while (pos + 8 <= total) {
+      var h = await readBytes(file, pos, Math.min(16, total - pos));
+      var dv = new DataView(h.buffer);
+      var size = dv.getUint32(0), hdr = 8;
+      if (size === 1) { if (h.length < 16) break; size = u64(dv, 8); hdr = 16; }
+      else if (size === 0) size = total - pos;
+      if (size < hdr) throw fail('BAD', '影片檔頭結構異常');
+      boxes.push({ type: typeAt(h, 4), start: pos, size: size, hdr: hdr });
+      pos += size;
+    }
+    return boxes;
+  }
+
+  function parseBoxes(buf, off, end) {
+    var out = [], dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+    while (off + 8 <= end) {
+      var size = dv.getUint32(off), hdr = 8;
+      if (size === 1) { size = u64(dv, off + 8); hdr = 16; }
+      else if (size === 0) size = end - off;
+      if (size < hdr || off + size > end) throw fail('BAD', '影片索引結構異常');
+      var b = { type: typeAt(buf, off + 4), off: off, size: size, hdr: hdr };
+      if (CONTAINERS[b.type]) b.children = parseBoxes(buf, off + hdr, off + size);
+      out.push(b);
+      off += size;
+    }
+    return out;
+  }
+  function find(list, type) { for (var i = 0; i < list.length; i++) if (list[i].type === type) return list[i]; return null; }
+  function path(list, types) { var cur = { children: list }; for (var i = 0; i < types.length; i++) { cur = cur && cur.children ? find(cur.children, types[i]) : null; } return cur; }
+
+  // ── 解析一條軌道的樣本表 ──
+  function readTrack(buf, trak) {
+    var dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+    var ch = trak.children;
+    var mdhd = path(ch, ['mdia', 'mdhd']), hdlr = path(ch, ['mdia', 'hdlr']);
+    var stbl = path(ch, ['mdia', 'minf', 'stbl']);
+    if (!mdhd || !hdlr || !stbl) return null;
+    var handler = typeAt(buf, hdlr.off + hdlr.hdr + 8);
+    var p = mdhd.off + mdhd.hdr, v = buf[p];
+    var timescale = v === 1 ? dv.getUint32(p + 20) : dv.getUint32(p + 12);
+
+    var sb = stbl.children;
+    var stsz = find(sb, 'stsz'), stts = find(sb, 'stts'), stsc = find(sb, 'stsc');
+    var stco = find(sb, 'stco'), co64 = find(sb, 'co64');
+    if (find(sb, 'stz2')) throw fail('UNSUPPORTED', '不支援這種影片索引格式（stz2）');
+    if (!stsz || !stts || !stsc || !(stco || co64)) return null;
+
+    var q = stsz.off + stsz.hdr + 4;
+    var constSize = dv.getUint32(q), n = dv.getUint32(q + 4);
+    if (n === 0) return { handler: handler, n: 0 };
+    var size = new Float64Array(n);
+    for (var i = 0; i < n; i++) size[i] = constSize || dv.getUint32(q + 8 + i * 4);
+
+    // 解碼時間與長度
+    var dts = new Float64Array(n), dur = new Float64Array(n);
+    q = stts.off + stts.hdr + 4;
+    var cnt = dv.getUint32(q), t = 0, si = 0;
+    for (var e = 0; e < cnt && si < n; e++) {
+      var c = dv.getUint32(q + 4 + e * 8), d = dv.getUint32(q + 8 + e * 8);
+      for (var k = 0; k < c && si < n; k++) { dts[si] = t; dur[si] = d; t += d; si++; }
+    }
+
+    // 顯示時間位移
+    var ctts = find(sb, 'ctts'), cto = new Float64Array(n), cttsVer = 0;
+    if (ctts) {
+      q = ctts.off + ctts.hdr; cttsVer = buf[q];
+      cnt = dv.getUint32(q + 4); si = 0;
+      for (e = 0; e < cnt && si < n; e++) {
+        c = dv.getUint32(q + 8 + e * 8);
+        var off = cttsVer === 1 ? dv.getInt32(q + 12 + e * 8) : dv.getUint32(q + 12 + e * 8);
+        // 有些工具寫 version 0 但實際是負值
+        if (cttsVer === 0 && off > 0x7fffffff) off = off - 4294967296;
+        for (k = 0; k < c && si < n; k++) { cto[si++] = off; }
+      }
+    }
+
+    // 關鍵影格（沒有 stss 代表每個樣本都是關鍵影格）
+    var stss = find(sb, 'stss'), sync = null;
+    if (stss) {
+      sync = new Uint8Array(n);
+      q = stss.off + stss.hdr + 4; cnt = dv.getUint32(q);
+      for (e = 0; e < cnt; e++) { var idx = dv.getUint32(q + 4 + e * 4) - 1; if (idx < n) sync[idx] = 1; }
+    }
+
+    // chunk → 樣本位置
+    var chunkOff = [];
+    if (stco) { q = stco.off + stco.hdr + 4; cnt = dv.getUint32(q); for (e = 0; e < cnt; e++) chunkOff.push(dv.getUint32(q + 4 + e * 4)); }
+    else { q = co64.off + co64.hdr + 4; cnt = dv.getUint32(q); for (e = 0; e < cnt; e++) chunkOff.push(u64(dv, q + 4 + e * 8)); }
+    q = stsc.off + stsc.hdr + 4; cnt = dv.getUint32(q);
+    var offset = new Float64Array(n), sdi = new Uint32Array(n);
+    si = 0;
+    for (e = 0; e < cnt; e++) {
+      var first = dv.getUint32(q + 4 + e * 12) - 1, spc = dv.getUint32(q + 8 + e * 12), desc = dv.getUint32(q + 12 + e * 12);
+      var next = e + 1 < cnt ? dv.getUint32(q + 4 + (e + 1) * 12) - 1 : chunkOff.length;
+      for (var cIdx = first; cIdx < next && si < n; cIdx++) {
+        var o = chunkOff[cIdx];
+        for (k = 0; k < spc && si < n; k++) { offset[si] = o; sdi[si] = desc; o += size[si]; si++; }
+      }
+    }
+
+    // 原本的編輯清單：開頭的空白編輯（media_time = -1）代表這條軌延後出現，
+    // 第一個實際片段的 media_time 代表從哪裡開始播；兩者都要算進真正的顯示時間
+    var mediaTime = 0, emptyDelay = 0, elst = path(ch, ['edts', 'elst']);
+    if (elst) {
+      q = elst.off + elst.hdr; var ev = buf[q]; cnt = dv.getUint32(q + 4);
+      for (e = 0; e < cnt; e++) {
+        var segDur = ev === 1 ? u64(dv, q + 8 + e * 20) : dv.getUint32(q + 8 + e * 12);
+        var mt = ev === 1 ? (dv.getInt32(q + 8 + e * 20 + 8) * 4294967296 + dv.getUint32(q + 8 + e * 20 + 12)) : dv.getInt32(q + 8 + e * 12 + 4);
+        if (mt < 0) { emptyDelay += segDur; continue; }
+        mediaTime = mt; break;
+      }
+    }
+
+    return { trak: trak, handler: handler, timescale: timescale, n: n, size: size, dts: dts, dur: dur,
+      cto: cto, cttsVer: cttsVer, hasCtts: !!ctts, sync: sync, offset: offset, sdi: sdi, mediaTime: mediaTime, emptyDelay: emptyDelay,
+      sampleEntry: typeAt(buf, find(sb, 'stsd').off + find(sb, 'stsd').hdr + 12) };
+  }
+
+  // ── 寫 box ──
+  function cat(parts) {
+    var len = 0, i; for (i = 0; i < parts.length; i++) len += parts[i].length;
+    var out = new Uint8Array(len), o = 0; for (i = 0; i < parts.length; i++) { out.set(parts[i], o); o += parts[i].length; }
+    return out;
+  }
+  function box(type, parts) {
+    var body = cat(parts), out = new Uint8Array(body.length + 8), dv = new DataView(out.buffer);
+    dv.setUint32(0, body.length + 8);
+    for (var i = 0; i < 4; i++) out[4 + i] = type.charCodeAt(i);
+    out.set(body, 8);
+    return out;
+  }
+  function u32arr(vals) {
+    var out = new Uint8Array(vals.length * 4), dv = new DataView(out.buffer);
+    for (var i = 0; i < vals.length; i++) dv.setUint32(i * 4, vals[i] >>> 0);
+    return out;
+  }
+  function fullHdr(version, flags) { return new Uint8Array([version, (flags >> 16) & 255, (flags >> 8) & 255, flags & 255]); }
+  function raw(buf, b) { return buf.subarray(b.off, b.off + b.size); }
+  function withDuration(buf, b, fieldOff32, fieldOff64, value) {
+    var copy = raw(buf, b).slice(), dv = new DataView(copy.buffer);
+    var p = b.hdr, v = copy[p];
+    if (v === 1) { dv.setUint32(p + fieldOff64, Math.floor(value / 4294967296)); dv.setUint32(p + fieldOff64 + 4, value >>> 0); }
+    else dv.setUint32(p + fieldOff32, Math.min(value, 0xffffffff) >>> 0);
+    return copy;
+  }
+
+  async function fastTrim(file, startSec, endSec, opts) {
+    opts = opts || {};
+    var onProgress = opts.onProgress || function () {};
+    var top = await scanTop(file);
+    var moovBox = null, ftypBox = null, hasMoof = false;
+    top.forEach(function (b) { if (b.type === 'moov') moovBox = b; if (b.type === 'ftyp') ftypBox = b; if (b.type === 'moof') hasMoof = true; });
+    if (!moovBox) throw fail('NOMOOV', '找不到影片索引（moov），檔案可能沒有錄製完整');
+    if (moovBox.size > 200 * 1048576) throw fail('BAD', '影片索引過大，無法處理');
+    onProgress(0.05, '讀取影片索引...');
+
+    var buf = await readBytes(file, moovBox.start, moovBox.size);
+    var moov = { type: 'moov', off: 0, size: moovBox.size, hdr: moovBox.hdr, children: parseBoxes(buf, moovBox.hdr, moovBox.size) };
+    if (hasMoof || find(moov.children, 'mvex')) throw fail('FRAGMENTED', '這支影片是分段錄製格式（fragmented MP4），無法快速裁切');
+
+    var dv = new DataView(buf.buffer);
+    var mvhd = find(moov.children, 'mvhd');
+    var mp = mvhd.off + mvhd.hdr;
+    var movieTs = buf[mp] === 1 ? dv.getUint32(mp + 20) : dv.getUint32(mp + 12);
+
+    var tracks = [];
+    moov.children.forEach(function (b) {
+      if (b.type !== 'trak') return;
+      var t = readTrack(buf, b);
+      if (t && t.n > 0 && (t.handler === 'vide' || t.handler === 'soun')) tracks.push(t);
+    });
+    var video = tracks.filter(function (t) { return t.handler === 'vide'; })[0] || null;
+    var audio = tracks.filter(function (t) { return t.handler === 'soun'; })[0] || null;
+    if (opts.audioOnly) video = null;
+    if (!video && !audio) throw fail('NOTRACK', '找不到可裁切的影像或聲音軌');
+    onProgress(0.2, '計算裁切位置...');
+
+    var keep = [];     // { t, i0, i1(不含) }
+    var startPres, endPres, keyPres;
+
+    if (video) {
+      var V = video, n = V.n, ts = V.timescale;
+      var vDelay = V.emptyDelay / movieTs;
+      var pres = function (i) { return vDelay + (V.dts[i] + V.cto[i] - V.mediaTime) / ts; };
+      // 起點：最後一個顯示時間 <= 起點的關鍵影格
+      var s = -1;
+      for (var i = 0; i < n; i++) {
+        if (V.sync && !V.sync[i]) continue;
+        if (pres(i) <= startSec + 1e-3) s = i; else if (s >= 0) break;
+      }
+      if (s < 0) { for (i = 0; i < n; i++) if (!V.sync || V.sync[i]) { s = i; break; } }
+      // 終點：從解碼順序截斷，截斷點之後的樣本顯示時間全都 >= 終點（前面的都能正常解碼）
+      var sufMin = new Float64Array(n + 1); sufMin[n] = Infinity;
+      for (i = n - 1; i >= 0; i--) sufMin[i] = Math.min(sufMin[i + 1], pres(i));
+      var j = n;
+      if (endSec != null) { for (i = s + 1; i < n; i++) { if (sufMin[i] >= endSec - 1e-3) { j = i; break; } } }
+      keyPres = pres(s);
+      // 資料從關鍵影格開始解碼，畫面從指定時間開始顯示；
+      // 起點對齊到最接近的完整影格，避免卡在兩格中間被播放器捨掉半格而讓音畫錯開
+      startPres = keyPres;
+      if (startSec > keyPres) {
+        var halfFrame = V.dur[s] / ts / 2, best = Infinity;
+        for (i = s; i < n; i++) {
+          var pi = pres(i);
+          if (pi >= startSec - halfFrame && pi < best) best = pi;
+          if (V.dts[i] / ts > startSec + 5) break;   // 超過起點幾秒就不用再找
+        }
+        if (best !== Infinity) startPres = best;
+      }
+      var maxEnd = 0;
+      for (i = s; i < j; i++) maxEnd = Math.max(maxEnd, pres(i) + V.dur[i] / ts);
+      endPres = endSec != null ? Math.min(endSec, maxEnd) : maxEnd;
+      keep.push({ t: V, i0: s, i1: j });
+    } else {
+      startPres = startSec; endPres = endSec;
+    }
+
+    if (audio) {
+      var A = audio, ats = A.timescale;
+      var aDelay = A.emptyDelay / movieTs;
+      var apres = function (i) { return aDelay + (A.dts[i] - A.mediaTime) / ats; };
+      var half = A.dur[0] / ats / 2;
+      var a0 = 0, a1 = A.n;
+      for (i = 0; i < A.n; i++) { if (apres(i) >= startPres - half) { a0 = i; break; } }
+      if (endPres != null) { for (i = a0; i < A.n; i++) { if (apres(i) >= endPres - half) { a1 = i; break; } } }
+      if (!video) { endPres = apres(a1 - 1) + A.dur[a1 - 1] / ats; startPres = apres(a0); }
+      if (a1 > a0) keep.push({ t: A, i0: a0, i1: a1 });
+    }
+    if (!keep.length || keep.every(function (k) { return k.i1 <= k.i0; })) throw fail('EMPTY', '裁切範圍內沒有內容，請確認起訖時間');
+
+    // ── 資料區：依原檔位置排序、相鄰合併成少數幾段 ──
+    var all = [];
+    keep.forEach(function (k, ti) { for (var i = k.i0; i < k.i1; i++) all.push([k.t.offset[i], k.t.size[i]]); });
+    all.sort(function (a, b) { return a[0] - b[0]; });
+    var ranges = [], total = 0;
+    for (i = 0; i < all.length; i++) {
+      var st = all[i][0], en = st + all[i][1], last = ranges[ranges.length - 1];
+      if (last && st <= last.end) { if (en > last.end) { total += en - last.end; last.end = en; } }
+      else { ranges.push({ start: st, end: en, newStart: total }); total += en - st; }
+    }
+    function newRel(origOff) {   // 二分搜尋所屬區段
+      var lo = 0, hi = ranges.length - 1;
+      while (lo < hi) { var mid = (lo + hi + 1) >> 1; if (ranges[mid].start <= origOff) lo = mid; else hi = mid - 1; }
+      return ranges[lo].newStart + (origOff - ranges[lo].start);
+    }
+    var mdatHdrLen = total + 8 > 0xffffffff ? 16 : 8;
+    onProgress(0.5, '重建影片索引...');
+
+    function buildMoov(base) {
+      var useCo64 = base + total > 0xffffffff;
+      var tkhdDurs = [];
+      var traks = keep.map(function (k) {
+        var T = k.t, cnt = k.i1 - k.i0, b = T.trak, ch = b.children;
+        var dts0 = T.dts[k.i0];
+        var mediaDur = T.dts[k.i1 - 1] + T.dur[k.i1 - 1] - dts0;
+        var isVideo = T.handler === 'vide';
+        var presDur = isVideo ? (endPres - startPres) : mediaDur / T.timescale;
+        var tkhdDur = Math.round(presDur * movieTs);
+        tkhdDurs.push(tkhdDur);
+
+        // stts
+        var stts = [], prev = -1;
+        for (var i = k.i0; i < k.i1; i++) {
+          if (T.dur[i] === prev) stts[stts.length - 1][0]++; else { stts.push([1, T.dur[i]]); prev = T.dur[i]; }
+        }
+        var sttsVals = [stts.length]; stts.forEach(function (e) { sttsVals.push(e[0], e[1]); });
+        var stblBox = find(minfOf(b).children, 'stbl');
+        var stblParts = [raw(buf, find(stblBox.children, 'stsd'))];
+        stblParts.push(box('stts', [fullHdr(0, 0), u32arr(sttsVals)]));
+
+        if (T.hasCtts) {
+          var ct = [], pv = null, neg = false;
+          for (i = k.i0; i < k.i1; i++) {
+            if (T.cto[i] < 0) neg = true;
+            if (T.cto[i] === pv) ct[ct.length - 1][0]++; else { ct.push([1, T.cto[i]]); pv = T.cto[i]; }
+          }
+          var ctVals = [ct.length]; ct.forEach(function (e) { ctVals.push(e[0], e[1] < 0 ? e[1] + 4294967296 : e[1]); });
+          stblParts.push(box('ctts', [fullHdr(neg || T.cttsVer === 1 ? 1 : 0, 0), u32arr(ctVals)]));
+        }
+        if (T.sync) {
+          var ss = [];
+          for (i = k.i0; i < k.i1; i++) if (T.sync[i]) ss.push(i - k.i0 + 1);
+          stblParts.push(box('stss', [fullHdr(0, 0), u32arr([ss.length].concat(ss))]));
+        }
+        // chunk：原檔連續的樣本放同一個 chunk
+        var chunks = [], stsc = [];
+        for (i = k.i0; i < k.i1; i++) {
+          var contiguous = i > k.i0 && T.offset[i] === T.offset[i - 1] + T.size[i - 1] && T.sdi[i] === T.sdi[i - 1];
+          if (contiguous) chunks[chunks.length - 1].n++;
+          else chunks.push({ off: base + newRel(T.offset[i]), n: 1, sdi: T.sdi[i] });
+        }
+        chunks.forEach(function (c, ci) {
+          var lastE = stsc[stsc.length - 1];
+          if (!lastE || lastE[1] !== c.n || lastE[2] !== c.sdi) stsc.push([ci + 1, c.n, c.sdi]);
+        });
+        var stscVals = [stsc.length]; stsc.forEach(function (e) { stscVals.push(e[0], e[1], e[2]); });
+        stblParts.push(box('stsc', [fullHdr(0, 0), u32arr(stscVals)]));
+        var sizes = [0, cnt]; for (i = k.i0; i < k.i1; i++) sizes.push(T.size[i]);
+        stblParts.push(box('stsz', [fullHdr(0, 0), u32arr(sizes)]));
+        if (useCo64) {
+          var co = new Uint8Array(4 + chunks.length * 8), cdv = new DataView(co.buffer);
+          cdv.setUint32(0, chunks.length);
+          chunks.forEach(function (c, ci) { cdv.setUint32(4 + ci * 8, Math.floor(c.off / 4294967296)); cdv.setUint32(8 + ci * 8, c.off >>> 0); });
+          stblParts.push(box('co64', [fullHdr(0, 0), co]));
+        } else {
+          stblParts.push(box('stco', [fullHdr(0, 0), u32arr([chunks.length].concat(chunks.map(function (c) { return c.off; })))]));
+        }
+
+        var mdia = find(ch, 'mdia'), minf = find(mdia.children, 'minf');
+        var minfParts = minf.children.map(function (m) { return m.type === 'stbl' ? box('stbl', stblParts) : raw(buf, m); });
+        var mdiaParts = mdia.children.map(function (m) {
+          if (m.type === 'mdhd') return withDuration(buf, m, 16, 24, mediaDur);
+          if (m.type === 'minf') return box('minf', minfParts);
+          return raw(buf, m);
+        });
+        var trakParts = [];
+        ch.forEach(function (m) {
+          if (m.type === 'tkhd') trakParts.push(withDuration(buf, m, 20, 28, tkhdDur));
+          else if (m.type === 'edts' || m.type === 'tref') { /* 下面重建或捨棄 */ }
+          else if (m.type === 'mdia') {
+            if (isVideo) {
+              // 影像：用編輯清單把起點對到關鍵影格的顯示時間，藏住開放式 GOP 前面的 B 影格
+              var mt = Math.max(0, T.cto[k.i0] + Math.round((startPres - keyPres) * T.timescale));
+              var el = new Uint8Array(16), edv = new DataView(el.buffer);
+              edv.setUint32(0, 1); edv.setUint32(4, Math.min(tkhdDur, 0xffffffff)); edv.setInt32(8, mt); edv.setUint32(12, 0x00010000);
+              trakParts.push(box('edts', [box('elst', [fullHdr(0, 0), el])]));
+            }
+            trakParts.push(box('mdia', mdiaParts));
+          } else trakParts.push(raw(buf, m));
+        });
+        return box('trak', trakParts);
+      });
+      var moovParts = [];
+      moov.children.forEach(function (m) {
+        if (m.type === 'mvhd') moovParts.push(withDuration(buf, m, 16, 24, Math.max.apply(null, tkhdDurs)));
+        else if (m.type === 'trak') { /* 依序換成新的 */ }
+        else moovParts.push(raw(buf, m));
+      });
+      // trak 放在 mvhd 後面
+      var idx = moov.children[0].type === 'mvhd' ? 1 : 0;
+      return box('moov', moovParts.slice(0, idx).concat(traks, moovParts.slice(idx)));
+    }
+
+    var ftypBytes = ftypBox ? await readBytes(file, ftypBox.start, ftypBox.size) : new Uint8Array(0);
+    var probe = buildMoov(0);
+    var base = ftypBytes.length + probe.length + mdatHdrLen;
+    var moovBytes = buildMoov(base);
+    if (moovBytes.length !== probe.length) {   // 換成 co64 時長度會變，再算一次
+      base = ftypBytes.length + moovBytes.length + mdatHdrLen;
+      moovBytes = buildMoov(base);
+    }
+
+    var mdatHdr = new Uint8Array(mdatHdrLen), hdv = new DataView(mdatHdr.buffer);
+    if (mdatHdrLen === 8) { hdv.setUint32(0, total + 8); }
+    else { hdv.setUint32(0, 1); hdv.setUint32(8, Math.floor((total + 16) / 4294967296)); hdv.setUint32(12, (total + 16) >>> 0); }
+    mdatHdr[4] = 109; mdatHdr[5] = 100; mdatHdr[6] = 97; mdatHdr[7] = 116;   // 'mdat'
+
+    var parts = [ftypBytes, moovBytes, mdatHdr];
+    ranges.forEach(function (r) { parts.push(file.slice(r.start, r.end)); });
+    onProgress(1, '完成');
+
+    return {
+      parts: parts,
+      size: ftypBytes.length + moovBytes.length + mdatHdrLen + total,
+      actualStart: startPres,
+      keyframeStart: video ? keyPres : startPres,
+      actualEnd: endPres,
+      hasVideo: !!video,
+      hasAudio: !!audio,
+      audioEntry: audio ? audio.sampleEntry : null
+    };
+  }
+
+  function minfOf(trak) { var mdia = find(trak.children, 'mdia'); return find(mdia.children, 'minf'); }
+
+  root.__mp4FastTrim = fastTrim;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
 
 <!-- ── 簡體→繁體（含台灣用語）── -->
@@ -2579,7 +2984,27 @@ window.dispatchEvent(new Event('transcription-ready'));
 (function() {
   var _FF = FFmpeg;
   var createFFmpeg = _FF.createFFmpeg;
-  var fetchFile = _FF.fetchFile;
+  // 瀏覽器版 FFmpeg 要把整支影片讀進記憶體：超過 2 GB 會直接讀不進來（File could not be read! Code=0），
+  // 1.5 GB 左右以上處理時也容易記憶體不足。實測 1.48 GB 可正常處理。
+  var FF_MAX_BYTES = 1.5 * 1073741824;
+  var TRIM_FAST_BYTES = 1073741824;   // 影片裁切超過 1 GB 就改走快速裁切
+  function bigFileError(f) {
+    return new Error('檔案 ' + fmtBytes(f.size) + ' 太大，瀏覽器一次最多只能處理約 1.5 GB。'
+      + '請先用「影片裁切片段」切出需要的段落（大檔會自動改用快速裁切，不受大小限制），再用切好的檔案處理。');
+  }
+  function isMemoryError(e) {
+    return /could not be read|NotReadable|Cannot enlarge memory|out of memory|OOM|memory access out of bounds|Array buffer allocation/i.test(String(e && e.message || e));
+  }
+  function fmtClock(sec) {
+    sec = Math.max(0, sec || 0);
+    var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), x = sec % 60;
+    return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + x.toFixed(3).padStart(6, '0');
+  }
+  var fetchFile = async function(f) {
+    if (f && f.size > FF_MAX_BYTES) throw bigFileError(f);
+    try { return await _FF.fetchFile(f); }
+    catch (e) { if (f && isMemoryError(e)) throw bigFileError(f); throw e; }
+  };
 
   var ff = null;
   var ffReady = false;
@@ -2609,7 +3034,7 @@ window.dispatchEvent(new Event('transcription-ready'));
 
   var MIME = {
     mp4:'video/mp4', webm:'video/webm', mov:'video/quicktime', avi:'video/x-msvideo',
-    mp3:'audio/mpeg', wav:'audio/wav', aac:'audio/aac', flac:'audio/flac', ogg:'audio/ogg',
+    mp3:'audio/mpeg', wav:'audio/wav', aac:'audio/aac', m4a:'audio/mp4', flac:'audio/flac', ogg:'audio/ogg',
     png:'image/png', jpg:'image/jpeg', gif:'image/gif'
   };
 
@@ -2729,6 +3154,35 @@ window.dispatchEvent(new Event('transcription-ready'));
       var outFmtSel = card.querySelector('.trim-out-fmt');
       var outFmt = outFmtSel ? outFmtSel.value : 'video';
       var inExt = getExt(file.name), inN = 'in.' + inExt;
+
+      // 超過 1 GB 的 MP4／MOV：不經過 FFmpeg，直接從原檔取出片段重組（不受 2 GB 限制、幾秒完成）
+      if (file.size > TRIM_FAST_BYTES) {
+        if (!/^(mp4|mov|m4v)$/.test(inExt)) {
+          throw new Error('檔案 ' + fmtBytes(file.size) + ' 太大，大檔快速裁切只支援 MP4／MOV。'
+            + '請先用剪輯軟體把影片轉成 MP4，或縮短後再處理。');
+        }
+        if (currentProgressEl) currentProgressEl.textContent = currentProgressBase = '大檔快速裁切中...';
+        var audioOnly = outFmt === 'audio';
+        var r;
+        try {
+          r = await window.__mp4FastTrim(file, start, dur !== null ? end : null, {
+            audioOnly: audioOnly,
+            onProgress: function(ratio) { if (currentBar) currentBar.style.width = Math.max(10, Math.round(ratio * 95)) + '%'; }
+          });
+        } catch (e) {
+          throw new Error((e && e.code ? e.message : '無法快速裁切這支影片（' + (e && e.message || e) + '）')
+            + '。可以先用剪輯軟體輸出成一般 MP4 再試。');
+        }
+        if (audioOnly && !r.hasAudio) throw new Error('這支影片沒有聲音軌');
+        var isAac = r.audioEntry === 'mp4a';
+        var ext = audioOnly ? (isAac ? 'm4a' : inExt) : inExt;
+        var type = audioOnly && isAac ? 'audio/mp4' : (inExt === 'mov' ? 'video/quicktime' : 'video/mp4');
+        var note = '檔案超過 1 GB，已改用快速裁切：保留原始畫質、不重新編碼，所以畫質與位元率設定不會套用。'
+          + (audioOnly ? '聲音直接取出原始音軌，輸出為 ' + ext.toUpperCase() + '（不轉 MP3）。' : '')
+          + '實際範圍 ' + fmtClock(r.actualStart) + ' → ' + fmtClock(r.actualEnd) + '。';
+        return { blob: new Blob(r.parts, { type: type }), ext: ext, note: note,
+                 filename: basename(file.name) + '_trim.' + ext };
+      }
       // Pre-clean any leftover virtual FS files
       try { ff.FS('unlink', inN); } catch(e) {}
       ff.FS('writeFile', inN, await fetchFile(file));
@@ -3057,6 +3511,9 @@ window.dispatchEvent(new Event('transcription-ready'));
       errEl.textContent = '';
       var chip = card.querySelector('.trim-range-val');
       if (chip) chip.textContent = toolId === 'gif' ? '未設定 — 轉整段影片' : '尚未設定 — 點上方按鈕設定';
+      var rn = card.querySelector('.result-note'); if (rn) rn.hidden = true;
+      var bh = card.querySelector('.trim-big-hint');
+      if (bh) bh.hidden = !(f.size > TRIM_FAST_BYTES);
       var hs = card.querySelector('.time-start'); if (hs) hs.value = '0';
       var he = card.querySelector('.time-end'); if (he) he.value = '';
     }
@@ -3132,11 +3589,13 @@ window.dispatchEvent(new Event('transcription-ready'));
         if (toolId === 'trim') {
           var svgEl = dlBtn.querySelector('svg');
           var extLabel = result.ext.toUpperCase();
-          dlBtn.textContent = result.ext === 'mp3' ? '下載裁切後音訊 (' + extLabel + ')' : '下載裁切後影片 (' + extLabel + ')';
+          dlBtn.textContent = (result.ext === 'mp3' || result.ext === 'm4a') ? '下載裁切後音訊 (' + extLabel + ')' : '下載裁切後影片 (' + extLabel + ')';
           if (svgEl) dlBtn.insertBefore(svgEl, dlBtn.firstChild);
         }
+        var noteEl = card.querySelector('.result-note');
+        if (noteEl) { noteEl.textContent = result.note || ''; noteEl.hidden = !result.note; }
         var mime = MIME[result.ext] || 'application/octet-stream';
-        var blob = new Blob([result.data.buffer], { type: mime });
+        var blob = result.blob || new Blob([result.data.buffer], { type: mime });
         var url = URL.createObjectURL(blob);
         blobMap.set(card, url);
         dlBtn.onclick = function() {
@@ -3151,10 +3610,11 @@ window.dispatchEvent(new Event('transcription-ready'));
         card.classList.add('has-file', 'has-error');
         bar.style.width = '0%';
         errEl.textContent = '處理失敗：' + (err.message || '格式不支援或記憶體不足');
-        // 若 ffmpeg 內部狀態卡住，強制下次重新初始化
-        if (err.message && err.message.indexOf('one command at a time') >= 0) {
+        // 若 ffmpeg 內部狀態卡住（或記憶體不足後損壞），強制下次重新初始化
+        if (err.message && (err.message.indexOf('one command at a time') >= 0 || isMemoryError(err))) {
           ffReady = false;
         }
+        if (isMemoryError(err)) errEl.textContent = '處理失敗：' + bigFileError(file).message;
       } finally {
         currentBar = null;
         if (currentProgressEl) currentProgressEl.textContent = currentProgressBase;
@@ -7812,7 +8272,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-09-11 21:22</span>
+  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-09-15 14:28</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 
