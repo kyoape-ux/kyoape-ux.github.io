@@ -36,3 +36,8 @@
 
 - GitHub Pages（從 `main` 分支根目錄部署）
 - 推送到 `main` 即自動部署
+
+## 影片長度（dur）修正（2026-09-21）
+- 原因：網頁輸入「3:25」寫進試算表時被自動轉成時間；後端 `fmtCell` 把所有日期格式轉成 yyyy-MM-dd，時長變「1899-12-30」，再被前端存回後原值遺失。
+- 後端 GAS（光田影片管理系統 後端，部署 AKfycbxDla5… 第 17 版）：`fmtCell(v, h)` 對 `dur`／`yt_avgdur` 換算回「分:秒」，只剩日期（00:00:00）的壞資料回傳空白；`buildRow` 寫入時長時前面加 `'` 強制文字。線上 Code.gs 與本機 files/apps-script-youtube-module.js 不同，以線上為準。
+- 前端 `batchUpdateYt` 改抓 `statistics,contentDetails`，順便以 YouTube 長度覆寫 `dur`；`normalizeDur` 遇到 1899/1900 日期回傳空白。已執行一次，96 部有 YT 連結的影片長度全部補回。無 YT 連結的影片（16 部）長度仍需手填。
