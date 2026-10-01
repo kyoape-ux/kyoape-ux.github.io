@@ -42,3 +42,4 @@
 - 後端 GAS（光田影片管理系統 後端，部署 AKfycbxDla5… 第 17 版）：`fmtCell(v, h)` 對 `dur`／`yt_avgdur` 換算回「分:秒」，只剩日期（00:00:00）的壞資料回傳空白；`buildRow` 寫入時長時前面加 `'` 強制文字。線上 Code.gs 與本機 files/apps-script-youtube-module.js 不同，以線上為準。
 - 前端 `batchUpdateYt` 改抓 `statistics,contentDetails`，順便以 YouTube 長度覆寫 `dur`；`normalizeDur` 遇到 1899/1900 日期回傳空白。已執行一次，96 部有 YT 連結的影片長度全部補回。無 YT 連結的影片（16 部）長度仍需手填。
 - 2026-09-22：GAS 第 18 版加唯讀 `ytChannel`（頻道訂閱數）、第 19 版加唯讀 `getSocialSummary`（給行銷中心社群總覽，說明見 社群總覽數字_給行銷中心.md 第五節）。改 GAS 請保留這兩個 action。
+- 2026-10-01：`importYtStudioCSV` 新增「要匯入哪一年」的提問（填年份或 all），原本寫死只收當年度，無法補去年基準值。已用 2025 全年 YT Studio CSV 匯入 82 支，再跑「批次更新 YT 數據」補回按讚／留言。
