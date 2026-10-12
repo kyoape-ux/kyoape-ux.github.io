@@ -358,6 +358,35 @@ footer a{color:var(--indigo2);text-decoration:none}
 .gif-result-note.ok{color:#6ee7b7;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.25)}
 .gif-line-tip{margin-top:8px;font-size:11.5px;line-height:1.65;color:var(--text2);padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--border)}
 
+/* ── GIF 畫面範圍框選 ── */
+.gifc{display:none;margin:10px 0 2px}
+.tool-card.has-file .gifc{display:block}
+.tool-card.processing .gifc,.tool-card.done .gifc{display:none}
+.gifc-stage{position:relative;width:100%;border-radius:10px;overflow:hidden;background:#000;border:1px solid var(--border);
+  line-height:0;cursor:crosshair;touch-action:none;user-select:none;-webkit-user-select:none}
+.gifc-canvas{width:100%;display:block}
+.gifc-box{position:absolute;border:1.5px solid #fbbf24;box-shadow:0 0 0 9999px rgba(0,0,0,.45);cursor:move}
+.gifc-h{position:absolute;width:14px;height:14px;border-radius:3px;background:#fbbf24;border:1px solid #78350f}
+.gifc-h[data-h=nw]{left:-7px;top:-7px;cursor:nwse-resize}
+.gifc-h[data-h=ne]{right:-7px;top:-7px;cursor:nesw-resize}
+.gifc-h[data-h=sw]{left:-7px;bottom:-7px;cursor:nesw-resize}
+.gifc-h[data-h=se]{right:-7px;bottom:-7px;cursor:nwse-resize}
+.gifc-bar{display:flex;align-items:center;gap:9px;margin-top:8px}
+.gifc-seek{flex:1;min-width:0;accent-color:#f59e0b}
+.gifc-time{font-size:10.5px;color:var(--text3);flex:none;font-variant-numeric:tabular-nums}
+.gifc-row{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11.5px}
+.gifc-lbl{color:var(--text3);flex:none}
+.gifc-val{color:#fcd34d;flex:1;min-width:0}
+.gifc-reset{flex:none;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);border-radius:7px;
+  padding:4px 9px;font-size:11px;font-family:inherit;cursor:pointer;transition:.15s}
+.gifc-reset:hover{color:var(--text);border-color:#f59e0b}
+.gifc-ratios{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.gifc-ratios button{border:1px solid var(--border);background:rgba(255,255,255,.02);color:var(--text2);border-radius:7px;
+  padding:5px 10px;font-size:11.5px;font-family:inherit;cursor:pointer;transition:.15s}
+.gifc-ratios button:hover{color:var(--text);border-color:var(--border2)}
+.gifc-ratios button.active{border-color:#f59e0b;background:rgba(245,158,11,.14);color:#fcd34d}
+.gifc-hint{margin-top:7px;font-size:10.5px;line-height:1.6;color:var(--text3)}
+
 /* ── 大檔快速裁切提示 ── */
 .trim-big-hint{margin:10px 0 2px;padding:9px 11px;border-radius:9px;font-size:11.5px;line-height:1.65;color:#bae6fd;background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.28)}
 .trim-big-hint b{color:#e0f2fe}
@@ -1683,8 +1712,8 @@ if (!self.crossOriginIsolated) {
       <input type="file" hidden accept="video/*,.mkv,.avi,.webm,.flv,.ts">
       <div class="tool-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-gif"/></svg></div>
       <div class="tool-name">影片轉 GIF 動圖</div>
-      <div class="tool-desc">把影片片段轉成 GIF，可選輸出寬度與幀率；進階選項可調顏色數、抖動方式與靜態背景最佳化，控制檔案大小與畫質。</div>
-      <div class="tool-formats"><span class="fmt">兩段式調色盤</span><span class="fmt">可選片段</span><span class="fmt">完成即預覽</span></div>
+      <div class="tool-desc">把影片片段轉成 GIF，可框選畫面範圍只擷取局部放大，並選輸出寬度與幀率；進階選項可調顏色數、抖動方式與靜態背景最佳化，控制檔案大小與畫質。</div>
+      <div class="tool-formats"><span class="fmt">可框選範圍</span><span class="fmt">可選片段</span><span class="fmt">完成即預覽</span></div>
       <div class="drop-area">
         <div class="drop-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-folder"/></svg></div>
         <div class="drop-area-text">拖曳影片到這裡，或點擊選取</div>
@@ -1698,6 +1727,33 @@ if (!self.crossOriginIsolated) {
       <input type="hidden" class="time-start"><input type="hidden" class="time-end">
       <button class="tool-btn trim-open-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-sliders"/></svg>選擇要轉的片段（可略過）</button>
       <div class="trim-range-chip"><span class="trim-range-lbl">片段範圍</span><span class="trim-range-val">未設定 — 轉整段影片</span></div>
+
+      <div class="gifc">
+        <div class="gifc-stage">
+          <canvas class="gifc-canvas"></canvas>
+          <div class="gifc-box" hidden>
+            <span class="gifc-h" data-h="nw"></span><span class="gifc-h" data-h="ne"></span>
+            <span class="gifc-h" data-h="sw"></span><span class="gifc-h" data-h="se"></span>
+          </div>
+        </div>
+        <div class="gifc-bar">
+          <input type="range" class="gifc-seek" min="0" max="1000" value="100">
+          <span class="gifc-time">00:00</span>
+        </div>
+        <div class="gifc-row">
+          <span class="gifc-lbl">畫面範圍</span>
+          <span class="gifc-val">整個畫面</span>
+          <button type="button" class="gifc-reset" hidden>取消框選</button>
+        </div>
+        <div class="gifc-ratios">
+          <button type="button" data-r="0" class="active">自由</button>
+          <button type="button" data-r="1">1:1</button>
+          <button type="button" data-r="1.77778">16:9</button>
+          <button type="button" data-r="0.5625">9:16</button>
+          <button type="button" data-r="1.33333">4:3</button>
+        </div>
+        <div class="gifc-hint">在畫面上拖曳框出要做成 GIF 的範圍（只想放大局部時很好用）；框好可再拖動位置或拉四角調整大小。不框就是整個畫面。</div>
+      </div>
 
       <div class="gif-opts">
         <select class="fmt-select" name="gifTarget" style="margin-bottom:7px">
@@ -3297,7 +3353,9 @@ window.dispatchEvent(new Event('transcription-ready'));
       var start = parseTime(card.querySelector('.time-start').value) || 0;
       var end = parseTime(card.querySelector('.time-end').value);
       var dur = (end !== null && end > start) ? (end - start) : null;
-      var srcW = parseInt(card.dataset.gifSrcW, 10) || 1080;
+      var cropArr = (card.dataset.gifCrop || '').split(',').map(Number);
+      var crop = cropArr.length === 4 && cropArr.every(function(n) { return n > 0 || n === 0; }) && cropArr[2] > 0 ? cropArr : null;
+      var srcW = crop ? crop[2] : (parseInt(card.dataset.gifSrcW, 10) || 1080);
 
       var inN = 'in.' + getExt(file.name), outN = 'out.gif', palN = 'gif_pal.png';
       ff.FS('writeFile', inN, await fetchFile(file));
@@ -3305,8 +3363,11 @@ window.dispatchEvent(new Event('transcription-ready'));
       // 分兩次跑：用 split 一次跑完的話，palettegen 要等全部幀進來才吐調色盤，所有幀都得暫存在記憶體，
       // 1080×1080 十幾秒在 ffmpeg.wasm 會慢到接近卡死；分兩次則記憶體不隨長度增加，輸出完全相同。
       async function encode(o) {
-        var pre = 'fps=' + o.fps;
-        if (o.width > 0) pre += ',scale=' + o.width + ':-1' + (lanczos ? ':flags=lanczos' : '');
+        var pre = '';
+        if (crop) pre += 'crop=' + crop[2] + ':' + crop[3] + ':' + crop[0] + ':' + crop[1] + ',';
+        pre += 'fps=' + o.fps;
+        // 選到比來源還寬時不放大，免得白白變模糊又變大
+        if (o.width > 0 && o.width < srcW) pre += ',scale=' + o.width + ':-1' + (lanczos ? ':flags=lanczos' : '');
         var gen = 'palettegen=max_colors=' + o.colors + ':stats_mode=' + (staticOpt ? 'diff' : 'full');
         var use = 'paletteuse=dither=' + o.dither + (o.dither === 'bayer' ? ':bayer_scale=5' : '')
                 + (staticOpt ? ':diff_mode=rectangle' : '');
@@ -5472,20 +5533,171 @@ window.dispatchEvent(new Event('transcription-ready'));
     }
     if (wSel) wSel.addEventListener('change', syncBigHint);
     if (tSel) tSel.addEventListener('change', syncBigHint);
-    var probeInput = card.querySelector('input[type=file]');
-    if (probeInput && origOpt) probeInput.addEventListener('change', function() {
-      var f = probeInput.files[0];
-      if (!f) return;
-      var pv = document.createElement('video');
-      pv.preload = 'metadata'; pv.muted = true;
-      pv.onloadedmetadata = function() {
-        srcW = pv.videoWidth || 0;
-        card.dataset.gifSrcW = String(srcW);
-        origOpt.textContent = srcW ? ('原始尺寸（' + pv.videoWidth + '×' + pv.videoHeight + '）') : '維持原始寬度';
-        URL.revokeObjectURL(pv.src);
-        syncBigHint();
+
+    // ── 畫面範圍：在預覽上框出要轉成 GIF 的區域 ──
+    var stage = card.querySelector('.gifc-stage');
+    var cv = card.querySelector('.gifc-canvas'), cx = cv.getContext('2d');
+    var boxEl = card.querySelector('.gifc-box');
+    var seekEl = card.querySelector('.gifc-seek'), timeEl = card.querySelector('.gifc-time');
+    var valEl = card.querySelector('.gifc-val'), resetBtn = card.querySelector('.gifc-reset');
+    var vid = document.createElement('video');
+    vid.muted = true; vid.playsInline = true; vid.preload = 'auto';
+    var vw = 0, vh = 0, ratio = 0, crop = null, busy = false, pending = false;
+    var MINW = 24;
+
+    function even(n) { return Math.max(2, Math.round(n / 2) * 2); }
+    function fmtT(sec) {
+      sec = Math.max(0, sec || 0);
+      return String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
+    }
+    function pvRange() {
+      var st = parseTime(card.querySelector('.time-start').value) || 0;
+      var en = parseTime(card.querySelector('.time-end').value);
+      var d = vid.duration || 0;
+      if (!(en > st)) { st = 0; en = d; }
+      return { start: st, end: en || d };
+    }
+    function syncCropState() {
+      if (crop) {
+        card.dataset.gifCrop = [crop.x, crop.y, crop.w, crop.h].join(',');
+        valEl.textContent = crop.w + ' × ' + crop.h + ' px（原片 ' + vw + ' × ' + vh + '）';
+        resetBtn.hidden = false; boxEl.hidden = false;
+        boxEl.style.left = (crop.x / vw * 100) + '%';
+        boxEl.style.top = (crop.y / vh * 100) + '%';
+        boxEl.style.width = (crop.w / vw * 100) + '%';
+        boxEl.style.height = (crop.h / vh * 100) + '%';
+      } else {
+        delete card.dataset.gifCrop;
+        valEl.textContent = vw ? ('整個畫面（' + vw + ' × ' + vh + '）') : '整個畫面';
+        resetBtn.hidden = true; boxEl.hidden = true;
+      }
+      // 輸出寬度的「原始尺寸」與大檔提醒都要跟著框選後的寬度走
+      srcW = crop ? crop.w : vw;
+      card.dataset.gifSrcW = String(srcW || 0);
+      if (origOpt) origOpt.textContent = srcW
+        ? ((crop ? '框選範圍原尺寸（' : '原始尺寸（') + (crop ? crop.w + '×' + crop.h : vw + '×' + vh) + '）')
+        : '維持原始寬度';
+      syncBigHint();
+    }
+    async function drawFrame() {
+      if (!vw || busy) { if (busy) pending = true; return; }
+      busy = true;
+      try {
+        var rg = pvRange();
+        var t = rg.start + (rg.end - rg.start) * (parseInt(seekEl.value, 10) / 1000);
+        timeEl.textContent = fmtT(t);
+        await new Promise(function(res) {
+          if (Math.abs(vid.currentTime - t) < 0.02) { res(); return; }
+          var done = false;
+          function h() { if (done) return; done = true; vid.removeEventListener('seeked', h); res(); }
+          vid.addEventListener('seeked', h); vid.currentTime = t; setTimeout(h, 1500);
+        });
+        cx.drawImage(vid, 0, 0, vw, vh);
+      } catch (e) { /* 預覽失敗不影響轉檔 */ }
+      busy = false;
+      if (pending) { pending = false; drawFrame(); }
+    }
+
+    function loadPreview(f) {
+      crop = null; vw = vh = 0;
+      if (vid.src && vid.src.indexOf('blob:') === 0) URL.revokeObjectURL(vid.src);
+      vid.src = URL.createObjectURL(f);
+      vid.onloadedmetadata = function() {
+        vw = vid.videoWidth; vh = vid.videoHeight;
+        cv.width = vw; cv.height = vh;
+        stage.style.aspectRatio = vw + '/' + vh;
+        seekEl.value = '100';
+        syncCropState();
+        drawFrame();
       };
-      pv.src = URL.createObjectURL(f);
+    }
+
+    // 指標操作：空白處拖曳＝重新框選、框內拖曳＝移動、四角＝調整大小
+    var drag = null;
+    function ptr(e) {
+      var r = stage.getBoundingClientRect();
+      return { x: (e.clientX - r.left) / r.width * vw, y: (e.clientY - r.top) / r.height * vh };
+    }
+    function clampBox(b) {
+      b.w = Math.min(b.w, vw); b.h = Math.min(b.h, vh);
+      b.x = Math.min(Math.max(0, b.x), vw - b.w);
+      b.y = Math.min(Math.max(0, b.y), vh - b.h);
+      return b;
+    }
+    function fromCorners(ax, ay, bx, by) {
+      var x1 = Math.min(ax, bx), y1 = Math.min(ay, by), w = Math.abs(bx - ax), h = Math.abs(by - ay);
+      if (ratio) {   // 固定比例：以較長邊為準，並保持拖曳方向
+        if (w / h > ratio) h = w / ratio; else w = h * ratio;
+        if (w > vw) { w = vw; h = w / ratio; }
+        if (h > vh) { h = vh; w = h * ratio; }
+        x1 = bx < ax ? ax - w : ax; y1 = by < ay ? ay - h : ay;
+      }
+      return clampBox({ x: x1, y: y1, w: w, h: h });
+    }
+    stage.addEventListener('pointerdown', function(e) {
+      if (!vw) return;
+      var p = ptr(e), h = e.target && e.target.dataset ? e.target.dataset.h : null;
+      if (h && crop) {
+        var ax = h === 'nw' || h === 'sw' ? crop.x + crop.w : crop.x;
+        var ay = h === 'nw' || h === 'ne' ? crop.y + crop.h : crop.y;
+        drag = { mode: 'corner', ax: ax, ay: ay };
+      } else if (crop && p.x >= crop.x && p.x <= crop.x + crop.w && p.y >= crop.y && p.y <= crop.y + crop.h) {
+        drag = { mode: 'move', ox: p.x - crop.x, oy: p.y - crop.y };
+      } else {
+        drag = { mode: 'new', ax: p.x, ay: p.y };
+        crop = { x: p.x, y: p.y, w: 0, h: 0 };
+      }
+      stage.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    stage.addEventListener('pointermove', function(e) {
+      if (!drag || !vw) return;
+      var p = ptr(e);
+      if (drag.mode === 'move') crop = clampBox({ x: p.x - drag.ox, y: p.y - drag.oy, w: crop.w, h: crop.h });
+      else crop = fromCorners(drag.ax, drag.ay, p.x, p.y);
+      syncCropState();
+    });
+    function endDrag(e) {
+      if (!drag) return;
+      drag = null;
+      try { stage.releasePointerCapture(e.pointerId); } catch (err) {}
+      if (crop) {
+        if (crop.w < MINW || crop.h < MINW) crop = null;          // 只是點一下 → 取消框選
+        else crop = { x: even(crop.x), y: even(crop.y), w: even(crop.w), h: even(crop.h) };
+        if (crop) { if (crop.x + crop.w > vw) crop.w = even(vw - crop.x); if (crop.y + crop.h > vh) crop.h = even(vh - crop.y); }
+      }
+      syncCropState();
+    }
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+
+    resetBtn.addEventListener('click', function() { crop = null; syncCropState(); });
+    card.querySelectorAll('.gifc-ratios button').forEach(function(b) {
+      b.addEventListener('click', function() {
+        card.querySelectorAll('.gifc-ratios button').forEach(function(x) { x.classList.toggle('active', x === b); });
+        ratio = parseFloat(b.dataset.r) || 0;
+        if (ratio && crop) { crop = fromCorners(crop.x, crop.y, crop.x + crop.w, crop.y + crop.h); crop = { x: even(crop.x), y: even(crop.y), w: even(crop.w), h: even(crop.h) }; syncCropState(); }
+      });
+    });
+    seekEl.addEventListener('input', drawFrame);
+    // 片段範圍改過之後，預覽的時間軸也跟著改
+    new MutationObserver(function() { drawFrame(); })
+      .observe(card.querySelector('.trim-range-val'), { childList: true, characterData: true, subtree: true });
+
+    var probeInput = card.querySelector('input[type=file]');
+    if (probeInput) probeInput.addEventListener('change', function() {
+      var f = probeInput.files[0];
+      if (f) loadPreview(f);
+    });
+    ['.file-clear', '.reset-btn'].forEach(function(sel) {
+      var b = card.querySelector(sel);
+      if (b) b.addEventListener('click', function() {
+        crop = null; vw = vh = 0;
+        if (vid.src && vid.src.indexOf('blob:') === 0) URL.revokeObjectURL(vid.src);
+        vid.removeAttribute('src'); vid.load();
+        cx.clearRect(0, 0, cv.width, cv.height);
+        syncCropState();
+      });
     });
     var img = card.querySelector('.gif-result-img');
     var dimsEl = card.querySelector('.gif-result-dims');
@@ -8272,7 +8484,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-09-15 14:28</span>
+  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-10-12 16:53</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 
