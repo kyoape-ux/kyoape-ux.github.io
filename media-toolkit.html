@@ -361,6 +361,9 @@ footer a{color:var(--indigo2);text-decoration:none}
 /* ── 螢幕錄影：正在錄什麼 ── */
 .rec-source{margin-top:8px;padding:8px 11px;border-radius:9px;font-size:11.5px;line-height:1.6;
   border:1px solid rgba(52,211,153,.28);background:rgba(52,211,153,.07);color:#a7f3d0}
+.progress-track.indeterminate{overflow:hidden}
+.progress-track.indeterminate .progress-bar{width:38%!important;animation:recIndet 1.2s ease-in-out infinite}
+@keyframes recIndet{0%{margin-left:-38%}100%{margin-left:100%}}
 .rec-source.partial{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.1);color:#fcd34d}
 .tool-card.done .rec-source,.tool-card.processing .rec-source{display:none}
 .rec-source b{color:#fff}
@@ -2190,8 +2193,8 @@ if (!self.crossOriginIsolated) {
       <div class="rec-fmt-row">
         <span>輸出格式</span>
         <select class="fmt-select rec-fmt">
-          <option value="webm" selected>WebM（瀏覽器原生，最快）</option>
-          <option value="mp4">MP4（最相容，需轉換較久）</option>
+          <option value="mp4" selected>MP4（最相容，推薦）</option>
+          <option value="webm">WebM（檔案較小）</option>
         </select>
       </div>
       <div class="rec-warn">分享分頁音訊需在分享視窗選「Chrome 分頁」並勾選「分享分頁音訊」。macOS 無法直接錄整個系統聲音。</div>
@@ -5913,10 +5916,23 @@ window.dispatchEvent(new Event('transcription-ready'));
     function fmtSec(s){ var m=Math.floor(s/60), ss=Math.floor(s%60); return pad(m)+':'+pad(ss); }
     function tsStr(){ var d=new Date(); return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'_'+pad(d.getHours())+pad(d.getMinutes())+pad(d.getSeconds()); }
 
-    function pickMime(){
-      var types=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
-      for (var i=0;i<types.length;i++) if (MediaRecorder.isTypeSupported(types[i])) return types[i];
+    var MP4_TYPES = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4;codecs=avc1,mp4a.40.2','video/mp4;codecs=avc1','video/mp4'];
+    var H264_WEBM = ['video/webm;codecs=h264,opus','video/webm;codecs=h264'];
+    var VPX_WEBM  = ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
+    function firstSupported(list){
+      for (var i=0;i<list.length;i++) if (MediaRecorder.isTypeSupported(list[i])) return list[i];
       return '';
+    }
+    // 要 MP4 就直接錄成 MP4，錄完即可下載，完全不用轉檔（轉檔要整支重新編碼，很慢）。
+    // 瀏覽器不支援時退而求其次錄 H.264 的 WebM，之後轉檔只要換容器不用重壓。
+    function pickMime(wantMp4){
+      if (wantMp4) return firstSupported(MP4_TYPES) || firstSupported(H264_WEBM) || firstSupported(VPX_WEBM);
+      return firstSupported(VPX_WEBM) || firstSupported(H264_WEBM);
+    }
+    var recordedMime='', recDurationSec=0;
+    if (firstSupported(MP4_TYPES)) {
+      var mp4opt = fmtSel.querySelector('option[value=mp4]');
+      if (mp4opt) mp4opt.textContent = 'MP4（最相容，直接錄製免轉檔）';
     }
     function cleanup(){
       if (displayStream){ displayStream.getTracks().forEach(function(t){ t.stop(); }); displayStream=null; }
@@ -6104,7 +6120,8 @@ window.dispatchEvent(new Event('transcription-ready'));
     function resetAll(){
       cleanup();
       if (recorder && recorder.state!=='inactive'){ try{ recorder.stop(); }catch(e){} }
-      recorder=null; chunks=[]; pausedDur=0;
+      recorder=null; chunks=[]; pausedDur=0; recordedMime=''; recDurationSec=0;
+      fmtSel.disabled=false;
       floatBar.hidden=true; srcEl.hidden=true; floatWarn.hidden=true; floatSrc.textContent='';
       if (timerId){ clearInterval(timerId); timerId=null; }
       if (recordedUrl){ URL.revokeObjectURL(recordedUrl); recordedUrl=null; }
@@ -6126,20 +6143,32 @@ window.dispatchEvent(new Event('transcription-ready'));
     }
 
     function addDownloadHandler(){
-      var wantMp4 = fmtSel.value==='mp4';
+      var isMp4 = /mp4/.test(recordedMime);
+      var isH264Webm = /h264/.test(recordedMime);
+      var wantMp4 = fmtSel.value==='mp4' && !isMp4;
+      var dlLabel = dlBtn.querySelector('svg');
+      dlBtn.textContent = isMp4 ? '下載影片 (MP4)' : (wantMp4 ? '轉成 MP4 並下載' : '下載影片 (WebM)');
+      if (dlLabel) dlBtn.insertBefore(dlLabel, dlBtn.firstChild);
       if (wantMp4){
         dlBtn.onclick = async function(){
           if (ffRunning) return;
           ffRunning=true;
           card.classList.add('processing');
-          bar.style.width='5%';
-          progText.textContent='轉成 MP4...';
-          currentBar=bar; currentProgressEl=progText; currentProgressBase='轉成 MP4...';
+          // 這版瀏覽器 FFmpeg 轉檔過程只會吐一行時間訊息，算不出百分比，
+          // 與其讓進度條卡在 5% 像當掉，不如用跑動的進度條＋已處理時間，讓人知道還在動
+          bar.parentElement.classList.add('indeterminate');
+          var convT0 = Date.now();
+          var convTip = recDurationSec > 0 ? '（影片長 ' + fmtSec(recDurationSec) + '，約需同等或更久的時間）' : '';
+          progText.textContent = '轉成 MP4… 已處理 00:00 ' + convTip;
+          var convTimer = setInterval(function(){
+            progText.textContent = '轉成 MP4… 已處理 ' + fmtSec((Date.now()-convT0)/1000) + ' ' + convTip;
+          }, 1000);
           try {
             await ensureFF();
-            bar.style.width='15%';
+            bar.style.width='100%';
             ff.FS('writeFile','in.webm', await fetchFile(recordedBlob));
-            await ff.run('-i','in.webm','-c:v','libx264','-preset','ultrafast','-crf','23','-pix_fmt','yuv420p','-c:a','aac','-b:a','128k','out.mp4');
+            var vArgs = isH264Webm ? ['-c:v','copy'] : ['-c:v','libx264','-preset','ultrafast','-crf','23','-pix_fmt','yuv420p'];
+            await ff.run.apply(ff, ['-i','in.webm'].concat(vArgs, ['-c:a','aac','-b:a','128k','out.mp4']));
             var data = ff.FS('readFile','out.mp4');
             fsClean('in.webm','out.mp4');
             var blob = new Blob([data.buffer], { type:'video/mp4' });
@@ -6151,6 +6180,8 @@ window.dispatchEvent(new Event('transcription-ready'));
             errEl.textContent='轉檔失敗：'+(e.message||e);
             if (e.message && e.message.indexOf('one command at a time')>=0) ffReady=false;
           } finally {
+            clearInterval(convTimer);
+            bar.parentElement.classList.remove('indeterminate');
             card.classList.remove('processing');
             ffRunning=false; currentBar=null; currentProgressEl=null; currentProgressBase='';
             progText.textContent='處理中...';
@@ -6158,7 +6189,8 @@ window.dispatchEvent(new Event('transcription-ready'));
         };
       } else {
         dlBtn.onclick = function(){
-          var a=document.createElement('a'); a.href=recordedUrl; a.download='screen_recording_'+tsStr()+'.webm'; a.click();
+          var a=document.createElement('a'); a.href=recordedUrl;
+          a.download='screen_recording_'+tsStr()+(isMp4?'.mp4':'.webm'); a.click();
         };
       }
     }
@@ -6166,8 +6198,11 @@ window.dispatchEvent(new Event('transcription-ready'));
     startBtn.addEventListener('click', async function(){
       errEl.textContent='';
       try {
-        var mimeType = pickMime();
+        var wantMp4 = fmtSel.value==='mp4';
+        var mimeType = pickMime(wantMp4);
         if (!mimeType) throw new Error('瀏覽器不支援錄影 (MediaRecorder)');
+        recordedMime = mimeType;
+        fmtSel.disabled = true;
 
         displayStream = await navigator.mediaDevices.getDisplayMedia({
           video: { frameRate: 30 },
@@ -6224,6 +6259,7 @@ window.dispatchEvent(new Event('transcription-ready'));
         recorder = new MediaRecorder(finalStream, { mimeType: mimeType });
         recorder.ondataavailable = function(e){ if (e.data && e.data.size>0) chunks.push(e.data); };
         recorder.onstop = function(){
+          recDurationSec = Math.max(0, (Date.now()-startTime-pausedDur)/1000);
           recordedBlob = new Blob(chunks, { type: mimeType });
           recordedUrl  = URL.createObjectURL(recordedBlob);
           var vid = document.createElement('video');
@@ -6236,7 +6272,7 @@ window.dispatchEvent(new Event('transcription-ready'));
           card.classList.add('done');
           cleanup();
           // 串接：把錄影結果存起來給下個工具用
-          card._chainOutput = { blob: recordedBlob, filename: 'screen_' + tsStr() + '.webm' };
+          card._chainOutput = { blob: recordedBlob, filename: 'screen_' + tsStr() + (/mp4/.test(mimeType) ? '.mp4' : '.webm') };
           if (window.__addChainBar) window.__addChainBar(card, 'screenRecord', function(){ return card._chainOutput; });
         };
         recorder.start(1000);
@@ -8632,7 +8668,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-10-14 09:19</span>
+  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-10-14 09:33</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 
