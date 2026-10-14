@@ -361,6 +361,8 @@ footer a{color:var(--indigo2);text-decoration:none}
 /* ── 螢幕錄影：正在錄什麼 ── */
 .rec-source{margin-top:8px;padding:8px 11px;border-radius:9px;font-size:11.5px;line-height:1.6;
   border:1px solid rgba(52,211,153,.28);background:rgba(52,211,153,.07);color:#a7f3d0}
+.rec-estimate{margin-top:6px;font-size:11px;color:var(--text3);line-height:1.6}
+.rec-estimate b{color:var(--text2)}
 .progress-track.indeterminate{overflow:hidden}
 .progress-track.indeterminate .progress-bar{width:38%!important;animation:recIndet 1.2s ease-in-out infinite}
 @keyframes recIndet{0%{margin-left:-38%}100%{margin-left:100%}}
@@ -2190,6 +2192,23 @@ if (!self.crossOriginIsolated) {
         <label class="rec-opt-row"><input type="checkbox" class="rec-opt-tab" checked>包含分頁／系統音訊（簡報、影片聲）</label>
         <label class="rec-opt-row"><input type="checkbox" class="rec-opt-pip">嵌入講者鏡頭（右下角 PIP）</label>
       </div>
+      <div class="rec-fmt-row">
+        <span>解析度</span>
+        <select class="fmt-select rec-res">
+          <option value="1080" selected>最高 1080p（推薦，清楚又不佔空間）</option>
+          <option value="0">原始解析度（最清楚，檔案很大）</option>
+          <option value="720">最高 720p（檔案最小）</option>
+        </select>
+      </div>
+      <div class="rec-fmt-row">
+        <span>畫質</span>
+        <select class="fmt-select rec-quality">
+          <option value="low">標準（省空間）</option>
+          <option value="high" selected>高畫質（推薦，文字清楚）</option>
+          <option value="max">最高（文字最銳利，檔案大）</option>
+        </select>
+      </div>
+      <div class="rec-estimate"></div>
       <div class="rec-fmt-row">
         <span>輸出格式</span>
         <select class="fmt-select rec-fmt">
@@ -5929,7 +5948,38 @@ window.dispatchEvent(new Event('transcription-ready'));
       if (wantMp4) return firstSupported(MP4_TYPES) || firstSupported(H264_WEBM) || firstSupported(VPX_WEBM);
       return firstSupported(VPX_WEBM) || firstSupported(H264_WEBM);
     }
-    var recordedMime='', recDurationSec=0;
+    var recordedMime='', recDurationSec=0, recSpec='';
+    var resSel = card.querySelector('.rec-res');
+    var qualSel = card.querySelector('.rec-quality');
+    var estEl = card.querySelector('.rec-estimate');
+
+    // MediaRecorder 預設只給約 2.5 Mbps，錄滿是文字的簡報一定糊。
+    // 依實際解析度與幀率算出合理位元率（每像素每幀的位元數）。
+    function calcBitrate(w, h, fps, q) {
+      var bpp = q === 'low' ? 0.06 : q === 'max' ? 0.2 : 0.12;
+      return Math.max(1500000, Math.min(Math.round(w * h * fps * bpp), 40000000));
+    }
+    function capRes(w, h, cap) {
+      if (!cap || h <= cap) return { w: w, h: h };
+      var k = cap / h;
+      return { w: Math.round(w * k / 2) * 2, h: cap };
+    }
+    function screenGuess() {
+      var dpr = window.devicePixelRatio || 1;
+      return { w: Math.round(screen.width * dpr), h: Math.round(screen.height * dpr) };
+    }
+    function updateEstimate() {
+      var g = screenGuess();
+      var r = capRes(g.w, g.h, parseInt(resSel.value, 10) || 0);
+      var bps = calcBitrate(r.w, r.h, 30, qualSel.value);
+      var mbPer10min = Math.round(bps / 8 * 600 / 1048576);
+      estEl.innerHTML = '預計錄成 <b>' + r.w + '×' + r.h + '、約 ' + (bps / 1e6).toFixed(1) + ' Mbps</b>，'
+        + '每 10 分鐘約 <b>' + mbPer10min + ' MB</b>。（依實際分享的畫面大小可能不同）'
+        + (mbPer10min > 900 ? '<br><b style="color:#fcd34d">檔案偏大：錄超過 20 分鐘可能因記憶體不足而中斷，建議改 1080p 或分段錄。</b>' : '');
+    }
+    resSel.addEventListener('change', updateEstimate);
+    qualSel.addEventListener('change', updateEstimate);
+    updateEstimate();
     if (firstSupported(MP4_TYPES)) {
       var mp4opt = fmtSel.querySelector('option[value=mp4]');
       if (mp4opt) mp4opt.textContent = 'MP4（最相容，直接錄製免轉檔）';
@@ -6100,14 +6150,15 @@ window.dispatchEvent(new Event('transcription-ready'));
       try { kind = (track.getSettings && track.getSettings().displaySurface) || ''; } catch (e) {}
       var full = kind === 'monitor';
       var name = kind === 'monitor' ? '整個螢幕' : kind === 'window' ? '單一視窗' : kind === 'browser' ? '單一分頁' : '選定的畫面';
-      floatSrc.textContent = kind ? '· ' + name : '';
+      floatSrc.textContent = (kind ? '· ' + name : '') + (recSpec ? ' · ' + recSpec : '');
       floatWarn.hidden = full || !kind;
       srcEl.hidden = false;
       srcEl.className = 'rec-source' + (full || !kind ? '' : ' partial');
-      srcEl.innerHTML = full
+      var specLine = recSpec ? '<br>實際錄製規格：<b>' + recSpec + '</b>' : '';
+      srcEl.innerHTML = (full
         ? '正在錄<b>整個螢幕</b>：切換視窗、分頁都會錄進去。'
         : (kind ? '正在錄<b>' + name + '</b>：只有這個' + (kind === 'browser' ? '分頁' : '視窗') + '的內容會被錄到，<b>切到別的畫面不會錄進去</b>。要錄切換過程請停止後重錄，在分享視窗改選「整個螢幕」。'
-                : '已開始錄製選定的畫面。');
+                : '已開始錄製選定的畫面。')) + specLine;
     }
     floatBar.querySelector('.rec-float-stop').addEventListener('click', function(){ stopRec(); });
     floatPause.addEventListener('click', function(){ pauseBtn.click(); });
@@ -6120,7 +6171,7 @@ window.dispatchEvent(new Event('transcription-ready'));
     function resetAll(){
       cleanup();
       if (recorder && recorder.state!=='inactive'){ try{ recorder.stop(); }catch(e){} }
-      recorder=null; chunks=[]; pausedDur=0; recordedMime=''; recDurationSec=0;
+      recorder=null; chunks=[]; pausedDur=0; recordedMime=''; recDurationSec=0; recSpec='';
       fmtSel.disabled=false;
       floatBar.hidden=true; srcEl.hidden=true; floatWarn.hidden=true; floatSrc.textContent='';
       if (timerId){ clearInterval(timerId); timerId=null; }
@@ -6204,13 +6255,15 @@ window.dispatchEvent(new Event('transcription-ready'));
         recordedMime = mimeType;
         fmtSel.disabled = true;
 
+        var resCap = parseInt(resSel.value, 10) || 0;
+        var vCon = { frameRate: { ideal: 30 } };
+        if (resCap) { vCon.height = { max: resCap }; vCon.width = { max: Math.round(resCap * 16 / 9 * 1.6) }; }
         displayStream = await navigator.mediaDevices.getDisplayMedia({
-          video: { frameRate: 30 },
+          video: vCon,
           audio: optTab.checked
         });
         if (!displayStream) return;
         displayStream.getVideoTracks()[0].onended = function(){ stopRec(); };
-        showSource(displayStream.getVideoTracks()[0]);
 
         // 取 webcam（如果使用者要 PIP）
         if (optPip && optPip.checked){
@@ -6256,7 +6309,16 @@ window.dispatchEvent(new Event('transcription-ready'));
         var finalStream = new MediaStream(videoTracks.concat(audioTracks));
 
         chunks=[];
-        recorder = new MediaRecorder(finalStream, { mimeType: mimeType });
+        var vs = {};
+        try { vs = displayStream.getVideoTracks()[0].getSettings() || {}; } catch (e) {}
+        var recW = vs.width || 1920, recH = vs.height || 1080, recFps = vs.frameRate || 30;
+        var vBitrate = calcBitrate(recW, recH, recFps, qualSel.value);
+        recorder = new MediaRecorder(finalStream, {
+          mimeType: mimeType,
+          videoBitsPerSecond: vBitrate,
+          audioBitsPerSecond: 128000
+        });
+        recSpec = recW + '×' + recH + ' · ' + (vBitrate / 1e6).toFixed(1) + ' Mbps';
         recorder.ondataavailable = function(e){ if (e.data && e.data.size>0) chunks.push(e.data); };
         recorder.onstop = function(){
           recDurationSec = Math.max(0, (Date.now()-startTime-pausedDur)/1000);
@@ -6275,6 +6337,7 @@ window.dispatchEvent(new Event('transcription-ready'));
           card._chainOutput = { blob: recordedBlob, filename: 'screen_' + tsStr() + (/mp4/.test(mimeType) ? '.mp4' : '.webm') };
           if (window.__addChainBar) window.__addChainBar(card, 'screenRecord', function(){ return card._chainOutput; });
         };
+        showSource(displayStream.getVideoTracks()[0]);
         recorder.start(1000);
         startTime = Date.now(); pausedDur = 0;
         card.classList.add('recording');
@@ -8668,7 +8731,7 @@ window.addEventListener('resize', function() {
 .site-footer .ver-org{margin-top:6px;color:var(--text-muted)}
 </style>
 <footer class="site-footer">
-  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-10-14 09:33</span>
+  <span class="ver">v1.13.0</span><span class="ver-date">更新於 2026-10-14 09:48</span>
   <div class="ver-org">光田綜合醫院 · 行銷企劃處　視覺多媒體設計組</div>
 </footer>
 
